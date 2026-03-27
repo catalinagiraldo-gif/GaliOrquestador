@@ -1,0 +1,252 @@
+<div class="modal-overlay">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <h3 class="modal-title">Editar orden</h3>
+      <button class="close-btn">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Body: 3 columns -->
+    <div class="modal-body">
+      <!-- Column 1: Client info + Product -->
+      <div class="column column-1">
+        <!-- Client info section -->
+        <div class="section">
+          <h4 class="section-title">Información del cliente</h4>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="input-label">Nombre</label>
+              <input type="text" class="dropi-input filled" [(ngModel)]="client.nombre" />
+            </div>
+            <div class="form-group half">
+              <label class="input-label">Apellido</label>
+              <input type="text" class="dropi-input filled" [(ngModel)]="client.apellido" />
+            </div>
+          </div>
+
+          <div class="form-row phone-row">
+            <div class="form-group phone-country">
+              <label class="input-label">Teléfono</label>
+              <div class="phone-input-group">
+                <div class="country-select">
+                  <span class="flag">&#x1F1E8;&#x1F1F4;</span>
+                  <span class="country-code">{{ client.countryCode }}</span>
+                  <i class="pi pi-chevron-down"></i>
+                </div>
+                <input type="text" class="dropi-input filled phone-number" [(ngModel)]="client.phone" />
+              </div>
+            </div>
+            <div class="form-group whatsapp-verify">
+              <label class="input-label">&nbsp;</label>
+              <button class="btn-whatsapp">
+                <i class="pi pi-bell"></i>
+                Verificar WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="input-label">Departamento</label>
+              <select class="dropi-input dropi-select filled" [(ngModel)]="client.departamento">
+                <option *ngFor="let d of departamentos" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+            <div class="form-group half">
+              <label class="input-label">Ciudad</label>
+              <select class="dropi-input dropi-select filled" [(ngModel)]="client.ciudad">
+                <option *ngFor="let c of ciudades" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="input-label">Dirección</label>
+            <input type="text" class="dropi-input filled" [(ngModel)]="client.direccion" />
+          </div>
+
+          <div class="form-group">
+            <label class="input-label">Email</label>
+            <input type="email" class="dropi-input filled" [(ngModel)]="client.email" />
+          </div>
+
+          <div class="form-group">
+            <label class="input-label">Tienda</label>
+            <select class="dropi-input dropi-select filled" [(ngModel)]="client.tienda">
+              <option *ngFor="let t of tiendas" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div class="toggle-row">
+            <label class="toggle-label">
+              <span class="toggle-text">¿Desea agregar notas para el proveedor?</span>
+              <div class="toggle-switch" [class.active]="client.addNotes" (click)="client.addNotes = !client.addNotes">
+                <div class="toggle-thumb"></div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Product section -->
+        <div class="section">
+          <h4 class="section-title">Producto seleccionado</h4>
+
+          <div class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">
+                <i class="pi pi-box"></i>
+              </div>
+            </div>
+            <div class="product-info">
+              <span class="product-name">{{ product.name }}</span>
+              <span class="product-id">ID: {{ product.id }}</span>
+              <span class="product-supplier">Proveedor: {{ product.supplier }}</span>
+              <span class="product-price">Precio proveedor: {{ formatCurrency(product.supplierPrice) }}</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label class="input-label">Precio de venta</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <input type="text" class="dropi-input filled has-prefix" [(ngModel)]="product.salePrice" />
+              </div>
+              <span class="helper-text">Precio sugerido: {{ formatCurrency(product.suggestedPrice) }}</span>
+            </div>
+            <div class="form-group half">
+              <label class="input-label">
+                Cantidad
+                <i class="pi pi-info-circle tooltip-icon"></i>
+              </label>
+              <input type="number" class="dropi-input filled" [(ngModel)]="product.quantity" min="1" />
+              <span class="helper-text">Stock: {{ product.stock }}</span>
+            </div>
+          </div>
+
+          <button class="btn-add-product">
+            <i class="pi pi-plus-circle"></i>
+            Agregar producto
+          </button>
+        </div>
+      </div>
+
+      <!-- Column 2: Carrier selection -->
+      <div class="column column-2">
+        <div class="section">
+          <h4 class="section-title">Selecciona una transportadora</h4>
+
+          <div class="collection-type">
+            <label
+              class="collection-option"
+              [class.selected]="collectionType === 'con_recaudo'"
+              (click)="collectionType = 'con_recaudo'"
+            >
+              <div class="radio-circle" [class.active]="collectionType === 'con_recaudo'">
+                <div class="radio-dot" *ngIf="collectionType === 'con_recaudo'"></div>
+              </div>
+              <span>Con recaudo</span>
+            </label>
+            <label
+              class="collection-option"
+              [class.selected]="collectionType === 'sin_recaudo'"
+              (click)="collectionType = 'sin_recaudo'"
+            >
+              <div class="radio-circle" [class.active]="collectionType === 'sin_recaudo'">
+                <div class="radio-dot" *ngIf="collectionType === 'sin_recaudo'"></div>
+              </div>
+              <span>Sin recaudo</span>
+            </label>
+          </div>
+
+          <div class="carrier-list">
+            <div
+              *ngFor="let carrier of carriers"
+              class="carrier-item"
+              [class.selected]="selectedCarrierId === carrier.id"
+              (click)="selectCarrier(carrier.id)"
+            >
+              <div class="carrier-left">
+                <div class="radio-circle" [class.active]="selectedCarrierId === carrier.id">
+                  <div class="radio-dot" *ngIf="selectedCarrierId === carrier.id"></div>
+                </div>
+                <div class="carrier-logo" [style.background-color]="carrier.color">
+                  {{ carrier.initials }}
+                </div>
+                <span class="carrier-name">{{ carrier.name }}</span>
+              </div>
+              <span class="carrier-price">{{ formatCurrency(carrier.price) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: Order summary -->
+      <div class="column column-3">
+        <div class="section">
+          <h4 class="section-title">Resumen de la orden</h4>
+
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="text-right">Precio de venta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ product.name }} ({{ product.quantity }})</td>
+                <td class="text-right">{{ formatCurrency(product.salePrice) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-rows">
+            <div class="summary-row total-row">
+              <span class="summary-label">Total a recaudar</span>
+              <span class="summary-value bold">{{ formatCurrency(totalRecaudar) }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Precio proveedor</span>
+              <span class="summary-value">{{ formatCurrency(product.supplierPrice) }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Precio de envío</span>
+              <span class="summary-value">{{ formatCurrency(precioEnvio) }}</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">
+                Comisión plataforma
+                <span class="tag-success">Excento</span>
+              </span>
+              <span class="summary-value">{{ formatCurrency(comisionPlataforma) }}</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-row ganancia-row">
+            <span class="summary-label">
+              <i class="pi pi-dollar ganancia-icon"></i>
+              Ganancia
+            </span>
+            <span class="summary-value ganancia-value">{{ formatCurrency(ganancia) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <div class="footer-actions">
+        <button class="btn-secondary">Cancelar</button>
+        <button class="btn-primary">Actualizar orden</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,671 @@
+@import 'styles/variables';
+
+// Additional tokens not in _variables.scss
+$primary-50: #fef8f1;
+$success-500: #0abb87;
+$success-700: #078560;
+$success-50: #e7f8f3;
+
+// ============================
+// Modal overlay & container
+// ============================
+.modal-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - #{$header-height});
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: $size-8;
+}
+
+.modal-container {
+  width: 1214px;
+  max-width: 100%;
+  background: $white;
+  border-radius: $radius-md;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.06);
+  padding: $size-8;
+}
+
+// ============================
+// Header
+// ============================
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $size-6;
+}
+
+.modal-title {
+  font-family: $font-primary;
+  font-size: $font-2xl;
+  font-weight: $font-bold;
+  color: $gray-700;
+  margin: 0;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  color: $gray-400;
+  font-size: 18px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $gray-50;
+    color: $gray-600;
+  }
+}
+
+// ============================
+// Body: 3-column layout
+// ============================
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: $size-6;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: $size-6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $size-4;
+}
+
+.section-title {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-semibold;
+  color: $gray-700;
+  margin: 0;
+  padding-bottom: $size-2;
+  border-bottom: 1px solid $gray-100;
+}
+
+// ============================
+// Form elements
+// ============================
+.form-row {
+  display: flex;
+  gap: $size-3;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+
+  &.half {
+    flex: 1;
+  }
+}
+
+.input-label {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-regular;
+  color: $gray-600;
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+}
+
+.tooltip-icon {
+  font-size: 12px;
+  color: $gray-300;
+  cursor: help;
+}
+
+.dropi-input {
+  height: 40px;
+  border-radius: $radius-md;
+  border: 1px solid $gray-200;
+  padding: 0 $size-3;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+  background: $white;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+
+  &.filled {
+    border-color: $gray-400;
+    color: $gray-700;
+  }
+
+  &:focus {
+    border-color: $primary-500;
+  }
+
+  &.has-prefix {
+    padding-left: $size-6;
+  }
+}
+
+.dropi-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23858ea6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: $size-8;
+  cursor: pointer;
+}
+
+.input-with-prefix {
+  position: relative;
+
+  .input-prefix {
+    position: absolute;
+    left: $size-3;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-400;
+    pointer-events: none;
+  }
+}
+
+.helper-text {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $gray-400;
+}
+
+// ============================
+// Phone input group
+// ============================
+.phone-row {
+  align-items: flex-end;
+}
+
+.phone-country {
+  flex: 1;
+}
+
+.phone-input-group {
+  display: flex;
+  gap: 0;
+}
+
+.country-select {
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+  height: 40px;
+  padding: 0 $size-2;
+  border: 1px solid $gray-400;
+  border-radius: $radius-md 0 0 $radius-md;
+  background: $gray-50;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-700;
+  white-space: nowrap;
+
+  .flag {
+    font-size: 16px;
+  }
+
+  .country-code {
+    font-size: $font-xs;
+    color: $gray-600;
+  }
+
+  .pi-chevron-down {
+    font-size: 10px;
+    color: $gray-400;
+  }
+}
+
+.phone-number {
+  border-radius: 0 $radius-md $radius-md 0 !important;
+  border-left: none !important;
+}
+
+.whatsapp-verify {
+  flex: 0 0 auto;
+}
+
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  height: 40px;
+  padding: 0 $size-4;
+  background: transparent;
+  border: 1px solid $success-500;
+  border-radius: $radius-md;
+  color: $success-500;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+
+  .pi {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background-color: $success-50;
+  }
+}
+
+// ============================
+// Toggle switch
+// ============================
+.toggle-row {
+  margin-top: $size-2;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+}
+
+.toggle-switch {
+  width: 40px;
+  height: 22px;
+  background: $gray-200;
+  border-radius: 11px;
+  position: relative;
+  transition: background-color 0.2s;
+
+  &.active {
+    background: $primary-500;
+  }
+
+  .toggle-thumb {
+    width: 18px;
+    height: 18px;
+    background: $white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  }
+
+  &.active .toggle-thumb {
+    transform: translateX(18px);
+  }
+}
+
+// ============================
+// Product card
+// ============================
+.product-card {
+  display: flex;
+  gap: $size-3;
+  padding: $size-3;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  background: $gray-50;
+}
+
+.product-image-placeholder {
+  width: 64px;
+  height: 64px;
+  background: $gray-100;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $gray-300;
+  font-size: 24px;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.product-name {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: $gray-700;
+}
+
+.product-id,
+.product-supplier {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $gray-400;
+}
+
+.product-price {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $gray-600;
+  font-weight: $font-medium;
+}
+
+// ============================
+// Add product button
+// ============================
+.btn-add-product {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $size-2;
+  width: 100%;
+  height: 29px;
+  background: transparent;
+  border: 1px solid $primary-500;
+  border-radius: $radius-md;
+  color: $primary-500;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  .pi {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background-color: $primary-50;
+  }
+}
+
+// ============================
+// Collection type radio group
+// ============================
+.collection-type {
+  display: flex;
+  gap: $size-3;
+}
+
+.collection-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-3 $size-4;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+  transition: all 0.2s;
+
+  &.selected {
+    background-color: $primary-50;
+    border-color: $primary-500;
+    color: $gray-700;
+  }
+}
+
+// ============================
+// Radio circle (shared)
+// ============================
+.radio-circle {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  border: 2px solid $gray-200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+
+  &.active {
+    border-color: $primary-500;
+  }
+}
+
+.radio-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $primary-500;
+}
+
+// ============================
+// Carrier list
+// ============================
+.carrier-list {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+}
+
+.carrier-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $size-3 $size-4;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $gray-200;
+  }
+
+  &.selected {
+    background-color: $primary-50;
+    border-color: $primary-500;
+  }
+}
+
+.carrier-left {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+}
+
+.carrier-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $white;
+  font-family: $font-primary;
+  font-size: 8px;
+  font-weight: $font-bold;
+  letter-spacing: -0.5px;
+}
+
+.carrier-name {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-700;
+}
+
+.carrier-price {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+  font-weight: $font-medium;
+}
+
+// ============================
+// Summary table
+// ============================
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-400;
+    text-align: left;
+    padding-bottom: $size-2;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  td {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-600;
+    padding: $size-3 0;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+}
+
+.summary-divider {
+  height: 1px;
+  background: $gray-100;
+}
+
+// ============================
+// Summary rows
+// ============================
+.summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summary-label {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+}
+
+.summary-value {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $gray-600;
+
+  &.bold {
+    font-weight: $font-bold;
+    color: $gray-700;
+  }
+}
+
+.total-row .summary-value {
+  font-weight: $font-bold;
+  color: $gray-700;
+}
+
+.tag-success {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $size-2;
+  background: $success-50;
+  color: $success-700;
+  border-radius: 32px;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+}
+
+.ganancia-row {
+  margin-top: $size-2;
+}
+
+.ganancia-icon {
+  color: $success-500;
+  font-size: 16px;
+}
+
+.ganancia-value {
+  font-weight: $font-bold;
+  color: $success-500 !important;
+  font-size: $font-base;
+}
+
+// ============================
+// Footer
+// ============================
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $size-6;
+  padding-top: $size-6;
+  border-top: 1px solid $gray-100;
+}
+
+.footer-actions {
+  display: flex;
+  gap: $size-3;
+  width: 470px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  height: 39px;
+  padding: 0 $size-6;
+  background: transparent;
+  border: 1px solid $primary-500;
+  border-radius: $radius-md;
+  color: $primary-500;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $primary-50;
+  }
+}
+
+.btn-primary {
+  height: 39px;
+  padding: 0 $size-6;
+  background: $primary-500;
+  border: none;
+  border-radius: $radius-md;
+  color: $white;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $primary-600;
+  }
+}

@@ -18,6 +18,13 @@ export const routes: Routes = [
             m => m.PrototypeGalleryComponent,
           ),
       },
+      {
+        path: 'pedidos/orden-manual',
+        loadComponent: () =>
+          import('./pages/orders-manual/orders-manual.component').then(
+            m => m.OrdersManualComponent,
+          ),
+      },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       // Catch-all for prototype routes — renders gallery as placeholder
       {
