@@ -26,10 +26,59 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'mis-pedidos/mis-pedidos',
+        loadComponent: () =>
+          import('./pages/mis-pedidos/mis-pedidos.component').then(
+            m => m.MisPedidosComponent,
+          ),
+      },
+      {
         path: 'pedidos/orden-manual',
         loadComponent: () =>
           import('./pages/orders-manual/orders-manual.component').then(
             m => m.OrdersManualComponent,
+          ),
+      },
+      {
+        path: 'productos/caza-productos',
+        loadComponent: () =>
+          import('./pages/caza-productos/caza-productos.component').then(
+            m => m.CazaProductosComponent,
+          ),
+      },
+      {
+        path: 'productos/proveedores',
+        loadComponent: () =>
+          import('./pages/proveedores/proveedores.component').then(
+            m => m.ProveedoresComponent,
+          ),
+      },
+      {
+        path: 'historial-de-cartera',
+        loadComponent: () =>
+          import('./pages/historial-cartera/historial-cartera.component').then(
+            m => m.HistorialCarteraComponent,
+          ),
+      },
+      {
+        path: 'dropi-card/cards',
+        loadComponent: () =>
+          import('./pages/dropicard/dropicard.component').then(
+            m => m.DropicardComponent,
+          ),
+      },
+      {
+        path: 'cas/bandeja',
+        loadComponent: () =>
+          import('./pages/cas/cas.component').then(
+            m => m.CasComponent,
+          ),
+      },
+      {
+        path: 'academy',
+        loadComponent: () =>
+          import('./pages/academy/academy.component').then(
+            m => m.AcademyComponent,
           ),
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },

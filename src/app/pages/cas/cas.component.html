@@ -1,0 +1,204 @@
+<div class="cas-container">
+  <!-- Left Panel: Bandeja -->
+  <div class="bandeja-panel">
+    <div class="bandeja-content">
+      <!-- Search -->
+      <div class="bandeja-search">
+        <div class="search-icon-wrapper">
+          <i class="pi pi-search"></i>
+        </div>
+        <input
+          type="text"
+          placeholder="Buscar"
+          [(ngModel)]="searchQuery"
+          class="search-input"
+        />
+      </div>
+
+      <!-- Tabs -->
+      <div class="bandeja-tabs">
+        <div
+          class="tab-item"
+          [class.active]="activeTab === 'enviadas'"
+          (click)="setTab('enviadas')"
+        >
+          Enviadas
+        </div>
+        <div
+          class="tab-item"
+          [class.active]="activeTab === 'activas'"
+          (click)="setTab('activas')"
+        >
+          Activas
+          <span class="badge-counter" *ngIf="activeCount > 0">{{ activeCount }}</span>
+        </div>
+        <div
+          class="tab-item"
+          [class.active]="activeTab === 'resueltas'"
+          (click)="setTab('resueltas')"
+        >
+          Resueltas
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="bandeja-filters">
+        <div class="filter-dropdowns">
+          <button class="dropdown-btn">
+            <span>Motivos de consulta</span>
+            <i class="pi pi-chevron-down"></i>
+          </button>
+          <button class="dropdown-btn">
+            <span>Transportadora</span>
+            <i class="pi pi-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggle + Sort -->
+      <div class="bandeja-toggle-sort">
+        <div class="toggle-group">
+          <div
+            class="toggle-switch"
+            [class.active]="showUnreadOnly"
+            (click)="showUnreadOnly = !showUnreadOnly"
+          >
+            <div class="toggle-indicator"></div>
+          </div>
+          <span class="toggle-label">No leídos</span>
+        </div>
+        <button class="sort-btn">
+          <span>Ordenar por</span>
+          <i class="pi pi-chevron-down"></i>
+        </button>
+      </div>
+
+      <!-- Conversation List -->
+      <div class="conversation-list">
+        <div
+          class="conversation-card"
+          *ngFor="let conv of filteredConversations"
+          [class.selected]="conv.selected"
+          (click)="selectConversation(conv)"
+        >
+          <div class="conv-avatar">
+            <img [src]="conv.avatarUrl" [alt]="conv.name" />
+          </div>
+          <div class="conv-content">
+            <!-- Header row: badge + timestamp -->
+            <div class="conv-header">
+              <span class="conv-badge" *ngIf="conv.badgeLabel">{{ conv.badgeLabel }}</span>
+              <span class="conv-timestamp">{{ conv.timestamp }}</span>
+            </div>
+            <!-- Name + preview -->
+            <div class="conv-name-row">
+              <span class="conv-name">{{ conv.name }}</span>
+              <span class="conv-unread-badge" *ngIf="conv.unreadCount > 0">{{ conv.unreadCount }}</span>
+            </div>
+            <span class="conv-preview">{{ conv.preview }}</span>
+            <!-- Tags -->
+            <div class="conv-tags">
+              <span class="conv-tag" *ngFor="let tag of conv.tags">{{ tag }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Chat -->
+  <div class="chat-panel">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-header-name">{{ chatHeader.name }}</div>
+        <div class="chat-header-tags">
+          <span
+            class="header-tag"
+            *ngFor="let tag of chatHeader.tags"
+            [class.tag-orange]="tag.color === 'orange'"
+          >
+            {{ tag.label }}
+          </span>
+        </div>
+        <div class="chat-header-meta">
+          <span class="meta-orden">
+            ORDEN ID <strong>{{ chatHeader.ordenId }}</strong>
+            <i class="pi pi-external-link meta-link-icon"></i>
+          </span>
+          <span class="meta-dot"></span>
+          <span class="meta-text">Estado: {{ chatHeader.estado }}</span>
+          <span class="meta-dot"></span>
+          <span class="meta-text">GUIA: {{ chatHeader.guia }}</span>
+        </div>
+      </div>
+      <div class="chat-header-right">
+        <button class="refresh-btn">
+          <i class="pi pi-history"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Body -->
+    <div class="chat-body">
+      <!-- System info bar -->
+      <div class="chat-info-bar">
+        <span>
+          <strong>Inicio de conversación </strong>#78980 01/18/2025 11:11AM
+        </span>
+      </div>
+
+      <!-- Ticket message -->
+      <div class="chat-ticket">
+        <p class="ticket-line">
+          <span class="ticket-label">Descripción: </span>
+          <span class="ticket-value"> Lorem ipsum dolor sit amet consectetur adipiscing elit, sociosqu parturient pharetra mattis ultricies id, placerat litora feugiat euismod vel accumsan.</span>
+        </p>
+        <p class="ticket-line">
+          <span class="ticket-label">Fecha estimada:</span>
+          <span class="ticket-value"> 12/03/2024 8:00AM</span>
+        </p>
+
+        <!-- Images -->
+        <div class="ticket-images">
+          <div class="ticket-image-wrapper">
+            <img src="assets/images/cas/product-img.svg" alt="Producto" />
+          </div>
+          <div class="ticket-image-wrapper">
+            <img src="assets/images/cas/product-img.svg" alt="Producto" />
+          </div>
+          <div class="ticket-image-wrapper">
+            <img src="assets/images/cas/product-img.svg" alt="Producto" />
+          </div>
+        </div>
+
+        <!-- Sender info -->
+        <div class="ticket-sender">
+          <span class="sender-name"><strong>Carolina Herrera</strong> 09:26 AM</span>
+        </div>
+
+        <!-- Avatar -->
+        <div class="ticket-avatar">
+          <img src="assets/images/cas/perfiles.svg" alt="Carolina" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-bar">
+      <div class="clip-btn">
+        <i class="pi pi-paperclip"></i>
+      </div>
+      <div class="message-input-wrapper">
+        <input
+          type="text"
+          placeholder="Ingresar mensaje"
+          [(ngModel)]="messageText"
+          class="message-input"
+          (keyup.enter)="sendMessage()"
+        />
+      </div>
+      <button class="send-btn" (click)="sendMessage()">Enviar</button>
+    </div>
+  </div>
+</div>

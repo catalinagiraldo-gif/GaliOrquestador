@@ -1,0 +1,470 @@
+@import 'styles/variables';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.academy-page {
+  padding: $size-4 $size-6;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.academy-card {
+  background: $white;
+  border-radius: $radius-md;
+  padding: $size-6;
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  overflow: hidden;
+}
+
+// ============================
+// HERO SECTION
+// ============================
+.hero-section {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  height: 372px;
+  position: relative;
+  flex-wrap: wrap;
+}
+
+.hero-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+}
+
+.hero-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+.hero-subtitle {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-regular;
+  color: $gray-700;
+  line-height: 1.5;
+}
+
+.hero-title {
+  font-family: $font-primary;
+  font-size: 30px;
+  font-weight: $font-bold;
+  color: $gray-800;
+  line-height: 1.1;
+  margin: 0;
+  max-width: 415px;
+
+  .title-highlight {
+    color: $primary-500;
+  }
+}
+
+.hero-description {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-regular;
+  color: $gray-700;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hero-cta-text {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  color: $gray-600;
+  margin: 0;
+
+  .cta-highlight {
+    font-weight: $font-bold;
+    color: $primary-500;
+  }
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 21px;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 33px;
+  padding: $size-3;
+  background: $primary-500;
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.1;
+  transition: background 0.15s;
+
+  &:hover {
+    background: $primary-600;
+  }
+}
+
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 33px;
+  padding: $size-3;
+  background: transparent;
+  color: $gray-500;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.1;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: $gray-50;
+    border-color: $gray-300;
+  }
+}
+
+// Hero Right — Video
+.hero-right {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.video-container {
+  width: 568px;
+  max-width: 100%;
+  height: 351px;
+  border-radius: $radius-md;
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(21px);
+}
+
+.video-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: $radius-md;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 400px;
+  background: rgba(14, 17, 26, 0.6);
+  backdrop-filter: blur(2.18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(14, 17, 26, 0.8);
+  }
+
+  .play-icon {
+    color: $white;
+    font-size: 20px;
+
+    i {
+      font-size: 20px;
+    }
+  }
+}
+
+.decorative-gears {
+  position: absolute;
+  top: 19px;
+  left: -49px;
+  width: 97px;
+  height: 97px;
+  pointer-events: none;
+}
+
+// ============================
+// COURSES SECTION
+// ============================
+.courses-section {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.courses-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.courses-titles {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.courses-title {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-bold;
+  color: $gray-700;
+  line-height: 1.1;
+  margin: 0;
+  max-width: 571px;
+}
+
+.courses-subtitle {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 571px;
+}
+
+.courses-carousel {
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.courses-scroll {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 8px;
+  max-width: 100%;
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.course-card {
+  width: 235px;
+  min-width: 235px;
+  background: $white;
+  border-radius: $radius-md;
+  overflow: hidden;
+  box-shadow: $shadow-medium;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.course-thumb-wrapper {
+  width: 100%;
+  height: 108px;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-tag-overlay {
+  position: absolute;
+  left: 9px;
+  bottom: 0;
+  transform: translateY(50%);
+}
+
+.course-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 32px;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  max-height: 16px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.tag-primary {
+    background: $primary-500;
+    color: $white;
+  }
+
+  &.tag-secondary {
+    background: #ffecda;
+    color: $primary-500;
+  }
+
+  &.tag-info {
+    background: #50a5f1;
+    color: $white;
+  }
+}
+
+.course-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 12px;
+}
+
+.course-info {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.course-title-row {
+  display: flex;
+  align-items: center;
+  min-height: 17px;
+}
+
+.course-title {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  color: $gray-800;
+  line-height: 1.5;
+  max-width: 179px;
+}
+
+.course-desc {
+  font-family: $font-primary;
+  font-size: 9px;
+  font-weight: 300;
+  color: $gray-800;
+  line-height: 13.28px;
+  letter-spacing: -0.0009px;
+  max-width: 175px;
+}
+
+.course-duration {
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+
+  i {
+    font-size: 16px;
+    color: $gray-600;
+  }
+
+  .duration-label,
+  .duration-value {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: $font-medium;
+    color: $gray-800;
+    line-height: 1.5;
+  }
+}
+
+.course-instructor {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.instructor-avatar {
+  width: 29px;
+  height: 29px;
+  border-radius: 376px;
+  object-fit: cover;
+}
+
+.instructor-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.instructor-name {
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: $font-medium;
+  color: $gray-800;
+  line-height: 1.5;
+}
+
+.instructor-role {
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+}
+
+// Scroll button
+.scroll-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 32px;
+  background: $white;
+  box-shadow: $shadow-medium;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: $size-4;
+  transition: box-shadow 0.15s;
+
+  i {
+    font-size: 14px;
+    color: $gray-600;
+  }
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+  }
+}

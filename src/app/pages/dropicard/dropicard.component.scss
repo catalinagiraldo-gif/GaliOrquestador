@@ -1,0 +1,462 @@
+@import 'styles/variables';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
+  padding: $size-4 $size-8;
+  background: $gray-50;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+// ── Breadcrumb ──
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .breadcrumb-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+
+    i {
+      font-size: 12px;
+      color: $gray-500;
+    }
+  }
+
+  .breadcrumb-chevron {
+    font-size: 10px;
+    color: $gray-500;
+  }
+
+  .breadcrumb-item {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-regular;
+    color: $gray-500;
+    line-height: 1.5;
+    text-align: center;
+    white-space: nowrap;
+
+    &.active {
+      color: $gray-700;
+    }
+  }
+}
+
+// ── Title Row ──
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page-title {
+  font-family: $font-primary;
+  font-size: $font-2xl;
+  font-weight: $font-bold;
+  color: $gray-700;
+  line-height: 1.1;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-solicitar {
+  width: 200px;
+  height: 39px;
+  max-height: 39px;
+  min-width: 33px;
+  background: $primary-500;
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  padding: $size-3;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: $primary-600;
+  }
+}
+
+// ── Promotional Banner ──
+.promo-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 20px;
+  min-height: 215px;
+  border-radius: $radius-md;
+  box-shadow: $shadow-medium;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
+}
+
+.banner-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 15, 30, 0.9) 0%, rgba(20, 30, 60, 0.7) 50%, rgba(15, 52, 96, 0.5) 100%);
+  border-radius: $radius-md;
+}
+
+.banner-card-image {
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-30deg);
+  z-index: 1;
+}
+
+.card-visual {
+  width: 380px;
+  max-width: 100%;
+  height: 240px;
+}
+
+.card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #2d2d3d 0%, #1a1a2e 50%, #0d0d1a 100%);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  }
+}
+
+.card-label-dropi {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: $font-bold;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 2px;
+  text-transform: lowercase;
+}
+
+.card-label-visa {
+  font-family: $font-primary;
+  font-size: 22px;
+  font-weight: $font-bold;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 3px;
+  margin-bottom: 4px;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 477px;
+  max-width: 100%;
+}
+
+.banner-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.banner-title {
+  font-family: $font-primary;
+  font-size: $font-2xl;
+  font-weight: $font-bold;
+  color: $white;
+  line-height: 1.1;
+  margin: 0;
+  max-width: 397px;
+}
+
+.banner-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  transition: color 0.15s ease;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    color: $white;
+  }
+}
+
+.banner-subtitle {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-regular;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+
+  .banner-highlight {
+    font-weight: $font-medium;
+    color: $white;
+  }
+}
+
+.btn-ver-beneficios {
+  width: 164px;
+  height: 40px;
+  border: 1px solid $primary-500;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $primary-500;
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-bold;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  min-height: 24px;
+  padding: $size-4;
+
+  &:hover {
+    background: $primary-500;
+    color: $white;
+  }
+}
+
+// ── Filters Card ──
+.filters-card {
+  background: $white;
+  border-radius: $radius-md;
+  padding: $size-4;
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $size-4;
+}
+
+.filters-selects {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+
+.filter-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.filter-select {
+  width: 100%;
+  height: 40px;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  padding: 8px 36px 8px 12px;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-500;
+  background: $white;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  line-height: 1.5;
+
+  &:focus {
+    border-color: $primary-500;
+  }
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+
+  i {
+    font-size: 12px;
+    color: $gray-500;
+  }
+}
+
+.btn-aplicar-filtros {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $size-1;
+  height: 40px;
+  min-width: 33px;
+  padding: $size-3;
+  background: $primary-500;
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: $primary-600;
+  }
+}
+
+.search-field {
+  flex: 1 1 250px;
+  max-width: 302px;
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background: $gray-50;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  padding: $size-3;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.search-icon {
+  font-size: 16px;
+  color: $gray-500;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-700;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+}
+
+// ── Empty State ──
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: $size-4;
+  min-height: 428px;
+}
+
+.empty-icon {
+  width: 63.75px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  filter: grayscale(1);
+
+  .empty-dropi-icon {
+    font-size: 48px;
+    color: $gray-300;
+  }
+}
+
+.empty-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $size-2;
+  max-width: 400px;
+  text-align: center;
+}
+
+.empty-title {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  color: $gray-500;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.empty-subtitle {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-500;
+  line-height: 1.5;
+  margin: 0;
+}

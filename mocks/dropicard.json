@@ -1,0 +1,26 @@
+{
+  "cards": [],
+  "banner": {
+    "title": "!No te quedes sin la tuya! Unidades limitadas, pidela ahora",
+    "subtitle": "Conoce los beneficios que te ofrece tu tarjeta de debito Dropicard",
+    "ctaLabel": "Ver beneficios",
+    "cardImage": "assets/images/dropicard/card-front.png",
+    "backgroundImage": "assets/images/dropicard/banner-bg.png"
+  },
+  "emptyState": {
+    "title": "!No hay tarjetas solicitadas!",
+    "subtitle": "!Pide tu Dropicard y recibe los beneficios!"
+  },
+  "filters": {
+    "tipoTarjeta": {
+      "label": "Tipo de tarjeta",
+      "options": ["Todas", "Virtual", "Fisica"],
+      "default": "Todas"
+    },
+    "estado": {
+      "label": "Estado",
+      "options": ["Seleccionar", "Activa", "Inactiva", "Bloqueada", "Pendiente"],
+      "default": "Seleccionar"
+    }
+  }
+}

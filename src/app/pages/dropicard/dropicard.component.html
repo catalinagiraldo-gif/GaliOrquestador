@@ -1,0 +1,114 @@
+<div class="page-wrapper">
+<!-- Breadcrumb: Card icon > Dropicard > Tarjetas -->
+<div class="breadcrumb">
+  <span class="breadcrumb-icon">
+    <i class="pi pi-credit-card"></i>
+  </span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item">Dropicard</span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item active">Tarjetas</span>
+</div>
+
+<!-- Title + CTA Row -->
+<div class="title-row">
+  <h1 class="page-title">Dropicard</h1>
+  <button class="btn-solicitar" (click)="solicitarTarjeta()">
+    Solicitar tarjeta
+  </button>
+</div>
+
+<!-- Promotional Banner -->
+<div class="promo-banner" *ngIf="showBanner">
+  <div class="banner-bg-overlay"></div>
+  <div class="banner-card-image">
+    <div class="card-visual">
+      <div class="card-placeholder">
+        <span class="card-label-visa">VISA</span>
+        <span class="card-label-dropi">dropicard</span>
+      </div>
+    </div>
+  </div>
+  <div class="banner-content">
+    <div class="banner-header">
+      <h2 class="banner-title">¡No te quedes sin la tuya! Unidades limitadas, pídela ahora</h2>
+      <button class="banner-close" (click)="closeBanner()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <div class="banner-subtitle">
+      <span>Conoce los beneficios que te ofrece tu tarjeta de débito </span>
+      <span class="banner-highlight">Dropicard</span>
+    </div>
+    <button class="btn-ver-beneficios" (click)="verBeneficios()">
+      Ver beneficios
+    </button>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-card">
+  <div class="filters-row">
+    <div class="filters-selects">
+      <!-- Tipo de tarjeta -->
+      <div class="filter-field">
+        <label class="filter-label">Tipo de tarjeta</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="tipoTarjeta" class="filter-select">
+            <option value="Todas">Todas</option>
+            <option value="Virtual">Virtual</option>
+            <option value="Fisica">Física</option>
+          </select>
+          <span class="select-arrow">
+            <i class="pi pi-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+      <!-- Estado -->
+      <div class="filter-field">
+        <label class="filter-label">Estado</label>
+        <div class="select-wrapper">
+          <select [(ngModel)]="estado" class="filter-select">
+            <option value="Seleccionar">Seleccionar</option>
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+            <option value="Bloqueada">Bloqueada</option>
+            <option value="Pendiente">Pendiente</option>
+          </select>
+          <span class="select-arrow">
+            <i class="pi pi-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    <!-- Aplicar filtros button -->
+    <button class="btn-aplicar-filtros" (click)="aplicarFiltros()">
+      <i class="pi pi-filter"></i>
+      <span>Aplicar filtros</span>
+    </button>
+    <!-- Search -->
+    <div class="search-field">
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Buscar"
+          [(ngModel)]="searchQuery"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!hasCards">
+  <div class="empty-icon">
+    <i class="pi pi-box empty-dropi-icon"></i>
+  </div>
+  <div class="empty-info">
+    <p class="empty-title">!No hay tarjetas solicitadas!</p>
+    <p class="empty-subtitle">¡Pide tu Dropicard y recibe los beneficios!</p>
+  </div>
+</div>
+</div>

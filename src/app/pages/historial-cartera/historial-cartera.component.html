@@ -1,0 +1,218 @@
+<div class="page-wrapper">
+<!-- Breadcrumb: Home > Label > Label -->
+<div class="breadcrumb">
+  <span class="breadcrumb-icon">
+    <i class="pi pi-home"></i>
+  </span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item">Label</span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item active">Label</span>
+</div>
+
+<!-- Filters Container -->
+<div class="filters-container">
+  <div class="filters-inner">
+    <!-- Row 1: Date pickers + Tipo dropdown -->
+    <div class="filters-row-1">
+      <!-- Date From -->
+      <div class="date-picker-field">
+        <div class="date-input-wrapper">
+          <input type="text" class="date-input" [value]="fechaDesde" readonly />
+          <span class="date-icon">
+            <i class="pi pi-calendar"></i>
+          </span>
+        </div>
+      </div>
+      <!-- Date To -->
+      <div class="date-picker-field">
+        <div class="date-input-wrapper">
+          <input type="text" class="date-input" [value]="fechaHasta" readonly />
+          <span class="date-icon">
+            <i class="pi pi-calendar"></i>
+          </span>
+        </div>
+      </div>
+      <!-- Filtrar por tipo -->
+      <div class="tipo-dropdown-field">
+        <div class="select-wrapper">
+          <select class="tipo-select" [(ngModel)]="filtroPorTipo">
+            <option value="">Filtrar por tipo</option>
+            <option value="ENTRADA">ENTRADA</option>
+            <option value="SALIDA">SALIDA</option>
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Código + Transaccion + Search -->
+    <div class="filters-row-2">
+      <!-- Filtrar por código -->
+      <div class="codigo-field">
+        <div class="select-wrapper">
+          <select class="codigo-select" [(ngModel)]="filtroPorCodigo">
+            <option value="">Filtrar por código</option>
+            <option value="SPEI">SPEI</option>
+            <option value="OXXO">OXXO</option>
+            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+          </select>
+          <span class="select-arrow"></span>
+        </div>
+      </div>
+      <!-- id de transaccion + download button -->
+      <div class="transaccion-field">
+        <input
+          type="text"
+          class="transaccion-input"
+          placeholder="id de transaccion"
+          [(ngModel)]="idTransaccion"
+        />
+        <button class="download-btn">
+          <i class="pi pi-download"></i>
+        </button>
+      </div>
+      <!-- Buscar search -->
+      <div class="search-field">
+        <div class="search-input-wrapper">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="applyFilters()"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button class="btn-action btn-recargar">
+      <i class="pi pi-wallet"></i>
+      <span>Recargar Cartera</span>
+    </button>
+    <button class="btn-action btn-descargar">
+      <i class="pi pi-file-excel"></i>
+      <span>Descargar Excel</span>
+    </button>
+    <button class="btn-action btn-transferencia">
+      <i class="pi pi-arrow-right-arrow-left"></i>
+      <span>Transferencia entre wallets</span>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <div class="tabs-row">
+      <button
+        class="tab-item"
+        [class.active]="activeTab === 'billetera'"
+        (click)="setActiveTab('billetera')"
+      >
+        Transacciones en billetera
+      </button>
+      <button
+        class="tab-item"
+        [class.active]="activeTab === 'depositos'"
+        (click)="setActiveTab('depositos')"
+      >
+        Depósitos manuales
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container" *ngIf="activeTab === 'billetera'">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Monto</th>
+          <th>Descripción</th>
+          <th>Usuario</th>
+          <th>Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of paginatedTransactions">
+          <td class="cell-id">{{ t.id }}</td>
+          <td class="cell-fecha">{{ t.fecha }}</td>
+          <td class="cell-tipo">
+            <span class="tipo-label">{{ t.tipo }}</span>
+          </td>
+          <td class="cell-monto" [ngClass]="getMontoClass(t)">
+            {{ t.montoDisplay }}
+          </td>
+          <td class="cell-descripcion">{{ t.descripcion }}</td>
+          <td class="cell-usuario">{{ t.usuario }}</td>
+          <td class="cell-opciones">
+            <button class="btn-opciones">
+              <i class="pi pi-ellipsis-v"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="footer-row">
+          <td></td>
+          <td></td>
+          <td class="footer-total-label">Total</td>
+          <td class="footer-total-value">{{ totalMonto }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Empty state for deposits tab -->
+  <div class="empty-state" *ngIf="activeTab === 'depositos'">
+    <p class="empty-text">No hay depósitos manuales registrados</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      <span>Mostrar</span>
+      <div class="page-size-select">
+        <select [(ngModel)]="pageSize" (ngModelChange)="currentPage = 1; applyFilters()">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+        </select>
+      </div>
+      <span>registros de {{ totalRecords }}</span>
+    </div>
+    <div class="pagination-nav">
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)"
+      >
+        <i class="pi pi-chevron-left"></i>
+      </button>
+      <button
+        *ngFor="let p of getPageNumbers()"
+        class="page-btn"
+        [class.active]="p === currentPage"
+        (click)="onPageChange(p)"
+      >
+        {{ p }}
+      </button>
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)"
+      >
+        <i class="pi pi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+</div>

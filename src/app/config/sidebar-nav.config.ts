@@ -32,7 +32,7 @@ const dropshipperNav: NavItem[] = [
     label: 'Mis pedidos',
     icon: IC + 'shopping-cart.svg',
     children: [
-      { label: 'Órdenes', route: '/mis-pedidos/ordenes' },
+      { label: 'Mis Pedidos', route: '/mis-pedidos/mis-pedidos' },
       { label: 'Novedades', route: '/mis-pedidos/novedades' },
       { label: 'Carritos abandonados', route: '/mis-pedidos/carritos-abandonados' },
       { label: 'Etiquetas', route: '/mis-pedidos/etiquetas' },
@@ -135,7 +135,7 @@ const proveedorNav: NavItem[] = [
     label: 'Mis pedidos',
     icon: IC + 'shopping-cart.svg',
     children: [
-      { label: 'Órdenes', route: '/mis-pedidos/ordenes' },
+      { label: 'Mis Pedidos', route: '/mis-pedidos/mis-pedidos' },
       { label: 'Novedades', route: '/mis-pedidos/novedades' },
       { label: 'Carritos abandonados', route: '/mis-pedidos/carritos-abandonados' },
       { label: 'Etiquetas', route: '/mis-pedidos/etiquetas' },

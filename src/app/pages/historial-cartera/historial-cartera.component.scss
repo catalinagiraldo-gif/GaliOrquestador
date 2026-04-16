@@ -1,0 +1,584 @@
+@import 'styles/variables';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
+  padding: $size-4 $size-8;
+  background: $gray-50;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+// ── Breadcrumb ──
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .breadcrumb-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+
+    i {
+      font-size: 12px;
+      color: $gray-500;
+    }
+  }
+
+  .breadcrumb-chevron {
+    font-size: 10px;
+    color: $gray-500;
+  }
+
+  .breadcrumb-item {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-regular;
+    color: $gray-500;
+    line-height: 1.5;
+
+    &.active {
+      color: $gray-700;
+    }
+  }
+}
+
+// ── Filters Container ──
+.filters-container {
+  background: $white;
+  border-radius: $radius-md;
+  padding: $size-4;
+  box-shadow: $shadow-small;
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
+}
+
+.filters-inner {
+  display: flex;
+  flex-direction: column;
+  gap: $size-4;
+}
+
+// ── Row 1: Date pickers + Tipo ──
+.filters-row-1 {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.date-picker-field {
+  flex: 1 1 300px;
+  max-width: 363px;
+  padding: 0 10px;
+}
+
+.date-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid $gray-700;
+  border-radius: 5px;
+  height: 53px;
+  padding: 0 10px;
+  background: $white;
+}
+
+.date-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: $font-primary;
+  font-size: 14.4px;
+  font-weight: $font-regular;
+  color: $gray-800;
+  line-height: 16.2px;
+  padding-top: 26px;
+  padding-bottom: 14px;
+  background: transparent;
+}
+
+.date-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+
+  i {
+    font-size: 18px;
+    color: $gray-500;
+  }
+}
+
+.tipo-dropdown-field {
+  flex: 1 1 300px;
+  max-width: 363px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  height: 68px;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.tipo-select,
+.codigo-select {
+  width: 100%;
+  height: 38.63px;
+  min-height: 36px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 30px 8px 10px;
+  font-family: $font-primary;
+  font-size: 14.4px;
+  font-weight: $font-regular;
+  color: $gray-300;
+  background: $white;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+
+  &:focus {
+    border-color: $primary-500;
+  }
+}
+
+.select-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid $gray-300;
+  pointer-events: none;
+}
+
+// ── Row 2: Código + Transacción + Search ──
+.filters-row-2 {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.codigo-field {
+  flex: 1 1 300px;
+  max-width: 363px;
+  padding: 0 10px 16px 0;
+}
+
+.transaccion-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding-bottom: 16px;
+}
+
+.transaccion-input {
+  width: 241px;
+  height: 36.13px;
+  border: 1px solid #f1b44c;
+  border-radius: 4px;
+  padding: 9px 12px;
+  font-family: $font-primary;
+  font-size: 14.4px;
+  font-weight: $font-regular;
+  color: $gray-500;
+  background: $white;
+  outline: none;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+
+  &:focus {
+    border-color: $primary-500;
+  }
+}
+
+.download-btn {
+  width: 40px;
+  height: 38.63px;
+  background: #50a5f1;
+  border: 1px solid #50a5f1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 8px;
+
+  i {
+    font-size: 14px;
+    color: $white;
+  }
+
+  &:hover {
+    background: darken(#50a5f1, 8%);
+  }
+}
+
+.search-field {
+  margin-left: auto;
+  flex: 1 1 250px;
+  max-width: 330px;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #e4e5e6;
+  border-radius: 4px;
+  height: 36.13px;
+  padding: 0 12px 0 40px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: $gray-500;
+}
+
+.search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: $font-primary;
+  font-size: 14.4px;
+  font-weight: $font-regular;
+  color: $gray-800;
+
+  &::placeholder {
+    color: $gray-500;
+  }
+}
+
+// ── Action Buttons ──
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 10px;
+}
+
+.btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $size-1;
+  height: 40px;
+  min-width: 33px;
+  padding: $size-3;
+  border-radius: $radius-md;
+  border: none;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  color: $white;
+  line-height: 1.1;
+  white-space: nowrap;
+  transition: filter 0.15s ease;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}
+
+.btn-recargar {
+  background: #0abb87;
+}
+
+.btn-descargar {
+  background: #50a5f1;
+}
+
+.btn-transferencia {
+  background: #f1b44c;
+}
+
+// ── Tabs ──
+.tabs-container {
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tabs-row {
+  display: flex;
+}
+
+.tab-item {
+  height: 52px;
+  max-height: 52px;
+  padding: $size-4 $size-6;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: $white;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  color: $gray-400;
+  line-height: 1.1;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  margin-bottom: -2px;
+
+  &.active {
+    color: $gray-600;
+    border-bottom-color: $primary-500;
+  }
+
+  &:hover:not(.active) {
+    color: $gray-600;
+  }
+}
+
+// ── Table ──
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    font-family: $font-primary;
+    font-size: 14px;
+    font-weight: $font-semibold;
+    color: $gray-500;
+    text-align: center;
+    padding: 12px;
+    border-top: 1px solid $gray-100;
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+
+  tbody td {
+    font-family: $font-primary;
+    font-size: 14px;
+    font-weight: $font-regular;
+    color: $gray-500;
+    text-align: center;
+    padding: 13px 12px;
+    border-top: 1px solid $gray-100;
+    line-height: 1.5;
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: rgba($gray-50, 0.6);
+    }
+  }
+}
+
+.cell-id {
+  width: 95px;
+  white-space: nowrap;
+}
+
+.cell-fecha {
+  width: 131px;
+  white-space: nowrap;
+}
+
+.cell-tipo {
+  width: 114px;
+
+  .tipo-label {
+    font-weight: $font-semibold;
+  }
+}
+
+.cell-monto {
+  width: 100px;
+  font-weight: $font-medium;
+  white-space: nowrap;
+
+  &.monto-entrada {
+    color: #0abb87;
+  }
+
+  &.monto-salida {
+    color: $gray-300;
+  }
+}
+
+.cell-descripcion {
+  width: 350px;
+  max-width: 350px;
+  text-align: left;
+  padding-left: 18px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.cell-usuario {
+  width: 197px;
+  white-space: nowrap;
+}
+
+.cell-opciones {
+  width: 90px;
+}
+
+.btn-opciones {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $gray-400;
+  padding: 4px 8px;
+
+  &:hover {
+    color: $gray-600;
+  }
+}
+
+// ── Footer Row ──
+.footer-row {
+  td {
+    border-top: 2px solid $gray-100;
+    padding: 13px 12px;
+  }
+}
+
+.footer-total-label {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: $font-regular;
+  color: $gray-500;
+  text-align: center;
+}
+
+.footer-total-value {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: $font-regular;
+  color: $gray-500;
+  text-align: center;
+}
+
+// ── Empty State ──
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $size-10;
+
+  .empty-text {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $gray-500;
+  }
+}
+
+// ── Pagination ──
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.pagination-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-500;
+}
+
+.page-size-select {
+  select {
+    height: 27px;
+    border: 1px solid $gray-200;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-700;
+    background: $white;
+    outline: none;
+    cursor: pointer;
+  }
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.page-btn {
+  min-width: 34px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $gray-200;
+  border-radius: 4px;
+  background: $white;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-500;
+  padding: 0 8px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &.active {
+    background: $primary-500;
+    border-color: $primary-500;
+    color: $white;
+  }
+
+  &:hover:not(.active):not(:disabled) {
+    background: $gray-50;
+    border-color: $gray-300;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,500 @@
+@import 'styles/variables';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.caza-productos-page {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $size-4 $size-8;
+}
+
+// ========== Breadcrumb ==========
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0;
+
+  &-icon {
+    color: $gray-500;
+    font-size: 12px;
+  }
+
+  &-chevron {
+    font-size: 10px;
+    color: $gray-300;
+  }
+
+  &-item {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-regular;
+    color: $gray-500;
+    line-height: 1.5;
+
+    &.active {
+      color: $gray-700;
+    }
+  }
+}
+
+// ========== Page Header ==========
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.page-title {
+  font-family: $font-primary;
+  font-size: 24px;
+  font-weight: $font-bold;
+  color: #32394d;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.btn-crear-publicacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $size-1;
+  width: 200px;
+  height: 39px;
+  padding: $size-3;
+  background: $primary-500;
+  border: none;
+  border-radius: $radius-md;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  color: $white;
+  line-height: 1.1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $primary-600;
+  }
+}
+
+// ========== Banner ==========
+.banner-section {
+  margin-top: $size-5;
+}
+
+.banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  height: 180px;
+  padding: 20px;
+  border-radius: $radius-md;
+  box-shadow: $shadow-medium;
+  overflow: hidden;
+  background: linear-gradient(122.57deg, #ffffff 69.19%, $primary-500 103.45%);
+}
+
+.banner-image-area {
+  position: absolute;
+  left: 32px;
+  top: 8px;
+  width: 380px;
+  height: 281px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 468px;
+  max-width: 100%;
+  justify-content: center;
+}
+
+.banner-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.banner-subtitle {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: #32394d;
+  line-height: 1.5;
+}
+
+.banner-title {
+  font-family: $font-primary;
+  font-size: 30px;
+  font-weight: $font-bold;
+  color: #32394d;
+  line-height: 1.1;
+}
+
+.banner-description {
+  font-family: $font-primary;
+  font-size: $font-base;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+  width: 421px;
+  max-width: 100%;
+  margin: 0;
+}
+
+.banner-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: $gray-700;
+  font-size: 14px;
+
+  &:hover {
+    color: $gray-900;
+  }
+}
+
+// ========== Filtros ==========
+.filtros-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: $size-5;
+}
+
+.filtros-card {
+  background: $white;
+  border-radius: $radius-md;
+  padding: $size-4;
+  overflow: hidden;
+}
+
+.filtros-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 48px;
+  width: 100%;
+}
+
+.filtros-inputs {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  max-width: 280px;
+  min-width: 0;
+}
+
+.select-label {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+
+  select {
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px;
+    padding-right: 36px;
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-regular;
+    color: $gray-500;
+    line-height: 1.5;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+
+    &:focus {
+      border-color: $primary-500;
+    }
+  }
+
+  .select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: $gray-500;
+    pointer-events: none;
+  }
+}
+
+.btn-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $size-1;
+  height: 40px;
+  min-width: 40px;
+  padding: $size-3;
+  background: $primary-300;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+
+  i {
+    font-size: 18px;
+    color: $white;
+  }
+
+  &:hover {
+    background: $primary-500;
+  }
+}
+
+.toggle-group {
+  display: flex;
+  gap: 4px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toggle-label {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+// Custom switch toggle
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 21px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #d3d7de;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      left: 3px;
+      top: 2px;
+      background: $white;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+  }
+
+  input:checked + .slider {
+    background: $primary-500;
+
+    &::before {
+      transform: translateX(18px);
+    }
+  }
+}
+
+.search-input {
+  width: 260px;
+  max-width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: $size-3;
+  background: $gray-50;
+  border: 1px solid #e6eaf2;
+  border-radius: $radius-md;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-regular;
+    color: $gray-700;
+
+    &::placeholder {
+      color: $gray-500;
+    }
+  }
+
+  .search-icon {
+    color: $gray-500;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+}
+
+// ========== Barra tabla ==========
+.barra-tabla {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: $size-4;
+}
+
+.barra-count {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  line-height: 1.5;
+
+  .count-number {
+    color: $gray-600;
+    font-weight: $font-medium;
+  }
+
+  .count-text {
+    color: $gray-600;
+    font-weight: $font-regular;
+  }
+}
+
+.barra-sort {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.sort-label {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-600;
+  line-height: 1.5;
+}
+
+.sort-dropdown {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  height: 39px;
+  padding: $size-3;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: $radius-md;
+
+  span {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $gray-500;
+    line-height: 1.1;
+  }
+
+  i {
+    font-size: 12px;
+    color: $gray-500;
+  }
+}
+
+// ========== Empty State ==========
+.empty-state-section {
+  padding: $size-4;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  gap: $size-4;
+  align-items: center;
+  padding: $size-4;
+}
+
+.empty-state-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+
+  .dropi-icon {
+    width: 51px;
+    height: 48px;
+    mix-blend-mode: luminosity;
+  }
+
+  .dropi-shadow {
+    width: 46px;
+    height: 4px;
+    margin-top: -2px;
+  }
+}
+
+.empty-state-text {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-regular;
+  color: $gray-500;
+  line-height: 1.5;
+  text-align: center;
+  max-width: 400px;
+  margin: 0;
+}

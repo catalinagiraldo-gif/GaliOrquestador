@@ -2,10 +2,17 @@ import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import ordersData from '../../../../mocks/orders.json';
+import pedidosData from '../../../../mocks/pedidos.json';
 import productsData from '../../../../mocks/products.json';
 import usersData from '../../../../mocks/users.json';
 import walletData from '../../../../mocks/wallet.json';
 import analyticsData from '../../../../mocks/analytics.json';
+import casData from '../../../../mocks/cas.json';
+import academyData from '../../../../mocks/academy.json';
+import cazaProductosData from '../../../../mocks/caza-productos.json';
+import proveedoresData from '../../../../mocks/proveedores.json';
+import historialCarteraData from '../../../../mocks/historial-cartera.json';
+import dropicardData from '../../../../mocks/dropicard.json';
 
 // Mutable in-memory copies (reset on page refresh)
 let orders = [...ordersData];
@@ -20,6 +27,11 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
       return of(new HttpResponse({ status: 200, body: user }));
     }
     return of(new HttpResponse({ status: 401, body: { error: 'Invalid credentials' } }));
+  }
+
+  // GET /api/pedidos
+  if (req.url.includes('/api/pedidos') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: pedidosData }));
   }
 
   // GET /api/orders
@@ -56,6 +68,36 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   // GET /api/analytics
   if (req.url.includes('/api/analytics') && req.method === 'GET') {
     return of(new HttpResponse({ status: 200, body: analyticsData }));
+  }
+
+  // GET /api/caza-productos
+  if (req.url.includes('/api/caza-productos') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: cazaProductosData }));
+  }
+
+  // GET /api/proveedores
+  if (req.url.includes('/api/proveedores') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: proveedoresData }));
+  }
+
+  // GET /api/historial-cartera
+  if (req.url.includes('/api/historial-cartera') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: historialCarteraData }));
+  }
+
+  // GET /api/dropicard
+  if (req.url.includes('/api/dropicard') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: dropicardData }));
+  }
+
+  // GET /api/cas
+  if (req.url.includes('/api/cas') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: casData }));
+  }
+
+  // GET /api/academy
+  if (req.url.includes('/api/academy') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: academyData }));
   }
 
   return next(req);

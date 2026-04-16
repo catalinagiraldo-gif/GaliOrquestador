@@ -1,0 +1,111 @@
+<div class="academy-page">
+  <div class="academy-card">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-left">
+        <div class="hero-texts">
+          <span class="hero-subtitle">Como Dropshipper</span>
+          <h1 class="hero-title">
+            Impulsa tu negocio desde cero con <span class="title-highlight">Dropi Academy</span>
+          </h1>
+          <p class="hero-description">
+            Cursos prácticos y guías paso a paso para dominar el comercio electrónico, mejorar tus ventas y sacarle el máximo provecho a Dropi.
+          </p>
+        </div>
+
+        <p class="hero-cta-text">
+          Conoce más sobre <strong class="cta-highlight">Dropi Academy</strong>
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn-primary">Accede a Dropi Academy</button>
+          <button class="btn-secondary">Registrarse es Gratis</button>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="video-container">
+          <img
+            src="assets/images/academy/video-thumbnail.svg"
+            alt="Video Dropi Academy"
+            class="video-thumb"
+          />
+          <div class="play-button">
+            <div class="play-icon">
+              <i class="pi pi-play"></i>
+            </div>
+          </div>
+        </div>
+        <!-- Decorative element -->
+        <img
+          src="assets/images/academy/decorative-gears.svg"
+          alt=""
+          class="decorative-gears"
+        />
+      </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses-section">
+      <div class="courses-header">
+        <div class="courses-titles">
+          <h2 class="courses-title">Explora los cursos de Dropi Academy</h2>
+          <p class="courses-subtitle">Aprende a tu ritmo, sin experiencia previa.</p>
+        </div>
+      </div>
+
+      <div class="courses-carousel">
+        <div class="courses-scroll">
+          <div
+            class="course-card"
+            *ngFor="let course of courses"
+          >
+            <!-- Thumbnail -->
+            <div class="course-thumb-wrapper">
+              <img [src]="course.thumbnailUrl" [alt]="course.title" class="course-thumb" />
+              <!-- Tag overlay -->
+              <div class="course-tag-overlay">
+                <span class="course-tag" [ngClass]="getTagClass(course.tagColor)">
+                  {{ course.tagLabel }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Card body -->
+            <div class="course-body">
+              <div class="course-info">
+                <div class="course-title-row">
+                  <span class="course-title">{{ course.title }}</span>
+                </div>
+                <span class="course-desc" *ngIf="course.description">{{ course.description }}</span>
+              </div>
+
+              <div class="course-duration">
+                <i class="pi pi-book"></i>
+                <span class="duration-label">Duración:</span>
+                <span class="duration-value">{{ course.modules }}</span>
+              </div>
+
+              <div class="course-instructor">
+                <img
+                  [src]="course.instructorAvatar"
+                  [alt]="course.instructorName"
+                  class="instructor-avatar"
+                />
+                <div class="instructor-info">
+                  <span class="instructor-name">{{ course.instructorName }}</span>
+                  <span class="instructor-role">{{ course.instructorRole }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scroll button -->
+        <button class="scroll-btn" (click)="scrollCourses('right')">
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

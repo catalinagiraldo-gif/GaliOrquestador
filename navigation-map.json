@@ -80,7 +80,9 @@
           "route": "/productos/proveedores",
           "type": "page",
           "roles": ["dropshipper"],
-          "description": "Listado de proveedores disponibles."
+          "prototype": "/productos/proveedores",
+          "figmaSource": "https://www.figma.com/design/n2502amhkeOJ2hrfIXHj63/Productos?node-id=1-28296",
+          "description": "Listado de proveedores disponibles. Grid de cards con logo, nombre, cantidad de productos, categorías y favorito. Filtros por tipo, ciudad, categorías."
         },
         "perfil-proveedor": {
           "route": "/productos/proveedores/:id",
@@ -98,7 +100,9 @@
           "route": "/productos/caza-productos",
           "type": "page",
           "roles": ["dropshipper"],
-          "description": "Herramienta para descubrir productos trending."
+          "prototype": "/productos/caza-productos",
+          "figmaSource": "https://www.figma.com/design/S8rl72C8LMF7DPDkeh83lX/Caza-productos?node-id=10252-66977",
+          "description": "Herramienta para descubrir productos trending. Banner hero, filtros (Categoría, Estado, Con ofertas toggle, Buscar producto), grid de publicaciones, botón Crear publicación."
         },
         "print-on-demand": {
           "route": "/productos/print-on-demand",
@@ -131,16 +135,30 @@
       "roles": ["dropshipper", "proveedor", "admin"],
       "views": {
         "listado": {
-          "route": "/pedidos/todos",
+          "route": "/mis-pedidos/mis-pedidos",
           "type": "page",
           "roles": ["dropshipper"],
-          "description": "Listado de todas las órdenes del dropshipper con filtros por estado.",
+          "prototype": "/mis-pedidos/mis-pedidos",
+          "figmaSource": "https://www.figma.com/design/GwQWPc0xftCOfPVvTQWEj2/Huella-digital?node-id=8563-140983",
+          "description": "Listado de todas las órdenes del dropshipper. Tabla con columnas: Cliente (nombre, dirección con iconos de verificación, teléfono), Estatus de la orden (PENDIENTE, GUÍA GENERADA con tracking, PENDIENTE DE CONFIRMACIÓN), Transportadora, Bodega, Tipo de envío (CON/SIN RECAUDO con badges de tienda y orderID), Etiqueta, Detalles (iconos de acciones por fila).",
+          "layout": {
+            "breadcrumb": "Home > Mis pedidos > Mis pedidos",
+            "title": "Mis Pedidos",
+            "actionBar": "Dropdown 'Acciones' (izquierda) + Botón filtro naranja (derecha) + Input 'Buscar'",
+            "table": "Columnas: Cliente, Estatus de la orden, Transportadora, Bodega, Tipo de envío, Etiqueta, Detalles"
+          },
           "actions": [
-            { "cta": "Crear orden", "opens": "pedidos.orden-manual", "type": "modal" },
-            { "cta": "Ver detalle", "opens": "pedidos.orden-detalle", "type": "navigate" },
-            { "cta": "Filtrar por estado", "type": "filter", "targets": ["status"] },
-            { "cta": "Buscar orden", "type": "search", "targets": ["id", "cliente", "tracking"] },
-            { "cta": "Exportar", "type": "action" }
+            { "cta": "Acciones (dropdown)", "type": "action", "description": "Dropdown con acciones masivas sobre pedidos" },
+            { "cta": "Filtro", "type": "filter", "targets": ["status", "fecha", "transportadora", "ciudad"] },
+            { "cta": "Buscar", "type": "search", "targets": ["id", "producto", "cliente", "telefono"] },
+            { "cta": "Ver detalle (search icon)", "opens": "pedidos.orden-detalle", "type": "navigate" },
+            { "cta": "Eliminar (trash icon)", "type": "action", "confirmation": true },
+            { "cta": "Editar cliente (user-pen icon)", "type": "action" },
+            { "cta": "Huella digital (fingerprint icon)", "type": "action", "description": "Ver huella digital del cliente para validación anti-fraude" },
+            { "cta": "Notificaciones (bell icon)", "type": "action", "description": "Ver notificaciones de la orden, badge con conteo" },
+            { "cta": "Etiquetar (tag icon)", "type": "action" },
+            { "cta": "Soporte (headset icon)", "type": "action", "description": "Abrir ticket de soporte CAS para esta orden" },
+            { "cta": "Crear orden", "opens": "pedidos.orden-manual", "type": "modal" }
           ]
         },
         "listado-proveedor": {
@@ -295,9 +313,11 @@
           "description": "Facturas del dropshipper."
         },
         "historial": {
-          "route": "/financiero/historial",
+          "route": "/historial-de-cartera",
           "type": "page",
-          "description": "Historial completo de cartera."
+          "prototype": "/historial-de-cartera",
+          "figmaSource": "https://www.figma.com/design/3qTruUgzuOFnrRmWHIuL6C/Recargas--Confio?node-id=125-33856",
+          "description": "Historial completo de cartera. Filtros de fecha, tipo, código. Tabs: Transacciones en billetera / Depósitos manuales. Tabla con #, Fecha, Tipo, Monto, Descripción, Usuario, Opciones. Botones: Recargar Cartera, Descargar Excel, Transferencia entre wallets."
         }
       }
     },
@@ -494,6 +514,13 @@
       "icon": "pi-comments",
       "roles": ["dropshipper", "proveedor", "admin"],
       "views": {
+        "bandeja": {
+          "route": "/cas/bandeja",
+          "type": "page",
+          "prototype": "WORKING",
+          "roles": ["dropshipper"],
+          "description": "Bandeja de entrada CAS con panel de conversaciones y chat."
+        },
         "tickets": {
           "route": "/cas/tickets",
           "type": "page",
@@ -518,16 +545,19 @@
       "description": "Vistas que no pertenecen a un módulo con submenu.",
       "views": {
         "dropi-card": {
-          "route": "/dropi-card",
+          "route": "/dropi-card/cards",
           "type": "page",
           "roles": ["dropshipper", "proveedor"],
+          "prototype": "/dropi-card/cards",
+          "figmaSource": "https://www.figma.com/design/vdvGJN2gZ1VpjdJhm5vqfM/Dropicard?node-id=2004-32741",
           "label": "Dropi Card",
           "icon": "pi-credit-card",
-          "description": "Tarjeta virtual Dropi para pagos y retiros."
+          "description": "Gestión de tarjetas Dropicard. Banner promocional, filtros por tipo/estado, solicitar tarjeta."
         },
         "academy": {
           "route": "/academy",
           "type": "page",
+          "prototype": "WORKING",
           "roles": ["dropshipper"],
           "label": "Academy",
           "icon": "pi-book",

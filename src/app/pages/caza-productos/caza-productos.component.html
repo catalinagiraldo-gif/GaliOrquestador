@@ -1,0 +1,114 @@
+<div class="caza-productos-page">
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <span class="breadcrumb-icon"><i class="pi pi-search"></i></span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item">Productos</span>
+  <i class="pi pi-chevron-right breadcrumb-chevron"></i>
+  <span class="breadcrumb-item active">Caza productos</span>
+</div>
+
+<!-- Header: Title + CTA -->
+<div class="page-header">
+  <h1 class="page-title">Caza productos</h1>
+  <button class="btn-crear-publicacion">Crear publicación</button>
+</div>
+
+<!-- Banner -->
+<section class="banner-section" *ngIf="showBanner">
+  <div class="banner">
+    <div class="banner-image-area">
+      <img src="assets/images/caza-productos/banner-products.png" alt="Caza productos" class="banner-image" />
+    </div>
+    <div class="banner-content">
+      <div class="banner-text-group">
+        <span class="banner-subtitle">Te damos la bienvenida a</span>
+        <span class="banner-title">Caza productos</span>
+      </div>
+      <p class="banner-description">Publica el producto que buscas y recibirás ofertas de proveedores interesados. Ideal para descubrir productos que no están en el catálogo.</p>
+    </div>
+    <button class="banner-close" (click)="closeBanner()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+</section>
+
+<!-- Filtros -->
+<section class="filtros-section">
+  <div class="filtros-card">
+    <div class="filtros-row">
+      <div class="filtros-inputs">
+        <!-- Categoría -->
+        <div class="select-group">
+          <label class="select-label">Categoría</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedCategory">
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+            <i class="pi pi-chevron-down select-icon"></i>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="select-group">
+          <label class="select-label">Estado</label>
+          <div class="select-wrapper">
+            <select [(ngModel)]="selectedStatus">
+              <option *ngFor="let st of statuses" [value]="st">{{ st }}</option>
+            </select>
+            <i class="pi pi-chevron-down select-icon"></i>
+          </div>
+        </div>
+
+        <!-- Arrow button -->
+        <button class="btn-arrow">
+          <i class="pi pi-arrow-right"></i>
+        </button>
+
+        <!-- Con ofertas toggle -->
+        <div class="toggle-group">
+          <span class="toggle-label">Con ofertas</span>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="conOfertas" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-input">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" placeholder="Buscar producto" [(ngModel)]="searchQuery" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Count + Sort bar -->
+  <div class="barra-tabla">
+    <div class="barra-count">
+      <span class="count-number">{{ filteredPublications.length }}</span>
+      <span class="count-text">publicaciones encontradas</span>
+    </div>
+    <div class="barra-sort">
+      <span class="sort-label">Ordenar por:</span>
+      <button class="sort-dropdown">
+        <span>{{ sortBy }}</span>
+        <i class="pi pi-chevron-down"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Empty State -->
+<section class="empty-state-section">
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <img src="assets/images/caza-productos/dropi-icon-gray.svg" alt="" class="dropi-icon" />
+      <img src="assets/images/caza-productos/dropi-icon-shadow.svg" alt="" class="dropi-shadow" />
+    </div>
+    <p class="empty-state-text">
+      Crea una publicación con el producto que buscas y permite que los proveedores premium se pongan en contacto contigo.
+    </p>
+  </div>
+</section>
+</div>

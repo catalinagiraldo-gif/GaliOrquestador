@@ -1,0 +1,145 @@
+<div class="mis-pedidos-page">
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a class="breadcrumb-item" routerLink="/home">
+      <i class="pi pi-home"></i>
+    </a>
+    <span class="breadcrumb-separator">›</span>
+    <a class="breadcrumb-item">Mis pedidos</a>
+    <span class="breadcrumb-separator">›</span>
+    <span class="breadcrumb-item active">Mis pedidos</span>
+  </div>
+
+  <!-- Title -->
+  <h1 class="page-title">Mis Pedidos</h1>
+
+  <!-- Table Container -->
+  <div class="table-container">
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-bar-left">
+        <button class="btn-actions" (click)="toggleActionsDropdown()">
+          Acciones
+          <i class="pi pi-chevron-down"></i>
+        </button>
+      </div>
+      <div class="action-bar-right">
+        <button class="btn-filter">
+          <svg width="19" height="19" viewBox="0 0 19 19" fill="none">
+            <path d="M2 4h15M4 9.5h11M7 15h5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="search-input">
+          <img src="assets/icons/pedidos/search.svg" alt="" class="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar"
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-scroll">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th class="col-client">Cliente</th>
+            <th class="col-status">Estatus de la orden</th>
+            <th class="col-transport">Transprotadora</th>
+            <th class="col-bodega">Bodega</th>
+            <th class="col-envio">Tipo de envío</th>
+            <th class="col-etiqueta">Etiqueta</th>
+            <th class="col-detalles">Detalles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pedido of filteredPedidos; let odd = odd" [class.row-alt]="odd">
+            <!-- Cliente -->
+            <td class="col-client">
+              <div class="client-info">
+                <div class="client-name">{{ pedido.client.name }}</div>
+                <div class="client-address">
+                  <span class="address-text">{{ pedido.client.address }}</span>
+                  <img
+                    [src]="getMarkerIcon(pedido.client.addressStatus)"
+                    alt=""
+                    class="address-marker-icon"
+                  />
+                </div>
+                <div class="client-phone">Tel: {{ pedido.client.phone }}</div>
+              </div>
+            </td>
+
+            <!-- Estatus de la orden -->
+            <td class="col-status">
+              <div class="status-cell">
+                <span class="status-badge" [ngClass]="getStatusClass(pedido.status)">
+                  {{ pedido.status }}
+                </span>
+                <span *ngIf="pedido.trackingNumber" class="tracking-number">
+                  {{ pedido.trackingNumber }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Transportadora -->
+            <td class="col-transport">{{ pedido.transportadora }}</td>
+
+            <!-- Bodega -->
+            <td class="col-bodega">{{ pedido.bodega }}</td>
+
+            <!-- Tipo de envío -->
+            <td class="col-envio">
+              <div class="envio-cell">
+                <span class="envio-tipo">{{ pedido.tipoEnvio }}</span>
+                <div class="envio-badges">
+                  <span class="envio-badge">{{ pedido.storeBadge }}</span>
+                  <span class="envio-badge">{{ pedido.orderId }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Etiqueta -->
+            <td class="col-etiqueta">
+              <img *ngIf="pedido.etiqueta" src="assets/icons/pedidos/tag.svg" alt="" class="etiqueta-icon" />
+            </td>
+
+            <!-- Detalles (acciones) -->
+            <td class="col-detalles">
+              <div class="action-icons">
+                <button *ngIf="hasAction(pedido, 'dropdown')" class="action-icon" title="Expandir">
+                  <img src="assets/icons/pedidos/dropdown-arrow.svg" alt="" />
+                </button>
+                <button *ngIf="hasAction(pedido, 'search')" class="action-icon" title="Ver detalle">
+                  <img src="assets/icons/pedidos/search.svg" alt="" />
+                </button>
+                <button *ngIf="hasAction(pedido, 'trash')" class="action-icon" title="Eliminar">
+                  <img src="assets/icons/pedidos/trash.svg" alt="" />
+                </button>
+                <button *ngIf="hasAction(pedido, 'user-pen')" class="action-icon" title="Editar cliente">
+                  <img src="assets/icons/pedidos/user-pen.svg" alt="" />
+                </button>
+                <button class="action-icon icon-huella" title="Huella digital">
+                  <img src="assets/icons/pedidos/huella.svg" alt="" />
+                  <span *ngIf="pedido.huellaStatus === 'alert'" class="alert-dot"></span>
+                </button>
+                <button class="action-icon icon-bell" title="Notificaciones">
+                  <img src="assets/icons/pedidos/bell-ring.svg" alt="" />
+                  <span *ngIf="pedido.notificaciones > 0" class="notification-badge">{{ pedido.notificaciones }}</span>
+                </button>
+                <button *ngIf="hasAction(pedido, 'tag')" class="action-icon" title="Etiquetar">
+                  <img src="assets/icons/pedidos/tag.svg" alt="" />
+                </button>
+                <button *ngIf="hasAction(pedido, 'headset')" class="action-icon" title="Soporte">
+                  <img src="assets/icons/pedidos/headset.svg" alt="" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
