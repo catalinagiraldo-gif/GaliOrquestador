@@ -1,5 +1,6 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 import ordersData from '../../../../mocks/orders.json';
 import pedidosData from '../../../../mocks/pedidos.json';
@@ -15,6 +16,11 @@ import historialCarteraData from '../../../../mocks/historial-cartera.json';
 import dropicardData from '../../../../mocks/dropicard.json';
 import ordersProviderData from '../../../../mocks/orders-provider.json';
 import billingDropshippersData from '../../../../mocks/billing-dropshippers.json';
+import galiDiscoveryData from '../../../../mocks/gali-discovery.json';
+import galiStrategyData from '../../../../mocks/gali-strategy.json';
+import galiCreationData from '../../../../mocks/gali-creation.json';
+import galiLaunchData from '../../../../mocks/gali-launch.json';
+import galiDashboardData from '../../../../mocks/gali-dashboard.json';
 
 // Mutable in-memory copies (reset on page refresh)
 let orders = [...ordersData];
@@ -110,6 +116,31 @@ export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
   // GET /api/billing-dropshippers
   if (req.url.includes('/api/billing-dropshippers') && req.method === 'GET') {
     return of(new HttpResponse({ status: 200, body: billingDropshippersData }));
+  }
+
+  // GET /api/gali-discovery — Modo Descubrimiento AI-First
+  if (req.url.includes('/api/gali-discovery') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: galiDiscoveryData })).pipe(delay(300));
+  }
+
+  // GET /api/gali-strategy — Modo Estrategia AI-First
+  if (req.url.includes('/api/gali-strategy') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: galiStrategyData })).pipe(delay(300));
+  }
+
+  // GET /api/gali-creation — Modo Creación AI-First
+  if (req.url.includes('/api/gali-creation') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: galiCreationData })).pipe(delay(300));
+  }
+
+  // GET /api/gali-launch — Modo Lanzamiento AI-First
+  if (req.url.includes('/api/gali-launch') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: galiLaunchData })).pipe(delay(300));
+  }
+
+  // GET /api/gali-dashboard — Dashboard + Onboarding AI-First
+  if (req.url.includes('/api/gali-dashboard') && req.method === 'GET') {
+    return of(new HttpResponse({ status: 200, body: galiDashboardData })).pipe(delay(300));
   }
 
   return next(req);

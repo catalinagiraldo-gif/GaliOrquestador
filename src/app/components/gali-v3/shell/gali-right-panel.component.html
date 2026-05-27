@@ -1,0 +1,116 @@
+<aside class="rpanel" [class.is-open]="open()" [class.is-collapsed]="!open()" aria-label="Panel lateral Gali">
+  <!-- Estado COLAPSADO: chip vertical con toggle + badge -->
+  <button
+    *ngIf="!open()"
+    type="button"
+    class="rpanel__chip"
+    (click)="toggle()"
+    [attr.aria-label]="'Abrir panel Gali (⌘J)' + (unreadCount() ? ' · ' + unreadCount() + ' mensaje nuevo' : '')"
+    title="Abrir panel Gali (⌘J)">
+    <span class="rpanel__chip-sparkle" aria-hidden="true">✦</span>
+    <span class="rpanel__chip-arrow" aria-hidden="true">‹</span>
+    <span *ngIf="unreadCount() > 0" class="rpanel__chip-badge" aria-hidden="true">{{ unreadCount() }}</span>
+  </button>
+
+  <!-- Estado ABIERTO -->
+  <ng-container *ngIf="open()">
+    <header class="rpanel__head">
+      <nav class="rpanel__tabs" role="tablist" aria-label="Secciones del panel Gali">
+        <button
+          type="button"
+          role="tab"
+          class="rpanel__tab"
+          [class.is-active]="tab() === 'chat'"
+          [attr.aria-selected]="tab() === 'chat'"
+          (click)="setTab('chat')">
+          <span class="rpanel__tab-icon" aria-hidden="true">✦</span>
+          <span>Gali</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="rpanel__tab"
+          [class.is-active]="tab() === 'bloques'"
+          [attr.aria-selected]="tab() === 'bloques'"
+          (click)="setTab('bloques')">
+          <span class="rpanel__tab-icon" aria-hidden="true">▦</span>
+          <span>Mis bloques</span>
+          <span *ngIf="bloquesCount() > 0" class="rpanel__tab-count">{{ bloquesCount() }}</span>
+        </button>
+      </nav>
+      <button
+        type="button"
+        class="rpanel__collapse"
+        (click)="toggle()"
+        aria-label="Cerrar panel Gali (⌘J)"
+        title="Cerrar panel (⌘J)">›</button>
+    </header>
+
+    <!-- TAB CHAT — incluye business-context como acordeón colapsable -->
+    <div class="rpanel__content" *ngIf="tab() === 'chat'" role="tabpanel">
+      <section class="rpanel__business" [class.is-expanded]="businessExpanded()">
+        <button type="button" class="rpanel__business-toggle" (click)="toggleBusiness()" [attr.aria-expanded]="businessExpanded()">
+          <span class="rpanel__business-label">
+            <span class="rpanel__business-dot" aria-hidden="true"></span>
+            Negocio en vivo
+          </span>
+          <span class="rpanel__business-arrow" aria-hidden="true">{{ businessExpanded() ? '▴' : '▾' }}</span>
+        </button>
+        <div *ngIf="businessExpanded()" class="rpanel__business-body">
+          <gali-business-context></gali-business-context>
+        </div>
+      </section>
+
+      <div class="rpanel__chat">
+        <gali-chat></gali-chat>
+      </div>
+    </div>
+
+    <!-- TAB MIS BLOQUES — output global de Vista 8 -->
+    <div class="rpanel__content" *ngIf="tab() === 'bloques'" role="tabpanel">
+      <div class="rpanel__bloques">
+        <header class="rpanel__bloques-head">
+          <div>
+            <strong>Mis bloques custom</strong>
+            <span>Creados con el Constructor de Gali</span>
+          </div>
+          <button type="button" class="rpanel__bloques-new" (click)="irAlConstructor()">
+            <span aria-hidden="true">✦</span> Nuevo
+          </button>
+        </header>
+
+        <!-- Empty state -->
+        <div *ngIf="bloquesCount() === 0" class="rpanel__bloques-empty">
+          <svg viewBox="0 0 120 90" class="rpanel__bloques-empty-art" aria-hidden="true">
+            <rect x="10" y="20" width="36" height="48" rx="4" fill="#FCE4C7" stroke="#F49A3D" stroke-width="1.2"/>
+            <rect x="52" y="14" width="32" height="22" rx="4" fill="#FFF9F0" stroke="#B8593A" stroke-width="1.2"/>
+            <rect x="52" y="40" width="32" height="28" rx="4" fill="#D8DECF" stroke="#5F7058" stroke-width="1.2"/>
+            <rect x="90" y="20" width="20" height="48" rx="4" fill="#F3E1B8" stroke="#C88A1C" stroke-width="1.2" stroke-dasharray="3 2"/>
+            <text x="100" y="48" text-anchor="middle" font-family="Inter" font-size="13" fill="#C88A1C">+</text>
+          </svg>
+          <strong>Aún no construyes bloques</strong>
+          <p>Describe en español lo que quieres ver y Gali lo arma en vivo. Lo guardas y aparece aquí.</p>
+          <button type="button" class="rpanel__bloques-cta" (click)="irAlConstructor()">Crear mi primer bloque →</button>
+        </div>
+
+        <!-- List -->
+        <ul *ngIf="bloquesCount() > 0" class="rpanel__bloques-list">
+          <li *ngFor="let b of bloques(); let i = index" class="rpanel__bloque" [style.animation-delay.ms]="i * 60">
+            <button type="button" class="rpanel__bloque-btn" (click)="irAlConstructor()">
+              <span class="rpanel__bloque-icon" aria-hidden="true">{{ b.icono }}</span>
+              <span class="rpanel__bloque-body">
+                <strong>{{ b.titulo }}</strong>
+                <span class="rpanel__bloque-desc">{{ b.descripcion }}</span>
+                <span class="rpanel__bloque-meta">
+                  <em>{{ b.categoria }}</em>
+                  <em [attr.data-real]="!b.datos_simulados">{{ b.datos_simulados ? 'simulado' : 'datos reales' }}</em>
+                  <em>{{ b.confianza_gali * 100 | number: '1.0-0' }}% confianza</em>
+                </span>
+              </span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</aside>

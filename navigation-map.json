@@ -651,6 +651,278 @@
           "description": "Gestión de retiros de saldo de la plataforma."
         }
       }
+    },
+    "gali-v3": {
+      "route": "/gali-v3",
+      "label": "Gali Híbrido (Builder + Orquestador)",
+      "icon": "pi-sparkles",
+      "roles": ["dropshipper"],
+      "defaultView": "inicio",
+      "description": "Workspace AI-First tri-pane (Navigator + Canvas/Artifact + Negocio live) con chat persistente estilo Claude/Cursor. Gali asistente y constructor: armas proyectos, automatizaciones, vistas y agentes. Despierta componentes en catálogo/pedidos/campañas.",
+      "views": {
+        "inicio": {
+          "route": "/gali-v3",
+          "type": "page",
+          "prototype": "/gali-v3",
+          "description": "WelcomeArtifact: saludo memoria-aware + 3 cards (Reanudar último proyecto / Construir nuevo / Builder) + plantillas destacadas + chat persistente.",
+          "components": ["WelcomeArtifact", "GaliTopbar", "GaliNavigator", "GaliBusinessContext", "GaliChat"]
+        },
+        "proyecto-detalle": {
+          "route": "/gali-v3/proyecto/:id",
+          "type": "page",
+          "prototype": "/gali-v3/proyecto/collar-gps-2026",
+          "description": "Workspace de proyecto con memoria visible: hero + pipeline + siguiente acción Gali + decisiones + aprendizajes + tabs (conversaciones/decisiones/artifacts)."
+        },
+        "proyecto-nuevo": {
+          "route": "/gali-v3/proyecto/nuevo",
+          "type": "page",
+          "prototype": "/gali-v3/proyecto/nuevo",
+          "description": "Crear proyecto desde objetivo en lenguaje natural."
+        },
+        "builder": {
+          "route": "/gali-v3/builder",
+          "type": "page",
+          "prototype": "/gali-v3/builder",
+          "description": "Builder visual de automatizaciones tipo Make: paleta de triggers/acciones/condiciones + canvas con bloques encadenados + ejecución mock con streaming log."
+        },
+        "mercado": {
+          "route": "/gali-v3/mercado",
+          "type": "page",
+          "prototype": "/gali-v3/mercado",
+          "description": "Marketplace con 3 tabs: Plantillas (12) / Agentes (8) / Conexiones (Meta, TikTok, Shopify, Tienda Nube, WhatsApp, Claude)."
+        },
+        "dropi-catalogo": {
+          "route": "/gali-v3/dropi/catalogo",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/catalogo",
+          "description": "Catálogo despertado: cada ProductCard tiene botón ✦ que al click expande análisis Gali + ángulos LATAM + acciones in-card."
+        },
+        "dropi-pedidos": {
+          "route": "/gali-v3/dropi/pedidos",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/pedidos",
+          "description": "Pedidos con triage Gali en 3 zonas: críticas / Gali manejando / resueltas hoy."
+        },
+        "dropi-campanas": {
+          "route": "/gali-v3/dropi/campanas",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/campanas",
+          "description": "Campañas con health-indicator Gali y diagnóstico contextual + acción sugerida in-card."
+        },
+        "mercado-agente": {
+          "route": "/gali-v3/mercado/agente/:id",
+          "type": "page",
+          "prototype": "/gali-v3/mercado/agente/ag-1",
+          "description": "Detalle de un agente del mercado: tagline, descripción, qué hace, requisitos, cómo trabaja con tu negocio, agentes relacionados. Botón instalar/desinstalar funcional."
+        },
+        "artifact-landing": {
+          "route": "/gali-v3/artifact/landing/:id",
+          "type": "page",
+          "prototype": "/gali-v3/artifact/landing/land-1",
+          "description": "Landing como artifact editable in-place: click cualquier texto para editarlo, paleta de 3 ángulos cambia la skin, preview desktop/mobile, versions (v1·v2·v3) restorables, save version, generar variación con Gali, publicar."
+        },
+        "vista-personalizada": {
+          "route": "/gali-v3/vista/:slug",
+          "type": "page",
+          "prototype": "/gali-v3/vista/operacion-hoy",
+          "description": "Vista personalizada con widgets componibles. /vista/nueva permite componer desde prompt natural — Gali infiere widgets y los pinta progresivamente. 9 widgets disponibles + 3 templates iniciales."
+        },
+        "mi-objetivo": {
+          "route": "/gali-v3/objetivo",
+          "type": "page",
+          "prototype": "/gali-v3/objetivo",
+          "description": "V4 Vista 5 — Modo Objetivos → Roadmap personalizado por Gali. Onboarding 3 preguntas (qué quieres lograr / para cuándo / qué tienes hoy) → Gali genera roadmap de 4 semanas con pasos accionables. Aplica H#11 (razonamiento expuesto) y H#13 (confianza por paso + por objetivo). Cada paso navega a un bloque de Dropi. Reutiliza project.service.ts V3.",
+          "components": ["GoalHero", "RazonamientoGali", "RoadmapTimeline", "SemanaCard", "PasoCard"]
+        },
+        "comunidad-en-vivo": {
+          "route": "/gali-v3/comunidad",
+          "type": "page",
+          "prototype": "/gali-v3/comunidad",
+          "description": "V4 Vista 3 — Líder Virtual de Comunidad. Síntesis en tiempo real de 1.247 dropshippers LATAM: 10 señales (tendencia/oportunidad/estrategia) + 5 productos en tendencia + 3 casos top anonimizados + 3 alertas (transportadoras, proveedores, saturación). Filtros de relevancia (perfil/nicho/ecosistema) + Modo mentor + Top 3 movimientos del top 10%. Aplica H#11 (fuentes citadas anonimizadas) + H#13 (confianza por señal y global) + H#9 (gestiona escasez de datos).",
+          "components": ["LiderVirtualHero", "FiltroRelevancia", "Top3Movimientos", "ProductoTendencia", "AlertaComunidad", "CasoTop"]
+        },
+        "mi-stack": {
+          "route": "/gali-v3/mi-stack",
+          "type": "page",
+          "prototype": "/gali-v3/mi-stack",
+          "description": "V4 Vista 4 — Mi Stack personal (evolución de /gali-v3/integraciones). 15 plataformas en 4 categorías (Ads / Finanzas / Comms / E-commerce). Gali intelligence_score por integración. Recomendaciones según perfil + señales de comunidad. Modal OAuth mock 3 pasos. Aplica H#11 (insights generados visibles) + H#5 (alertas de compliance y privacidad) + H#12 (conexión reversible).",
+          "components": ["IntelligenceHero", "RecomendacionesGali", "CategoriaSection", "PlataformaCard", "ModalOAuthMock"]
+        },
+        "bloque-builder": {
+          "route": "/gali-v3/bloque-builder",
+          "type": "page",
+          "prototype": "/gali-v3/bloque-builder",
+          "description": "V4 Vista 8 NUEVA — Constructor de Bloques Custom. Modal split chat 40% + preview en vivo 60%. Modo Chat (describe en español y Gali genera) + Modo Manual (formulario estructurado). 5 ejemplos pre-cargados (ventas por ciudad / margen efectivo / cohorts / fuga de pedidos / proyección Gali). 6 fuentes de datos (Dropi core + Stack Personal + Comunidad + Memoria). 8 tipos de visualización (métrica, barras, líneas, tabla, funnel, cohort heatmap, barras agrupadas, top-N). Toggles: Probar con datos reales (H#13), Compartir con comunidad. Aplica H#11 (razonamiento expandible) + H#13 (badge confianza color + datos sim/reales) + H#5 (advertencia costo computacional) + H#10 (ejemplos contra campo vacío para novato). Reutiliza block-registry.ts V3 al guardar.",
+          "components": ["SplitChatPreview", "ModoChat", "ModoManual", "EjemploChip", "PreviewBarras", "PreviewTabla", "PreviewCohort", "PreviewFunnel", "PreviewLineas", "BadgeConfianza", "BadgeSimReal", "RazonamientoExpand", "CostoComputacional", "ToggleDatosReales", "ToggleCompartir"],
+          "origin_points": [
+            { "from": "/gali-v3 (Inicio)", "cta": "Card 'Bloques con Gali' en welcome-artifact" },
+            { "from": "/gali-v3 (Inicio)", "cta": "Sección 'Mis bloques custom' → 'Crear otro' o card vacía con 'Empezar'" },
+            { "from": "Sidebar V3 (cualquier ruta)", "cta": "Entrada 'Constructor' en sección Gali" },
+            { "from": "Command Palette ⌘K", "cta": "'Crear bloque custom con Gali' en grupo Crear" },
+            { "from": "Command Palette ⌘K", "cta": "Click en cualquier item del grupo 'Mis Bloques' (bloques guardados)" },
+            { "from": "Chat de Gali", "cta": "Slash command /bloque-nuevo" },
+            { "from": "Prototype gallery /home", "cta": "Card GALI-V4 · V8" }
+          ],
+          "post_action_flow": {
+            "on_save": "Bloque persiste en localStorage `gali_v3_bloques_custom` + toast con CTA 'Ir al Inicio →' + aparece en welcome-artifact sección 'Mis bloques custom' + queda buscable en Command Palette grupo 'Mis Bloques'",
+            "on_cancel": "Navega a /gali-v3 sin guardar; el draft del bloque se descarta",
+            "on_save_with_compartir": "Mock: también se marca para publicar en marketplace (Fase 3 — no implementado el endpoint todavía)"
+          }
+        },
+        "command-palette": {
+          "route": "/gali-v3 (global ⌘K)",
+          "type": "overlay",
+          "prototype": "/gali-v3",
+          "description": "Command palette global tipo Cursor/Linear: ⌘+K abre, fuzzy search, navegar/crear/invocar acciones Gali, ↑↓ navega ↵ ejecuta esc cierra. Incluye proyectos, agentes, flows y acciones rápidas."
+        },
+        "mapa-negocio": {
+          "route": "/gali-v3/mapa",
+          "type": "page",
+          "prototype": "/gali-v3/mapa",
+          "description": "Mapa visual del negocio: grafo de 21 nodos en 6 zonas (Gali Core · Descubrimiento · Estrategia · Operación · Financiero · Acompañamiento). Estás aquí pulsa. Hover resalta conexiones. Click navega. Atajo ⌘M global."
+        },
+        "dropi-proveedores": {
+          "route": "/gali-v3/dropi/proveedores",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/proveedores",
+          "description": "Proveedores despertados: cada card con score Gali, entrega, devoluciones, fit con tu nicho. Click ✦ expande análisis + productos destacados."
+        },
+        "dropi-caza": {
+          "route": "/gali-v3/dropi/caza-productos",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/caza-productos",
+          "description": "Caza productos despertada: 10 trending ordenados por fit con tu perfil. Recomendación Gali (lanzar/esperar/pasar) + razón. CTA crear proyecto pre-cargado."
+        },
+        "dropi-cartera": {
+          "route": "/gali-v3/dropi/cartera",
+          "type": "page",
+          "prototype": "/gali-v3/dropi/cartera",
+          "description": "Historial cartera despertado: resumen + sparkline de flujo de caja + 3 sugerencias Gali (auto-retiro, mejor día, alerta gasto) + tabla movimientos categorizada."
+        },
+        "legacy-cas": {
+          "route": "/gali-v3/legacy/cas",
+          "type": "page-with-overlay",
+          "prototype": "/gali-v3/legacy/cas",
+          "description": "Sección CAS clásica con chip ✦ flotante: drawer Gali contextual con resumen, 3 sugerencias y chat embebido."
+        },
+        "legacy-academy": {
+          "route": "/gali-v3/legacy/academy",
+          "type": "page-with-overlay",
+          "prototype": "/gali-v3/legacy/academy",
+          "description": "Sección Academy clásica con chip ✦ flotante: drawer Gali con cursos sugeridos según tu nivel y meta."
+        },
+        "legacy-dropi-card": {
+          "route": "/gali-v3/legacy/dropi-card",
+          "type": "page-with-overlay",
+          "prototype": "/gali-v3/legacy/dropi-card",
+          "description": "Sección Dropi Card clásica con chip ✦ flotante: drawer Gali con análisis de uso, sugerencia de aumento de cupo, alertas de gasto."
+        },
+        "proximos-pasos-pattern": {
+          "route": "(transversal · footer en 5 artifacts)",
+          "type": "pattern",
+          "prototype": "/gali-v3",
+          "description": "Patrón footer 'Lo que sigue' insertado en Welcome / Project / Landing / Vista / Builder. Genera 2-3 sugerencias contextuales según ruta + proyecto. Stagger-in animation."
+        },
+        "breadcrumb-conversacional": {
+          "route": "(transversal · 28px sub-topbar)",
+          "type": "pattern",
+          "prototype": "/gali-v3",
+          "description": "Breadcrumb conversacional: '✦ Gali · Estás en: X · Próximo: Y'. Reacciona a la ruta. Siempre visible bajo la topbar."
+        },
+        "retos-gamificacion": {
+          "route": "/gali-v3/retos",
+          "type": "page",
+          "prototype": "/gali-v3/retos",
+          "description": "Sistema de retos y gamificación: perfil jugador (puntos, racha 🔥, rank cohorte) + 4 retos diarios + 4 semanales con cohort comparison + 2 misiones largas con checkpoints + Líder de Comunidad virtual (agente Top 1) + 6 insignias ganadas + 3 próximas + top 5 cohorte. Todo interactivo, persistente en localStorage."
+        },
+        "mapa-edit-mode": {
+          "route": "/gali-v3/mapa (toggle ✎)",
+          "type": "interaction",
+          "prototype": "/gali-v3/mapa",
+          "description": "Mapa del negocio en modo edición: drag-and-drop libre de nodos entre zonas (Descubrimiento, Estrategia, Operación, etc) o reorder dentro de zona. Persiste en localStorage. Botón restaurar."
+        },
+        "drag-drop-builder": {
+          "route": "/gali-v3/builder (DnD nativo)",
+          "type": "interaction",
+          "prototype": "/gali-v3/builder",
+          "description": "Builder con drag-and-drop nativo HTML5: arrastra desde paleta al canvas, reordena nodos con handle, drop slots entre bloques con feedback visual + curvas SVG Bézier entre nodos."
+        },
+        "agente-editor": {
+          "route": "/gali-v3/mercado/agente/nuevo",
+          "type": "page",
+          "prototype": "/gali-v3/mercado/agente/nuevo",
+          "description": "Wizard de 4 pasos para crear agentes custom: identidad (preview live) → trigger → prompt+herramientas → test dry-run + guardar."
+        },
+        "voz-real": {
+          "route": "(transversal · botón mic en chat)",
+          "type": "feature",
+          "prototype": "/gali-v3",
+          "description": "Reconocimiento de voz real con Web Speech API (lang es-CO) + waveform real de 8 bars desde MediaDevices/AudioContext. Banner 'Escuchando…' con transcript interim en vivo."
+        },
+        "adjuntos-chat": {
+          "route": "(transversal · botón 📎 en chat)",
+          "type": "feature",
+          "prototype": "/gali-v3",
+          "description": "Adjuntos funcionales: upload de imagen con thumbnail base64, paste URL con preview, attach producto del catálogo, attach artifact previo. Chips con thumb/icon/meta/×."
+        },
+        "signal-highlight": {
+          "route": "(transversal · ?signal=ID en URL)",
+          "type": "interaction",
+          "prototype": "/gali-v3/proyecto/collar-gps-2026?signal=sig-2",
+          "description": "Click en señal de topbar → navega + RESALTA la zona relevante con pulso 3x + scrollIntoView smooth. Directiva [signalHighlight] aplicada en proyecto, dropi-campanas, dropi-catalogo."
+        },
+        "a11y-pattern": {
+          "route": "(transversal · skip link + focus visible + reduced motion)",
+          "type": "pattern",
+          "prototype": "/gali-v3",
+          "description": "A11y: skip link 'Saltar al contenido principal', focus-visible ring naranja consistente, prefers-reduced-motion desactiva animaciones, aria-hidden en iconos decorativos, main con aria-label."
+        }
+      }
+    },
+
+    "gali": {
+      "route": "/gali",
+      "label": "Gali AI-First (v1 legacy)",
+      "icon": "pi-sparkles",
+      "roles": ["dropshipper"],
+      "defaultView": "descubrimiento",
+      "figmaSource": null,
+      "specSource": "docs/Specs/DropiAiFirst.md#5-pantalla-2-modo-descubrimiento",
+      "description": "Workspace AI-First. Gali (agente) materializa la interfaz según la intención del usuario.",
+      "views": {
+        "descubrimiento": {
+          "route": "/gali/descubrimiento",
+          "type": "page",
+          "roles": ["dropshipper"],
+          "prototype": "/gali/descubrimiento",
+          "origin_points": ["home", "prototype-gallery"],
+          "layout": "Hero state (Gali central, 640px) → Workspace state (canvas grid 4x2 + Gali sidebar 340px). Sidebar Dropi colapsado a mini-rail 64px. Topbar 56px con mission ribbon evolutiva.",
+          "components": [
+            "TopbarGali",
+            "MissionRibbon",
+            "GaliHero",
+            "GaliSidebar",
+            "GaliAvatar (5 states)",
+            "GaliMessage (streaming)",
+            "GaliExecutionStream",
+            "ConfidenceMeter",
+            "GaliLearningRibbon",
+            "ReasoningAnchor",
+            "FiltersBar",
+            "ProductCard (hover-why)",
+            "DemoTourOverlay"
+          ],
+          "actions": [
+            { "cta": "Quiero ver tendencias de hoy (sugerencia)", "type": "sendIntent" },
+            { "cta": "Elegir este (en card)", "opens": "gali.estrategia (placeholder)", "type": "select-product" },
+            { "cta": "Sí, vamos", "opens": "modal-placeholder", "type": "next-mode" },
+            { "cta": "🗑 Olvidar todo (learning ribbon)", "type": "forget-learnings" },
+            { "cta": "↺ Empezar de cero (sidebar header)", "type": "reset-session" },
+            { "cta": "Filtro categoría", "type": "filter-category" },
+            { "cta": "Ordenar por (sales/trend/margin)", "type": "reorder" }
+          ]
+        }
+      }
     }
   }
 }

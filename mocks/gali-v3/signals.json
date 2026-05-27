@@ -1,0 +1,59 @@
+{
+  "signals": [
+    {
+      "id": "sig-1",
+      "tipo": "oportunidad",
+      "icon": "⚡",
+      "titulo": "Tu campaña del Collar GPS puede escalar",
+      "contexto": "ROAS 2.8x sostenido 72h. 312 campañas similares duplicaron presupuesto en día 18 y llegaron a 4.2x.",
+      "accion_sugerida": { "label": "Escalar a $160k/día", "target_route": "/gali-v3/proyecto/collar-gps-2026" },
+      "urgencia": "media",
+      "timestamp": "hace 12 min",
+      "fuente": "Datos LATAM Dropi"
+    },
+    {
+      "id": "sig-2",
+      "tipo": "riesgo",
+      "icon": "⚠️",
+      "titulo": "CTR cayó 40% en últimas 6 horas",
+      "contexto": "Tu campaña 'Banner B - Hogar' precede un baneo en 67% de casos similares. Recomiendo pausar y activar Video A como reemplazo.",
+      "accion_sugerida": { "label": "Pausar y activar Video A", "target_route": "/gali-v3/proyecto/collar-gps-2026" },
+      "urgencia": "alta",
+      "timestamp": "hace 6 min",
+      "fuente": "Vigilante anti-baneo"
+    },
+    {
+      "id": "sig-3",
+      "tipo": "oportunidad",
+      "icon": "🎯",
+      "titulo": "Producto en alza: Difusor de aromaterapia",
+      "contexto": "+340% ventas semana en Colombia. Encaja con tu perfil (margen 68%, ticket $58k). Ventana 10-14 días antes de saturación.",
+      "accion_sugerida": { "label": "Ver análisis completo", "target_route": "/gali-v3/dropi/catalogo" },
+      "urgencia": "media",
+      "timestamp": "hace 1 hora",
+      "fuente": "Motor de Producto"
+    },
+    {
+      "id": "sig-4",
+      "tipo": "optimizacion",
+      "icon": "🔧",
+      "titulo": "Creatives del Collar GPS llevan 14 días",
+      "contexto": "Tu audiencia ya vio cada creative ~3.2 veces. Renovar ahora previene fatiga. Gali puede generar 3 variaciones nuevas.",
+      "accion_sugerida": { "label": "Generar variaciones", "target_route": "/gali-v3/proyecto/collar-gps-2026" },
+      "urgencia": "baja",
+      "timestamp": "hace 3 horas",
+      "fuente": "Creativo autónomo"
+    },
+    {
+      "id": "sig-5",
+      "tipo": "optimizacion",
+      "icon": "📊",
+      "titulo": "Reporte semanal listo para WhatsApp",
+      "contexto": "Plantilla 'Reporte WA semanal' detectó tu cierre de semana. ¿Te envío el resumen al WhatsApp ahora?",
+      "accion_sugerida": { "label": "Enviar reporte", "target_route": "/gali-v3/mercado" },
+      "urgencia": "baja",
+      "timestamp": "hace 8 horas",
+      "fuente": "Plantilla activa"
+    }
+  ]
+}

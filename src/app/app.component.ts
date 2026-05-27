@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
@@ -16,16 +16,17 @@ import { AuthService } from './services/auth.service';
       <router-outlet />
     </ng-container>
 
-    <!-- App shell with sidebar + header -->
+    <!-- App shell with sidebar + header (header oculto en /gali) -->
     <ng-template #appShell>
-      <div class="app-shell">
-        <app-sidebar />
+      <div class="app-shell" [class.app-shell--gali]="isGaliWorkspace">
+        <app-sidebar [collapsed]="isGaliWorkspace && sidebarCollapsed" />
         <div class="app-shell__main">
           <app-header
+            *ngIf="!isGaliWorkspace"
             [userName]="(auth.user$ | async)?.name ?? 'Usuario'"
             [userRole]="(auth.user$ | async)?.role ?? ''"
           />
-          <main class="app-shell__content">
+          <main class="app-shell__content" [class.app-shell__content--gali]="isGaliWorkspace">
             <router-outlet />
           </main>
         </div>
@@ -36,6 +37,8 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent {
   isLoginPage = false;
+  isGaliWorkspace = false;
+  sidebarCollapsed = true;
 
   constructor(
     public auth: AuthService,
@@ -48,6 +51,13 @@ export class AppComponent {
       )
       .subscribe(url => {
         this.isLoginPage = url.startsWith('/login');
+        this.isGaliWorkspace = url.startsWith('/gali');
+        if (this.isGaliWorkspace) this.sidebarCollapsed = true;
       });
+  }
+
+  @HostListener('window:gali:toggle-rail')
+  onToggleRail(): void {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 }

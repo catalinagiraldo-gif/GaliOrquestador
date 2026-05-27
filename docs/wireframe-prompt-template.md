@@ -129,3 +129,81 @@ Claude Code seguirá este orden al recibir el prompt:
 - **Las imágenes importan.** Si el diseño tiene product shots, dilo explícitamente para que se descarguen.
 - **El tipo de vista es crítico.** Modal vs página cambia completamente la implementación.
 - **Textos exactos.** Si en Figma dice "Número de télefono", Claude debe poner exactamente eso, no "Teléfono".
+
+---
+
+## Variante: Wireframes derivados de spec (sin Figma)
+
+Para prototipos cuya fuente de verdad es un documento de spec (no Figma) — típicamente visiones de producto, exploraciones AI-First, o ideas pre-design — usa este template alternativo. Cuando exista Figma, migrar al template estándar de arriba.
+
+```
+Genera un wireframe interactivo derivado de un spec narrativo:
+
+### Vista *
+- Nombre: [ej: Gali — Modo Descubrimiento]
+- Módulo: [ej: gali > descubrimiento]
+- Rol de usuario: [dropshipper | proveedor | admin]
+
+### Spec source *  (reemplaza al Figma URL)
+- Ruta: [ej: docs/Specs/DropiAiFirst.md]
+- Sección / anchor: [ej: "## 5. PANTALLA 2: MODO DESCUBRIMIENTO" (líneas 635-753)]
+- Sub-secciones relevantes:
+  - Componentes detallados: [línea range]
+  - Diálogos literales: [línea range]
+  - Mock data canónica: [línea range]
+
+### Tipo de vista *
+- [ ] Página completa (page)
+- [ ] Modal (overlay)
+  - Si es modal, ¿sobre qué vista se apila?: [ej: dashboard]
+  - ¿Qué CTA lo abre?: [...]
+  - ¿Qué pasa al completar? (on_success): [...]
+  - ¿Qué pasa al cancelar? (on_cancel): [...]
+
+### Componentes Gen UI a renderizar  (reemplaza a "Nodos adicionales")
+Lista los componentes que el sistema/agente materializa según el contexto:
+- [ej: ProductCard — aparece tras "ver tendencias"]
+- [ej: BuyerPersonaCard — aparece tras seleccionar producto]
+- [ej: ExecutionStream — siempre mientras Gali procesa]
+- [ej: ConfidenceMeter — anidado en cada respuesta de Gali]
+
+### Datos mock
+- Entidad principal: [ej: productos, misiones, buyer personas]
+- Cantidad mínima de items: [ej: 20+ productos]
+- Propiedades importantes: [ej: id, name, image, category, margin, salesWeek, confidence, badge, reasoning]
+- ¿Hay imágenes en el spec?: [sí/no — generalmente no, reusa src/assets/images/*]
+
+### Interacciones clave
+- [ej: Click chip sugerencia → equivale a Enter con texto del chip]
+- [ej: Hover >800ms en card → tooltip "¿Por qué este?"]
+- [ej: Click "Elegir este" → toast + mission ribbon avanza + nuevo mensaje Gali]
+- [ej: 25s sin interacción → idle nudge proactivo]
+
+### Decisiones de diseño que el spec NO resuelve (preguntar al usuario)
+Lista las decisiones tácticas que el spec deja abiertas y que afectan implementación:
+- Layout específico (hero permanente vs colapsable)
+- Identidad tipográfica (respeta DS o introduce display nueva)
+- Sensación target (premium | vivo y activo | latino | técnico)
+- Memoria entre sesiones (efímera | localStorage | mock con perfil)
+- Razonamiento visible (execution stream + confidence | solo stream | nada)
+
+### Contexto adicional (opcional)
+- Skills a aplicar: [ej: bencium-innovative-ux-designer, agentic-ux-design-relationship-centric-interfaces]
+- Sensación buscada: [ej: "esto no se parece a Dropi" + "Gali está leyendo mi mente"]
+- Out of scope explícito: [lista de qué NO se prototipa]
+- Referentes visuales: [ej: Cursor 3, Claude Artifacts, Perplexity Shopping]
+```
+
+### Ejemplo completado — Gali Modo Descubrimiento
+
+Ver el spec ejecutado en [Specs/PlanPrototipo_DropiAiFirst_ModoDescubrimiento.md](./Specs/PlanPrototipo_DropiAiFirst_ModoDescubrimiento.md) como referencia de cómo expandir este template a un plan accionable.
+
+### Diferencias clave respecto al template estándar
+
+| Aspecto | Template estándar (Figma) | Variante spec-derived |
+|---|---|---|
+| Fuente de verdad | Figma node-id | Markdown anchor + líneas |
+| Anti-hallucination | `get_design_context` por sub-nodo | Lectura literal del spec + AskUserQuestion para gaps |
+| Imágenes | `upload_assets` desde Figma | Reutilizar `src/assets/images/*` existentes |
+| Componentes | Mapeo 1:1 con nodos Figma | Componentes Gen UI inferidos del comportamiento descrito |
+| Iteración | Diseñador actualiza Figma → re-generar | Conversar con el usuario para resolver gaps antes de codear |
