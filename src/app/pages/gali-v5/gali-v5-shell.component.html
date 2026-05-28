@@ -1,0 +1,46 @@
+<div
+  class="gali-v5-shell"
+  [class.gali-v5-shell--compact]="isCompactNav()"
+  [class.gali-v5-shell--no-section]="!hasSectionPanel()"
+  [class.gali-v5-shell--nav-collapsed]="sectionNavCollapsed()">
+  <dropi-header-ia2
+    [userName]="(auth.user$ | async)?.name ?? 'Alejandra'"
+  />
+
+  <div class="gali-v5-shell__body">
+    <dropi-icon-rail />
+
+    <dropi-section-nav
+      *ngIf="hasSectionPanel()"
+      [panel]="sectionPanel()"
+      [collapsed]="sectionNavCollapsed()"
+      (collapseRequested)="collapseSectionNav()"
+    />
+
+    <main class="gali-v5-shell__content">
+      <button
+        *ngIf="hasSectionPanel() && sectionNavCollapsed()"
+        type="button"
+        class="gali-v5-shell__nav-expand"
+        data-proto-skip
+        (click)="toggleSectionNav()"
+        aria-label="Expandir menú de secciones">
+        <i class="pi pi-angle-double-right"></i>
+        <span>Secciones</span>
+      </button>
+
+      <router-outlet />
+    </main>
+  </div>
+
+  <dropi-menu-action />
+
+  <div
+    *ngIf="feedback.toast() as t"
+    class="gali-v5-shell__toast"
+    role="status"
+    aria-live="polite">
+    <i class="pi pi-check-circle"></i>
+    {{ t.message }}
+  </div>
+</div>

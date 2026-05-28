@@ -54,7 +54,9 @@
     { "id": "n-retos", "zona": "gali-core", "label": "Retos", "subtitle": "gamificación · racha 🔥12", "icon": "🎯", "route": "/gali-v3/retos", "estado": "ready", "kpi": "1840pts · #23 cohorte" },
 
     { "id": "n-catalogo", "zona": "descubrimiento", "label": "Catálogo", "subtitle": "despertado ✦", "icon": "📦", "route": "/gali-v3/dropi/catalogo", "estado": "ready", "kpi": "6 productos · análisis Gali" },
-    { "id": "n-proveedores", "zona": "descubrimiento", "label": "Proveedores", "subtitle": "score Gali por proveedor", "icon": "🏬", "route": "/gali-v3/dropi/proveedores", "estado": "ready", "kpi": "8 con score · fit-aware" },
+    { "id": "n-proveedores", "zona": "descubrimiento", "label": "PetStore Colombia", "subtitle": "Collar GPS · Stock 847 · 96% cumpl.", "icon": "🏬", "route": "/gali-v3/dropi/proveedores", "estado": "ready", "kpi": "Precio $28.500 · ✅ Normal" },
+    { "id": "n-proveedor-2", "zona": "descubrimiento", "label": "TechGear MX", "subtitle": "Electrónicos · Stock 234", "icon": "🏬", "route": "/gali-v3/dropi/proveedores", "estado": "ready", "kpi": "Cumpl. 91% · ⚠ atención" },
+    { "id": "n-proveedor-3", "zona": "descubrimiento", "label": "Bienestar Home", "subtitle": "Aromaterapia · Stock 1200", "icon": "🏬", "route": "/gali-v3/dropi/proveedores", "estado": "ready", "kpi": "Precio estable · ✅" },
     { "id": "n-caza", "zona": "descubrimiento", "label": "Caza productos", "subtitle": "trending ordenado por fit", "icon": "🔥", "route": "/gali-v3/dropi/caza-productos", "estado": "ready", "kpi": "10 hallazgos hoy" },
 
     { "id": "n-landing", "zona": "estrategia", "label": "Landing artifact", "subtitle": "editable in-place · v2", "icon": "📄", "route": "/gali-v3/artifact/landing/land-1", "estado": "ready", "kpi": "3 paletas · versions" },

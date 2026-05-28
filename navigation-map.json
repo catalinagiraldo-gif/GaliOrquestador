@@ -2,13 +2,21 @@
   "$schema": "dropi-navigation-context-map",
   "version": "1.0.0",
   "description": "Navigation Context Map — maps Dropi modules, views, CTAs, origin points, and post-action flows for contextual wireframe generation.",
-  "roles": ["dropshipper", "proveedor", "admin"],
+  "roles": [
+    "dropshipper",
+    "proveedor",
+    "admin"
+  ],
   "modules": {
     "home": {
       "route": "/home",
       "label": "Inicio",
       "icon": "pi-home",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "defaultView": "landing",
       "figmaSource": "https://www.figma.com/design/fgCAWbyWdvCWuO3vcmJe45/Home?node-id=2004-748",
       "views": {
@@ -25,9 +33,21 @@
             "trainings": "Lista de capacitaciones (Dropshipper, Logística, Shopify, Módulo de Garantías) con botón Ver"
           },
           "actions": [
-            { "cta": "Quiero mi entrada", "type": "external", "description": "Link a evento externo" },
-            { "cta": "Unirme al evento", "type": "external", "description": "Link a Instagram Live o similar" },
-            { "cta": "Ver (capacitación)", "type": "external", "description": "Abre capacitación en Academy o externo" }
+            {
+              "cta": "Quiero mi entrada",
+              "type": "external",
+              "description": "Link a evento externo"
+            },
+            {
+              "cta": "Unirme al evento",
+              "type": "external",
+              "description": "Link a Instagram Live o similar"
+            },
+            {
+              "cta": "Ver (capacitación)",
+              "type": "external",
+              "description": "Abre capacitación en Academy o externo"
+            }
           ]
         }
       }
@@ -36,12 +56,18 @@
       "route": "/productos",
       "label": "Productos",
       "icon": "pi-search",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "catalogo": {
           "route": "/productos/catalogo",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "prototype": "/productos/catalogo",
           "figmaSource": "https://www.figma.com/design/20WQwTPB8Ymg82NVtul86a/Búsqueda-semántica?node-id=3008-71039",
           "description": "Catálogo de productos disponibles para vender. Incluye búsqueda semántica con IA, filtros avanzados, carousel de proveedores y grid de product cards.",
@@ -54,32 +80,113 @@
             "productGrid": "Cards con imagen, badges (Variable/Combo, Exclusivo/Premium/Verificado, candado privado), favorito, categoría, stock, nombre, proveedor con link"
           },
           "actions": [
-            { "cta": "Ver todos (proveedores)", "opens": "productos.proveedores", "type": "navigate" },
-            { "cta": "Click product card", "opens": "productos.detalle-producto", "type": "navigate" },
-            { "cta": "Tienda Proveedor", "opens": "productos.perfil-proveedor", "type": "navigate" },
-            { "cta": "Buscador optimizado", "type": "search", "targets": ["nombre", "descripcion", "categoria"], "description": "Búsqueda semántica con IA" },
-            { "cta": "Buscar por imagen", "type": "search", "targets": ["imagen"], "description": "Upload de imagen para búsqueda visual" },
-            { "cta": "Filtrar", "type": "filter", "targets": ["favoritos", "privados", "conOrdenes", "tipoProveedor", "rangoPrecio", "stock", "categorias", "ciudad"] },
-            { "cta": "Ordenar por", "type": "filter", "targets": ["aleatorio", "recientes", "precio", "stock"] },
-            { "cta": "Toggle vista", "type": "action", "description": "Cambia entre vista grid y vista lista" },
-            { "cta": "Enviar a cliente", "opens": "pedidos.orden-manual", "type": "modal", "params": { "productId": ":id" }, "location": "card-product-footer", "description": "Text-button naranja con icono shopping-cart-arrow-right en el footer de cada Card-product. Inter Bold 14px, color primary-500 #f49a3d." }
+            {
+              "cta": "Ver todos (proveedores)",
+              "opens": "productos.proveedores",
+              "type": "navigate"
+            },
+            {
+              "cta": "Click product card",
+              "opens": "productos.detalle-producto",
+              "type": "navigate"
+            },
+            {
+              "cta": "Tienda Proveedor",
+              "opens": "productos.perfil-proveedor",
+              "type": "navigate"
+            },
+            {
+              "cta": "Buscador optimizado",
+              "type": "search",
+              "targets": [
+                "nombre",
+                "descripcion",
+                "categoria"
+              ],
+              "description": "Búsqueda semántica con IA"
+            },
+            {
+              "cta": "Buscar por imagen",
+              "type": "search",
+              "targets": [
+                "imagen"
+              ],
+              "description": "Upload de imagen para búsqueda visual"
+            },
+            {
+              "cta": "Filtrar",
+              "type": "filter",
+              "targets": [
+                "favoritos",
+                "privados",
+                "conOrdenes",
+                "tipoProveedor",
+                "rangoPrecio",
+                "stock",
+                "categorias",
+                "ciudad"
+              ]
+            },
+            {
+              "cta": "Ordenar por",
+              "type": "filter",
+              "targets": [
+                "aleatorio",
+                "recientes",
+                "precio",
+                "stock"
+              ]
+            },
+            {
+              "cta": "Toggle vista",
+              "type": "action",
+              "description": "Cambia entre vista grid y vista lista"
+            },
+            {
+              "cta": "Enviar a cliente",
+              "opens": "pedidos.orden-manual",
+              "type": "modal",
+              "params": {
+                "productId": ":id"
+              },
+              "location": "card-product-footer",
+              "description": "Text-button naranja con icono shopping-cart-arrow-right en el footer de cada Card-product. Inter Bold 14px, color primary-500 #f49a3d."
+            }
           ]
         },
         "detalle-producto": {
           "route": "/productos/detalle/:id",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Ficha de un producto con galería, descripción, precio y acciones.",
           "actions": [
-            { "cta": "Vender este producto", "opens": "pedidos.orden-manual", "type": "modal", "params": { "productId": ":id" } },
-            { "cta": "Agregar a favoritos", "type": "action" },
-            { "cta": "Ver proveedor", "opens": "productos.perfil-proveedor", "type": "navigate" }
+            {
+              "cta": "Vender este producto",
+              "opens": "pedidos.orden-manual",
+              "type": "modal",
+              "params": {
+                "productId": ":id"
+              }
+            },
+            {
+              "cta": "Agregar a favoritos",
+              "type": "action"
+            },
+            {
+              "cta": "Ver proveedor",
+              "opens": "productos.perfil-proveedor",
+              "type": "navigate"
+            }
           ]
         },
         "proveedores": {
           "route": "/productos/proveedores",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "prototype": "/productos/proveedores",
           "figmaSource": "https://www.figma.com/design/n2502amhkeOJ2hrfIXHj63/Productos?node-id=1-28296",
           "description": "Listado de proveedores disponibles. Grid de cards con logo, nombre, cantidad de productos, categorías y favorito. Filtros por tipo, ciudad, categorías."
@@ -87,19 +194,25 @@
         "perfil-proveedor": {
           "route": "/productos/proveedores/:id",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Perfil del proveedor con productos y métricas."
         },
         "negociaciones": {
           "route": "/productos/negociaciones",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Negociaciones de precio con proveedores."
         },
         "caza-productos": {
           "route": "/productos/caza-productos",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "prototype": "/productos/caza-productos",
           "figmaSource": "https://www.figma.com/design/S8rl72C8LMF7DPDkeh83lX/Caza-productos?node-id=10252-66977",
           "description": "Herramienta para descubrir productos trending. Banner hero, filtros (Categoría, Estado, Con ofertas toggle, Buscar producto), grid de publicaciones, botón Crear publicación."
@@ -107,23 +220,38 @@
         "print-on-demand": {
           "route": "/productos/print-on-demand",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Productos personalizables con print on demand."
         },
         "mis-productos": {
           "route": "/productos/mis-productos",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "description": "Listado de productos propios del proveedor.",
           "actions": [
-            { "cta": "Crear producto", "opens": "productos.crear-producto", "type": "navigate" },
-            { "cta": "Editar producto", "opens": "productos.editar-producto", "type": "navigate" }
+            {
+              "cta": "Crear producto",
+              "opens": "productos.crear-producto",
+              "type": "navigate"
+            },
+            {
+              "cta": "Editar producto",
+              "opens": "productos.editar-producto",
+              "type": "navigate"
+            }
           ]
         },
         "categorias": {
           "route": "/productos/categorias",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "description": "Gestión de categorías de productos."
         }
       }
@@ -132,12 +260,18 @@
       "route": "/pedidos",
       "label": "Pedidos",
       "icon": "pi-shopping-cart",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "listado": {
           "route": "/mis-pedidos/mis-pedidos",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "prototype": "/mis-pedidos/mis-pedidos",
           "figmaSource": "https://www.figma.com/design/GwQWPc0xftCOfPVvTQWEj2/Huella-digital?node-id=8563-140983",
           "description": "Listado de todas las órdenes del dropshipper. Tabla con columnas: Cliente (nombre, dirección con iconos de verificación, teléfono), Estatus de la orden (PENDIENTE, GUÍA GENERADA con tracking, PENDIENTE DE CONFIRMACIÓN), Transportadora, Bodega, Tipo de envío (CON/SIN RECAUDO con badges de tienda y orderID), Etiqueta, Detalles (iconos de acciones por fila).",
@@ -148,23 +282,77 @@
             "table": "Columnas: Cliente, Estatus de la orden, Transportadora, Bodega, Tipo de envío, Etiqueta, Detalles"
           },
           "actions": [
-            { "cta": "Acciones (dropdown)", "type": "action", "description": "Dropdown con acciones masivas sobre pedidos" },
-            { "cta": "Filtro", "type": "filter", "targets": ["status", "fecha", "transportadora", "ciudad"] },
-            { "cta": "Buscar", "type": "search", "targets": ["id", "producto", "cliente", "telefono"] },
-            { "cta": "Ver detalle (search icon)", "opens": "pedidos.orden-detalle", "type": "navigate" },
-            { "cta": "Eliminar (trash icon)", "type": "action", "confirmation": true },
-            { "cta": "Editar cliente (user-pen icon)", "type": "action" },
-            { "cta": "Huella digital (fingerprint icon)", "type": "action", "description": "Ver huella digital del cliente para validación anti-fraude" },
-            { "cta": "Notificaciones (bell icon)", "type": "action", "description": "Ver notificaciones de la orden, badge con conteo" },
-            { "cta": "Etiquetar (tag icon)", "type": "action" },
-            { "cta": "Soporte (headset icon)", "type": "action", "description": "Abrir ticket de soporte CAS para esta orden" },
-            { "cta": "Crear orden", "opens": "pedidos.orden-manual", "type": "modal" }
+            {
+              "cta": "Acciones (dropdown)",
+              "type": "action",
+              "description": "Dropdown con acciones masivas sobre pedidos"
+            },
+            {
+              "cta": "Filtro",
+              "type": "filter",
+              "targets": [
+                "status",
+                "fecha",
+                "transportadora",
+                "ciudad"
+              ]
+            },
+            {
+              "cta": "Buscar",
+              "type": "search",
+              "targets": [
+                "id",
+                "producto",
+                "cliente",
+                "telefono"
+              ]
+            },
+            {
+              "cta": "Ver detalle (search icon)",
+              "opens": "pedidos.orden-detalle",
+              "type": "navigate"
+            },
+            {
+              "cta": "Eliminar (trash icon)",
+              "type": "action",
+              "confirmation": true
+            },
+            {
+              "cta": "Editar cliente (user-pen icon)",
+              "type": "action"
+            },
+            {
+              "cta": "Huella digital (fingerprint icon)",
+              "type": "action",
+              "description": "Ver huella digital del cliente para validación anti-fraude"
+            },
+            {
+              "cta": "Notificaciones (bell icon)",
+              "type": "action",
+              "description": "Ver notificaciones de la orden, badge con conteo"
+            },
+            {
+              "cta": "Etiquetar (tag icon)",
+              "type": "action"
+            },
+            {
+              "cta": "Soporte (headset icon)",
+              "type": "action",
+              "description": "Abrir ticket de soporte CAS para esta orden"
+            },
+            {
+              "cta": "Crear orden",
+              "opens": "pedidos.orden-manual",
+              "type": "modal"
+            }
           ]
         },
         "listado-proveedor": {
           "route": "/pedidos/mis-pedidos-proveedor",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "prototype": "/pedidos/mis-pedidos-proveedor",
           "figmaSource": "https://www.figma.com/design/jVScWyetpomdiEPzjjb3Az/CAS-Diseño-2.0?node-id=10932-101172",
           "figjamSource": "https://www.figma.com/board/vc49RZY2vR7aveAeY2p5e9/Investigación-Facturación-Proveedores?node-id=3-803",
@@ -172,7 +360,10 @@
           "drawerDetailFigma": "https://www.figma.com/design/GwQWPc0xftCOfPVvTQWEj2/Huella-digital?node-id=7570-71065",
           "description": "Listado de pedidos recibidos por el proveedor con 2 tabs: 'Mis Pedidos' (tabla de órdenes con acciones + panel de filtros) y 'Datos Facturación' (consulta multipaís CO/CL/MX/EC/AR de datos tributarios de dropshippers con drawer de detalle y descarga real de Excel).",
           "layout": {
-            "tabs": ["Mis Pedidos", "Datos Facturación"],
+            "tabs": [
+              "Mis Pedidos",
+              "Datos Facturación"
+            ],
             "title": "Mis Pedidos",
             "tab1_misPedidos": {
               "bulkActions": "Dropdown 'Acciones' para operaciones en lote sobre pedidos seleccionados",
@@ -194,36 +385,127 @@
             }
           },
           "actions": [
-            { "cta": "Ver detalle (lupa Tab 1)", "opens": "pedidos.orden-detalle", "type": "navigate" },
-            { "cta": "Ver detalle (lupa Tab 2)", "type": "drawer", "description": "Drawer lateral derecho con datos completos del dropshipper" },
-            { "cta": "Acciones (bulk)", "type": "action", "description": "Dropdown con Generar guías / Imprimir seleccionados / Exportar Excel; requiere ≥1 pedido seleccionado excepto Exportar" },
-            { "cta": "Filtro Tab 1", "type": "filter", "opensModal": "filters-tab1", "targets": ["estado", "transportadora", "bodega", "tipoEnvio", "fecha", "searchField"] },
-            { "cta": "Filtro Tab 2", "type": "filter", "opensModal": "filters-tab2", "targets": ["pais", "estado", "completitudMin", "regimen", "fecha"] },
-            { "cta": "Aplicar filtros", "type": "action", "description": "Confirma los filtros seleccionados en el modal y actualiza la tabla; muestra contador en el botón de filtro" },
-            { "cta": "Buscar", "type": "search", "targets": ["id", "producto", "cliente"] },
-            { "cta": "País quick filter", "type": "filter", "description": "Chips de país (CO/CL/MX/EC/AR/Todos) que actualizan columnas tributarias y moneda" },
-            { "cta": "Imprimir guía", "type": "action", "description": "Genera e imprime guía de envío" },
-            { "cta": "Etiquetar", "type": "action", "description": "Asigna etiqueta al pedido" },
-            { "cta": "WhatsApp", "type": "external", "description": "Abre chat WhatsApp con el cliente" },
-            { "cta": "Tab Datos Facturación", "type": "tab", "description": "Cambia a vista de datos de facturación; si no hay Habeas aceptado, dispara el modal de consentimiento" },
-            { "cta": "Descargar Excel", "type": "action", "description": "Genera archivo .xlsx real con xlsx library; columnas incluyen datos tributarios completos por dropshipper; filename datos-facturacion-{codigoPais}-{YYYY-MM-DD}.xlsx" },
-            { "cta": "Aceptar Habeas Data", "type": "modal", "description": "Modal de consentimiento de política de privacidad; persiste en localStorage tras aceptar" }
+            {
+              "cta": "Ver detalle (lupa Tab 1)",
+              "opens": "pedidos.orden-detalle",
+              "type": "navigate"
+            },
+            {
+              "cta": "Ver detalle (lupa Tab 2)",
+              "type": "drawer",
+              "description": "Drawer lateral derecho con datos completos del dropshipper"
+            },
+            {
+              "cta": "Acciones (bulk)",
+              "type": "action",
+              "description": "Dropdown con Generar guías / Imprimir seleccionados / Exportar Excel; requiere ≥1 pedido seleccionado excepto Exportar"
+            },
+            {
+              "cta": "Filtro Tab 1",
+              "type": "filter",
+              "opensModal": "filters-tab1",
+              "targets": [
+                "estado",
+                "transportadora",
+                "bodega",
+                "tipoEnvio",
+                "fecha",
+                "searchField"
+              ]
+            },
+            {
+              "cta": "Filtro Tab 2",
+              "type": "filter",
+              "opensModal": "filters-tab2",
+              "targets": [
+                "pais",
+                "estado",
+                "completitudMin",
+                "regimen",
+                "fecha"
+              ]
+            },
+            {
+              "cta": "Aplicar filtros",
+              "type": "action",
+              "description": "Confirma los filtros seleccionados en el modal y actualiza la tabla; muestra contador en el botón de filtro"
+            },
+            {
+              "cta": "Buscar",
+              "type": "search",
+              "targets": [
+                "id",
+                "producto",
+                "cliente"
+              ]
+            },
+            {
+              "cta": "País quick filter",
+              "type": "filter",
+              "description": "Chips de país (CO/CL/MX/EC/AR/Todos) que actualizan columnas tributarias y moneda"
+            },
+            {
+              "cta": "Imprimir guía",
+              "type": "action",
+              "description": "Genera e imprime guía de envío"
+            },
+            {
+              "cta": "Etiquetar",
+              "type": "action",
+              "description": "Asigna etiqueta al pedido"
+            },
+            {
+              "cta": "WhatsApp",
+              "type": "external",
+              "description": "Abre chat WhatsApp con el cliente"
+            },
+            {
+              "cta": "Tab Datos Facturación",
+              "type": "tab",
+              "description": "Cambia a vista de datos de facturación; si no hay Habeas aceptado, dispara el modal de consentimiento"
+            },
+            {
+              "cta": "Descargar Excel",
+              "type": "action",
+              "description": "Genera archivo .xlsx real con xlsx library; columnas incluyen datos tributarios completos por dropshipper; filename datos-facturacion-{codigoPais}-{YYYY-MM-DD}.xlsx"
+            },
+            {
+              "cta": "Aceptar Habeas Data",
+              "type": "modal",
+              "description": "Modal de consentimiento de política de privacidad; persiste en localStorage tras aceptar"
+            }
           ]
         },
         "listado-admin": {
           "route": "/ordenes/todas",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Vista administrativa de todas las órdenes de la plataforma.",
           "actions": [
-            { "cta": "Ver detalle", "opens": "pedidos.orden-detalle", "type": "navigate" },
-            { "cta": "Filtrar por estado", "type": "filter", "targets": ["status", "dropshipper", "proveedor"] }
+            {
+              "cta": "Ver detalle",
+              "opens": "pedidos.orden-detalle",
+              "type": "navigate"
+            },
+            {
+              "cta": "Filtrar por estado",
+              "type": "filter",
+              "targets": [
+                "status",
+                "dropshipper",
+                "proveedor"
+              ]
+            }
           ]
         },
         "orden-manual": {
           "route": "/pedidos/orden-manual",
           "type": "modal",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Modal para crear una orden manual. Incluye datos del cliente, selección de productos, transportadora y resumen con ganancia.",
           "jira": "DROP-9268",
           "origin_points": [
@@ -232,11 +514,28 @@
             "productos.detalle-producto.cta:vender-este-producto",
             "home.dashboard.cta:crear-orden"
           ],
-          "on_success": { "target": "pedidos.listado", "feedback": "toast-success", "message": "Orden creada exitosamente" },
+          "on_success": {
+            "target": "pedidos.listado",
+            "feedback": "toast-success",
+            "message": "Orden creada exitosamente"
+          },
           "on_cancel": "back",
           "fields": {
-            "required": ["nombre", "apellido", "telefono", "direccion", "departamento", "ciudad", "producto", "transportadora"],
-            "optional": ["email", "tienda", "notas_proveedor"]
+            "required": [
+              "nombre",
+              "apellido",
+              "telefono",
+              "direccion",
+              "departamento",
+              "ciudad",
+              "producto",
+              "transportadora"
+            ],
+            "optional": [
+              "email",
+              "tienda",
+              "notas_proveedor"
+            ]
           },
           "business_rules": [
             "Validar teléfono según dígitos del país (CO=10)",
@@ -248,41 +547,80 @@
         "orden-detalle": {
           "route": "/pedidos/detalle/:id",
           "type": "page",
-          "roles": ["dropshipper", "proveedor", "admin"],
+          "roles": [
+            "dropshipper",
+            "proveedor",
+            "admin"
+          ],
           "description": "Detalle de una orden con timeline de estados, datos del cliente y producto.",
           "actions": [
-            { "cta": "Editar orden", "opens": "pedidos.orden-manual", "type": "modal", "params": { "orderId": ":id", "mode": "edit" } },
-            { "cta": "Cancelar orden", "type": "action", "confirmation": true },
-            { "cta": "Imprimir guía", "type": "action" },
-            { "cta": "Ver tracking", "type": "expand" }
+            {
+              "cta": "Editar orden",
+              "opens": "pedidos.orden-manual",
+              "type": "modal",
+              "params": {
+                "orderId": ":id",
+                "mode": "edit"
+              }
+            },
+            {
+              "cta": "Cancelar orden",
+              "type": "action",
+              "confirmation": true
+            },
+            {
+              "cta": "Imprimir guía",
+              "type": "action"
+            },
+            {
+              "cta": "Ver tracking",
+              "type": "expand"
+            }
           ]
         },
         "novedades": {
           "route": "/pedidos/novedades",
           "type": "page",
-          "roles": ["dropshipper", "proveedor"],
+          "roles": [
+            "dropshipper",
+            "proveedor"
+          ],
           "description": "Listado de novedades (incidencias) en las órdenes."
         },
         "carritos": {
           "route": "/pedidos/carritos",
           "type": "page",
-          "roles": ["dropshipper", "proveedor"],
+          "roles": [
+            "dropshipper",
+            "proveedor"
+          ],
           "description": "Carritos de compra abandonados con opción de recuperación.",
           "actions": [
-            { "cta": "Enviar recordatorio", "type": "action" },
-            { "cta": "Ver detalle carrito", "type": "expand" }
+            {
+              "cta": "Enviar recordatorio",
+              "type": "action"
+            },
+            {
+              "cta": "Ver detalle carrito",
+              "type": "expand"
+            }
           ]
         },
         "etiquetas": {
           "route": "/pedidos/etiquetas",
           "type": "page",
-          "roles": ["dropshipper", "proveedor"],
+          "roles": [
+            "dropshipper",
+            "proveedor"
+          ],
           "description": "Gestión de etiquetas para clasificar pedidos."
         },
         "configuracion": {
           "route": "/pedidos/configuracion",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "description": "Configuración de pedidos del proveedor (tiempos de despacho, políticas)."
         }
       }
@@ -291,15 +629,28 @@
       "route": "/reportes",
       "label": "Reportes",
       "icon": "pi-chart-line",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "ventas": {
           "route": "/reportes/ventas",
           "type": "page",
           "description": "Reporte de ventas con gráficos y filtros por periodo.",
           "actions": [
-            { "cta": "Exportar reporte", "type": "action" },
-            { "cta": "Filtrar por periodo", "type": "filter", "targets": ["dateRange"] }
+            {
+              "cta": "Exportar reporte",
+              "type": "action"
+            },
+            {
+              "cta": "Filtrar por periodo",
+              "type": "filter",
+              "targets": [
+                "dateRange"
+              ]
+            }
           ]
         },
         "envios": {
@@ -310,7 +661,9 @@
         "financiero": {
           "route": "/reportes/financiero",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Reporte financiero consolidado de la plataforma."
         }
       }
@@ -319,15 +672,24 @@
       "route": "/financiero",
       "label": "Financiero",
       "icon": "pi-dollar",
-      "roles": ["dropshipper"],
+      "roles": [
+        "dropshipper"
+      ],
       "views": {
         "wallet": {
           "route": "/financiero/wallet",
           "type": "page",
           "description": "Wallet del dropshipper con saldo, movimientos y opciones de retiro.",
           "actions": [
-            { "cta": "Solicitar retiro", "opens": "financiero.solicitar-retiro", "type": "modal" },
-            { "cta": "Ver historial", "type": "expand" }
+            {
+              "cta": "Solicitar retiro",
+              "opens": "financiero.solicitar-retiro",
+              "type": "modal"
+            },
+            {
+              "cta": "Ver historial",
+              "type": "expand"
+            }
           ]
         },
         "facturas": {
@@ -348,26 +710,39 @@
       "route": "/marketing",
       "label": "Marketing",
       "icon": "pi-megaphone",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "campanas": {
           "route": "/marketing/campanas",
           "type": "page",
           "description": "Gestión de campañas de marketing.",
           "actions": [
-            { "cta": "Crear campaña", "opens": "marketing.crear-campana", "type": "navigate" }
+            {
+              "cta": "Crear campaña",
+              "opens": "marketing.crear-campana",
+              "type": "navigate"
+            }
           ]
         },
         "audiencias": {
           "route": "/marketing/audiencias",
           "type": "page",
-          "roles": ["dropshipper", "proveedor"],
+          "roles": [
+            "dropshipper",
+            "proveedor"
+          ],
           "description": "Gestión de audiencias para campañas."
         },
         "banners": {
           "route": "/marketing/banners",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Gestión de banners promocionales de la plataforma."
         }
       }
@@ -376,18 +751,25 @@
       "route": "/garantias",
       "label": "Garantías",
       "icon": "pi-verified",
-      "roles": ["proveedor", "admin"],
+      "roles": [
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "activas": {
           "route": "/garantias/activas",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "description": "Garantías activas del proveedor."
         },
         "solicitudes": {
           "route": "/garantias/solicitudes",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Solicitudes de garantía para revisión admin."
         },
         "historial": {
@@ -401,42 +783,60 @@
       "route": "/configurar",
       "label": "Configurar",
       "icon": "pi-cog",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "tienda": {
           "route": "/configurar/tienda",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Configuración de la tienda del dropshipper (nombre, logo, dominio)."
         },
         "integraciones": {
           "route": "/configurar/integraciones",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Integraciones con plataformas externas (Shopify, WooCommerce, etc)."
         },
         "notificaciones": {
           "route": "/configurar/notificaciones",
           "type": "page",
-          "roles": ["dropshipper", "admin"],
+          "roles": [
+            "dropshipper",
+            "admin"
+          ],
           "description": "Configuración de notificaciones por email, SMS, push."
         },
         "general": {
           "route": "/configuraciones/general",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "description": "Configuración general de cuenta."
         },
         "plataforma": {
           "route": "/configuraciones/plataforma",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Configuración global de la plataforma."
         },
         "pasarela": {
           "route": "/configuraciones/pasarela",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "description": "Configuración de pasarela de pago del proveedor."
         }
       }
@@ -445,18 +845,25 @@
       "route": "/transportadora",
       "label": "Transportadora",
       "icon": "pi-truck",
-      "roles": ["proveedor", "admin"],
+      "roles": [
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "empresas": {
           "route": "/transportadora/empresas",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Gestión de empresas transportadoras."
         },
         "mis-transportadoras": {
           "route": "/transportadora/mis-transportadoras",
           "type": "page",
-          "roles": ["proveedor"],
+          "roles": [
+            "proveedor"
+          ],
           "description": "Transportadoras habilitadas para el proveedor."
         },
         "tarifas": {
@@ -467,7 +874,9 @@
         "cobertura": {
           "route": "/transportadora/cobertura",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "description": "Mapa de cobertura de transportadoras."
         }
       }
@@ -476,7 +885,9 @@
       "route": "/usuarios",
       "label": "Usuarios",
       "icon": "pi-users",
-      "roles": ["admin"],
+      "roles": [
+        "admin"
+      ],
       "views": {
         "dropshippers": {
           "route": "/usuarios/dropshippers",
@@ -499,7 +910,9 @@
       "route": "/logistic",
       "label": "Logistic",
       "icon": "pi-car",
-      "roles": ["admin"],
+      "roles": [
+        "admin"
+      ],
       "views": {
         "envios": {
           "route": "/logistic/envios",
@@ -517,7 +930,9 @@
       "route": "/marca-blanca",
       "label": "Marca blanca",
       "icon": "pi-file",
-      "roles": ["admin"],
+      "roles": [
+        "admin"
+      ],
       "views": {
         "configuracion": {
           "route": "/marca-blanca/configuracion",
@@ -535,31 +950,45 @@
       "route": "/cas",
       "label": "CAS",
       "icon": "pi-comments",
-      "roles": ["dropshipper", "proveedor", "admin"],
+      "roles": [
+        "dropshipper",
+        "proveedor",
+        "admin"
+      ],
       "views": {
         "bandeja": {
           "route": "/cas/bandeja",
           "type": "page",
           "prototype": "WORKING",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Bandeja de entrada CAS con panel de conversaciones y chat."
         },
         "tickets": {
           "route": "/cas/tickets",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "description": "Sistema de tickets de soporte."
         },
         "chat": {
           "route": "/cas/chat",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "description": "Chat en vivo con soporte."
         },
         "landing": {
           "route": "/cas",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "description": "Centro de atención y soporte del dropshipper."
         }
       }
@@ -570,7 +999,10 @@
         "dropi-card": {
           "route": "/dropi-card/cards",
           "type": "page",
-          "roles": ["dropshipper", "proveedor"],
+          "roles": [
+            "dropshipper",
+            "proveedor"
+          ],
           "prototype": "/dropi-card/cards",
           "figmaSource": "https://www.figma.com/design/vdvGJN2gZ1VpjdJhm5vqfM/Dropicard?node-id=2004-32741",
           "label": "Dropi Card",
@@ -581,7 +1013,9 @@
           "route": "/academy",
           "type": "page",
           "prototype": "WORKING",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "label": "Academy",
           "icon": "pi-book",
           "description": "Centro de formación con cursos y tutoriales."
@@ -589,7 +1023,10 @@
         "clientes": {
           "route": "/clientes",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "label": "Clientes",
           "icon": "pi-user-edit",
           "description": "Gestión de clientes registrados."
@@ -597,7 +1034,10 @@
         "calendario": {
           "route": "/calendario",
           "type": "page",
-          "roles": ["proveedor", "admin"],
+          "roles": [
+            "proveedor",
+            "admin"
+          ],
           "label": "Calendario",
           "icon": "pi-calendar",
           "description": "Calendario de eventos y despachos."
@@ -605,7 +1045,9 @@
         "auditorias": {
           "route": "/auditorias",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Auditorías",
           "icon": "pi-book",
           "description": "Registro de auditorías de la plataforma."
@@ -613,7 +1055,9 @@
         "bodegas": {
           "route": "/bodegas",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Bodegas",
           "icon": "pi-warehouse",
           "description": "Gestión de bodegas y almacenes."
@@ -621,7 +1065,9 @@
         "ciudades": {
           "route": "/ciudades",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Ciudades",
           "icon": "pi-map-marker",
           "description": "Gestión de ciudades habilitadas para envío."
@@ -629,7 +1075,9 @@
         "comunidades": {
           "route": "/comunidades",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Comunidades",
           "icon": "pi-globe",
           "description": "Gestión de comunidades de usuarios."
@@ -637,7 +1085,9 @@
         "reel-management": {
           "route": "/reel-management",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Reel Management",
           "icon": "pi-ticket",
           "description": "Gestión de reels y contenido visual."
@@ -645,7 +1095,9 @@
         "retiro-saldo": {
           "route": "/retiro-saldo",
           "type": "page",
-          "roles": ["admin"],
+          "roles": [
+            "admin"
+          ],
           "label": "Retiro de Saldo",
           "icon": "pi-money-bill",
           "description": "Gestión de retiros de saldo de la plataforma."
@@ -656,7 +1108,9 @@
       "route": "/gali-v3",
       "label": "Gali Híbrido (Builder + Orquestador)",
       "icon": "pi-sparkles",
-      "roles": ["dropshipper"],
+      "roles": [
+        "dropshipper"
+      ],
       "defaultView": "inicio",
       "description": "Workspace AI-First tri-pane (Navigator + Canvas/Artifact + Negocio live) con chat persistente estilo Claude/Cursor. Gali asistente y constructor: armas proyectos, automatizaciones, vistas y agentes. Despierta componentes en catálogo/pedidos/campañas.",
       "views": {
@@ -665,7 +1119,13 @@
           "type": "page",
           "prototype": "/gali-v3",
           "description": "WelcomeArtifact: saludo memoria-aware + 3 cards (Reanudar último proyecto / Construir nuevo / Builder) + plantillas destacadas + chat persistente.",
-          "components": ["WelcomeArtifact", "GaliTopbar", "GaliNavigator", "GaliBusinessContext", "GaliChat"]
+          "components": [
+            "WelcomeArtifact",
+            "GaliTopbar",
+            "GaliNavigator",
+            "GaliBusinessContext",
+            "GaliChat"
+          ]
         },
         "proyecto-detalle": {
           "route": "/gali-v3/proyecto/:id",
@@ -683,7 +1143,7 @@
           "route": "/gali-v3/builder",
           "type": "page",
           "prototype": "/gali-v3/builder",
-          "description": "Builder visual de automatizaciones tipo Make: paleta de triggers/acciones/condiciones + canvas con bloques encadenados + ejecución mock con streaming log."
+          "description": "V4.1 WF-8 — Recetas (renombrado): entrada chat-first conversacional; canvas nodos como modo revisión post-/automatiza. Paleta triggers renombrada Cuando pase esto…"
         },
         "mercado": {
           "route": "/gali-v3/mercado",
@@ -725,43 +1185,111 @@
           "route": "/gali-v3/vista/:slug",
           "type": "page",
           "prototype": "/gali-v3/vista/operacion-hoy",
-          "description": "Vista personalizada con widgets componibles. /vista/nueva permite componer desde prompt natural — Gali infiere widgets y los pinta progresivamente. 9 widgets disponibles + 3 templates iniciales."
+          "description": "V4.1 WF-5-C — Vista compuesta operación diaria: pedidos + novedades + Vigilante Logístico + Rentabilidad Real + campañas + wallet. Panel Gali abierto por defecto. Slug rentabilidad-semana = preset Modo Medir."
+        },
+        "mi-equipo": {
+          "route": "/gali-v3/equipo",
+          "type": "page",
+          "prototype": "/gali-v3/equipo",
+          "description": "V4.1 WF-9 — Mi Equipo mock básico: dueño + asistente, permisos, toggle WhatsApp Gali, actividad reciente."
+        },
+        "panel-orquestador": {
+          "route": "/gali-v3 (global ⌘J)",
+          "type": "overlay",
+          "prototype": "/gali-v3/vista/operacion-hoy",
+          "description": "V4.1 WF-1 — Panel Orquestador: 3 zonas (agentes activos + señales loop + chat). Multi-agente visible, confianza graduada, sig-2 closed-loop CTR."
         },
         "mi-objetivo": {
           "route": "/gali-v3/objetivo",
           "type": "page",
           "prototype": "/gali-v3/objetivo",
           "description": "V4 Vista 5 — Modo Objetivos → Roadmap personalizado por Gali. Onboarding 3 preguntas (qué quieres lograr / para cuándo / qué tienes hoy) → Gali genera roadmap de 4 semanas con pasos accionables. Aplica H#11 (razonamiento expuesto) y H#13 (confianza por paso + por objetivo). Cada paso navega a un bloque de Dropi. Reutiliza project.service.ts V3.",
-          "components": ["GoalHero", "RazonamientoGali", "RoadmapTimeline", "SemanaCard", "PasoCard"]
+          "components": [
+            "GoalHero",
+            "RazonamientoGali",
+            "RoadmapTimeline",
+            "SemanaCard",
+            "PasoCard"
+          ]
         },
         "comunidad-en-vivo": {
           "route": "/gali-v3/comunidad",
           "type": "page",
           "prototype": "/gali-v3/comunidad",
           "description": "V4 Vista 3 — Líder Virtual de Comunidad. Síntesis en tiempo real de 1.247 dropshippers LATAM: 10 señales (tendencia/oportunidad/estrategia) + 5 productos en tendencia + 3 casos top anonimizados + 3 alertas (transportadoras, proveedores, saturación). Filtros de relevancia (perfil/nicho/ecosistema) + Modo mentor + Top 3 movimientos del top 10%. Aplica H#11 (fuentes citadas anonimizadas) + H#13 (confianza por señal y global) + H#9 (gestiona escasez de datos).",
-          "components": ["LiderVirtualHero", "FiltroRelevancia", "Top3Movimientos", "ProductoTendencia", "AlertaComunidad", "CasoTop"]
+          "components": [
+            "LiderVirtualHero",
+            "FiltroRelevancia",
+            "Top3Movimientos",
+            "ProductoTendencia",
+            "AlertaComunidad",
+            "CasoTop"
+          ]
         },
         "mi-stack": {
           "route": "/gali-v3/mi-stack",
           "type": "page",
           "prototype": "/gali-v3/mi-stack",
           "description": "V4 Vista 4 — Mi Stack personal (evolución de /gali-v3/integraciones). 15 plataformas en 4 categorías (Ads / Finanzas / Comms / E-commerce). Gali intelligence_score por integración. Recomendaciones según perfil + señales de comunidad. Modal OAuth mock 3 pasos. Aplica H#11 (insights generados visibles) + H#5 (alertas de compliance y privacidad) + H#12 (conexión reversible).",
-          "components": ["IntelligenceHero", "RecomendacionesGali", "CategoriaSection", "PlataformaCard", "ModalOAuthMock"]
+          "components": [
+            "IntelligenceHero",
+            "RecomendacionesGali",
+            "CategoriaSection",
+            "PlataformaCard",
+            "ModalOAuthMock"
+          ]
         },
         "bloque-builder": {
           "route": "/gali-v3/bloque-builder",
           "type": "page",
           "prototype": "/gali-v3/bloque-builder",
           "description": "V4 Vista 8 NUEVA — Constructor de Bloques Custom. Modal split chat 40% + preview en vivo 60%. Modo Chat (describe en español y Gali genera) + Modo Manual (formulario estructurado). 5 ejemplos pre-cargados (ventas por ciudad / margen efectivo / cohorts / fuga de pedidos / proyección Gali). 6 fuentes de datos (Dropi core + Stack Personal + Comunidad + Memoria). 8 tipos de visualización (métrica, barras, líneas, tabla, funnel, cohort heatmap, barras agrupadas, top-N). Toggles: Probar con datos reales (H#13), Compartir con comunidad. Aplica H#11 (razonamiento expandible) + H#13 (badge confianza color + datos sim/reales) + H#5 (advertencia costo computacional) + H#10 (ejemplos contra campo vacío para novato). Reutiliza block-registry.ts V3 al guardar.",
-          "components": ["SplitChatPreview", "ModoChat", "ModoManual", "EjemploChip", "PreviewBarras", "PreviewTabla", "PreviewCohort", "PreviewFunnel", "PreviewLineas", "BadgeConfianza", "BadgeSimReal", "RazonamientoExpand", "CostoComputacional", "ToggleDatosReales", "ToggleCompartir"],
+          "components": [
+            "SplitChatPreview",
+            "ModoChat",
+            "ModoManual",
+            "EjemploChip",
+            "PreviewBarras",
+            "PreviewTabla",
+            "PreviewCohort",
+            "PreviewFunnel",
+            "PreviewLineas",
+            "BadgeConfianza",
+            "BadgeSimReal",
+            "RazonamientoExpand",
+            "CostoComputacional",
+            "ToggleDatosReales",
+            "ToggleCompartir"
+          ],
           "origin_points": [
-            { "from": "/gali-v3 (Inicio)", "cta": "Card 'Bloques con Gali' en welcome-artifact" },
-            { "from": "/gali-v3 (Inicio)", "cta": "Sección 'Mis bloques custom' → 'Crear otro' o card vacía con 'Empezar'" },
-            { "from": "Sidebar V3 (cualquier ruta)", "cta": "Entrada 'Constructor' en sección Gali" },
-            { "from": "Command Palette ⌘K", "cta": "'Crear bloque custom con Gali' en grupo Crear" },
-            { "from": "Command Palette ⌘K", "cta": "Click en cualquier item del grupo 'Mis Bloques' (bloques guardados)" },
-            { "from": "Chat de Gali", "cta": "Slash command /bloque-nuevo" },
-            { "from": "Prototype gallery /home", "cta": "Card GALI-V4 · V8" }
+            {
+              "from": "/gali-v3 (Inicio)",
+              "cta": "Card 'Bloques con Gali' en welcome-artifact"
+            },
+            {
+              "from": "/gali-v3 (Inicio)",
+              "cta": "Sección 'Mis bloques custom' → 'Crear otro' o card vacía con 'Empezar'"
+            },
+            {
+              "from": "Sidebar V3 (cualquier ruta)",
+              "cta": "Entrada 'Constructor' en sección Gali"
+            },
+            {
+              "from": "Command Palette ⌘K",
+              "cta": "'Crear bloque custom con Gali' en grupo Crear"
+            },
+            {
+              "from": "Command Palette ⌘K",
+              "cta": "Click en cualquier item del grupo 'Mis Bloques' (bloques guardados)"
+            },
+            {
+              "from": "Chat de Gali",
+              "cta": "Slash command /bloque-nuevo"
+            },
+            {
+              "from": "Prototype gallery /home",
+              "cta": "Card GALI-V4 · V8"
+            }
           ],
           "post_action_flow": {
             "on_save": "Bloque persiste en localStorage `gali_v3_bloques_custom` + toast con CTA 'Ir al Inicio →' + aparece en welcome-artifact sección 'Mis bloques custom' + queda buscable en Command Palette grupo 'Mis Bloques'",
@@ -879,12 +1407,192 @@
         }
       }
     },
-
+    "gali-v5": {
+      "route": "/gali-v5",
+      "label": "Gali V5 · Dropi Baseline",
+      "icon": "pi-desktop",
+      "roles": [
+        "dropshipper"
+      ],
+      "defaultView": "inicio",
+      "figmaSource": "https://www.figma.com/design/fgCAWbyWdvCWuO3vcmJe45/Re-arquitectura-UI-Oficial",
+      "description": "Shell Dropi baseline: Header IA2 + rail 56px + panel 200px + FAB. IA reorganizada según Figma (Dashboard en Reportes, Garantías en Pedidos, Logística con 2 ítems).",
+      "views": {
+        "inicio": {
+          "route": "/gali-v5",
+          "type": "page",
+          "prototype": "/gali-v5",
+          "description": "Gali Hub — Orquestador: objetivo activo + 3 agentes (ADA Spy, Roax, Chatea Pro) + señales del día + loop cerrado de acciones + mis proyectos. Sprint 1 completado."
+        },
+        "catalogo": {
+          "route": "/gali-v5/productos/catalogo",
+          "type": "page",
+          "prototype": "/gali-v5/productos/catalogo",
+          "description": "Catálogo productos · búsqueda IA · filtros · grid."
+        },
+        "caza-productos": {
+          "route": "/gali-v5/productos/caza-productos",
+          "type": "page",
+          "prototype": "/gali-v5/productos/caza-productos",
+          "description": "Cazaproductos · grid publicaciones 216px · filtros · switch documentos."
+        },
+        "ordenes": {
+          "route": "/gali-v5/mis-pedidos/mis-pedidos",
+          "type": "page",
+          "prototype": "/gali-v5/mis-pedidos/mis-pedidos",
+          "description": "Ordenes · tabla Figma 41175 · dirección multilínea · acciones sticky 300px.",
+          "sprint4": "Triage banner + chips por fila (auto/managing/decision)"
+        },
+        "novedades": {
+          "route": "/gali-v5/mis-pedidos/novedades",
+          "type": "page",
+          "prototype": "/gali-v5/mis-pedidos/novedades",
+          "description": "Novedades logísticas · toolbar acciones · historial · celdas tienda/datos multilínea.",
+          "sprint4": "Clasificacion automatica por tipo + boton Gali resuelve"
+        },
+        "garantias": {
+          "route": "/gali-v5/mis-pedidos/garantias",
+          "type": "page",
+          "prototype": "/gali-v5/mis-pedidos/garantias",
+          "description": "Garantías bajo Pedidos · alert banner · tabla con tags."
+        },
+        "transportadoras": {
+          "route": "/gali-v5/logistica/transportadoras",
+          "type": "page",
+          "prototype": "/gali-v5/logistica/transportadoras",
+          "description": "Preferencias transportadoras · ranking favoritas · matriz departamento/ciudad."
+        },
+        "torre-logistica": {
+          "route": "/gali-v5/logistica/torre-logistica",
+          "type": "page",
+          "prototype": "/gali-v5/logistica/torre-logistica",
+          "description": "Torre logística Figma 44862 · indicadores 428×290 · mapa · switches Mi operación/Dropi."
+        },
+        "reportes-dashboard": {
+          "route": "/gali-v5/reportes/dashboard",
+          "type": "page",
+          "prototype": "/gali-v5/reportes/dashboard",
+          "description": "Dashboard KPI Figma 44950 · card dropshipper · tus órdenes · tendencia · reportes rápidos.",
+          "sprint4": "Gali PL insight banner: ganancia real vs Meta"
+        },
+        "reportes-calendario": {
+          "route": "/gali-v5/reportes/calendario",
+          "type": "page",
+          "prototype": "/gali-v5/reportes/calendario",
+          "description": "Calendario mensual Figma 46550 · eventos por celda · filtros año/mes."
+        },
+        "reportes-descargas": {
+          "route": "/gali-v5/reportes/descargas",
+          "type": "page",
+          "prototype": "/gali-v5/reportes/descargas",
+          "description": "Descargas Figma 43387 · lista reportes · acciones download/delete."
+        },
+        "validador-direcciones": {
+          "route": "/gali-v5/mis-pedidos/validador-direcciones",
+          "type": "page",
+          "prototype": "/gali-v5/mis-pedidos/validador-direcciones",
+          "description": "Validador Figma 47829 · cards 135px · filtros dept/ciudad · agregar dirección."
+        },
+        "etiquetas": {
+          "route": "/gali-v5/mis-pedidos/etiquetas",
+          "type": "page",
+          "prototype": "/gali-v5/mis-pedidos/etiquetas",
+          "description": "Etiquetas Figma 41093 · generar etiquetas · tabla 5 cols."
+        },
+        "historial-wallet": {
+          "route": "/gali-v5/financiero/historial-de-cartera",
+          "type": "page",
+          "prototype": "/gali-v5/financiero/historial-de-cartera",
+          "description": "Wallet Figma 46928 · alert Sin Recaudo · tabs Transacciones/Depósitos · filtros fecha/tipo/código · tabla # Fecha Tipo Monto Monto previo Descripción."
+        },
+        "dropicard": {
+          "route": "/gali-v5/dropi-card/cards",
+          "type": "page",
+          "prototype": "/gali-v5/dropi-card/cards",
+          "description": "Dropicard Figma 47829 · filas horizontales · Marcela Valencia · Activar/iconos acción · filtros inline."
+        },
+        "cas-bandeja": {
+          "route": "/gali-v5/cas/bandeja",
+          "type": "page",
+          "prototype": "/gali-v5/cas/bandeja",
+          "description": "CAS bandeja Figma 44291 · 3 columnas · inbox 360px · chat 800px · panel info."
+        },
+        "marketing-campanas": {
+          "route": "/gali-v5/marketing/campanas",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/campanas",
+          "description": "Campañas masivas Figma 41729 · tabs SMS/EMAIL · tabla checkbox ID Nombre Estado Fecha."
+        },
+        "marketing-automatizacion": {
+          "route": "/gali-v5/marketing/automatizacion",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/automatizacion",
+          "description": "Automatización Figma 41834 · toggles Activo · acciones search/users/trash."
+        },
+        "marketing-configuraciones": {
+          "route": "/gali-v5/marketing/configuraciones",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/configuraciones",
+          "description": "Configuraciones SMTP Figma 41896 · formulario servidor/port/security/credentials."
+        },
+        "marketing-chatea-pro": {
+          "route": "/gali-v5/marketing/chatea-pro",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/chatea-pro",
+          "description": "Chatea Pro Figma 41956 · hero oscuro · stats grid 4 cards."
+        },
+        "marketing-roax-informes": {
+          "route": "/gali-v5/marketing/roax-informes",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/roax-informes",
+          "description": "ROAX Informes Figma 42100 · KPI cards · rango fechas · logo ROAX.",
+          "sprint4": "ROAS real vs declarado + health campanas + reglas activas"
+        },
+        "marketing-roax-lanzador": {
+          "route": "/gali-v5/marketing/roax-lanzador",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/roax-lanzador",
+          "description": "Lanzador ROAX Figma 42708 · stepper 5 pasos · radio cards canal venta."
+        },
+        "marketing-creador-paginas": {
+          "route": "/gali-v5/marketing/creador-de-paginas",
+          "type": "page",
+          "prototype": "/gali-v5/marketing/creador-de-paginas",
+          "description": "Creador de páginas Figma 43387 · tabla productos · thumbs · exportaciones · acciones Shopify/globe/eye."
+        },
+        "proyecto-detalle": {
+          "route": "/gali-v5/proyecto/:id",
+          "type": "page",
+          "prototype": "/gali-v5/proyecto/collar-gps-2026",
+          "description": "Proyecto Detalle — orquestación de agentes (ADA Spy, Roax, Chatea Pro) por proyecto. Tabs: Resumen / Creativos / P&L Real / Producto / Estrategia / Campañas / Pedidos. Sprint 2 completado."
+        },
+        "marketplace": {
+          "route": "/gali-v5/marketplace",
+          "type": "page",
+          "prototype": "/gali-v5/marketplace",
+          "description": "Marketplace de Skills — 20 skills con filtros por agente y tipo (gratuita/experto/premium). Instalación en 1 clic con estado reactivo. CTA de publicar skill propio. Sprint 3 completado."
+        },
+        "diagnostico-modal": {
+          "route": "(modal)",
+          "type": "modal",
+          "prototype": "/gali-v5/proyecto/collar-gps-2026",
+          "description": "Diagnóstico Cross-Data modal — hipótesis ordenadas por probabilidad (con evidencias expandibles), acciones seleccionables con checkboxes, footer Ejecutar(N). Sprint 3 completado."
+        },
+        "skills-editor-modal": {
+          "route": "(modal)",
+          "type": "modal",
+          "prototype": "/gali-v5/marketplace",
+          "description": "Skills & Rules Editor wizard 3 pasos — Step 1: trigger (dropdown + valor + duración + vista previa), Step 2: acciones seleccionables, Step 3: nombre + dry-run simulación + resumen + activar. Sprint 3 completado."
+        }
+      }
+    },
     "gali": {
       "route": "/gali",
       "label": "Gali AI-First (v1 legacy)",
       "icon": "pi-sparkles",
-      "roles": ["dropshipper"],
+      "roles": [
+        "dropshipper"
+      ],
       "defaultView": "descubrimiento",
       "figmaSource": null,
       "specSource": "docs/Specs/DropiAiFirst.md#5-pantalla-2-modo-descubrimiento",
@@ -893,9 +1601,14 @@
         "descubrimiento": {
           "route": "/gali/descubrimiento",
           "type": "page",
-          "roles": ["dropshipper"],
+          "roles": [
+            "dropshipper"
+          ],
           "prototype": "/gali/descubrimiento",
-          "origin_points": ["home", "prototype-gallery"],
+          "origin_points": [
+            "home",
+            "prototype-gallery"
+          ],
           "layout": "Hero state (Gali central, 640px) → Workspace state (canvas grid 4x2 + Gali sidebar 340px). Sidebar Dropi colapsado a mini-rail 64px. Topbar 56px con mission ribbon evolutiva.",
           "components": [
             "TopbarGali",
@@ -913,13 +1626,36 @@
             "DemoTourOverlay"
           ],
           "actions": [
-            { "cta": "Quiero ver tendencias de hoy (sugerencia)", "type": "sendIntent" },
-            { "cta": "Elegir este (en card)", "opens": "gali.estrategia (placeholder)", "type": "select-product" },
-            { "cta": "Sí, vamos", "opens": "modal-placeholder", "type": "next-mode" },
-            { "cta": "🗑 Olvidar todo (learning ribbon)", "type": "forget-learnings" },
-            { "cta": "↺ Empezar de cero (sidebar header)", "type": "reset-session" },
-            { "cta": "Filtro categoría", "type": "filter-category" },
-            { "cta": "Ordenar por (sales/trend/margin)", "type": "reorder" }
+            {
+              "cta": "Quiero ver tendencias de hoy (sugerencia)",
+              "type": "sendIntent"
+            },
+            {
+              "cta": "Elegir este (en card)",
+              "opens": "gali.estrategia (placeholder)",
+              "type": "select-product"
+            },
+            {
+              "cta": "Sí, vamos",
+              "opens": "modal-placeholder",
+              "type": "next-mode"
+            },
+            {
+              "cta": "🗑 Olvidar todo (learning ribbon)",
+              "type": "forget-learnings"
+            },
+            {
+              "cta": "↺ Empezar de cero (sidebar header)",
+              "type": "reset-session"
+            },
+            {
+              "cta": "Filtro categoría",
+              "type": "filter-category"
+            },
+            {
+              "cta": "Ordenar por (sales/trend/margin)",
+              "type": "reorder"
+            }
           ]
         }
       }

@@ -1,0 +1,46 @@
+<div class="automatizacion-page">
+  <dropi-titulos title="Automatización" [breadcrumbs]="breadcrumbs">
+    <dropi-button-new titulosActions label="Agregar" icon="pi-plus" hierarchy="primary" [width]="140" />
+  </dropi-titulos>
+
+  <div class="automatizacion-page__table-wrap">
+    <table class="automatizacion-page__table">
+      <thead>
+        <tr>
+          <th style="width:90px">ID</th>
+          <th>Nombre</th>
+          <th style="width:120px">Activo</th>
+          <th style="width:140px">#</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of flows; track row.id) {
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.nombre }}</td>
+            <td>
+              <button
+                type="button"
+                class="automatizacion-page__toggle"
+                [class.is-on]="row.activo"
+                (click)="toggleActivo(row)"
+                [attr.aria-pressed]="row.activo"
+              >
+                <span></span>
+              </button>
+            </td>
+            <td>
+              <div class="automatizacion-page__actions">
+                <button type="button" title="Buscar"><i class="pi pi-search"></i></button>
+                <button type="button" title="Audiencia"><i class="pi pi-users"></i></button>
+                <button type="button" title="Eliminar"><i class="pi pi-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <dropi-paginator />
+</div>

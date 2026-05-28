@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { BusinessMapService } from '../../../services/gali-v3/business-map.service';
+import { BacklinksService } from '../../../services/gali-v3/backlinks.service';
 import { ProximosPasosComponent } from '../../../components/gali-v3/shared/proximos-pasos.component';
 
 @Component({
@@ -14,6 +15,7 @@ import { ProximosPasosComponent } from '../../../components/gali-v3/shared/proxi
 })
 export class GaliV3MapaComponent {
   private mapSvc = inject(BusinessMapService);
+  private backlinksSvc = inject(BacklinksService);
   private router = inject(Router);
 
   zonas = this.mapSvc.zonas;
@@ -66,8 +68,13 @@ export class GaliV3MapaComponent {
     this.hoveredNodeId.set(nodeId);
   }
 
-  go(route: string) {
-    if (this.editMode()) return; // No navegar en edit mode
+  go(route: string, nodeId?: string, label?: string) {
+    if (this.editMode()) return;
+    if (nodeId === 'n-proyecto' || label?.includes('Collar GPS')) {
+      this.backlinksSvc.select('collar-gps', label || 'Collar GPS');
+    } else if (nodeId?.startsWith('n-proveedor')) {
+      this.backlinksSvc.select('petstore', label || 'Proveedor');
+    }
     this.router.navigateByUrl(route);
   }
 

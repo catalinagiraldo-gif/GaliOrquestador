@@ -1,0 +1,27 @@
+@import 'styles/gali-v5-tokens';
+
+/** Evita pantallas vacías cuando el outlet no hereda altura del grid shell */
+@mixin dropi-page-host {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+@mixin dropi-content-panel {
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  background: $white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+@mixin dropi-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  background: $gray-50;
+}

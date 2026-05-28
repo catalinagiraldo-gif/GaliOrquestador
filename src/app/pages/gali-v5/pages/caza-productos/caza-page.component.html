@@ -1,0 +1,70 @@
+<div class="caza-page">
+  <dropi-titulos title="Caza productos" [breadcrumbs]="breadcrumbs">
+    <dropi-button-new titulosActions label="Crear publicación" hierarchy="primary" [width]="200" />
+  </dropi-titulos>
+
+  <section class="caza-page__filters">
+    <div class="caza-page__filter-row">
+      <div class="caza-page__select">
+        <label>Categoría</label>
+        <div class="caza-page__select-field"><span>Todas</span><i class="pi pi-chevron-down"></i></div>
+      </div>
+      <div class="caza-page__select">
+        <label>Estado</label>
+        <div class="caza-page__select-field"><span>Todos</span><i class="pi pi-chevron-down"></i></div>
+      </div>
+      <dropi-button-new icon="pi-arrow-right" [iconOnly]="true" hierarchy="primary" />
+      <dropi-search-oficial class="caza-page__search" placeholder="Buscar publicaciones" [(ngModel)]="searchQuery" />
+    </div>
+    <div class="caza-page__toggle">
+      <i class="pi pi-comments"></i>
+      <span>Publicaciones con propuestas</span>
+      <label class="caza-switch">
+        <input type="checkbox" [(ngModel)]="proposalsOnly" />
+        <span class="caza-switch__slider"></span>
+      </label>
+    </div>
+  </section>
+
+  <div class="caza-page__bar">
+    <span><strong>{{ publications.length }}</strong> publicaciones encontradas</span>
+    <div class="caza-page__sort">
+      <span>Ordenar por:</span>
+      <button type="button" class="caza-page__sort-btn">Más recientes <i class="pi pi-chevron-down"></i></button>
+    </div>
+  </div>
+
+  <div class="caza-grid">
+    @for (p of publications; track p.id) {
+      <article class="pub-card">
+        <div class="pub-card__image-wrap">
+          <img [src]="p.image" [alt]="p.title" class="pub-card__image" />
+          @if (p.proposals) {
+            <button type="button" class="pub-card__chat" aria-label="Propuestas">
+              <i class="pi pi-comments"></i>
+            </button>
+            <span class="pub-card__badge">{{ p.proposals }}</span>
+          }
+        </div>
+        <div class="pub-card__body">
+          <div class="pub-card__meta-row">
+            <span class="pub-card__category">{{ p.category }}</span>
+            @if (p.expiring) {
+              <span class="pub-card__status">Por finalizar</span>
+            }
+          </div>
+          <div class="pub-card__dates">
+            <i class="pi pi-clock"></i>
+            <span>{{ p.dateRange }}</span>
+          </div>
+          <h3 class="pub-card__title">{{ p.title }}</h3>
+          <div class="pub-card__price-block">
+            <span class="pub-card__price-label">Precio deseado</span>
+            <strong class="pub-card__price">{{ p.price }}</strong>
+          </div>
+        </div>
+        <button type="button" class="pub-card__cta">Ver detalles</button>
+      </article>
+    }
+  </div>
+</div>

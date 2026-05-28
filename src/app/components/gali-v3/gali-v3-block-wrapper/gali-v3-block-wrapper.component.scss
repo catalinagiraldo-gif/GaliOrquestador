@@ -19,6 +19,32 @@
   &:hover { @include gv3-card-hover; }
 }
 
+.bw.gali-active {
+  outline: 2px solid $gv3-terracota;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px $gv3-terracota-tint, $gv3-shadow-md;
+  animation: gv3-gali-pulse 2s ease-in-out infinite;
+}
+.bw.gali-done {
+  outline: 2px solid $gv3-sage;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px $gv3-sage-tint;
+}
+.bw__gali-badge {
+  font-family: $gv3-font-mono;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: $gv3-radius-sm;
+  background: $gv3-terracota-tint;
+  color: $gv3-terracota;
+  white-space: nowrap;
+  &--done { background: $gv3-sage-tint; color: $gv3-sage; }
+}
+@keyframes gv3-gali-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px $gv3-terracota-tint, $gv3-shadow-md; }
+  50% { box-shadow: 0 0 0 8px rgba(184, 89, 58, 0.08), $gv3-shadow-md; }
+}
+
 .bw[data-editing="true"] {
   outline: 1px dashed $gv3-orange-tint;
   outline-offset: 4px;

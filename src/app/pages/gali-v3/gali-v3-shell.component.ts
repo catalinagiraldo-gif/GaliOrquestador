@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, RouterOutlet, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { GaliTopbarComponent } from '../../components/gali-v3/shell/gali-topbar.component';
 import { GaliNavigatorComponent } from '../../components/gali-v3/shell/gali-navigator.component';
 import { GaliRightPanelComponent } from '../../components/gali-v3/shell/gali-right-panel.component';
 import { GaliCommandPaletteComponent } from '../../components/gali-v3/shell/command-palette.component';
 import { GaliBreadcrumbComponent } from '../../components/gali-v3/shell/gali-breadcrumb.component';
+import { GaliGuideTourComponent } from '../../components/gali-v3/shell/gali-guide-tour.component';
 import { GaliChatService } from '../../services/gali-v3/chat.service';
 import { GaliProjectService } from '../../services/gali-v3/project.service';
 import { GaliRightPanelService } from '../../services/gali-v3/right-panel.service';
+import { GaliGuideTourService } from '../../services/gali-v3/guide-tour.service';
 
 @Component({
   selector: 'app-gali-v3-shell',
@@ -22,17 +24,30 @@ import { GaliRightPanelService } from '../../services/gali-v3/right-panel.servic
     GaliRightPanelComponent,
     GaliCommandPaletteComponent,
     GaliBreadcrumbComponent,
+    GaliGuideTourComponent,
   ],
   templateUrl: './gali-v3-shell.component.html',
   styleUrls: ['./gali-v3-shell.component.scss'],
 })
-export class GaliV3ShellComponent {
+export class GaliV3ShellComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private chatSvc = inject(GaliChatService);
   private projectSvc = inject(GaliProjectService);
   private rpanelSvc = inject(GaliRightPanelService);
+  private tourSvc = inject(GaliGuideTourService);
 
   rpanelOpen = this.rpanelSvc.open;
+
+  ngOnInit(): void {
+    this.tourSvc.registerStepHook('rpanel', () => this.rpanelSvc.setOpen(true));
+    this.tourSvc.registerStepHook('canvas', () => this.rpanelSvc.setOpen(false));
+
+    const forceTour = this.route.snapshot.queryParamMap.get('tour') === '1';
+    if (this.tourSvc.shouldAutoStart(forceTour)) {
+      setTimeout(() => this.tourSvc.start(forceTour), 600);
+    }
+  }
 
   constructor() {
     this.router.events

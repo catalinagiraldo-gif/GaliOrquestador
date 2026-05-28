@@ -1,0 +1,232 @@
+<div class="hub">
+
+  <!-- ══════════════════════════════════════════════
+       OBJETIVO ACTIVO — header oscuro
+  ══════════════════════════════════════════════ -->
+  <header class="hub__objetivo">
+    <div class="objetivo__inner">
+      <div class="objetivo__left">
+        <span class="objetivo__eyebrow">🎯 OBJETIVO ACTIVO · {{ objetivo.semana }}</span>
+        <div class="objetivo__progress-row">
+          <span class="objetivo__number">{{ objetivo.actual }}</span>
+          <span class="objetivo__sep">/</span>
+          <span class="objetivo__total">{{ objetivo.meta }} {{ objetivo.unidad }}</span>
+        </div>
+        <div class="objetivo__bar-track">
+          <div class="objetivo__bar-fill" [style.width]="progresoObjetivoWidth"></div>
+        </div>
+      </div>
+
+      <div class="objetivo__gali">
+        <span class="objetivo__gali-label">✦ Gali dice:</span>
+        <p class="objetivo__gali-msg">{{ objetivo.galiMensaje }}</p>
+        <div class="objetivo__gali-actions">
+          <button type="button" class="btn-objetivo btn-objetivo--ghost">Ver plan</button>
+          <button type="button" class="btn-objetivo btn-objetivo--ghost">Ajustar meta</button>
+        </div>
+      </div>
+
+      <div class="objetivo__mode">
+        <button
+          type="button"
+          class="mode-toggle"
+          [class.mode-toggle--active]="modoGaliActivo()"
+          (click)="toggleModoGali()"
+          data-proto-skip>
+          <span class="mode-toggle__dot"></span>
+          <span class="mode-toggle__label">
+            {{ modoGaliActivo() ? 'Gali Activo' : 'Modo Normal' }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════
+       CUERPO PRINCIPAL — 3 columnas
+  ══════════════════════════════════════════════ -->
+  <div class="hub__body">
+
+    <!-- ── Columna 1: Agentes Activos ── -->
+    <section class="hub__col hub__col--agents">
+      <h2 class="hub__section-title">Agentes activos</h2>
+
+      <div class="agents-list">
+        <div
+          *ngFor="let agent of agentes"
+          class="agent-card"
+          [class.agent-card--active]="agent.estado === 'activo'"
+          [class.agent-card--waiting]="agent.estado === 'esperando'"
+          [class.agent-card--paused]="agent.estado === 'pausa'">
+
+          <div class="agent-card__header">
+            <span class="agent-card__icon">{{ agent.icono }}</span>
+            <div class="agent-card__title-group">
+              <span class="agent-card__name">{{ agent.nombre }}</span>
+              <span class="agent-card__tool">{{ agent.herramienta }}</span>
+            </div>
+            <span class="agent-status-dot" [class]="getAgentStatusClass(agent.estado)"></span>
+          </div>
+
+          <p class="agent-card__desc">{{ agent.descripcion }}</p>
+          <p class="agent-card__last">{{ agent.ultimaAccion }}</p>
+
+          <div class="agent-card__actions">
+            <button type="button" class="agent-btn agent-btn--primary">Ver reglas</button>
+            <button type="button" class="agent-btn agent-btn--ghost">
+              {{ agent.estado === 'pausa' ? 'Reanudar' : 'Pausar' }}
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="add-agent-btn">
+          <i class="pi pi-plus"></i>
+          <span>Agregar agente</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── Columna 2: Señales del Día ── -->
+    <section class="hub__col hub__col--signals">
+      <h2 class="hub__section-title">Señales del día</h2>
+
+      <div class="signals-list">
+        <div
+          *ngFor="let signal of signals"
+          class="signal-card"
+          [class]="getSignalClass(signal.urgencia)">
+
+          <div class="signal-card__header">
+            <span class="signal-card__icon">{{ signal.icon }}</span>
+            <div class="signal-card__meta">
+              <span class="signal-card__titulo">{{ signal.titulo }}</span>
+              <span class="signal-card__source">{{ signal.agente }} · {{ signal.timestamp }}</span>
+            </div>
+          </div>
+
+          <p class="signal-card__contexto" *ngIf="signal.urgencia !== 'baja'">
+            {{ signal.contexto }}
+          </p>
+
+          <button type="button" class="signal-cta"
+            [class.signal-cta--primary]="signal.urgencia === 'alta'"
+            [class.signal-cta--secondary]="signal.urgencia !== 'alta'">
+            {{ signal.cta }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Columna 3: KPIs de Hoy ── -->
+    <section class="hub__col hub__col--kpis">
+      <h2 class="hub__section-title">Hoy · {{ kpisHoy.semana }}</h2>
+
+      <div class="kpis-grid">
+        <div class="kpi-item">
+          <span class="kpi-item__label">Ganancia neta</span>
+          <span class="kpi-item__value">{{ kpisHoy.ganancia }}</span>
+          <span class="kpi-item__trend kpi-item__trend--down">
+            ↓ {{ kpisHoy.gananciaTendencia }}pts vs sem. ant.
+          </span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-item__label">Pedidos</span>
+          <span class="kpi-item__value">{{ kpisHoy.pedidos }}</span>
+          <span class="kpi-item__trend kpi-item__trend--neutral">esta semana</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-item__label">ROAS real</span>
+          <span class="kpi-item__value kpi-item__value--accent">{{ kpisHoy.roas }}</span>
+          <span class="kpi-item__trend kpi-item__trend--up">↑ vs sem. ant.</span>
+        </div>
+        <div class="kpi-item">
+          <span class="kpi-item__label">Pauta diaria</span>
+          <span class="kpi-item__value">{{ kpisHoy.pauta }}</span>
+          <span class="kpi-item__trend kpi-item__trend--neutral">3 campañas activas</span>
+        </div>
+      </div>
+
+      <a [routerLink]="['/gali-v5/reportes/dashboard']" class="kpi-cta">
+        Ver P&L real →
+      </a>
+    </section>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       LOOP CERRADO — historial de acciones Gali
+  ══════════════════════════════════════════════ -->
+  <section class="hub__loop">
+    <div class="loop__header">
+      <h2 class="hub__section-title">Loop cerrado — acciones de Gali</h2>
+      <span class="loop__hint">← desliza →</span>
+    </div>
+
+    <div class="loop__track">
+      <div
+        *ngFor="let entry of loopEntries"
+        class="loop-chip"
+        [class]="getLoopTypeClass(entry.tipo)">
+
+        <div class="loop-chip__top">
+          <span class="loop-chip__agent-icon">{{ entry.icon }}</span>
+          <span class="loop-chip__agent">{{ entry.agente }}</span>
+          <span class="loop-chip__time">{{ entry.hace }}</span>
+        </div>
+
+        <p class="loop-chip__accion">{{ entry.accion }}</p>
+        <p class="loop-chip__resultado">{{ entry.resultado }}</p>
+
+        <button *ngIf="entry.cta" type="button" class="loop-chip__cta">
+          {{ entry.cta }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       MIS PROYECTOS — vista rápida
+  ══════════════════════════════════════════════ -->
+  <section class="hub__proyectos">
+    <div class="proyectos__header">
+      <h2 class="hub__section-title">Mis proyectos</h2>
+      <a [routerLink]="['/gali-v5']" class="proyectos__ver-todos">Ver todos</a>
+    </div>
+
+    <div class="proyectos-list">
+      <div
+        *ngFor="let proyecto of proyectos"
+        class="proyecto-row">
+
+        <div class="proyecto-row__left">
+          <span class="proyecto-badge" [class]="getProjectStatusClass(proyecto.estado)">
+            {{ getProjectStatusLabel(proyecto.estado) }}
+          </span>
+          <span class="proyecto-row__nombre">{{ proyecto.nombre }}</span>
+        </div>
+
+        <div class="proyecto-row__metrics">
+          <span *ngIf="proyecto.roas !== '—'" class="proyecto-row__roas">
+            ROAS {{ proyecto.roas }}
+          </span>
+          <span *ngIf="proyecto.pedidos !== '—'" class="proyecto-row__pedidos">
+            {{ proyecto.pedidos }}
+          </span>
+        </div>
+
+        <div class="proyecto-row__signal"
+          [class.proyecto-row__signal--warning]="proyecto.signalType === 'warning'"
+          [class.proyecto-row__signal--ok]="proyecto.signalType === 'ok'"
+          [class.proyecto-row__signal--info]="proyecto.signalType === 'info'">
+          <span class="proyecto-row__signal-dot"></span>
+          <span class="proyecto-row__signal-text">{{ proyecto.galiMessage }}</span>
+        </div>
+
+        <a [routerLink]="['/gali-v5/proyecto', proyecto.id]" class="proyecto-row__link">
+          <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>

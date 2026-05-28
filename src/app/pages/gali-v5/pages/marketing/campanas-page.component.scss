@@ -1,0 +1,72 @@
+@import 'styles/gali-v5-tokens';
+@import './marketing-shared';
+
+:host {
+  @include marketing-page-shell;
+}
+
+.campanas-page {
+  @include marketing-page-inner;
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: $size-5;
+    align-items: start;
+  }
+
+  &__channels {
+    @include marketing-channel-tabs;
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $size-4;
+    min-width: 0;
+    padding: $size-4;
+    @include marketing-content-card;
+  }
+
+  &__table-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: $radius-md;
+    background: $error;
+    color: $white;
+    cursor: pointer;
+
+    i {
+      font-size: 16px;
+    }
+  }
+
+  &__table-wrap {
+    @include marketing-table-wrap;
+    border: none;
+    box-shadow: none;
+  }
+
+  &__table {
+    @include marketing-table;
+  }
+}
+
+@media (max-width: 900px) {
+  .campanas-page__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .campanas-page__channels {
+    flex-direction: row;
+  }
+}

@@ -1,0 +1,56 @@
+<div class="chatea-page">
+  <dropi-titulos title="Chatea Pro" [breadcrumbs]="breadcrumbs" />
+
+  <section class="chatea-page__hero">
+    <div class="chatea-page__hero-content">
+      <h2>Automatiza tu operación con expertos virtuales y vuélvete más rentable con Chatea Pro.</h2>
+      <p>
+        Confirma pedidos y recupera carritos abandonados por WhatsApp sin contratar más personal.
+        Chatea Pro trabaja 24/7 para que tú te enfoques en vender.
+      </p>
+      <div class="chatea-page__hero-actions">
+        <button type="button" class="chatea-page__btn chatea-page__btn--primary">
+          Comienza ahora
+          <i class="pi pi-external-link"></i>
+        </button>
+        <button type="button" class="chatea-page__btn chatea-page__btn--ghost">
+          <i class="pi pi-play"></i>
+          Ver como funciona
+        </button>
+      </div>
+
+      <div class="chatea-page__assistant">
+        <div class="chatea-page__assistant-icon"><i class="pi pi-comments"></i></div>
+        <div>
+          <strong>Asistente Logístico</strong>
+          <p>Confirma datos de envío y reduce devoluciones.</p>
+        </div>
+        <div class="chatea-page__assistant-nav">
+          <button type="button"><i class="pi pi-chevron-left"></i></button>
+          <button type="button"><i class="pi pi-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chatea-page__hero-visual">
+      <div class="chatea-page__phone-mock">
+        <div class="chatea-page__chat-bubble">
+          <span class="chatea-page__chat-badge">+ $350.000</span>
+          <p>Tu pedido #33885 ha sido confirmado ✓</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chatea-page__stats-section">
+    <h3>¡Lleva tu ecosistema a otro nivel con Chatea Pro!</h3>
+    <div class="chatea-page__stats-grid">
+      @for (stat of stats; track stat.value) {
+        <article class="chatea-page__stat-card">
+          <strong>{{ stat.value }}</strong>
+          <p>{{ stat.desc }}</p>
+        </article>
+      }
+    </div>
+  </section>
+</div>

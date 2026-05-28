@@ -1,0 +1,69 @@
+<div class="cas-bandeja">
+  <aside class="cas-bandeja__inbox">
+    <header class="cas-bandeja__inbox-head">
+      <h2>Bandeja</h2>
+      <dropi-search-oficial placeholder="Buscar ticket o pedido…" guiaLabel="Guía" [width]="320" [(ngModel)]="searchQuery" />
+    </header>
+    <div class="cas-bandeja__tabs">
+      <button type="button" [class.active]="activeFilter() === 'todos'" (click)="activeFilter.set('todos')">Todos</button>
+      <button type="button" [class.active]="activeFilter() === 'abiertos'" (click)="activeFilter.set('abiertos')">Abiertos</button>
+      <button type="button" [class.active]="activeFilter() === 'mios'" (click)="activeFilter.set('mios')">Asignados a mí</button>
+    </div>
+    <div class="cas-bandeja__ticket-list">
+      @for (ticket of tickets; track ticket.id) {
+        <button
+          type="button"
+          class="ticket-card"
+          [class.ticket-card--active]="selectedId() === ticket.id"
+          (click)="selectedId.set(ticket.id)"
+        >
+          <div class="ticket-card__top">
+            <strong>{{ ticket.id }}</strong>
+            <dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" />
+          </div>
+          <p class="ticket-card__subject">{{ ticket.subject }}</p>
+          <p class="ticket-card__meta">{{ ticket.client }} · {{ ticket.updated }}</p>
+        </button>
+      }
+    </div>
+  </aside>
+
+  <main class="cas-bandeja__chat">
+    @if (selectedTicket(); as ticket) {
+      <header class="cas-bandeja__chat-head">
+        <div>
+          <h3>{{ ticket.subject }}</h3>
+          <span>{{ ticket.id }} · {{ ticket.order }}</span>
+        </div>
+        <dropi-tag [label]="ticket.priority" variant="warning" />
+      </header>
+      <div class="cas-bandeja__messages">
+        @for (msg of messages; track msg.time) {
+          <div class="chat-msg" [class.chat-msg--agent]="msg.from === 'agent'">
+            <p>{{ msg.text }}</p>
+            <time>{{ msg.time }}</time>
+          </div>
+        }
+      </div>
+      <footer class="cas-bandeja__composer">
+        <input type="text" placeholder="Escribe un mensaje…" />
+        <button type="button"><i class="pi pi-send"></i></button>
+      </footer>
+    }
+  </main>
+
+  <aside class="cas-bandeja__info">
+    @if (selectedTicket(); as ticket) {
+      <h4>Información del ticket</h4>
+      <dl>
+        <dt>Cliente</dt><dd>{{ ticket.client }}</dd>
+        <dt>Pedido</dt><dd>{{ ticket.order }}</dd>
+        <dt>Agente</dt><dd>{{ ticket.agent }}</dd>
+        <dt>Estado</dt><dd><dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" /></dd>
+        <dt>Prioridad</dt><dd>{{ ticket.priority }}</dd>
+        <dt>Actualizado</dt><dd>{{ ticket.updated }}</dd>
+      </dl>
+      <p class="cas-bandeja__preview">{{ ticket.preview }}</p>
+    }
+  </aside>
+</div>

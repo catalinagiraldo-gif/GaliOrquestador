@@ -68,6 +68,19 @@ export interface GaliProject {
   metrics: ProjectMetrics;
 }
 
+export type SignalEstadoEjecucion = 'pendiente' | 'ejecutado' | 'resultado';
+export type AgenteEstado = 'activo' | 'esperando' | 'completado' | 'fallido' | 'pausa';
+
+export interface SignalResultado {
+  metrica: string;
+  antes: number;
+  despues: number;
+  delta_label: string;
+  roas_antes?: number;
+  roas_despues?: number;
+  ejecutado_hace?: string;
+}
+
 export interface Signal {
   id: string;
   tipo: SignalKind;
@@ -78,6 +91,23 @@ export interface Signal {
   urgencia: Urgencia;
   timestamp: string;
   fuente: string;
+  confianza?: number;
+  razonamiento?: string;
+  estado_ejecucion?: SignalEstadoEjecucion;
+  resultado?: SignalResultado;
+  propuesta_receta?: { label: string; route: string };
+}
+
+export interface AgenteActivo {
+  id: string;
+  nombre: string;
+  icono: string;
+  estado: AgenteEstado;
+  progreso_texto: string;
+  confianza: number;
+  memoria_usada: string[];
+  iniciado_hace: string;
+  marketplace_id: string | null;
 }
 
 export interface ChatMessage {

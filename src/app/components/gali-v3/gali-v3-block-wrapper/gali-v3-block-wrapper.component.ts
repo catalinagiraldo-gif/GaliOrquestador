@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { BlockManifest, BlockSize } from '../../../services/gali-v3/block-registry';
+import { BlockManifest, BlockId, BlockSize } from '../../../services/gali-v3/block-registry';
+import { CanvasHighlightService } from '../../../services/gali-v3/canvas-highlight.service';
 
 @Component({
   selector: 'gali-v3-block-wrapper',
@@ -18,7 +19,12 @@ export class GaliV3BlockWrapperComponent {
   @Output() remove = new EventEmitter<void>();
   @Output() expand = new EventEmitter<void>();
 
+  private highlightSvc = inject(CanvasHighlightService);
+
   menuOpen = signal(false);
+
+  galiHighlight = computed(() => this.highlightSvc.isHighlighted(this.manifest.id as BlockId));
+  galiDelta = computed(() => this.highlightSvc.deltaLabel());
 
   toggleMenu() { this.menuOpen.update(v => !v); }
   closeMenu() { this.menuOpen.set(false); }

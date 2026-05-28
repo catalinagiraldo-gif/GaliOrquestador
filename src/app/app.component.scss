@@ -13,6 +13,12 @@
     height: 100vh;
     overflow: hidden;
     transition: margin-left 0.2s ease;
+
+    &--standalone {
+      margin-left: 0;
+      width: 100%;
+      max-width: 100%;
+    }
   }
 
   &__content {
@@ -23,16 +29,21 @@
     height: calc(100vh - #{$header-height});
 
     &--gali {
+      width: 100%;
+      max-width: 100%;
       height: 100vh;
       background: transparent;
       overflow: hidden;
     }
   }
 
-  // When /gali/* — sidebar collapsed by default
   &--gali {
     .app-shell__main {
       margin-left: $sidebar-collapsed-width;
+
+      &--standalone {
+        margin-left: 0;
+      }
     }
   }
 }

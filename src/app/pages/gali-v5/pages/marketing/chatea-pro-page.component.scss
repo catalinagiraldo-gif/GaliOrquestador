@@ -1,0 +1,214 @@
+@import 'styles/gali-v5-tokens';
+@import './marketing-shared';
+
+:host {
+  @include marketing-page-shell;
+}
+
+.chatea-page {
+  @include marketing-page-inner;
+
+  &__hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    gap: $size-8;
+    padding: $size-8;
+    border-radius: $radius-lg;
+    background: linear-gradient(135deg, #1a1f2e 0%, #2d3548 100%);
+    color: $white;
+    margin-bottom: $size-8;
+    min-height: 360px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__hero-content h2 {
+    margin: 0 0 $size-4;
+    font-family: $font-primary;
+    font-size: $font-2xl;
+    font-weight: $font-bold;
+    line-height: 1.2;
+  }
+
+  &__hero-content > p {
+    margin: 0 0 $size-6;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    line-height: 1.6;
+    color: rgba($white, 0.85);
+  }
+
+  &__hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $size-3;
+    margin-bottom: $size-6;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $size-2;
+    height: 44px;
+    padding: 0 $size-5;
+    border-radius: $radius-lg;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    cursor: pointer;
+
+    &--primary {
+      border: none;
+      background: #50a5f1;
+      color: $white;
+    }
+
+    &--ghost {
+      border: 1px solid rgba($white, 0.4);
+      background: rgba($white, 0.08);
+      color: $white;
+    }
+  }
+
+  &__assistant {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    max-width: 420px;
+    padding: $size-4;
+    border-radius: $radius-lg;
+    background: rgba($white, 0.08);
+    border: 1px solid rgba($white, 0.12);
+
+    strong {
+      display: block;
+      font-family: $font-primary;
+      font-size: $font-sm;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-family: $font-primary;
+      font-size: $font-xs;
+      color: rgba($white, 0.7);
+    }
+  }
+
+  &__assistant-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #50a5f1;
+    flex-shrink: 0;
+
+    i {
+      font-size: 18px;
+    }
+  }
+
+  &__assistant-nav {
+    display: flex;
+    gap: $size-1;
+    margin-left: auto;
+
+    button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba($white, 0.3);
+      border-radius: 50%;
+      background: transparent;
+      color: $white;
+      cursor: pointer;
+    }
+  }
+
+  &__hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__phone-mock {
+    width: 220px;
+    height: 400px;
+    border-radius: 24px;
+    background: #111;
+    border: 4px solid #333;
+    padding: $size-4;
+    position: relative;
+  }
+
+  &__chat-bubble {
+    margin-top: $size-8;
+    padding: $size-3;
+    border-radius: $radius-md;
+    background: #075e54;
+    font-family: $font-primary;
+    font-size: $font-xs;
+
+    p {
+      margin: $size-2 0 0;
+    }
+  }
+
+  &__chat-badge {
+    display: inline-block;
+    padding: 2px $size-2;
+    border-radius: $radius-sm;
+    background: $success;
+    font-weight: $font-bold;
+    font-size: 11px;
+  }
+
+  &__stats-section h3 {
+    margin: 0 0 $size-6;
+    font-family: $font-primary;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    color: $gray-800;
+    text-align: center;
+  }
+
+  &__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $size-4;
+
+    @media (max-width: 1000px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__stat-card {
+    padding: $size-5;
+    border: 1px solid $gray-200;
+    border-radius: $radius-lg;
+    background: $white;
+
+    strong {
+      display: block;
+      margin-bottom: $size-2;
+      font-family: $font-primary;
+      font-size: $font-base;
+      font-weight: $font-bold;
+      color: $gray-800;
+    }
+
+    p {
+      margin: 0;
+      font-family: $font-primary;
+      font-size: $font-sm;
+      color: $gray-600;
+      line-height: 1.5;
+    }
+  }
+}

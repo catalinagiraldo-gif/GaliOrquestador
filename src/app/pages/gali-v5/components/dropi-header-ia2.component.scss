@@ -1,0 +1,222 @@
+@import 'styles/gali-v5-tokens';
+
+// Figma Header IA 2 — 53px height (discrepancia vs DS header 70px)
+.header-ia2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 53px;
+  padding: $size-2 $size-3;
+  background: $white;
+  border-bottom: 1px solid $gray-100;
+  flex-shrink: 0;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    min-width: 0;
+  }
+
+  &__logo-link {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    text-decoration: none;
+  }
+
+  &__gallery {
+    display: inline-flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+    padding: 6px $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    background: $white;
+    color: $gray-600;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+    .pi {
+      font-size: 13px;
+      color: $primary-500;
+    }
+
+    &:hover {
+      background: $gray-50;
+      border-color: $primary-500;
+      color: $gray-800;
+    }
+  }
+
+  &__logo {
+    width: 108px;
+    height: 37px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $size-4;
+    flex-shrink: 0;
+    min-width: 0;
+  }
+
+  &__beta {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  &__beta-label {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: #50a5f1; // Figma info-500
+    line-height: 1.1;
+  }
+
+  &__beta-switch {
+    position: relative;
+    width: 40px;
+    height: 21px;
+    border-radius: 12px;
+    background: $gray-200;
+    transition: background 0.2s ease;
+
+    &--on {
+      background: #50a5f1;
+    }
+  }
+
+  &__beta-knob {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    width: 17px;
+    height: 17px;
+    border-radius: 10px;
+    background: $white;
+    transition: left 0.2s ease;
+
+    .header-ia2__beta-switch--on & {
+      left: 20px;
+    }
+  }
+
+  &__wallet {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-1 $size-3;
+    border-radius: $radius-md;
+    background: $gray-50;
+    flex-shrink: 0;
+  }
+
+  &__wallet-icon {
+    font-size: 18px;
+    color: $gray-500;
+  }
+
+  &__wallet-amount,
+  &__wallet-mask {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $gray-700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__eye {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $gray-500;
+    cursor: pointer;
+    border-radius: $radius-sm;
+
+    &:hover {
+      background: $gray-100;
+    }
+  }
+
+  &__avatar {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border: 2px solid $gray-100;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    background: $gray-100;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .header-ia2 {
+    &__wallet-amount {
+      font-size: $font-xs;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .header-ia2 {
+    padding: $size-2;
+
+    &__gallery span {
+      display: none;
+    }
+
+    &__gallery {
+      padding: 6px $size-2;
+    }
+
+    &__logo {
+      width: 88px;
+      height: 30px;
+    }
+
+    &__actions {
+      gap: $size-2;
+    }
+
+    &__beta-label {
+      display: none;
+    }
+
+    &__wallet {
+      padding: $size-1 $size-2;
+    }
+
+    &__wallet-amount {
+      font-size: $font-xs;
+    }
+  }
+}

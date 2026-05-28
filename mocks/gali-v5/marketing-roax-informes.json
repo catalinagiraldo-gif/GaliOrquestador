@@ -1,0 +1,29 @@
+{
+  "dateRange": "Desde 1/08/25- Hasta 27/08/25",
+  "kpis": [
+    {
+      "label": "Impresiones",
+      "value": "120",
+      "delta": "12,5%",
+      "trend": "up"
+    },
+    {
+      "label": "Inversión",
+      "value": "$65.000.000",
+      "delta": "12,5%",
+      "trend": "down"
+    },
+    {
+      "label": "Conversiones",
+      "value": "48",
+      "delta": "8,2%",
+      "trend": "up"
+    },
+    {
+      "label": "ROAS",
+      "value": "4.2x",
+      "delta": "5,1%",
+      "trend": "up"
+    }
+  ]
+}

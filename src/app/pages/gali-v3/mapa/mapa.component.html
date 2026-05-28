@@ -58,7 +58,7 @@
         [class.is-drop-over]="dragOverZone() === z.id && dragOverIdx() === i"
         [attr.data-color]="z.color"
         [attr.draggable]="editMode() ? 'true' : null"
-        (click)="go(n.route)"
+        (click)="go(n.route, n.id, n.label)"
         (mouseenter)="onHover(n.id)"
         (mouseleave)="onHover(null)"
         (focus)="onHover(n.id)"

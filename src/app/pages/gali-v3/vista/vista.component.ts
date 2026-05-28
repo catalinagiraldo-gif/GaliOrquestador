@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GaliBusinessService } from '../../../services/gali-v3/business.service';
@@ -8,13 +8,18 @@ import { GaliMarketplaceService } from '../../../services/gali-v3/marketplace.se
 import { GaliSignalsService } from '../../../services/gali-v3/signals.service';
 import { GaliChatService } from '../../../services/gali-v3/chat.service';
 import { GaliBloqueBuilderService } from '../../../services/gali-v3/bloque-builder.service';
+import { GaliRightPanelService } from '../../../services/gali-v3/right-panel.service';
 import { ProximosPasosComponent } from '../../../components/gali-v3/shared/proximos-pasos.component';
+import { BlockVigilanteLogisticoComponent } from '../../../components/gali-v3/blocks/block-vigilante-logistico.component';
+import { BlockRentabilidadComponent } from '../../../components/gali-v3/blocks/block-rentabilidad.component';
 
 type WidgetId =
   | 'pedidos-dia'
   | 'novedades-pendientes'
   | 'campanas-activas'
   | 'wallet-proyeccion'
+  | 'vigilante-logistico'
+  | 'rentabilidad-real'
   | 'productos-top'
   | 'flows-activos'
   | 'agentes-trabajando'
@@ -32,8 +37,14 @@ const VISTAS_DEFAULT: Record<string, Vista> = {
   'operacion-hoy': {
     slug: 'operacion-hoy',
     name: 'Mi operación de hoy',
-    description: 'Todo lo que importa hoy en una pantalla. Generado por Gali.',
-    widgets: ['pedidos-dia', 'novedades-pendientes', 'campanas-activas', 'wallet-proyeccion'],
+    description: 'Todo lo que importa hoy en una pantalla. Vigilante logístico + P&L + operación diaria.',
+    widgets: ['pedidos-dia', 'novedades-pendientes', 'vigilante-logistico', 'rentabilidad-real', 'campanas-activas', 'wallet-proyeccion'],
+  },
+  'rentabilidad-semana': {
+    slug: 'rentabilidad-semana',
+    name: 'Rentabilidad semana',
+    description: 'Modo Medir — P&L, métricas ROAS, logística y snapshot proveedor.',
+    widgets: ['rentabilidad-real', 'campanas-activas', 'vigilante-logistico', 'wallet-proyeccion'],
   },
   'productos-ganadores': {
     slug: 'productos-ganadores',
@@ -55,6 +66,8 @@ const ALL_WIDGETS: Array<{ id: WidgetId; label: string; icon: string }> = [
   { id: 'novedades-pendientes', label: 'Novedades pendientes', icon: '📦' },
   { id: 'campanas-activas', label: 'Campañas activas + ROAS', icon: '📣' },
   { id: 'wallet-proyeccion', label: 'Wallet + proyección', icon: '💰' },
+  { id: 'vigilante-logistico', label: 'Vigilante Logístico', icon: '🚛' },
+  { id: 'rentabilidad-real', label: 'Rentabilidad Real (P&L)', icon: '💰' },
   { id: 'productos-top', label: 'Productos top', icon: '⚡' },
   { id: 'flows-activos', label: 'Flows automatizando', icon: '🔧' },
   { id: 'agentes-trabajando', label: 'Agentes trabajando', icon: '🤖' },
@@ -65,11 +78,11 @@ const ALL_WIDGETS: Array<{ id: WidgetId; label: string; icon: string }> = [
 @Component({
   selector: 'app-gali-v3-vista',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProximosPasosComponent],
+  imports: [CommonModule, RouterModule, ProximosPasosComponent, BlockVigilanteLogisticoComponent, BlockRentabilidadComponent],
   templateUrl: './vista.component.html',
   styleUrls: ['./vista.component.scss'],
 })
-export class GaliV3VistaComponent {
+export class GaliV3VistaComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private businessSvc = inject(GaliBusinessService);
   private projectSvc = inject(GaliProjectService);
@@ -77,6 +90,7 @@ export class GaliV3VistaComponent {
   private signalsSvc = inject(GaliSignalsService);
   private chatSvc = inject(GaliChatService);
   private bloqueSvc = inject(GaliBloqueBuilderService);
+  private rpanelSvc = inject(GaliRightPanelService);
 
   bloquesCustom = this.bloqueSvc.bloquesGuardados;
 
@@ -103,6 +117,13 @@ export class GaliV3VistaComponent {
   composedWidgets = signal<WidgetId[]>([]);
 
   format(n: number) { return this.businessSvc.formatCurrency(n); }
+
+  ngOnInit() {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    if (slug === 'operacion-hoy' || this.route.snapshot.queryParamMap.get('panel') === 'open') {
+      this.rpanelSvc.setOpen(true);
+    }
+  }
 
   toggleEdit() { this.editing.update(v => !v); }
 

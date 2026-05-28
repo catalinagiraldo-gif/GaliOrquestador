@@ -1,9 +1,16 @@
-<article class="bw" [attr.data-size]="size" [attr.data-editing]="editing">
+<article
+  class="bw"
+  [attr.data-size]="size"
+  [attr.data-editing]="editing"
+  [class.gali-active]="galiHighlight() === 'active'"
+  [class.gali-done]="galiHighlight() === 'done'">
   <header class="bw__head">
     <div class="bw__title">
       <h3>{{ manifest.label }}</h3>
       <span class="bw__hint">{{ manifest.hint }}</span>
     </div>
+    <span *ngIf="galiHighlight() === 'active'" class="bw__gali-badge">✦ Gali revisando…</span>
+    <span *ngIf="galiHighlight() === 'done' && galiDelta() as d" class="bw__gali-badge bw__gali-badge--done">✦ {{ d }}</span>
 
     <div class="bw__actions">
       <a

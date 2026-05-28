@@ -1,0 +1,252 @@
+@import 'styles/gali-v5-tokens';
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cas-bandeja {
+  display: flex;
+  height: 100%;
+  background: $white;
+
+  &__inbox {
+    width: 360px;
+    flex-shrink: 0;
+    border-right: 1px solid $gray-100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__inbox-head {
+    padding: $size-4;
+    border-bottom: 1px solid $gray-100;
+
+    h2 {
+      margin: 0 0 $size-3;
+      font-family: $font-primary;
+      font-size: $font-lg;
+      font-weight: $font-bold;
+      color: $gray-700;
+    }
+  }
+
+  &__tabs {
+    display: flex;
+    padding: 0 $size-4;
+    border-bottom: 1px solid $gray-100;
+
+    button {
+      flex: 1;
+      height: 40px;
+      border: none;
+      background: transparent;
+      font-family: $font-primary;
+      font-size: $font-sm;
+      color: $gray-500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+
+      &.active {
+        color: $primary-600;
+        border-bottom-color: $primary-500;
+      }
+    }
+  }
+
+  &__ticket-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: $size-2;
+  }
+
+  &__chat {
+    flex: 1;
+    min-width: 0;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid $gray-100;
+  }
+
+  &__chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $size-4;
+    border-bottom: 1px solid $gray-100;
+
+    h3 {
+      margin: 0;
+      font-family: $font-primary;
+      font-size: $font-base;
+      font-weight: $font-semibold;
+      color: $gray-700;
+    }
+
+    span {
+      font-size: $font-xs;
+      color: $gray-500;
+    }
+  }
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $size-4;
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+    background: $gray-50;
+  }
+
+  &__composer {
+    display: flex;
+    gap: $size-2;
+    padding: $size-3 $size-4;
+    border-top: 1px solid $gray-100;
+
+    input {
+      flex: 1;
+      height: 40px;
+      padding: 0 $size-3;
+      border: 1px solid $gray-200;
+      border-radius: $radius-lg;
+      font-family: $font-primary;
+      font-size: $font-sm;
+    }
+
+    button {
+      width: 42px;
+      height: 40px;
+      border: none;
+      border-radius: $radius-lg;
+      background: $primary-500;
+      color: $white;
+      cursor: pointer;
+    }
+  }
+
+  &__info {
+    width: 280px;
+    flex-shrink: 0;
+    padding: $size-4;
+    overflow-y: auto;
+
+    h4 {
+      margin: 0 0 $size-4;
+      font-family: $font-primary;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    dl {
+      margin: 0 0 $size-4;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: $size-2 $size-3;
+      font-family: $font-primary;
+      font-size: $font-sm;
+
+      dt {
+        color: $gray-500;
+        margin: 0;
+      }
+
+      dd {
+        margin: 0;
+        color: $gray-700;
+      }
+    }
+  }
+
+  &__preview {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-500;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+.ticket-card {
+  width: 100%;
+  text-align: left;
+  padding: $size-3;
+  border: 1px solid transparent;
+  border-radius: $radius-lg;
+  background: $white;
+  cursor: pointer;
+  margin-bottom: $size-2;
+
+  &:hover {
+    background: $gray-50;
+  }
+
+  &--active {
+    border-color: $primary-500;
+    background: rgba($primary-500, 0.06);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+
+    strong {
+      font-family: $font-primary;
+      font-size: $font-sm;
+      color: $gray-700;
+    }
+  }
+
+  &__subject {
+    margin: 0 0 4px;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $gray-700;
+  }
+
+  &__meta {
+    margin: 0;
+    font-size: $font-xs;
+    color: $gray-400;
+  }
+}
+
+.chat-msg {
+  max-width: 75%;
+  padding: $size-3;
+  border-radius: $radius-lg;
+  background: $white;
+  box-shadow: $shadow-small;
+
+  &--agent {
+    align-self: flex-start;
+  }
+
+  &:not(&--agent) {
+    align-self: flex-end;
+    background: rgba($primary-500, 0.1);
+  }
+
+  p {
+    margin: 0 0 4px;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-700;
+  }
+
+  time {
+    font-size: $font-xs;
+    color: $gray-400;
+  }
+}

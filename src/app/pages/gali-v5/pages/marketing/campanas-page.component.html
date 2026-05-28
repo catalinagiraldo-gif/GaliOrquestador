@@ -1,0 +1,53 @@
+<div class="campanas-page">
+  <dropi-titulos title="Campañas masivas" [breadcrumbs]="breadcrumbs">
+    <dropi-button-new titulosActions label="Nueva campaña" icon="pi-chevron-down" hierarchy="primary" [width]="200" />
+  </dropi-titulos>
+
+  <div class="campanas-page__layout">
+    <nav class="campanas-page__channels">
+      <button type="button" [class.is-active]="activeChannel === 'sms'" (click)="activeChannel = 'sms'">
+        <i class="pi pi-send"></i>
+        SMS
+      </button>
+      <button type="button" [class.is-active]="activeChannel === 'email'" (click)="activeChannel = 'email'">
+        <i class="pi pi-envelope"></i>
+        EMAIL
+      </button>
+    </nav>
+
+    <div class="campanas-page__main">
+      <div class="campanas-page__table-actions">
+        <button type="button" class="campanas-page__delete-btn" title="Eliminar seleccionados">
+          <i class="pi pi-trash"></i>
+        </button>
+      </div>
+
+      <div class="campanas-page__table-wrap">
+        <table class="campanas-page__table">
+          <thead>
+            <tr>
+              <th style="width:48px"><input type="checkbox" aria-label="Seleccionar todo" /></th>
+              <th style="width:90px">ID</th>
+              <th>Nombre</th>
+              <th style="width:140px">Estado</th>
+              <th style="width:140px">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredRows; track row.id) {
+              <tr>
+                <td><input type="checkbox" [attr.aria-label]="'Seleccionar ' + row.nombre" /></td>
+                <td>{{ row.id }}</td>
+                <td>{{ row.nombre }}</td>
+                <td><dropi-tag [label]="row.estado" [variant]="estadoVariant(row.estado)" /></td>
+                <td>{{ row.fecha }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <dropi-paginator />
+    </div>
+  </div>
+</div>

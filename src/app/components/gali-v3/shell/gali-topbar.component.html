@@ -1,15 +1,27 @@
 <header class="topbar">
-  <div class="topbar__brand" routerLink="/gali-v4">
+  <div class="topbar__brand" routerLink="/gali-v3">
     <span class="topbar__sparkle" aria-hidden="true">✦</span>
     <span class="topbar__name">Gali</span>
-    <span class="topbar__version" aria-label="Versión 4">V4</span>
+    <span class="topbar__version" aria-label="Versión 4.1">V4.1</span>
     <span class="topbar__divider">·</span>
-    <span class="topbar__tag">Dropi orquestador</span>
+    <span class="topbar__tag topbar__tag--mode">{{ modeHeader() }}</span>
   </div>
 
-  <nav class="topbar__nav" aria-label="Navegación principal Gali">
+  <nav class="topbar__modos" aria-label="Modos de trabajo">
+    <button
+      *ngFor="let m of modos"
+      type="button"
+      class="topbar__modo"
+      [class.is-active]="isModoActive(m.id)"
+      (click)="navigateModo(m.id)"
+      [title]="m.label">
+      {{ m.emoji }} {{ m.label }}
+    </button>
+  </nav>
+
+  <nav class="topbar__nav" aria-label="Navegación principal Gali" data-tour="topbar-nav">
     <a routerLink="/gali-v3" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="is-active">Inicio</a>
-    <a routerLink="/gali-v3/builder" routerLinkActive="is-active">Builder</a>
+    <a routerLink="/gali-v3/builder" routerLinkActive="is-active">Recetas</a>
     <a routerLink="/gali-v3/mercado" routerLinkActive="is-active">Mercado</a>
     <a routerLink="/gali-v3/dropi/catalogo" routerLinkActive="is-active">Catálogo</a>
   </nav>
@@ -17,6 +29,7 @@
   <div class="topbar__right">
     <button
       class="topbar__signals"
+      data-tour="topbar-signals"
       [class.has-critical]="signalsCriticas().length > 0"
       [attr.aria-expanded]="popoverOpen()"
       (click)="togglePopover()"
@@ -25,6 +38,25 @@
       <span class="topbar__signals-count" *ngIf="signalsCount() > 0">{{ signalsCount() }} señales</span>
       <span class="topbar__signals-count is-empty" *ngIf="signalsCount() === 0">Sin señales</span>
       <span class="topbar__signals-dot" *ngIf="signalsCount() > 0"></span>
+    </button>
+
+    <button
+      type="button"
+      class="topbar__cmdk-hint"
+      data-tour="topbar-cmdk"
+      (click)="openCommandPalette()"
+      aria-label="Abrir command palette (⌘K)"
+      title="Command palette (⌘K)">
+      <kbd>⌘K</kbd>
+    </button>
+
+    <button
+      type="button"
+      class="topbar__tour"
+      (click)="restartTour()"
+      aria-label="Ver tour guiado de Gali V4"
+      title="Tour guiado">
+      ?
     </button>
 
     <button

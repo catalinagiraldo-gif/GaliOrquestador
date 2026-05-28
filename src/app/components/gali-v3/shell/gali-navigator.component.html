@@ -1,6 +1,23 @@
 <aside class="nav" aria-label="Navigator Gali">
+  <section class="nav__section nav__section--ahora">
+    <header class="nav__head">
+      <span class="nav__head-label">⚡ Ahora</span>
+      <span class="nav__head-meta">live</span>
+    </header>
+    <ul class="nav__list nav__list--kpi">
+      <li><span class="nav__kpi">{{ snapshot().pedidos.hoy }} pedidos hoy</span></li>
+      <li><span class="nav__kpi nav__kpi--warn">{{ snapshot().pedidos.novedades_criticas }} novedades</span></li>
+      <li><span class="nav__kpi">ROAS {{ snapshot().campanas.roas_promedio }}x</span></li>
+    </ul>
+    <ul class="nav__list nav__list--links">
+      <li><a routerLink="/gali-v3/objetivo" routerLinkActive="is-active" class="nav__item nav__item--compact"><span>🎯</span> Objetivo</a></li>
+      <li><a routerLink="/gali-v3/comunidad" routerLinkActive="is-active" class="nav__item nav__item--compact"><span>👥</span> Comunidad</a></li>
+      <li><a routerLink="/gali-v3/mi-stack" routerLinkActive="is-active" class="nav__item nav__item--compact"><span>🔌</span> Mi Stack</a></li>
+    </ul>
+  </section>
+
   <section class="nav__section nav__section--map">
-    <a routerLink="/gali-v3/mapa" routerLinkActive="is-active" class="nav__item nav__item--map">
+    <a routerLink="/gali-v3/mapa" routerLinkActive="is-active" class="nav__item nav__item--map" data-tour="nav-mapa">
       <span class="nav__item-icon">🗺</span>
       <span class="nav__item-label">Mapa del negocio</span>
       <span class="nav__item-badge nav__item-badge--cmd">⌘M</span>
@@ -110,19 +127,31 @@
 
   <section class="nav__section">
     <header class="nav__head">
-      <span class="nav__head-label">Builder</span>
+      <span class="nav__head-label">Recetas</span>
     </header>
     <ul class="nav__list">
       <li>
         <a routerLink="/gali-v3/builder" routerLinkActive="is-active" class="nav__item">
           <span class="nav__item-icon">🔧</span>
-          <span class="nav__item-label">Automatizaciones</span>
+          <span class="nav__item-label">Mis recetas</span>
         </a>
       </li>
       <li>
         <a routerLink="/gali-v3/bloque-builder" routerLinkActive="is-active" class="nav__item">
           <span class="nav__item-icon">✦</span>
-          <span class="nav__item-label">Constructor de bloques</span>
+          <span class="nav__item-label">Constructor de tableros</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/gali-v3/vista/operacion-hoy" routerLinkActive="is-active" class="nav__item">
+          <span class="nav__item-icon">📋</span>
+          <span class="nav__item-label">Mis vistas</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/gali-v3/equipo" routerLinkActive="is-active" class="nav__item">
+          <span class="nav__item-icon">👥</span>
+          <span class="nav__item-label">Mi equipo</span>
         </a>
       </li>
     </ul>

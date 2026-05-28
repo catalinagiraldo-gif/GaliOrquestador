@@ -1,5 +1,4 @@
-<aside class="rpanel" [class.is-open]="open()" [class.is-collapsed]="!open()" aria-label="Panel lateral Gali">
-  <!-- Estado COLAPSADO: chip vertical con toggle + badge -->
+<aside class="rpanel" [class.is-open]="open()" [class.is-collapsed]="!open()" aria-label="Panel orquestador Gali">
   <button
     *ngIf="!open()"
     type="button"
@@ -12,42 +11,129 @@
     <span *ngIf="unreadCount() > 0" class="rpanel__chip-badge" aria-hidden="true">{{ unreadCount() }}</span>
   </button>
 
-  <!-- Estado ABIERTO -->
   <ng-container *ngIf="open()">
     <header class="rpanel__head">
-      <nav class="rpanel__tabs" role="tablist" aria-label="Secciones del panel Gali">
-        <button
-          type="button"
-          role="tab"
-          class="rpanel__tab"
-          [class.is-active]="tab() === 'chat'"
-          [attr.aria-selected]="tab() === 'chat'"
-          (click)="setTab('chat')">
-          <span class="rpanel__tab-icon" aria-hidden="true">✦</span>
-          <span>Gali</span>
-        </button>
-        <button
-          type="button"
-          role="tab"
-          class="rpanel__tab"
-          [class.is-active]="tab() === 'bloques'"
-          [attr.aria-selected]="tab() === 'bloques'"
-          (click)="setTab('bloques')">
-          <span class="rpanel__tab-icon" aria-hidden="true">▦</span>
-          <span>Mis bloques</span>
-          <span *ngIf="bloquesCount() > 0" class="rpanel__tab-count">{{ bloquesCount() }}</span>
-        </button>
-      </nav>
-      <button
-        type="button"
-        class="rpanel__collapse"
-        (click)="toggle()"
-        aria-label="Cerrar panel Gali (⌘J)"
-        title="Cerrar panel (⌘J)">›</button>
+      <div class="rpanel__head-title">
+        <span class="rpanel__head-sparkle">✦</span>
+        <strong>Orquestador Gali</strong>
+        <span class="rpanel__head-count">{{ agentes().length }} agentes</span>
+      </div>
+      <button type="button" class="rpanel__collapse" (click)="toggle()" aria-label="Cerrar panel Gali (⌘J)" title="Cerrar (⌘J)">›</button>
     </header>
 
-    <!-- TAB CHAT — incluye business-context como acordeón colapsable -->
-    <div class="rpanel__content" *ngIf="tab() === 'chat'" role="tabpanel">
+    <div class="rpanel__scroll">
+      <!-- ZONA 1: Agentes activos -->
+      <section class="rpanel__zone" [class.is-collapsed]="!agentsExpanded()">
+        <button type="button" class="rpanel__zone-toggle" (click)="toggleAgents()" [attr.aria-expanded]="agentsExpanded()">
+          <span>◉ Agentes activos ({{ agentes().length }})</span>
+          <span aria-hidden="true">{{ agentsExpanded() ? '▴' : '▾' }}</span>
+        </button>
+        <ul *ngIf="agentsExpanded()" class="rpanel__agents">
+          <li *ngFor="let a of agentes()" class="rpanel__agent" [attr.data-estado]="a.estado">
+            <div class="rpanel__agent-head">
+              <span class="rpanel__agent-icon" [class.is-pulse]="a.estado === 'activo'">{{ agentEstadoIcon(a.estado) }}</span>
+              <span class="rpanel__agent-emoji">{{ a.icono }}</span>
+              <strong>{{ a.nombre }}</strong>
+              <span class="rpanel__conf-badge" [attr.data-tone]="agentConfianzaTone(a.confianza)">
+                {{ confianzaPct(a.confianza) }}
+              </span>
+            </div>
+            <p class="rpanel__agent-progress">{{ a.progreso_texto }}</p>
+            <div class="rpanel__agent-memory" *ngIf="a.memoria_usada.length">
+              <span>Usa memoria:</span>
+              <em *ngFor="let m of a.memoria_usada">{{ m }}</em>
+            </div>
+            <div class="rpanel__agent-actions">
+              <button type="button" class="rpanel__agent-btn">ver log</button>
+              <button type="button" class="rpanel__agent-btn" (click)="toggleAgentPausa(a.id, $event)">
+                {{ a.estado === 'pausa' ? 'reanudar' : 'pausar' }}
+              </button>
+            </div>
+            <span class="rpanel__agent-time">{{ a.iniciado_hace }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ZONA 2: Señales con loop -->
+      <section class="rpanel__zone" [class.is-collapsed]="!signalsExpanded()">
+        <button type="button" class="rpanel__zone-toggle" (click)="toggleSignals()" [attr.aria-expanded]="signalsExpanded()">
+          <span>⚡ Señales ({{ signals().length }})</span>
+          <span aria-hidden="true">{{ signalsExpanded() ? '▴' : '▾' }}</span>
+        </button>
+        <ul *ngIf="signalsExpanded()" class="rpanel__signals">
+          <li *ngFor="let s of signals()" class="rpanel__signal" [class.is-alta]="s.urgencia === 'alta'" [attr.data-estado]="s.estado_ejecucion">
+            <div class="rpanel__signal-head">
+              <span>{{ s.icon }}</span>
+              <strong>{{ s.titulo }}</strong>
+              <span class="rpanel__conf-badge" [attr.data-tone]="confianzaTone(s.confianza)">
+                {{ confianzaPct(s.confianza) }}
+              </span>
+            </div>
+            <p class="rpanel__signal-ctx">{{ s.contexto }}</p>
+            <button type="button" class="rpanel__why" (click)="toggleSignalReasoning(s.id)">
+              {{ isSignalReasoningExpanded(s.id) ? '▴ Ocultar' : '▾ ¿Por qué?' }}
+            </button>
+            <p *ngIf="isSignalReasoningExpanded(s.id) && s.razonamiento" class="rpanel__reasoning">
+              {{ s.razonamiento }}
+              <em>· Fuente: {{ s.fuente }}</em>
+            </p>
+
+            <div *ngIf="s.estado_ejecucion === 'resultado' && s.resultado as r" class="rpanel__result">
+              <span class="rpanel__result-label">📈 Resultado ({{ r.ejecutado_hace || 'reciente' }})</span>
+              <div class="rpanel__result-metrics">
+                <span>CTR: {{ r.antes }}% → {{ r.despues }}%</span>
+                <span *ngIf="r.roas_antes">ROAS: {{ r.roas_antes }}x → {{ r.roas_despues }}x</span>
+              </div>
+              <p class="rpanel__result-delta">{{ r.delta_label }}</p>
+              <div *ngIf="s.propuesta_receta as rec" class="rpanel__result-actions">
+                <button type="button" class="rpanel__cta" (click)="goToReceta(rec.route)">{{ rec.label }} →</button>
+                <button type="button" class="rpanel__cta rpanel__cta--ghost">No gracias</button>
+              </div>
+            </div>
+
+            <div *ngIf="s.estado_ejecucion !== 'resultado'" class="rpanel__signal-actions">
+              <button type="button" class="rpanel__cta" (click)="executeSignal(s.id, $event)">
+                {{ s.accion_sugerida.label }}
+              </button>
+              <button type="button" class="rpanel__dismiss" (click)="dismissSignal(s.id, $event)" aria-label="Descartar">×</button>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Backlinks (Fase B) -->
+      <section *ngIf="backlinks().length" class="rpanel__zone rpanel__zone--backlinks">
+        <header class="rpanel__backlinks-head">📡 Conectado con {{ backlinkLabel() }}</header>
+        <ul class="rpanel__backlinks">
+          <li *ngFor="let b of backlinks()">
+            <a [routerLink]="b.target_route" [attr.data-estado]="b.estado">
+              ← {{ b.count }} {{ b.label }}
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Mis tableros -->
+      <section class="rpanel__zone" [class.is-collapsed]="!tablerosExpanded()">
+        <button type="button" class="rpanel__zone-toggle" (click)="toggleTableros()" [attr.aria-expanded]="tablerosExpanded()">
+          <span>▦ Mis tableros ({{ bloquesCount() }})</span>
+          <span aria-hidden="true">{{ tablerosExpanded() ? '▴' : '▾' }}</span>
+        </button>
+        <div *ngIf="tablerosExpanded()" class="rpanel__tableros">
+          <p class="rpanel__tableros-hint">Tableros custom del Constructor — no confundir con Mis vistas (layouts del lienzo).</p>
+          <button type="button" class="rpanel__tableros-new" (click)="irAlConstructor()">✦ Constructor de tableros</button>
+          <ul *ngIf="bloquesCount() > 0" class="rpanel__bloques-list">
+            <li *ngFor="let b of bloques()" class="rpanel__bloque">
+              <button type="button" (click)="irAlConstructor()">
+                <span>{{ b.icono }}</span>
+                <strong>{{ b.titulo }}</strong>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Negocio en vivo -->
       <section class="rpanel__business" [class.is-expanded]="businessExpanded()">
         <button type="button" class="rpanel__business-toggle" (click)="toggleBusiness()" [attr.aria-expanded]="businessExpanded()">
           <span class="rpanel__business-label">
@@ -60,57 +146,11 @@
           <gali-business-context></gali-business-context>
         </div>
       </section>
-
-      <div class="rpanel__chat">
-        <gali-chat></gali-chat>
-      </div>
     </div>
 
-    <!-- TAB MIS BLOQUES — output global de Vista 8 -->
-    <div class="rpanel__content" *ngIf="tab() === 'bloques'" role="tabpanel">
-      <div class="rpanel__bloques">
-        <header class="rpanel__bloques-head">
-          <div>
-            <strong>Mis bloques custom</strong>
-            <span>Creados con el Constructor de Gali</span>
-          </div>
-          <button type="button" class="rpanel__bloques-new" (click)="irAlConstructor()">
-            <span aria-hidden="true">✦</span> Nuevo
-          </button>
-        </header>
-
-        <!-- Empty state -->
-        <div *ngIf="bloquesCount() === 0" class="rpanel__bloques-empty">
-          <svg viewBox="0 0 120 90" class="rpanel__bloques-empty-art" aria-hidden="true">
-            <rect x="10" y="20" width="36" height="48" rx="4" fill="#FCE4C7" stroke="#F49A3D" stroke-width="1.2"/>
-            <rect x="52" y="14" width="32" height="22" rx="4" fill="#FFF9F0" stroke="#B8593A" stroke-width="1.2"/>
-            <rect x="52" y="40" width="32" height="28" rx="4" fill="#D8DECF" stroke="#5F7058" stroke-width="1.2"/>
-            <rect x="90" y="20" width="20" height="48" rx="4" fill="#F3E1B8" stroke="#C88A1C" stroke-width="1.2" stroke-dasharray="3 2"/>
-            <text x="100" y="48" text-anchor="middle" font-family="Inter" font-size="13" fill="#C88A1C">+</text>
-          </svg>
-          <strong>Aún no construyes bloques</strong>
-          <p>Describe en español lo que quieres ver y Gali lo arma en vivo. Lo guardas y aparece aquí.</p>
-          <button type="button" class="rpanel__bloques-cta" (click)="irAlConstructor()">Crear mi primer bloque →</button>
-        </div>
-
-        <!-- List -->
-        <ul *ngIf="bloquesCount() > 0" class="rpanel__bloques-list">
-          <li *ngFor="let b of bloques(); let i = index" class="rpanel__bloque" [style.animation-delay.ms]="i * 60">
-            <button type="button" class="rpanel__bloque-btn" (click)="irAlConstructor()">
-              <span class="rpanel__bloque-icon" aria-hidden="true">{{ b.icono }}</span>
-              <span class="rpanel__bloque-body">
-                <strong>{{ b.titulo }}</strong>
-                <span class="rpanel__bloque-desc">{{ b.descripcion }}</span>
-                <span class="rpanel__bloque-meta">
-                  <em>{{ b.categoria }}</em>
-                  <em [attr.data-real]="!b.datos_simulados">{{ b.datos_simulados ? 'simulado' : 'datos reales' }}</em>
-                  <em>{{ b.confianza_gali * 100 | number: '1.0-0' }}% confianza</em>
-                </span>
-              </span>
-            </button>
-          </li>
-        </ul>
-      </div>
+    <!-- ZONA 3: Chat -->
+    <div class="rpanel__chat">
+      <gali-chat></gali-chat>
     </div>
   </ng-container>
 </aside>

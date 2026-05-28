@@ -1,0 +1,126 @@
+<div class="torre-page">
+  <dropi-titulos title="Torre logística" [breadcrumbs]="breadcrumbs" />
+
+  <div class="torre-tower">
+    <div class="torre-tower__filters">
+      <div class="torre-tower__filter-row">
+        <div class="torre-tower__field">
+          <label>Fecha</label>
+          <input type="date" value="2026-05-27" />
+        </div>
+        <div class="torre-tower__field">
+          <label>Departamento</label>
+          <select><option>Todos</option><option>Cundinamarca</option><option>Antioquia</option></select>
+        </div>
+        <div class="torre-tower__field">
+          <label>Ciudad</label>
+          <select><option>Todas</option><option>Bogotá</option><option>Medellín</option></select>
+        </div>
+        <div class="torre-tower__field">
+          <label>Transportadoras</label>
+          <select><option>Todas</option><option>Veloces</option><option>Servientrega</option></select>
+        </div>
+        <dropi-button-new icon="pi-arrow-right" [iconOnly]="true" hierarchy="primary" />
+      </div>
+      <div class="torre-tower__switches">
+        <label class="torre-switch">
+          <input type="checkbox" [(ngModel)]="miOperacion" />
+          <span class="torre-switch__track"></span>
+          Mi operación
+        </label>
+        <label class="torre-switch">
+          <input type="checkbox" [(ngModel)]="dropiView" />
+          <span class="torre-switch__track"></span>
+          Dropi
+        </label>
+        <div class="torre-tower__sort">
+          <span>Ordenar por:</span>
+          <button type="button">Mayor Efectividad <i class="pi pi-chevron-down"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="torre-tower__body">
+      <div class="torre-tower__indicators">
+        @for (ind of indicators; track ind.carrier) {
+          <article class="indicator-card">
+            <header class="indicator-card__head">
+              <span class="indicator-card__logo" [attr.data-carrier]="ind.carrier">{{ ind.carrier.charAt(0) }}</span>
+              <strong>{{ ind.carrier }}</strong>
+            </header>
+
+            <section class="indicator-section">
+              <div class="indicator-section__head">
+                <strong>Mi operación</strong>
+                <span>Efectividad</span>
+              </div>
+              <div class="indicator-section__bar-row">
+                <i class="pi pi-chart-bar indicator-section__icon"></i>
+                <div class="indicator-section__bar">
+                  <div class="indicator-section__fill indicator-section__fill--green" [style.width.%]="ind.myOpEffectiveness"></div>
+                </div>
+                <strong>{{ ind.myOpEffectiveness }}%</strong>
+              </div>
+              <div class="indicator-section__metrics">
+                <div>
+                  <span>Flete promedio</span>
+                  <strong>{{ ind.avgFreight }}</strong>
+                </div>
+                <div>
+                  <span>Tiempo de entrega</span>
+                  <strong>{{ ind.deliveryTime }}</strong>
+                </div>
+              </div>
+            </section>
+
+            <hr class="indicator-card__divider" />
+
+            <section class="indicator-section">
+              <div class="indicator-section__head">
+                <strong>Dropi</strong>
+                <span>Efectividad</span>
+              </div>
+              <div class="indicator-section__bar-row">
+                <span class="indicator-section__dropi-icon">D</span>
+                <div class="indicator-section__bar">
+                  <div
+                    class="indicator-section__fill"
+                    [class.indicator-section__fill--green]="ind.dropiEffectiveness >= 50"
+                    [class.indicator-section__fill--yellow]="ind.dropiEffectiveness < 50"
+                    [style.width.%]="ind.dropiEffectiveness"
+                  ></div>
+                </div>
+                <strong>{{ ind.dropiEffectiveness }}%</strong>
+              </div>
+              <div class="indicator-section__metrics">
+                <div>
+                  <span>Flete promedio</span>
+                  <strong>{{ ind.avgFreight }}</strong>
+                </div>
+                <div>
+                  <span>Tiempo de entrega</span>
+                  <strong>{{ ind.deliveryTimeDropi }}</strong>
+                </div>
+              </div>
+            </section>
+          </article>
+        }
+      </div>
+
+      <div class="torre-tower__map">
+        <div class="torre-tower__map-tools">
+          <dropi-button-new icon="pi-plus" [iconOnly]="true" hierarchy="outline" />
+          <dropi-button-new icon="pi-minus" [iconOnly]="true" hierarchy="outline" />
+        </div>
+        <div class="torre-tower__map-canvas">
+          <svg class="map-colombia" viewBox="0 0 400 554" aria-hidden="true">
+            <path class="map-colombia__land" d="M120 80 L280 60 L320 140 L350 220 L300 320 L240 420 L180 480 L100 400 L60 280 Z" />
+            @for (pin of mapPins; track pin.carrier) {
+              <circle [attr.cx]="pin.x" [attr.cy]="pin.y" r="6" class="map-colombia__pin" />
+            }
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

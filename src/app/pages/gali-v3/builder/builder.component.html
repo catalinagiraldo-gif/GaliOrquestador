@@ -1,17 +1,38 @@
 <article class="builder">
-  <header class="builder__head">
-    <div class="builder__head-meta">
-      <span class="builder__sparkle">✦</span>
-      <span class="builder__head-tag">Builder de automatizaciones</span>
+  <!-- WF-8: entrada chat-first -->
+  <section class="builder__chat-entry">
+    <header class="builder__head builder__head--compact">
+      <div class="builder__head-meta">
+        <span class="builder__sparkle">✦</span>
+        <span class="builder__head-tag">Recetas</span>
+      </div>
+      <h1>Cuéntame qué quieres que pase solo</h1>
+      <p class="builder__intro">
+        Gali arma la receta. Tú la revisas antes de activar. El canvas de nodos es modo revisión — no el punto de entrada.
+      </p>
+    </header>
+    <div class="builder__chat-box">
+      <textarea rows="3" placeholder="Cuando llegue un pedido de Bogotá, confírmalo automáticamente si tengo más de $50.000 en mi wallet…"></textarea>
+      <div class="builder__chat-examples">
+        <span>Ejemplos:</span>
+        <button type="button">Si novedad &gt; 8%, alertar WhatsApp</button>
+        <button type="button">Auto-pausa CTR bajo 1%</button>
+        <button type="button">Reporte semanal a WhatsApp</button>
+      </div>
+      <div class="builder__chat-actions">
+        <button type="button" class="builder__chat-cta">✦ Armar receta con Gali</button>
+        <button type="button" class="builder__chat-toggle" (click)="showNodeCanvas.set(!showNodeCanvas())">
+          {{ showNodeCanvas() ? 'Ocultar nodos' : 'Ver como nodos →' }}
+        </button>
+      </div>
     </div>
-    <h1>Construye flujos como en Make. Gali te sugiere los bloques.</h1>
-    <p class="builder__intro">
-      Encadena un <strong>trigger</strong> con una o más <strong>acciones</strong>.
-      Gali ejecuta el flujo cuando se cumple la condición. Sin código, sin saltos de pantalla.
-    </p>
-  </header>
+  </section>
 
-  <section class="builder__layout">
+  <section class="builder__layout" *ngIf="showNodeCanvas()">
+    <header class="builder__head builder__head--review">
+      <span class="builder__mono-tag">Modo revisión · receta armada</span>
+      <p>Confirma triggers y acciones antes de activar. Paleta abajo para ajustes finos.</p>
+    </header>
     <!-- Sidebar: tus flows + paleta -->
     <aside class="builder__sidebar">
       <header class="builder__sidebar-head">

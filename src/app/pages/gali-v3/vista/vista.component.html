@@ -144,6 +144,22 @@
       </div>
     </article>
 
+    <!-- Vigilante Logístico (WF-3) -->
+    <article *ngIf="v.widgets.includes('vigilante-logistico')" class="vista__widget vista__widget--wide">
+      <header><span>🚛</span> Vigilante Logístico</header>
+      <div class="vista__widget-body vista__widget-body--block">
+        <block-vigilante-logistico></block-vigilante-logistico>
+      </div>
+    </article>
+
+    <!-- Rentabilidad Real (WF-4) -->
+    <article *ngIf="v.widgets.includes('rentabilidad-real')" class="vista__widget vista__widget--wide">
+      <header><span>💰</span> Rentabilidad Real</header>
+      <div class="vista__widget-body vista__widget-body--block">
+        <block-rentabilidad></block-rentabilidad>
+      </div>
+    </article>
+
     <!-- Wallet -->
     <article *ngIf="v.widgets.includes('wallet-proyeccion')" class="vista__widget vista__widget--wallet">
       <header><span>💰</span> Wallet · proyección</header>

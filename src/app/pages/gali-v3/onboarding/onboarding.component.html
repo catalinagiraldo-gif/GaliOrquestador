@@ -101,35 +101,47 @@
       </ul>
     </ng-container>
 
-    <!-- Paso 4: Momento Wow -->
+    <!-- Paso 4: Gali ya está trabajando (WF-2) -->
     <ng-container *ngIf="paso() === 4">
-      <gali-mark [state]="streamingActivo() ? 'actuando' : 'propuesta'" size="xl"></gali-mark>
+      <gali-mark [state]="'actuando'" size="xl"></gali-mark>
+      <h2 class="ob3__pregunta ob3__pregunta--center">
+        Gali es tu socio de operación.<br/>
+        <em>Esto lo hace mientras trabajas:</em>
+      </h2>
 
-      <div class="ob3__wow-stream">
-        <pre class="ob3__wow-texto" [class.ob3__wow-texto--final]="!streamingActivo()">{{ textoStreaming() }}<span class="ob3__caret" *ngIf="streamingActivo()">▍</span></pre>
+      <ul class="ob3__checklist">
+        <li *ngFor="let item of checklist; let i = index" class="ob3__check-item" [style.animation-delay.ms]="i * 200">
+          <span class="ob3__check-icon" aria-hidden="true">✓</span>
+          <span>{{ item }}</span>
+          <em class="ob3__check-now">AHORA</em>
+        </li>
+      </ul>
+
+      <p class="ob3__check-sub">
+        No tienes que ir a buscarla. Ella te encuentra cuando importa.
+      </p>
+
+      <div class="ob3__hallazgos" *ngIf="showHallazgos()">
+        <span class="ob3__hallazgos-tag">Lo que encontró de tu negocio (Collar GPS)</span>
+        <ul>
+          <li *ngFor="let h of hallazgos">
+            <span>{{ h.icono }}</span>
+            <div>
+              <strong>{{ h.titulo }}</strong>
+              <p>{{ h.descripcion }}</p>
+            </div>
+          </li>
+        </ul>
       </div>
 
-      <ng-container *ngIf="!streamingActivo() && misionActual() as m">
-        <div class="ob3__mision">
-          <span class="ob3__mision-mono">tu primera misión</span>
-          <h3 class="ob3__mision-titulo">🎯 {{ m.titulo }}</h3>
-          <p class="ob3__mision-desc">{{ m.descripcion }}</p>
-          <p class="ob3__mision-hint">
-            Ya armé tu lienzo con un punto de partida — puedes editarlo libremente cuando entres.
-          </p>
-          <div class="ob3__mision-actions">
-            <button type="button" class="ob3__cta ob3__cta--primary" (click)="irAMision()">
-              {{ m.cta }} →
-            </button>
-            <a routerLink="/gali-v3/mapa" class="ob3__cta ob3__cta--ghost">
-              🗺 Ver mapa del negocio
-            </a>
-            <button type="button" class="ob3__cta ob3__cta--ghost" (click)="irAExplorar()">
-              Explorar Dropi primero
-            </button>
-          </div>
-        </div>
-      </ng-container>
+      <div class="ob3__mision-actions ob3__mision-actions--center">
+        <button type="button" class="ob3__cta ob3__cta--primary" (click)="verHallazgos()">
+          Ver qué encontró Gali de tu negocio →
+        </button>
+        <button type="button" class="ob3__cta ob3__cta--ghost" (click)="skipOnboarding()">
+          Ir al lienzo
+        </button>
+      </div>
     </ng-container>
   </main>
 

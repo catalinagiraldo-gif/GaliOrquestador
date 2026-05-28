@@ -27,34 +27,34 @@ interface VistaShortcut {
       <div class="gallery__header">
         <h2>Prototype Gallery</h2>
         <p class="gallery__subtitle">
-          La versión actual del prototipo es <strong>Gali V4</strong>. Las versiones anteriores quedan archivadas abajo.
+          <strong>Gali V5</strong> arranca con la recreación fiel de Dropi actual (sin Gali).
+          <strong>Gali V4</strong> queda archivada abajo.
         </p>
       </div>
 
-      <!-- VERSIÓN ACTUAL: única card destacada -->
-      <article class="featured" routerLink="/gali-v4">
+      <!-- VERSIÓN ACTUAL: Gali V5 — Dropi baseline -->
+      <article class="featured" routerLink="/gali-v5">
         <header class="featured__head">
           <span class="featured__tag">
-            <span aria-hidden="true">✦</span> Versión actual · Gali V4
+            <span aria-hidden="true">◆</span> Gali V5 · Fase 0
           </span>
-          <span class="featured__status" data-status="active">activo</span>
+          <span class="featured__status" data-status="active">baseline</span>
         </header>
 
         <h3 class="featured__title">
-          Gali V4 — <em>Orquestador AI-first</em> sobre Dropi
+          Dropi actual — <em>sin Gali</em>
         </h3>
 
         <p class="featured__lead">
-          Re-arquitectura AI-first sobre V3 vivo. Shell con right panel colapsable estilo Cursor (⌘J),
-          Constructor de bloques con chat + preview en vivo, 8 vistas nuevas/evolucionadas con heurísticas
-          Nielsen aplicadas (H#11 razonamiento expandible · H#13 confianza con color · H#5 prevención).
+          Recreación del shell oficial (Header IA 2 + rail de iconos 56px + FAB) y la primera
+          pantalla de cada sección según Figma Re-arquitectura UI Oficial. Base limpia antes de
+          diseñar Gali V5 encima.
         </p>
 
-        <!-- Atajos directos a cada vista clave dentro de V4 -->
         <div class="featured__vistas">
-          <strong class="featured__vistas-label">Vistas de V4</strong>
+          <strong class="featured__vistas-label">Secciones Dropi</strong>
           <div class="featured__vistas-grid">
-            <a *ngFor="let v of vistasV4" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
+            <a *ngFor="let v of vistasV5" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
               <span class="featured__vista-badge">{{ v.badge }}</span>
               <strong>{{ v.label }}</strong>
               <span class="featured__vista-desc">{{ v.description }}</span>
@@ -62,22 +62,47 @@ interface VistaShortcut {
           </div>
         </div>
 
-        <!-- Capabilities del shell -->
         <div class="featured__features">
-          <strong class="featured__features-label">Capacidades del shell V4</strong>
+          <strong class="featured__features-label">Shell Dropi baseline</strong>
           <ul>
-            <li *ngFor="let cap of shellV4">{{ cap }}</li>
+            <li *ngFor="let cap of shellV5">{{ cap }}</li>
           </ul>
         </div>
 
         <footer class="featured__foot">
-          <a routerLink="/gali-v4" class="featured__cta">
-            <span aria-hidden="true">✦</span> Abrir Gali V4
+          <a routerLink="/gali-v5" class="featured__cta">
+            <span aria-hidden="true">◆</span> Abrir Dropi baseline
             <span aria-hidden="true">→</span>
           </a>
-          <span class="featured__kbd" aria-hidden="true">o usa ⌘K dentro</span>
+          <span class="featured__kbd">Figma · Secciones Dropi</span>
         </footer>
       </article>
+
+      <!-- Gali V4 — archivada como versión anterior inmediata -->
+      <details class="legacy legacy--v4" [open]="v4Open()">
+        <summary (click)="toggleV4($event)">
+          <span class="legacy__chevron" aria-hidden="true">{{ v4Open() ? '▾' : '▸' }}</span>
+          <strong>Gali V4 — versión anterior</strong>
+          <span class="legacy__count">8 vistas</span>
+        </summary>
+        <article class="featured featured--compact" routerLink="/gali-v4">
+          <p class="featured__lead featured__lead--compact">
+            Orquestador AI-first sobre V3. Shell con right panel colapsable, Constructor de bloques,
+            8 vistas con heurísticas Nielsen.
+          </p>
+          <div class="featured__vistas-grid">
+            <a *ngFor="let v of vistasV4" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
+              <span class="featured__vista-badge">{{ v.badge }}</span>
+              <strong>{{ v.label }}</strong>
+            </a>
+          </div>
+          <footer class="featured__foot">
+            <a routerLink="/gali-v4" class="featured__cta featured__cta--secondary">
+              Abrir Gali V4 →
+            </a>
+          </footer>
+        </article>
+      </details>
 
       <!-- VERSIONES ANTERIORES — colapsables, no en el grid principal -->
       <details class="legacy" [open]="legacyOpen()">
@@ -111,11 +136,40 @@ interface VistaShortcut {
 })
 export class PrototypeGalleryComponent {
   legacyOpen = signal(false);
+  v4Open = signal(false);
 
   toggleLegacy(ev: Event) {
     ev.preventDefault();
     this.legacyOpen.update(v => !v);
   }
+
+  toggleV4(ev: Event) {
+    ev.preventDefault();
+    this.v4Open.update(v => !v);
+  }
+
+  vistasV5: VistaShortcut[] = [
+    { label: 'Inicio', route: '/gali-v5', badge: '✓', description: 'Home · saludo · proveedores · banner Colombia' },
+    { label: 'Catálogo', route: '/gali-v5/productos/catalogo', badge: '✓', description: 'Búsqueda IA · filtros · grid productos' },
+    { label: 'Proveedores', route: '/gali-v5/productos/proveedores', badge: '✓', description: 'Grid de tarjetas · filtros · favoritos' },
+    { label: 'Negociaciones', route: '/gali-v5/productos/negociaciones', badge: '✓', description: 'Tabs · tarjetas de negociación · acciones' },
+    { label: 'Cazaproductos', route: '/gali-v5/productos/caza-productos', badge: '✓', description: 'Publicaciones · grid 216px · filtros' },
+    { label: 'Ordenes', route: '/gali-v5/mis-pedidos/mis-pedidos', badge: '✓', description: 'Tabla Figma · dirección · acciones sticky' },
+    { label: 'Transportadoras', route: '/gali-v5/logistica/transportadoras', badge: '✓', description: 'Preferencias · ranking · matriz ciudades' },
+    { label: 'Dashboard reportes', route: '/gali-v5/reportes/dashboard', badge: '✓', description: 'Reportes · tabla dashboard' },
+    { label: 'Historial wallet', route: '/gali-v5/financiero/historial-de-cartera', badge: '✓', description: 'Wallet · ledger' },
+    { label: 'Marketing', route: '/gali-v5/marketing/campanas', badge: '…', description: 'Pendiente · Campañas masivas' },
+    { label: 'CAS', route: '/gali-v5/cas/bandeja', badge: '✓', description: 'Bandeja de soporte' },
+    { label: 'Academy', route: '/gali-v5/academy', badge: '✓', description: 'Capacitaciones Dropi' },
+  ];
+
+  shellV5: string[] = [
+    'Header IA 2 — logo dropi · toggle BETA · wallet con ojo · avatar',
+    'Rail 56px — Home · Productos · Pedidos · Logística · Reportes · Financiero · Card · Marketing',
+    'Dashboard en Reportes (no rail) · Garantías dentro de Pedidos · Carritos fuera del nav',
+    'Menu-action flotante — huella · torre · chat',
+    'Páginas dedicadas: Ordenes, Caza, Garantías, Transportadoras, Torre, Dashboard reportes',
+  ];
 
   vistasV4: VistaShortcut[] = [
     {
@@ -179,6 +233,14 @@ export class PrototypeGalleryComponent {
 
   // Versiones anteriores — accesibles para referencia, archivadas
   legacy: PrototypeEntry[] = [
+    {
+      ticket: 'GALI-V4',
+      title: 'Gali V4 — Orquestador AI-first sobre Dropi',
+      module: 'Right panel · Bloque builder · 8 vistas Nielsen',
+      route: '/gali-v4',
+      status: 'review',
+      components: ['Inicio', 'Bloque builder', 'Objetivo', 'Comunidad', 'Mi Stack', 'Builder', 'Mercado', 'Mapa'],
+    },
     {
       ticket: 'GALI-V2',
       title: 'Gali v2 — Prototipo disruptivo y adaptativo',

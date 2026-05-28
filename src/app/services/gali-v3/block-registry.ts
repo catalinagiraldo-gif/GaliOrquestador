@@ -9,7 +9,9 @@ export type BlockId =
   | 'memoria'
   | 'misiones'
   | 'metricas'
-  | 'proyecto-activo';
+  | 'proyecto-activo'
+  | 'vigilante-logistico'
+  | 'rentabilidad';
 
 export type BlockSize = '1x1' | '2x1' | '2x2' | '3x1' | '3x2' | 'full';
 
@@ -143,6 +145,28 @@ export const BLOCK_REGISTRY: Record<BlockId, BlockManifest> = {
     datasource: 'local',
     niveles: ['operador', 'estratega'],
     expandRuta: '/gali-v3/proyectos',
+  },
+  'vigilante-logistico': {
+    id: 'vigilante-logistico',
+    label: 'Vigilante Logístico',
+    hint: 'Novedades críticas y transportadoras',
+    icon: 'soporte',
+    sizes: ['2x2', '3x2', 'full'],
+    defaultSize: '3x2',
+    datasource: 'mock',
+    niveles: ['operador', 'estratega'],
+    expandRuta: '/gali-v3/dropi/pedidos',
+  },
+  'rentabilidad': {
+    id: 'rentabilidad',
+    label: 'Rentabilidad Real',
+    hint: 'P&L 5 líneas · ganancia neta vs ROAS',
+    icon: 'metricas',
+    sizes: ['2x2', '3x2', 'full'],
+    defaultSize: '3x2',
+    datasource: 'mock',
+    niveles: ['operador', 'estratega'],
+    expandRuta: '/gali-v3/vista/rentabilidad-semana',
   },
 };
 

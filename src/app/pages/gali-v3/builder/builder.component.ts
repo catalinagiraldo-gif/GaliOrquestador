@@ -22,6 +22,7 @@ export class GaliV3BuilderComponent {
   private flowSvc = inject(GaliFlowService);
   private router = inject(Router);
 
+  showNodeCanvas = signal(false);
   recipeCompartidaToast = signal<boolean>(false);
 
   // ✦ Compartir recipe al marketplace de comunidad (Fase 3)

@@ -14,6 +14,8 @@ import {
 import { GaliStreamingService } from '../../../services/gali-v2/streaming.service';
 import { CanvasService } from '../../../services/gali-v3/canvas.service';
 import { GaliMemoryService } from '../../../services/gali-v3/memory.service';
+import { GaliRightPanelService } from '../../../services/gali-v3/right-panel.service';
+import hallazgosData from '../../../../../mocks/gali-v3/onboarding-hallazgos.json';
 
 interface OpcionRadio<T> {
   value: T;
@@ -33,7 +35,12 @@ export class GaliV3OnboardingComponent implements OnInit, OnDestroy {
   private canvas = inject(CanvasService);
   private streaming = inject(GaliStreamingService);
   private memorySvc = inject(GaliMemoryService);
+  private rpanelSvc = inject(GaliRightPanelService);
   private router = inject(Router);
+
+  readonly checklist = (hallazgosData as { checklist: string[] }).checklist;
+  readonly hallazgos = (hallazgosData as { hallazgos: Array<{ icono: string; titulo: string; descripcion: string; accion_label: string; target_route: string; confianza: number }> }).hallazgos;
+  showHallazgos = signal(false);
 
   paso = signal<0 | 1 | 2 | 3 | 4>(0);
 
@@ -133,6 +140,22 @@ export class GaliV3OnboardingComponent implements OnInit, OnDestroy {
 
     const reflejo = this.perfilSvc.pintarReflejo(perfil);
     this.dispararStream(reflejo.titulo + '\n\n' + reflejo.resumen);
+  }
+
+  verHallazgos() {
+    this.showHallazgos.set(true);
+    try {
+      localStorage.setItem('gali_v3_onboarding_hallazgos', '1');
+    } catch {}
+    this.rpanelSvc.setOpen(true);
+    this.router.navigate(['/gali-v3/vista/operacion-hoy'], { queryParams: { panel: 'open', from: 'onboarding' } });
+  }
+
+  skipOnboarding() {
+    try {
+      localStorage.setItem('gali_v3_onboarding_hallazgos', '1');
+    } catch {}
+    this.router.navigate(['/gali-v3/vista/operacion-hoy']);
   }
 
   irAMision() {

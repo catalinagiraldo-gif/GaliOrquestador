@@ -121,6 +121,11 @@
     color: $gray-600;
     margin: 0 0 $size-6;
     max-width: 72ch;
+
+    &--compact {
+      margin-bottom: $size-4;
+      font-size: $font-sm;
+    }
   }
 
   // ---- Vistas grid ----
@@ -253,6 +258,20 @@
       transform: translateY(-1px);
       box-shadow: 0 4px 24px rgba(244, 154, 61, 0.35);
     }
+
+    &--secondary {
+      background: $white;
+      color: $gray-700;
+      border: 1px solid $gray-200;
+      box-shadow: none;
+      font-size: 14px;
+
+      &:hover {
+        border-color: $primary-500;
+        color: $primary-600;
+        box-shadow: none;
+      }
+    }
   }
 
   &__kbd {
@@ -262,6 +281,17 @@
   }
 }
 
+.featured--compact {
+  display: block;
+  padding: $size-5;
+  margin: 0 $size-5 $size-5;
+  background: $white;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: $radius-md;
+  text-decoration: none;
+  color: inherit;
+}
+
 // ============================================
 // LEGACY (versiones anteriores colapsadas)
 // ============================================
@@ -269,6 +299,11 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: $radius-lg;
   background: rgba(0, 0, 0, 0.015);
+  margin-bottom: $size-4;
+
+  &--v4 {
+    margin-bottom: $size-6;
+  }
 
   summary {
     cursor: pointer;

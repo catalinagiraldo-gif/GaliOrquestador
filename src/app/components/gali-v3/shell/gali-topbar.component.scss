@@ -7,12 +7,13 @@
 }
 
 .topbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: $gv3-space-5;
-  height: $gv3-topbar-h;
-  padding: 0 $gv3-space-5;
+  gap: $gv3-space-3;
+  height: auto;
+  min-height: $gv3-topbar-h;
+  padding: $gv3-space-2 $gv3-space-5;
   background: $gv3-bg-surface;
   border-bottom: 1px solid $gv3-border-whisper;
   box-shadow: $gv3-shadow-xs;
@@ -58,7 +59,34 @@
 .topbar__tag {
   @include gv3-mono-tag;
   color: $gv3-text-tertiary;
+  &--mode { color: $gv3-terracota; font-weight: 600; }
 }
+
+.topbar__modos {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+.topbar__modo {
+  font-family: $gv3-font-mono;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: $gv3-radius-pill;
+  border: 1px solid transparent;
+  background: transparent;
+  color: $gv3-text-tertiary;
+  cursor: pointer;
+  transition: all $gv3-dur-fast $gv3-ease-out;
+  &:hover { background: $gv3-bg-cream; color: $gv3-text-primary; }
+  &.is-active {
+    background: $gv3-terracota-tint;
+    border-color: rgba(184, 89, 58, 0.25);
+    color: $gv3-terracota;
+    font-weight: 600;
+  }
+}
+
+.topbar__right { margin-left: auto; display: flex; align-items: center; gap: $gv3-space-2; }
 
 // --- Nav ---
 .topbar__nav {
@@ -86,7 +114,53 @@
 .topbar__right {
   display: flex;
   align-items: center;
-  gap: $gv3-space-3;
+  gap: $gv3-space-2;
+}
+
+.topbar__cmdk-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: 1px solid $gv3-border-subtle;
+  border-radius: $gv3-radius-sm;
+  background: $gv3-bg-cream;
+  cursor: pointer;
+  transition: all $gv3-dur-fast $gv3-ease-out;
+
+  kbd {
+    font-family: $gv3-font-mono;
+    font-size: $gv3-text-xs;
+    color: $gv3-text-tertiary;
+    letter-spacing: 0.04em;
+  }
+
+  &:hover {
+    border-color: $gv3-border-warm;
+    background: $gv3-orange-tint;
+  }
+}
+
+.topbar__tour {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $gv3-border-subtle;
+  border-radius: 50%;
+  background: $gv3-bg-surface;
+  color: $gv3-terracota;
+  font-family: $gv3-font-display;
+  font-size: $gv3-text-base;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $gv3-dur-fast $gv3-ease-out;
+
+  &:hover {
+    background: $gv3-terracota-tint;
+    border-color: rgba(184, 89, 58, 0.35);
+    transform: scale(1.05);
+  }
 }
 
 .topbar__signals {

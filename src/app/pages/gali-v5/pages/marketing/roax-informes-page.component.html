@@ -1,0 +1,107 @@
+<div class="roax-informes-page">
+  <dropi-titulos title="Informes" [breadcrumbs]="breadcrumbs" />
+
+  <div class="roax-informes-page__header">
+    <img class="roax-informes-page__logo" [src]="dropiLogo" alt="roax" />
+    <div class="roax-informes-page__header-actions">
+      <dropi-button-new label="Soporte" icon="pi-headphones" hierarchy="outline" [width]="110" />
+      <dropi-button-new label="Ajustes" icon="pi-cog" hierarchy="outline" [width]="110" />
+    </div>
+  </div>
+
+  <div class="roax-informes-page__report-header">
+    <h2>Reporte 1</h2>
+    <dropi-button-new label="Exportar" icon="pi-download" hierarchy="outline" [width]="110" />
+  </div>
+
+  <div class="roax-informes-page__date-range">
+    <span>{{ dateRange }}</span>
+    <button type="button" class="roax-informes-page__edit-btn" title="Editar rango">
+      <i class="pi pi-pencil"></i>
+    </button>
+  </div>
+
+  <!-- ✦ GALI: ROAS Real vs Declarado -->
+  <div class="gali-roas-insight">
+    <div class="gali-roas-insight__header">
+      <span class="gali-roas-insight__label">✦ Gali · P&L Real vs ROAS Declarado</span>
+      <span class="gali-roas-insight__cause">{{ galiRoasInsight.causa }}</span>
+    </div>
+    <div class="gali-roas-insight__boxes">
+      <div class="roas-cmp-box roas-cmp-box--declared">
+        <span class="roas-cmp-box__lbl">ROAS declarado Meta</span>
+        <span class="roas-cmp-box__val">{{ galiRoasInsight.roasDeclarado }}</span>
+        <span class="roas-cmp-box__note">Lo que reporta Meta</span>
+      </div>
+      <div class="roas-cmp-box roas-cmp-box--real">
+        <span class="roas-cmp-box__lbl">ROAS real Gali</span>
+        <span class="roas-cmp-box__val roas-cmp-box__val--accent">{{ galiRoasInsight.roasReal }}</span>
+        <span class="roas-cmp-box__note">Después de fletes y novedades</span>
+      </div>
+      <div class="roas-cmp-box roas-cmp-box--gap">
+        <span class="roas-cmp-box__lbl">Gap</span>
+        <span class="roas-cmp-box__val roas-cmp-box__val--danger">{{ galiRoasInsight.gap }}</span>
+        <span class="roas-cmp-box__note">Causa: novedades Cali</span>
+      </div>
+      <div class="roas-cmp-box roas-cmp-box--neto">
+        <span class="roas-cmp-box__lbl">Ganancia neta real</span>
+        <span class="roas-cmp-box__val roas-cmp-box__val--success">{{ galiRoasInsight.gananciaReal }}</span>
+        <span class="roas-cmp-box__note">vs {{ galiRoasInsight.presupuesto }} invertido</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✦ GALI: Health de campañas + Reglas activas -->
+  <div class="gali-campaigns-layer">
+    <div class="gali-health-section">
+      <h3 class="gali-section-title">Estado de campañas</h3>
+      <div class="health-list">
+        <div *ngFor="let h of healthIndicators" class="health-row" [class]="getHealthClass(h.status)">
+          <div class="health-row__indicator"></div>
+          <span class="health-row__name">{{ h.label }}</span>
+          <span *ngIf="h.status !== 'paused'" class="health-row__stat">ROAS {{ h.roas }}x</span>
+          <span *ngIf="h.status !== 'paused'" class="health-row__stat">CTR {{ h.ctr }}%</span>
+          <span *ngIf="h.status !== 'paused'" class="health-row__stat">Frec. {{ h.frecuencia }}x</span>
+          <span *ngIf="h.status === 'paused'" class="health-row__paused">Pausada</span>
+          <span class="health-row__status-badge" [class]="getHealthClass(h.status)">
+            {{ h.status === 'ok' ? '✓ Saludable' : h.status === 'warning' ? '⚠ Revisar' : '— Pausada' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gali-rules-section">
+      <h3 class="gali-section-title">Reglas activas de Roax</h3>
+      <div class="rule-status-list">
+        <div *ngFor="let r of reglaActivas" class="rule-status-row">
+          <span class="rule-status-row__icon">{{ r.icono }}</span>
+          <div class="rule-status-row__info">
+            <span class="rule-status-row__name">{{ r.nombre }}</span>
+            <span class="rule-status-row__meta">{{ r.ultimaEjecucion }} · {{ r.ejecuciones }} ejecuciones</span>
+          </div>
+          <span class="rule-status-dot" [class.rule-status-dot--active]="r.estado === 'activa'" [class.rule-status-dot--waiting]="r.estado === 'en_espera'"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="roax-informes-page__kpi-grid">
+    @for (kpi of kpis; track kpi.label) {
+      <article class="roax-informes-page__kpi-card">
+        <div class="roax-informes-page__kpi-label">
+          <span>{{ kpi.label }}</span>
+          <i class="pi pi-info-circle"></i>
+        </div>
+        <strong class="roax-informes-page__kpi-value">{{ kpi.value }}</strong>
+        <div class="roax-informes-page__kpi-delta" [class.is-down]="kpi.trend === 'down'">
+          <i class="pi" [class.pi-arrow-up]="kpi.trend === 'up'" [class.pi-arrow-down]="kpi.trend === 'down'"></i>
+          <span>{{ kpi.delta }}</span>
+        </div>
+        <button type="button" class="roax-informes-page__kpi-link">
+          <i class="pi pi-chart-line"></i>
+          Click para ver detalles
+        </button>
+      </article>
+    }
+  </div>
+</div>

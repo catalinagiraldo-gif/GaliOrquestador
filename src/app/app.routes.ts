@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './common/guards/auth.guard';
+import { GALI_V5_CHILD_ROUTES } from './pages/gali-v5/gali-v5.routes';
 
 export const routes: Routes = [
   {
@@ -130,6 +131,15 @@ export const routes: Routes = [
             m => m.GaliDashboardComponent,
           ),
       },
+      // Gali V5 — baseline Dropi sin Gali (Re-arquitectura UI Oficial)
+      {
+        path: 'gali-v5',
+        loadComponent: () =>
+          import('./pages/gali-v5/gali-v5-shell.component').then(
+            m => m.GaliV5ShellComponent,
+          ),
+        children: GALI_V5_CHILD_ROUTES,
+      },
       // Alias /gali-v4/** → /gali-v3/** (V4 es la versión actual; v3 es el path interno)
       {
         path: 'gali-v4',
@@ -212,6 +222,13 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/gali-v3/vista/vista.component').then(
                 m => m.GaliV3VistaComponent,
+              ),
+          },
+          {
+            path: 'equipo',
+            loadComponent: () =>
+              import('./pages/gali-v3/equipo/equipo.component').then(
+                m => m.GaliV3EquipoComponent,
               ),
           },
           {

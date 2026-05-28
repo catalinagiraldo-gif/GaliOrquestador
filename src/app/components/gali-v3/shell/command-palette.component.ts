@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { GaliProjectService } from '../../../services/gali-v3/project.service';
 import { GaliMarketplaceService } from '../../../services/gali-v3/marketplace.service';
@@ -25,7 +25,7 @@ interface PaletteItem {
   templateUrl: './command-palette.component.html',
   styleUrls: ['./command-palette.component.scss'],
 })
-export class GaliCommandPaletteComponent {
+export class GaliCommandPaletteComponent implements OnDestroy {
   private router = inject(Router);
   private projectSvc = inject(GaliProjectService);
   private marketSvc = inject(GaliMarketplaceService);
@@ -43,12 +43,15 @@ export class GaliCommandPaletteComponent {
   allItems = computed<PaletteItem[]>(() => {
     const items: PaletteItem[] = [
       { id: 'go-inicio', title: 'Ir a Inicio', subtitle: 'Welcome + sugerencias contextuales', icon: '🏠', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3'), keywords: 'inicio home welcome' },
-      { id: 'go-builder', title: 'Ir al Builder', subtitle: 'Automatizaciones tipo Make', icon: '⚡', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/builder'), keywords: 'builder automatización flow make' },
+      { id: 'go-builder', title: 'Ir a Recetas', subtitle: 'Automatizaciones conversacionales', icon: '⚡', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/builder'), keywords: 'recetas builder automatización flow make' },
       { id: 'go-mercado', title: 'Ir al Mercado', subtitle: 'Plantillas, agentes, conexiones', icon: '🛒', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/mercado'), keywords: 'mercado marketplace plantillas agentes' },
       { id: 'go-catalogo', title: 'Ir al Catálogo despertado', subtitle: 'Productos con análisis Gali', icon: '📦', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/dropi/catalogo'), keywords: 'catalogo productos' },
       { id: 'go-pedidos', title: 'Ir a Pedidos · Triage Gali', subtitle: 'Críticas, en proceso, resueltas', icon: '🛒', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/dropi/pedidos'), keywords: 'pedidos ordenes triage' },
       { id: 'go-campanas', title: 'Ir a Campañas · health-indicator', subtitle: 'Diagnóstico Gali por campaña', icon: '📣', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/dropi/campanas'), keywords: 'campañas ads roas' },
-      { id: 'go-vista', title: 'Vista: Mi operación de hoy', subtitle: 'Pedidos + novedades + campañas + saldo', icon: '📊', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/vista/operacion-hoy'), keywords: 'vista operacion hoy resumen' },
+      { id: 'go-vista', title: 'Mis vistas · Operación hoy', subtitle: 'Pedidos + vigilante + P&L + campañas', icon: '📊', group: 'Navegar', action: () => this.router.navigateByUrl('/gali-v3/vista/operacion-hoy'), keywords: 'vista operacion hoy resumen mis vistas' },
+      { id: 'go-agentes', title: 'Ver agentes activos', subtitle: 'Panel orquestador Gali', icon: '◉', group: 'Gali', action: () => { this.rpanelSvc.setOpen(true); }, keywords: 'agentes activos orquestador panel' },
+      { id: 'modo-operar', title: 'Modo Operar', subtitle: 'Vista operación de hoy', icon: '⚡', group: 'Gali', action: () => this.router.navigateByUrl('/gali-v3/vista/operacion-hoy'), keywords: 'operar hoy operacion' },
+      { id: 'go-vista-medir', title: 'Modo Medir · Rentabilidad semana', subtitle: 'P&L + ROAS + logística', icon: '📊', group: 'Gali', action: () => this.router.navigateByUrl('/gali-v3/vista/rentabilidad-semana'), keywords: 'medir rentabilidad semana pnl' },
       { id: 'new-project', title: 'Crear proyecto nuevo', subtitle: 'Define un objetivo y Gali arma el plan', icon: '📁', group: 'Crear', action: () => this.router.navigateByUrl('/gali-v3/proyecto/nuevo'), keywords: 'crear proyecto nuevo objetivo' },
       { id: 'new-flow', title: 'Crear automatización en blanco', subtitle: 'Builder con canvas vacío', icon: '⚙️', group: 'Crear', action: () => { const f = this.flowSvc.createBlankFlow(); this.router.navigateByUrl('/gali-v3/builder'); }, keywords: 'crear flow automatización trigger' },
       { id: 'new-vista', title: 'Crear vista personalizada', subtitle: 'Compón widgets en una pantalla', icon: '📋', group: 'Crear', action: () => this.router.navigateByUrl('/gali-v3/vista/nueva'), keywords: 'crear vista personalizada widgets' },
@@ -149,7 +152,19 @@ export class GaliCommandPaletteComponent {
       this.query();
       this.selectedIdx.set(0);
     });
+
+    window.addEventListener('gali:open-cmdk', this.handleOpenCmdk);
   }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('gali:open-cmdk', this.handleOpenCmdk);
+  }
+
+  private handleOpenCmdk = (): void => {
+    this.open.set(true);
+    this.query.set('');
+    this.selectedIdx.set(0);
+  };
 
   @HostListener('document:keydown', ['$event'])
   onKey(ev: KeyboardEvent) {
