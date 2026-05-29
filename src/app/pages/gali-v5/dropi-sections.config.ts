@@ -500,7 +500,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
 
 /** Pantallas mapeadas a nodos Figma */
 export const DROPI_SCREENS: DropiScreen[] = [
-  { id: 'home', label: 'Inicio', route: '/gali-v5', railKey: 'home', figmaNode: '12384:51981', status: 'ready', hasSectionPanel: true },
+  { id: 'home', label: 'Inicio', route: '/gali-v5', railKey: 'home', figmaNode: '12384:51981', status: 'ready', hasSectionPanel: false },
   { id: 'catalogo', label: 'Catálogo', route: '/gali-v5/productos/catalogo', railKey: 'productos', figmaNode: '12401:39945', status: 'ready', hasSectionPanel: true },
   { id: 'proveedores-list', label: 'Proveedores', route: '/gali-v5/productos/proveedores', railKey: 'productos', figmaNode: '12401:40084', status: 'ready', hasSectionPanel: true },
   { id: 'negociaciones', label: 'Negociaciones', route: '/gali-v5/productos/negociaciones', railKey: 'productos', figmaNode: '12401:40448', status: 'ready', hasSectionPanel: true },
@@ -585,7 +585,11 @@ const DASHBOARD_RAIL_KEY = 'dashboard';
 /** Panel secundario visible solo en secciones con sub-nav */
 export function resolveSectionPanel(url: string): SectionPanel | null {
   const path = url.split('?')[0];
-  if (HOME_EXACT.has(path) || GALI_HUB_PREFIXES.some(p => path.startsWith(p))) {
+  // Gali OS home — full-width workspace, sin panel lateral de secciones
+  if (HOME_EXACT.has(path)) {
+    return null;
+  }
+  if (GALI_HUB_PREFIXES.some(p => path.startsWith(p))) {
     return HOME_OVERVIEW_PANEL;
   }
 
