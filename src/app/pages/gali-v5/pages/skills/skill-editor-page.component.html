@@ -129,7 +129,7 @@
           <button type="button" class="se__add-btn" (click)="addCondition()">+ Añadir condición</button>
         </div>
 
-        @for (cond of draft().conditions; track $index; let i = $index) {
+        @for (cond of draft().conditions; track cond; let i = $index) {
           @if (i > 0) {
             <div class="se__conjunction-row">
               <select class="se__select se__select--sm" [value]="cond.conjunction ?? 'AND'" (change)="onCondConjChange(i, $event)">
