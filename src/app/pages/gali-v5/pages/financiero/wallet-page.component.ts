@@ -8,6 +8,7 @@ import {
   DropiPaginatorComponent,
 } from '../../components/shared';
 import walletData from '../../../../../../mocks/gali-v5/wallet-transactions.json';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface WalletTransaction {
   num: string;
@@ -28,6 +29,7 @@ interface WalletTransaction {
     DropiButtonNewComponent,
     DropiSearchOficialComponent,
     DropiPaginatorComponent,
+    DropiGaliBarComponent,
   ],
   templateUrl: './wallet-page.component.html',
   styleUrl: './wallet-page.component.scss',

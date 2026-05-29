@@ -131,6 +131,24 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     matchPrefixes: ['/gali-v5/marketing'],
   },
   {
+    key: 'proyectos',
+    label: 'Proyectos',
+    icon: `${G5}/boxes.svg`,
+    piIcon: 'pi-folder',
+    route: '/gali-v5/proyectos',
+    group: 'main',
+    matchPrefixes: ['/gali-v5/proyectos', '/gali-v5/proyecto'],
+  },
+  {
+    key: 'skills',
+    label: 'Skills',
+    icon: `${G5}/apps-add.svg`,
+    piIcon: 'pi-sparkles',
+    route: '/gali-v5/skills',
+    group: 'main',
+    matchPrefixes: ['/gali-v5/skills', '/gali-v5/marketplace'],
+  },
+  {
     key: 'cas',
     label: 'CAS',
     icon: `${G5}/callcenter-alt.svg`,
@@ -434,6 +452,50 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       },
     ],
   },
+  proyectos: {
+    railKey: 'proyectos',
+    title: 'Proyectos',
+    items: [
+      {
+        id: 'mis-proyectos',
+        label: 'Mis Proyectos',
+        route: '/gali-v5/proyectos',
+        icon: `${G5}/boxes.svg`,
+      },
+      {
+        id: 'nuevo-proyecto',
+        label: 'Nuevo proyecto',
+        route: '/gali-v5/proyectos?nuevo=true',
+        icon: `${G5}/handshake.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+    ],
+  },
+  skills: {
+    railKey: 'skills',
+    title: 'Skills',
+    items: [
+      {
+        id: 'mis-skills',
+        label: 'Mis Skills',
+        route: '/gali-v5/skills',
+        icon: `${G5}/apps-add.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+      {
+        id: 'crear-skill',
+        label: 'Crear skill',
+        route: '/gali-v5/skills?tab=crear',
+        icon: `${G5}/pencil.svg`,
+      },
+      {
+        id: 'marketplace',
+        label: 'Marketplace',
+        route: '/gali-v5/skills?tab=marketplace',
+        icon: `${G5}/trophy.svg`,
+      },
+    ],
+  },
 };
 
 /** Pantallas mapeadas a nodos Figma */
@@ -463,11 +525,15 @@ export const DROPI_SCREENS: DropiScreen[] = [
 ];
 
 const HOME_EXACT = new Set(['/gali-v5', '/gali-v5/']);
+const GALI_HUB_PREFIXES = [
+  '/gali-v5/marketplace',
+];
 
 /** Resuelve rail activo desde URL */
 export function resolveActiveRailKey(url: string): string {
   const path = url.split('?')[0];
   if (HOME_EXACT.has(path)) return 'home';
+  if (GALI_HUB_PREFIXES.some(p => path.startsWith(p))) return 'home';
 
   let best: IconRailItem | null = null;
   let bestLen = 0;
@@ -487,16 +553,29 @@ export function resolveActiveRailKey(url: string): string {
   return best?.key ?? 'home';
 }
 
-/** Panel en Home — acceso rápido (orden Manu 1/Default) */
+/** Panel en Home — Gali Hub acceso rápido a secciones core */
 export const HOME_OVERVIEW_PANEL: SectionPanel = {
   railKey: 'home',
-  title: 'Secciones',
-  items: DROPI_ICON_RAIL.filter(i => i.key !== 'home').map(item => ({
-    id: item.key,
-    label: item.label,
-    route: item.route,
-    icon: item.icon,
-  })),
+  title: 'Gali',
+  items: [
+    {
+      id: 'gali-hub',
+      label: 'Gali Hub',
+      route: '/gali-v5',
+      icon: 'assets/icons/sidebar/home.svg',
+    },
+    {
+      id: 'hdr-secciones',
+      label: 'Secciones',
+      type: 'header' as const,
+    },
+    ...DROPI_ICON_RAIL.filter(i => i.key !== 'home').map(item => ({
+      id: item.key,
+      label: item.label,
+      route: item.route,
+      icon: item.icon,
+    })),
+  ],
 };
 
 const NO_PANEL_RAIL_KEYS = new Set(['academy']);
@@ -506,7 +585,7 @@ const DASHBOARD_RAIL_KEY = 'dashboard';
 /** Panel secundario visible solo en secciones con sub-nav */
 export function resolveSectionPanel(url: string): SectionPanel | null {
   const path = url.split('?')[0];
-  if (HOME_EXACT.has(path)) {
+  if (HOME_EXACT.has(path) || GALI_HUB_PREFIXES.some(p => path.startsWith(p))) {
     return HOME_OVERVIEW_PANEL;
   }
 

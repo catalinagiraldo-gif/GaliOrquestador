@@ -321,3 +321,129 @@
     stroke-width: 2;
   }
 }
+
+// ── Gali Agent Bar + Vigilante Loop ──────────────────────────────
+.agent-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin: 16px 32px 0;
+  border-left: 3px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+
+  &__left { display: flex; align-items: center; gap: 10px; }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+    flex-shrink: 0;
+    animation: agBar-pulse 2s infinite;
+  }
+
+  &__identity { display: flex; flex-direction: column; gap: 2px; }
+
+  &__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1c1c1e;
+  }
+
+  &__status {
+    font-size: 11px;
+    color: #f59e0b;
+  }
+
+  &__action {
+    flex: 1;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  &__actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  &__cta {
+    padding: 5px 12px;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    background: transparent;
+    color: #f59e0b;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover { background: rgba(245, 158, 11, 0.1); }
+  }
+
+  &__secondary {
+    padding: 5px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover { border-color: #9ca3af; color: #374151; }
+  }
+}
+
+@keyframes agBar-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+}
+
+.vigilante-loop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 8px 32px 0;
+  padding: 12px 16px;
+  background: #fafaf8;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &--projection { opacity: 0.8; }
+  }
+
+  &__icon { font-size: 14px; flex-shrink: 0; }
+
+  &__text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+
+  &__accion { font-size: 12px; font-weight: 600; color: #1c1c1e; }
+
+  &__detalle { font-size: 11px; color: #6b7280; }
+
+  &__result {
+    font-size: 12px;
+    font-weight: 600;
+    color: #10b981;
+    flex-shrink: 0;
+  }
+
+  &__time { font-size: 11px; color: #9ca3af; flex-shrink: 0; }
+
+  &__action-btn {
+    padding: 4px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 5px;
+    background: white;
+    color: #6b7280;
+    font-size: 11px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+
+    &:hover { border-color: #f59e0b; color: #f59e0b; }
+  }
+}

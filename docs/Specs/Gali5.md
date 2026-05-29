@@ -1,10 +1,11 @@
 # Gali v5 — Spec de Producto e Ingeniería
 ## Dropi AI Orchestrator para Dropshippers LATAM · Mayo 2026
 
-> **Versión:** 5.0 · Cata Giraldo  
+> **Versión:** 5.1 · Cata Giraldo · Deep Reconstruction (Mayo 2026)  
 > **Stack:** Angular 17.3 Standalone · SCSS · PrimeNG 17 · Mock API interceptor  
 > **Rutas base:** `/gali-v5/*` — `src/app/pages/gali-v5/`  
-> **Mock data:** `mocks/gali-v3/` (proyectos.json, signals.json, agentes-activos.json, business-snapshot.json, etc.)
+> **Mock data:** `mocks/gali-v5/` (skills, PQR, problem-network, cas-tickets, etc.) + `mocks/gali-v3/` (proyectos, signals legacy)  
+> **Plan de reconstrucción:** `/Users/user/.cursor/plans/gali_v5_deep_reconstruction_3b6bb392.plan.md`
 
 ---
 
@@ -148,6 +149,10 @@ Cada dropshipper tiene su estilo, su umbral de riesgo, sus reglas de negocio. El
 - "Si el producto llega a 50 ventas en una semana, abrir segunda ciudad automáticamente"
 
 #### Marketplace de Skills de la Comunidad
+
+> **Actualización v5.1:** El Marketplace ya no vive en `/gali-v5/marketplace` aislado. Se unificó en **`/gali-v5/skills` tab 3** junto con Mis Skills y el wizard Crear. La ruta `/marketplace` redirige a `/skills?tab=marketplace`.
+
+Las skills de la comunidad son reglas If/Then que otros dropshippers han creado y compartido. Gali las adapta al contexto del usuario al instalarlas (ROAS actual, nichos, transportadoras activas).
 
 Los dropshippers más experimentados pueden compartir sus recetas de reglas como Skills en el Marketplace. El modelo tiene tres capas:
 
@@ -1052,93 +1057,71 @@ El editor visual de Rules tiene tres tipos de nodos:
 
 ## 9. Roadmap de Implementación (Sprints)
 
-### Sprint 1 — Gali Hub (DONE)
+> **Estado al 2026-05-29.** Sprints 1–4 y replanteo A–C están implementados. La **Deep Reconstruction** (plan V1–V10) está en curso — ver §12.
 
-**Estado:** Implementado y verificado
+### Sprint 1 — Gali Hub ✅ DONE
+
+**Archivos:** `home/home.component.{ts,html,scss}`
+
+**Entregó:** Objetivo activo, agentes, señales, KPIs, loop cerrado, mini-lista de proyectos.
+
+**Deep Reconstruction (V1):** Añadido **Section Health Grid** (9 secciones, navegación directa, badge de alertas). Pendiente: layout asimétrico 60/40 del plan, animación stagger completa, FAB badge cross-sección.
+
+---
+
+### Sprint 2 — Proyecto Detalle + Diagnóstico ✅ DONE
 
 **Archivos:**
-- `src/app/pages/gali-v5/home/home.component.ts`
-- `src/app/pages/gali-v5/home/home.component.html`
-- `src/app/pages/gali-v5/home/home.component.scss`
-
-**Qué entregó:**
-- Panel de señales proactivas con urgencia y razonamiento
-- Agentes activos con estado en tiempo real
-- Loop de resultados (señal → acción → resultado)
-- Proyectos activos con ROAS, pedidos, y mensaje contextual de Gali
-- Objetivo activo con progreso vs meta
-
-**Validación:** Ruta `/gali-v5` navegable con mock data. Compilation limpia.
-
----
-
-### Sprint 2 — Proyecto Detalle + Diagnóstico Cross-Data
-
-**Estado:** Pendiente
-
-**Entregables:**
-
-**2A — Proyecto Detalle** (`/gali-v5/proyecto/:id`)
-- Vista unificada del pipeline de un proyecto activo
-- Estado de cada etapa (ADA Spy validó → Roax activo → Chatea Pro en operación)
-- Memoria del proyecto: decisiones, aprendizajes, siguiente paso
-- Artifacts: landings, flows, creatives, scripts WhatsApp
-- CTA para lanzar Diagnóstico Cross-Data
-
-**2B — Diagnóstico Cross-Data** (modal desde cualquier sección)
-- Modal overlay sobre la vista padre (no nueva ruta)
-- Hipótesis ordenadas por probabilidad con evidencia
-- Opciones de acción con impacto estimado
-- Loop de seguimiento post-acción
-
-**Archivos a crear:**
-- `src/app/pages/gali-v5/proyecto/proyecto-detalle-page.component.ts`
-- `src/app/pages/gali-v5/components/diagnostico-modal/diagnostico-modal.component.ts`
+- `pages/proyecto/proyecto-detalle-page.component.*`
+- `components/diagnostico-modal/diagnostico-modal.component.*`
 - `mocks/gali-v5/diagnostico-cross-data.json`
 
----
-
-### Sprint 3 — Skills & Rules Editor + Marketplace
-
-**Estado:** Pendiente
-
-**Entregables:**
-
-**3A — Skills & Rules Editor** (modal desde Gali Hub o configuración)
-- Editor If/Then visual con nodos drag-and-drop
-- Panel de reglas activas por agente
-- Dry-run con datos históricos del usuario
-- Importar skill desde Marketplace
-
-**3B — Marketplace de Skills**
-- Grid de skills por categoría y agente
-- Página de detalle por skill: descripción, resultados, reviews
-- Flujo de instalación con adaptación al contexto del usuario
-- Flujo de publicación de skill propia
-
-**Archivos a crear:**
-- `src/app/pages/gali-v5/skills/skills-editor-modal.component.ts`
-- `src/app/pages/gali-v5/marketplace/marketplace-page.component.ts`
-- `src/app/pages/gali-v5/marketplace/skill-detalle-page.component.ts`
-- `mocks/gali-v5/skills-marketplace.json`
-- `mocks/gali-v5/user-rules.json`
+**Deep Reconstruction (V3–V5):** Detalle operativo. Pendiente: modal **Crear Proyecto** (V4) conversacional 3 pasos.
 
 ---
 
-### Sprint 4 — Mejoras a módulos existentes
+### Sprint 3 — Skills & Marketplace ✅ DONE (pre-unificación)
 
-**Estado:** Pendiente
+**Archivos originales:**
+- `pages/marketplace/marketplace-page.component.*`
+- `components/skills-editor-modal/skills-editor-modal.component.*`
 
-**Entregables por módulo:**
+**Deep Reconstruction (V6–V8):** Nueva **`/gali-v5/skills`** con 3 tabs:
+1. **Mis Skills** — lista desde `mocks/gali-v5/user-skills.json`
+2. **Crear skill** — wizard 4 pasos (intención → If/Then → connectors → dry-run)
+3. **Marketplace** — embed del marketplace existente
 
-| Módulo | Mejora | Archivo |
-|---|---|---|
-| Órdenes | Columna "tiempo en cola" + flag urgencia visual + confirmación batch | `pages/orders/orders-page.component.ts` |
-| Novedades | Campo "acción de Gali" por novedad + estado de contacto WhatsApp | `pages/novedades/novedades-page.component.ts` |
-| Campañas ROAX | Panel "reglas activas" con última ejecución | `pages/marketing/roax-informes-page.component.ts` |
-| Dashboard Reportes | Sección "por qué cambió" por KPI card | `pages/reportes/report-dashboard-kpi-page.component.ts` |
-| Financiero Wallet | P&L simplificado + proyección de saldo | `pages/financiero/wallet-page.component.ts` |
-| Torre Logística | Vista agrupada: en riesgo / en tránsito / entregado | `pages/logistica/torre-logistica-page.component.ts` |
+`/gali-v5/marketplace` → redirect a `/skills`.
+
+---
+
+### Sprint 4 — Capa Gali en módulos core ✅ DONE
+
+Órdenes, Novedades, ROAX Informes, Dashboard, Torre Logística, CAS, Garantías, Campañas, Catálogo, Caza, Wallet.
+
+---
+
+### Sprint Deep Reconstruction — En curso (V1–V10)
+
+| Vista | Route | Estado prototipo | Archivo principal |
+|---|---|---|---|
+| **V1** Gali Hub + Health Grid | `/gali-v5` | 🟡 Parcial | `home/*` |
+| **V2** Proyectos List | `/gali-v5/proyectos` | 🟡 Parcial | `pages/proyectos/*` |
+| **V3** Proyecto Detalle | `/gali-v5/proyecto/:id` | ✅ | `pages/proyecto/*` |
+| **V4** Modal Crear Proyecto | modal | ⏳ Pendiente | — |
+| **V5** Diagnóstico Cross-Data | modal | ✅ | `components/diagnostico-modal/*` |
+| **V6** Mis Skills | `/gali-v5/skills` tab 0 | ✅ | `pages/skills/*` |
+| **V7** Crear Skill Wizard | `/gali-v5/skills` tab 1 | ✅ | `pages/skills/*` |
+| **V8** Skills Marketplace | `/gali-v5/skills` tab 2 | ✅ | `pages/skills/*` + marketplace embed |
+| **V9** Caza — Historial + Red Problemas | `/gali-v5/productos/caza-productos` | ✅ | `pages/caza-productos/*` |
+| **V10** CAS — PQR Intelligence | `/gali-v5/cas/bandeja` | 🟡 Parcial | `pages/cas/*` |
+
+**Transversal — GaliChipComponent:** Creado en `components/gali-chip/`. Integrado en Caza, Skills, CAS. Pendiente: Catálogo, Pedidos, Logística, Marketing, Financiero, Reportes, Proyectos (7 secciones).
+
+**Mocks nuevos:**
+- `mocks/gali-v5/user-skills.json` (12 skills)
+- `mocks/gali-v5/pqr-patterns.json` (5 patrones)
+- `mocks/gali-v5/problem-network.json` (historial + red de problemas)
 
 ---
 
@@ -1179,13 +1162,19 @@ Estos límites no son configurables. Son parte del contrato de confianza entre G
 
 ### Vista 1: Gali Hub
 
-**Sprint 1 — DONE**
+**Sprint 1 — DONE · Deep Reconstruction V1 — 🟡 Parcial**
 
-- **Módulo / Route:** `/gali-v5` (ruta raíz del shell)
+- **Módulo / Route:** `/gali-v5`
 - **Tipo:** page
 - **Rol:** dropshipper
 - **Archivo:** `src/app/pages/gali-v5/home/home.component.ts`
-- **Mock data:** `mocks/gali-v3/signals.json`, `mocks/gali-v3/agentes-activos.json`, `mocks/gali-v3/proyectos.json`, `mocks/gali-v3/business-snapshot.json`
+- **Mock data:** hardcoded en TS + `mocks/gali-v3/` legacy
+
+**Nuevo en V1 (Deep Reconstruction):**
+- **Section Health Grid:** 9 celdas clicables (Productos, Pedidos, Logística, Marketing, Financiero, CAS, Proyectos, Skills, Reportes) con status `ok | warn | critical`, badge de alertas y mensaje contextual.
+- **Total alertas:** suma visible en header del grid.
+- **Navegación:** click en celda → ruta de la sección.
+- **Pendiente del plan:** layout asimétrico 60/40, agentes sticky inferior, animación stagger completa, FAB badge cross-sección.
 
 **Estructura visual:**
 ```
@@ -1255,7 +1244,7 @@ Estos límites no son configurables. Son parte del contrato de confianza entre G
 
 ### Vista 2: Proyecto Detalle
 
-**Sprint 2 — Pendiente**
+**Sprint 2 — ✅ DONE**
 
 - **Módulo / Route:** `/gali-v5/proyecto/:id`
 - **Tipo:** page
@@ -1325,7 +1314,7 @@ Estos límites no son configurables. Son parte del contrato de confianza entre G
 
 ### Vista 3: Diagnóstico Cross-Data
 
-**Sprint 2 — Pendiente**
+**Sprint 2 — ✅ DONE**
 
 - **Módulo / Route:** modal (se puede abrir desde Gali Hub, Proyecto Detalle, o cualquier módulo)
 - **Tipo:** modal
@@ -1540,51 +1529,169 @@ Estos límites no son configurables. Son parte del contrato de confianza entre G
 
 ---
 
+### Vista 6–8: Skills Hub unificado (`/gali-v5/skills`) — ✅ DONE
+
+**Deep Reconstruction — Sprint C**
+
+- **Route:** `/gali-v5/skills` (tabs: `mis-skills` | `crear` | `marketplace`)
+- **Redirect:** `/gali-v5/marketplace` → `/skills`
+- **Archivo:** `pages/skills/skills-page.component.{ts,html,scss}`
+- **Mocks:** `mocks/gali-v5/user-skills.json`, `skills-marketplace.json` (embed)
+
+**V6 — Mis Skills:** stats (activas/pausadas/ejecuciones), banner sugerencia Gali, filtros por agente/estado, cards con conectores MCP, CTA Editar → `SkillsEditorModalComponent`.
+
+**V7 — Crear Wizard (4 pasos):** intención conversacional → canvas If/Then → conectores MCP + upload archivos → alcance + dry-run + activar.
+
+**V8 — Marketplace tab:** embed de `MarketplacePageComponent` con filtros comunidad.
+
+**Navegación:** accesible desde `HOME_OVERVIEW_PANEL` (Mis Skills, Marketplace) y `GALI_HUB_PREFIXES` en `dropi-sections.config.ts`.
+
+---
+
+### Vista 9: Caza Productos — Historial + Red de Problemas — ✅ DONE
+
+**Deep Reconstruction — Sprint D**
+
+- **Route:** `/gali-v5/productos/caza-productos`
+- **Archivo:** `pages/caza-productos/caza-page.component.*`
+- **Mock:** `mocks/gali-v5/problem-network.json`
+- **Componente transversal:** `GaliChipComponent` (ADA Spy)
+
+**Modos (segmented control):**
+1. **Historial** — productos con fit-score desde nichos del usuario (ADA Spy)
+2. **Red de Problemas** — búsqueda semántica + mapa de nodos + drawer lateral con productos/ángulos/perfiles
+3. **Publicaciones** — grid original de publicaciones
+
+**Interacciones clave:** click producto historial → Crear Proyecto (V4 pendiente); click nodo problema → drawer; CTA "Analizar con ADA Spy".
+
+---
+
+### Vista 10: CAS Bandeja — PQR Intelligence — 🟡 Parcial
+
+**Deep Reconstruction — Sprint E**
+
+- **Route:** `/gali-v5/cas/bandeja`
+- **Archivo:** `pages/cas/cas-bandeja-page.component.*`
+- **Mocks:** `mocks/gali-v5/cas-tickets.json`, `pqr-patterns.json`
+- **Componente transversal:** `GaliChipComponent` (Chatea Pro)
+
+**Implementado:**
+- Panel derecho **Inteligencia PQR** con 5 patrones (insight cards, severidad, tendencia, CTA acción)
+- CTAs navegan a Skills, Proyecto o acción inline según patrón
+- Layout grid: bandeja | chat | PQR
+
+**Pendiente del plan:**
+- Columnas clasificación Gali + auto-respuesta en bandeja
+- Filtro "Clasificados por Gali"
+- Banner PQR en detalle de ticket
+- Ampliar `cas-tickets.json` a 25+ items con `gali_classification` y `gali_response_status`
+
+---
+
+## 12. Deep Reconstruction — Arquitectura Transversal
+
+> Fuente: plan `gali_v5_deep_reconstruction_3b6bb392.plan.md`
+
+### Problema raíz que resuelve
+
+Secciones construidas pero inaccesibles (`/proyectos`, `/marketplace`), Gali periférica (solo panel lateral), Skills sin sistema operativo. Las secciones eran islas.
+
+### Tres capas de presencia Gali
+
+| Capa | Qué es | Dónde |
+|---|---|---|
+| **0 — Navegación** | Proyectos + Skills en panel Gali (`HOME_OVERVIEW_PANEL`) | `dropi-sections.config.ts` |
+| **1 — Shell persistente** | FAB + panel derecho 360px (Chat/Agentes/Señales) | `gali-v5-shell`, `gali-right-panel` |
+| **2 — GaliChip por sección** | Pill agente + mensaje + CTA en header de cada módulo | `components/gali-chip/` |
+| **3 — Hub Business OS** | Section Health Grid + loop cerrado + objetivo | `home/` |
+
+### GaliChipComponent — contrato
+
+```typescript
+// Props
+agentName: 'ADA Spy' | 'Roax' | 'Chatea Pro' | 'Vigilante' | 'Gali' | 'Agente Financiero'
+message: string
+count?: number
+status: 'ok' | 'warn' | 'critical' | 'running' | 'neutral'
+ctaLabel?: string
+(ctaClick): EventEmitter
+```
+
+**Diseño:** pill `rgba(244,154,61,0.12)`, borde izquierdo 3px naranja, IBM Plex Sans 12px, dot pulsante si `running`.
+
+**Integración actual:** Caza Productos, Skills, CAS. **Pendiente:** 7 secciones restantes.
+
+### Skills como CORE
+
+Ruta unificada `/gali-v5/skills` reemplaza marketplace aislado. El dropshipper define hiperpersonalización via:
+- Skills propias (Mis Skills + wizard)
+- Skills comunidad (Marketplace tab)
+- Conectores MCP/apps/archivos (Paso 3 del wizard)
+
+### Descubrimiento de productos (Caza)
+
+Dos modos complementarios:
+- **Historial:** ADA Spy cruza nichos vendidos → fit-score
+- **Red de Problemas:** búsqueda por problema → grafo de nodos → productos + ángulos
+
+### Retroalimentación CAS → inteligencia de negocio
+
+Patrones PQR detectados en tickets alimentan:
+- Panel PQR en CAS (V10)
+- Penalización score ADA Spy del producto
+- Sugerencias de script Chatea Pro / alerta proveedor
+
+### Principios transversales (todas las vistas)
+
+**Loop cerrado visible:** señal → acción → resultado → siguiente paso.
+
+**Trust evolution:** Modo 0 (silencioso) → Modo 1 (aprobación) → Modo 2 (autopiloto con límites).
+
+**Innovative UX:** Inter + IBM Plex Sans, primario `#f49a3d`, backgrounds `#fafaf8`, stagger en listas, dot pulsante en `running`/`critical`.
+
+---
+
 ## Apéndice A — Estructura de Archivos Relevantes
 
 ```
 src/app/pages/gali-v5/
-├── gali-v5-shell.component.ts          # Shell principal del módulo
-├── gali-v5.routes.ts                    # Routing completo del módulo
-├── gali-v5.constants.ts                 # Constantes del módulo
-├── home/
-│   ├── home.component.ts               # Gali Hub (Sprint 1 — DONE)
-│   ├── home.component.html
-│   └── home.component.scss
+├── gali-v5-shell.component.*           # Shell + panel derecho Gali
+├── gali-v5.routes.ts                   # Rutas incl. /skills, /proyectos, redirect /marketplace
+├── dropi-sections.config.ts            # Nav rail + HOME_OVERVIEW_PANEL (Skills, Proyectos)
+├── home/                               # Gali Hub + Section Health Grid (V1)
 ├── pages/
-│   ├── catalog/                        # Catálogo con integración ADA Spy
-│   ├── caza-productos/                 # Caza Productos con scoring
-│   ├── orders/                         # Mis Pedidos con Chatea Pro
-│   ├── novedades/                      # Novedades con Vigilante
-│   ├── garantias/                      # Garantías
-│   ├── validador/                      # Validador de Direcciones
-│   ├── etiquetas/                      # Etiquetas
-│   ├── logistica/                      # Torre Logística + Transportadoras
-│   ├── marketing/                      # ROAX + Chatea Pro + Automatización
-│   ├── reportes/                       # Dashboard + Calendario + Descargas
-│   ├── financiero/                     # Wallet + P&L
-│   ├── cas/                            # CAS Bandeja
-│   ├── dropicard/                      # Dropi Card
-│   └── providers/                      # Proveedores
+│   ├── skills/                         # Skills Hub 3 tabs (V6–V8) ✅
+│   ├── proyectos/                      # Lista proyectos (V2) 🟡
+│   ├── proyecto/                       # Detalle proyecto (V3) ✅
+│   ├── caza-productos/                 # Historial + Red Problemas (V9) ✅
+│   ├── cas/                            # Bandeja + PQR panel (V10) 🟡
+│   ├── marketplace/                    # Embed en Skills tab marketplace
+│   ├── catalog/                        # Catálogo + ADA Spy bar
+│   ├── orders/                         # Órdenes + triage Gali
+│   ├── novedades/                      # Novedades + clasificación
+│   ├── marketing/                      # ROAX, Campañas, Chatea Pro
+│   ├── logistica/                      # Torre + Transportadoras
+│   ├── reportes/                       # Dashboard KPI + P&L gap
+│   └── financiero/                     # Wallet + Agente Financiero
 ├── components/
-│   └── [componentes compartidos del módulo]
-├── services/
-│   └── [servicios del módulo]
-└── screens/
-    └── dropi-screen-page.component.ts  # Placeholder para secciones sin wireframe
+│   ├── gali-chip/                      # Chip transversal agente+CTA ✅
+│   ├── gali-right-panel/               # Panel 360px Chat/Agentes/Señales ✅
+│   ├── diagnostico-modal/              # Diagnóstico cross-data (V5) ✅
+│   ├── skills-editor-modal/            # Editor reglas If/Then ✅
+│   └── dropi-panel-splitter/           # Splitter panel nav ✅
+└── services/
+    └── gali-state.service.ts           # Estado global Gali (modo, señales, chat)
 
-mocks/gali-v3/                          # Mock data existente (compartida con v3)
-├── proyectos.json
-├── signals.json
-├── agentes-activos.json
-├── business-snapshot.json
-├── flow-blocks-catalog.json
-└── ...
-
-mocks/gali-v5/                          # Mock data nueva para v5 (a crear)
-├── diagnostico-cross-data.json         # Sprint 2
-├── user-rules.json                     # Sprint 3
-└── skills-marketplace.json             # Sprint 3
+mocks/gali-v5/
+├── user-skills.json                    # 12 skills usuario (V6) ✅
+├── pqr-patterns.json                   # 5 patrones PQR (V10) ✅
+├── problem-network.json                # Historial + red problemas (V9) ✅
+├── cas-tickets.json                    # Tickets CAS + galiStatus ✅
+├── skills-marketplace.json             # Marketplace comunidad
+├── user-rules.json                     # Reglas editor skills
+├── diagnostico-cross-data.json         # Hipótesis diagnóstico
+├── orders.json, novedades.json         # Sprint 4
+└── marketing-roax-informes.json        # ROAS real vs declarado
 ```
 
 ---
@@ -1630,4 +1737,4 @@ $size-8: 32px;
 
 ---
 
-*Fin del documento. Versión 5.0 · Mayo 2026 · Dropi AI Orchestrator.*
+*Fin del documento. Versión 5.1 · Deep Reconstruction · Mayo 2026 · Dropi AI Orchestrator.*

@@ -1,0 +1,174 @@
+<div class="gali-panel">
+
+  <!-- Header -->
+  <div class="gali-panel__header">
+    <div class="gali-panel__identity">
+      <span class="gali-panel__glyph">✦</span>
+      <span class="gali-panel__name">Gali</span>
+      <span class="gali-panel__agents-pill">{{ gali.agents().length }} agentes activos</span>
+    </div>
+    <div class="gali-panel__header-actions">
+      <button
+        class="gali-panel__autopilot"
+        [class.gali-panel__autopilot--on]="autopilot()"
+        type="button"
+        title="Modo autopiloto"
+        (click)="toggleAutopilot()"
+        data-proto-skip>
+        <span class="gali-panel__autopilot-dot"></span>
+        Auto
+      </button>
+      <button class="gali-panel__close" type="button" aria-label="Cerrar panel Gali" (click)="close()" data-proto-skip>
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="gali-panel__tabs" role="tablist">
+    <button
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'chat'"
+      class="gali-panel__tab"
+      [class.gali-panel__tab--active]="activeTab() === 'chat'"
+      type="button"
+      (click)="setTab('chat')"
+      data-proto-skip>
+      Chat
+    </button>
+    <button
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'agentes'"
+      class="gali-panel__tab"
+      [class.gali-panel__tab--active]="activeTab() === 'agentes'"
+      type="button"
+      (click)="setTab('agentes')"
+      data-proto-skip>
+      Agentes
+    </button>
+    <button
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'senales'"
+      class="gali-panel__tab"
+      [class.gali-panel__tab--active]="activeTab() === 'senales'"
+      type="button"
+      (click)="setTab('senales')"
+      data-proto-skip>
+      Señales
+      @if (gali.criticalCount() > 0) {
+        <span class="gali-panel__tab-badge">{{ gali.criticalCount() }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- TAB: Chat -->
+  @if (activeTab() === 'chat') {
+    <div class="gali-panel__content gali-panel__chat">
+      <div class="gali-panel__messages">
+        @for (msg of gali.chatHistory(); track msg.id) {
+          <div class="gali-msg" [class.gali-msg--gali]="msg.from === 'gali'" [class.gali-msg--user]="msg.from === 'user'">
+            @if (msg.from === 'gali') {
+              <span class="gali-msg__avatar">✦</span>
+            }
+            <div class="gali-msg__bubble">
+              <p class="gali-msg__text">{{ msg.text }}</p>
+              <span class="gali-msg__time">{{ msg.time }}</span>
+            </div>
+          </div>
+        }
+        <div #chatEnd></div>
+      </div>
+
+      <div class="gali-panel__quick-actions">
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip>¿Qué pasó hoy?</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip>Ver señales críticas</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip>Mi P&amp;L de hoy</button>
+      </div>
+
+      <div class="gali-panel__input-row">
+        <input
+          class="gali-panel__input"
+          type="text"
+          placeholder="Pídele algo a Gali..."
+          [value]="chatInput()"
+          (input)="onInputChange($event)"
+          (keydown)="onKeyDown($event)"
+          aria-label="Mensaje para Gali"
+        />
+        <button
+          class="gali-panel__send"
+          type="button"
+          [disabled]="!chatInput().trim()"
+          (click)="send()"
+          data-proto-skip
+          aria-label="Enviar">
+          <i class="pi pi-send"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TAB: Agentes -->
+  @if (activeTab() === 'agentes') {
+    <div class="gali-panel__content gali-panel__agentes">
+      @for (agent of gali.agents(); track agent.id) {
+        <div class="agent-row">
+          <div class="agent-row__left">
+            <span class="agent-row__dot" [style.background]="agent.color"></span>
+            <div class="agent-row__info">
+              <span class="agent-row__name">{{ agent.name }}</span>
+              <span class="agent-row__action">{{ agent.action }}</span>
+            </div>
+          </div>
+          <span class="agent-row__status" [class.agent-row__status--active]="agent.status === 'activo'">
+            {{ agent.status }}
+          </span>
+        </div>
+      }
+
+      <div class="gali-panel__agent-actions">
+        <button class="gali-panel__agent-btn" type="button" data-proto-skip>
+          <i class="pi pi-pause"></i> Pausar todos
+        </button>
+        <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button" data-proto-skip>
+          <i class="pi pi-plus"></i> Añadir agente
+        </button>
+      </div>
+
+      <div class="gali-panel__autopilot-section">
+        <div class="gali-panel__autopilot-info">
+          <span class="gali-panel__autopilot-title">Modo autopiloto</span>
+          <span class="gali-panel__autopilot-desc">Gali opera en background y solo escala al humano decisiones estratégicas</span>
+        </div>
+        <button
+          class="gali-panel__toggle"
+          [class.gali-panel__toggle--on]="autopilot()"
+          type="button"
+          (click)="toggleAutopilot()"
+          data-proto-skip
+          [attr.aria-label]="autopilot() ? 'Desactivar autopiloto' : 'Activar autopiloto'">
+          <span class="gali-panel__toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- TAB: Señales -->
+  @if (activeTab() === 'senales') {
+    <div class="gali-panel__content gali-panel__senales">
+      @for (sig of gali.galiSignals(); track sig.id) {
+        <div class="signal-item" [class.signal-item--critica]="sig.type === 'critica'" [class.signal-item--sugerencia]="sig.type === 'sugerencia'" [class.signal-item--info]="sig.type === 'info'">
+          <span class="signal-item__emoji">{{ sig.emoji }}</span>
+          <div class="signal-item__body">
+            <p class="signal-item__msg">{{ sig.message }}</p>
+            <span class="signal-item__time">{{ sig.time }}</span>
+          </div>
+          @if (sig.cta) {
+            <button class="signal-item__cta" type="button" (click)="navigateToSignal(sig.id)" data-proto-skip>{{ sig.cta }}</button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -712,6 +712,117 @@ $hub-info:        #3b82f6;
 }
 
 // ══════════════════════════════════════════════════
+// SALUD POR SECCIÓN
+// ══════════════════════════════════════════════════
+.hub__health {
+  padding: $size-5 $size-8;
+  flex-shrink: 0;
+  animation: fadeUp 0.4s ease 0.15s both;
+}
+
+.health__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $size-4;
+}
+
+.health__total {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  color: $hub-warning;
+  background: rgba($hub-warning, 0.1);
+  padding: 4px 10px;
+  border-radius: $radius-pill;
+}
+
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $size-3;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.health-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: $size-3 $size-4;
+  background: $hub-card-bg;
+  border: 1px solid $hub-border;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  animation: fadeUp 0.35s ease both;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &--ok {
+    border-left: 3px solid $hub-success;
+  }
+
+  &--warn {
+    border-left: 3px solid $hub-warning;
+    background: rgba($hub-warning, 0.04);
+  }
+
+  &--critical {
+    border-left: 3px solid $hub-danger;
+    background: rgba($hub-danger, 0.04);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: $size-3;
+      right: $size-3;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $hub-danger;
+      animation: pulseDot 2s infinite;
+    }
+  }
+}
+
+.health-cell__label {
+  font-family: $font-secondary;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: $hub-text-primary;
+}
+
+.health-cell__badge {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-bold;
+  color: $white;
+  background: $hub-warning;
+  padding: 1px 7px;
+  border-radius: $radius-pill;
+}
+
+.health-cell__msg {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $hub-text-muted;
+  line-height: 1.35;
+}
+
+// ══════════════════════════════════════════════════
 // MIS PROYECTOS
 // ══════════════════════════════════════════════════
 .hub__proyectos {
@@ -880,7 +991,8 @@ $hub-info:        #3b82f6;
 
   .hub__objetivo,
   .hub__loop,
-  .hub__proyectos {
+  .hub__proyectos,
+  .hub__health {
     padding-left: $size-5;
     padding-right: $size-5;
   }

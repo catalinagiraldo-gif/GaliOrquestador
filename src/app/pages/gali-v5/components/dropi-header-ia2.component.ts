@@ -23,6 +23,21 @@ import { GALI_V5_DROPI_LOGO } from '../gali-v5.constants';
         </a>
       </div>
 
+      <!-- Objetivo activo — siempre visible -->
+      <a routerLink="/gali-v5" class="header-ia2__goal" title="Ver Gali Hub">
+        <span class="header-ia2__goal-icon">🎯</span>
+        <div class="header-ia2__goal-info">
+          <span class="header-ia2__goal-label">50 ventas / semana</span>
+          <div class="header-ia2__goal-bar">
+            <div class="header-ia2__goal-fill" style="width: 76%"></div>
+          </div>
+        </div>
+        <span class="header-ia2__goal-count">38<span class="header-ia2__goal-total">/50</span></span>
+        @if (autopilotOn) {
+          <span class="header-ia2__auto-badge">AUTO</span>
+        }
+      </a>
+
       <div class="header-ia2__actions">
         <button type="button" class="header-ia2__beta" aria-label="Toggle BETA" (click)="toggleBeta()">
           <span class="header-ia2__beta-label">BETA</span>
@@ -64,15 +79,14 @@ export class DropiHeaderIa2Component {
   @Input() userName = 'Alejandra';
   @Input() walletBalance = 2717360700;
   @Input() avatarUrl = 'assets/images/dropi-baseline/avatar-user.png';
+  @Input() galiMode: 0 | 1 | 2 = 0;
+  @Input() autopilotOn = false;
 
   betaOn = signal(true);
   walletVisible = signal(true);
 
   get formattedBalance(): string {
-    const formatted = this.walletBalance
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    return `$ ${formatted}`;
+    return `$ ${this.walletBalance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
   }
 
   toggleWallet(): void {

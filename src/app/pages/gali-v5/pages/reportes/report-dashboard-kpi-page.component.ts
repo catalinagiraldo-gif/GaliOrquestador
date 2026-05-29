@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DropiTitulosComponent } from '../../components/shared';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 @Component({
   selector: 'app-report-dashboard-kpi-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, DropiTitulosComponent],
+  imports: [CommonModule, RouterLink, DropiTitulosComponent, DropiGaliBarComponent],
   templateUrl: './report-dashboard-kpi-page.component.html',
   styleUrl: './report-dashboard-kpi-page.component.scss',
 })

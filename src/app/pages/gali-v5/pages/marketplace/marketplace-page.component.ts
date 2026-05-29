@@ -21,6 +21,16 @@ interface Skill {
   categoria: string;
 }
 
+interface PersonalizedSkill {
+  id: string;
+  title: string;
+  reason: string;
+  agent: string;
+  agentColor: string;
+  cta: string;
+  installed: boolean;
+}
+
 @Component({
   selector: 'app-marketplace-page',
   standalone: true,
@@ -28,6 +38,7 @@ interface Skill {
   templateUrl: './marketplace-page.component.html',
   styleUrl: './marketplace-page.component.scss',
 })
+
 export class MarketplacePageComponent {
   agenteTab = signal<AgenteFiltro>('todos');
   tipoFiltro = signal<SkillTipo | 'todos'>('todos');
@@ -35,6 +46,46 @@ export class MarketplacePageComponent {
   instalandoId = signal<string | null>(null);
   instaladosHoy = signal<string[]>([]);
   showEditor = signal(false);
+
+  readonly personalizedSkills: PersonalizedSkill[] = [
+    {
+      id: 'ps1',
+      title: 'Auto-swap si novedad > 10%',
+      reason: 'Tu Coordinadora Bogotá está en 15% esta semana. Este skill ya aplicaría ahora mismo.',
+      agent: 'Vigilante',
+      agentColor: '#f59e0b',
+      cta: 'Activar ahora',
+      installed: false,
+    },
+    {
+      id: 'ps2',
+      title: 'Escalar pauta 15% si ROAS > 2.5x por 48h',
+      reason: 'Tu ROAS es 2.9x en Collar GPS. Roax podría escalarlo automáticamente.',
+      agent: 'Roax',
+      agentColor: '#ff6102',
+      cta: 'Activar para Collar GPS',
+      installed: false,
+    },
+    {
+      id: 'ps3',
+      title: 'P&L real automático semanal',
+      reason: 'Tu gap ROAS declarado vs real fue -1.0x esta semana. Automatiza el seguimiento.',
+      agent: 'Agente Financiero',
+      agentColor: '#8b5cf6',
+      cta: 'Activar skill',
+      installed: false,
+    },
+  ];
+
+  personalizedInstalled = signal<string[]>([]);
+
+  installPersonalized(id: string): void {
+    this.personalizedInstalled.update(l => [...l, id]);
+  }
+
+  isPersonalizedInstalled(id: string): boolean {
+    return this.personalizedInstalled().includes(id);
+  }
 
   readonly agenteTabs: { id: AgenteFiltro; label: string; icono: string }[] = [
     { id: 'todos', label: 'Destacadas', icono: '⭐' },

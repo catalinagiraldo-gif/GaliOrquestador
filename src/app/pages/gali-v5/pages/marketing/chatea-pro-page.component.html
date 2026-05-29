@@ -1,56 +1,196 @@
 <div class="chatea-page">
   <dropi-titulos title="Chatea Pro" [breadcrumbs]="breadcrumbs" />
 
-  <section class="chatea-page__hero">
-    <div class="chatea-page__hero-content">
-      <h2>Automatiza tu operación con expertos virtuales y vuélvete más rentable con Chatea Pro.</h2>
-      <p>
-        Confirma pedidos y recupera carritos abandonados por WhatsApp sin contratar más personal.
-        Chatea Pro trabaja 24/7 para que tú te enfoques en vender.
-      </p>
-      <div class="chatea-page__hero-actions">
-        <button type="button" class="chatea-page__btn chatea-page__btn--primary">
-          Comienza ahora
-          <i class="pi pi-external-link"></i>
-        </button>
-        <button type="button" class="chatea-page__btn chatea-page__btn--ghost">
-          <i class="pi pi-play"></i>
-          Ver como funciona
-        </button>
+  <!-- Status bar operativo -->
+  <div class="chatea-page__status-bar">
+    <div class="chatea-status-bar">
+      <div class="chatea-status-bar__id">
+        <span class="chatea-status-bar__dot"></span>
+        <span class="chatea-status-bar__label">✦ Chatea Pro</span>
+        <span class="chatea-status-bar__active">activo</span>
       </div>
-
-      <div class="chatea-page__assistant">
-        <div class="chatea-page__assistant-icon"><i class="pi pi-comments"></i></div>
-        <div>
-          <strong>Asistente Logístico</strong>
-          <p>Confirma datos de envío y reduce devoluciones.</p>
+      <div class="chatea-status-bar__stats">
+        <div class="chatea-stat">
+          <strong class="chatea-stat__val chatea-stat__val--ok">{{ stats.confirmados }}</strong>
+          <span class="chatea-stat__label">confirmados hoy</span>
         </div>
-        <div class="chatea-page__assistant-nav">
-          <button type="button"><i class="pi pi-chevron-left"></i></button>
-          <button type="button"><i class="pi pi-chevron-right"></i></button>
+        <span class="chatea-stat__sep">·</span>
+        <div class="chatea-stat">
+          <strong class="chatea-stat__val chatea-stat__val--warn">{{ stats.anticiposPendientes }}</strong>
+          <span class="chatea-stat__label">anticipos pendientes</span>
+        </div>
+        <span class="chatea-stat__sep">·</span>
+        <div class="chatea-stat">
+          <strong class="chatea-stat__val chatea-stat__val--cart">{{ stats.carritos }}</strong>
+          <span class="chatea-stat__label">carritos activos</span>
+        </div>
+        <span class="chatea-stat__sep">·</span>
+        <div class="chatea-stat">
+          <strong class="chatea-stat__val">{{ stats.tasa }}</strong>
+          <span class="chatea-stat__label">tasa confirmación</span>
         </div>
       </div>
+      <button class="chatea-status-bar__cas-link" type="button" (click)="goToCas()" data-proto-skip>
+        Ver bandeja CAS →
+      </button>
     </div>
+  </div>
 
-    <div class="chatea-page__hero-visual">
-      <div class="chatea-page__phone-mock">
-        <div class="chatea-page__chat-bubble">
-          <span class="chatea-page__chat-badge">+ $350.000</span>
-          <p>Tu pedido #33885 ha sido confirmado ✓</p>
-        </div>
+  <!-- Layout principal: conversaciones + chat + reglas -->
+  <div class="chatea-page__layout">
+
+    <!-- Columna izquierda: conversaciones activas -->
+    <aside class="chatea-page__convs">
+      <h3>Conversaciones activas</h3>
+      <div class="conv-list">
+        @for (conv of conversaciones(); track conv.id) {
+          <button
+            class="conv-item"
+            [class.conv-item--active]="selectedConvId() === conv.id"
+            [class]="estadoLabel(conv.estado)"
+            type="button"
+            (click)="selectedConvId.set(conv.id)"
+            data-proto-skip>
+            <div class="conv-item__top">
+              <span class="conv-item__name">{{ conv.cliente }}</span>
+              <span class="conv-item__hora">{{ conv.hora }}</span>
+            </div>
+            <span class="conv-item__pedido">{{ conv.pedido }}</span>
+            <div class="conv-item__bottom">
+              <span class="conv-item__estado"
+                [class.conv-item__estado--pending]="conv.estado === 'anticipo_pendiente'"
+                [class.conv-item__estado--ok]="conv.estado === 'confirmado'"
+                [class.conv-item__estado--warn]="conv.estado === 'novedad'"
+                [class.conv-item__estado--cart]="conv.estado === 'carrito'">
+                {{ estadoLabel(conv.estado) }}
+              </span>
+              @if (conv.monto) {
+                <span class="conv-item__monto">{{ conv.monto }}</span>
+              }
+            </div>
+          </button>
+        }
       </div>
-    </div>
-  </section>
+    </aside>
 
-  <section class="chatea-page__stats-section">
-    <h3>¡Lleva tu ecosistema a otro nivel con Chatea Pro!</h3>
-    <div class="chatea-page__stats-grid">
-      @for (stat of stats; track stat.value) {
-        <article class="chatea-page__stat-card">
-          <strong>{{ stat.value }}</strong>
-          <p>{{ stat.desc }}</p>
-        </article>
+    <!-- Centro: chat con el cliente -->
+    <main class="chatea-page__chat">
+      @if (selectedConv(); as conv) {
+        <header class="chatea-chat__header">
+          <div>
+            <h4>{{ conv.cliente }}</h4>
+            <span>{{ conv.pedido }} · {{ conv.hora }}</span>
+          </div>
+          <span class="chatea-chat__estado"
+            [class.chatea-chat__estado--pending]="conv.estado === 'anticipo_pendiente'"
+            [class.chatea-chat__estado--ok]="conv.estado === 'confirmado'">
+            {{ estadoLabel(conv.estado) }}
+          </span>
+        </header>
+
+        <div class="chatea-chat__gali-context">
+          <span class="chatea-chat__gali-icon">✦</span>
+          <p>{{ conv.msg }}</p>
+        </div>
+
+        <div class="chatea-chat__messages">
+          @for (msg of chatMsgs(); track msg.hora) {
+            <div class="chat-bubble" [class.chat-bubble--gali]="msg.from === 'gali'" [class.chat-bubble--cliente]="msg.from === 'cliente'">
+              @if (msg.from === 'gali') {
+                <span class="chat-bubble__avatar">✦</span>
+              }
+              <div class="chat-bubble__content">
+                <p>{{ msg.text }}</p>
+                <time>{{ msg.hora }}</time>
+              </div>
+            </div>
+          }
+        </div>
+
+        <footer class="chatea-chat__composer">
+          <input
+            type="text"
+            placeholder="Escribe un mensaje como Gali…"
+            [value]="newMsg()"
+            (input)="newMsg.set($any($event.target).value)"
+            (keydown.enter)="sendMsg()"
+          />
+          <button type="button" (click)="sendMsg()" data-proto-skip>
+            <i class="pi pi-send"></i>
+          </button>
+        </footer>
       }
-    </div>
-  </section>
+    </main>
+
+    <!-- Columna derecha: reglas activas -->
+    <aside class="chatea-page__rules">
+      <h3>Reglas activas</h3>
+      <div class="rules-list">
+        <div class="rule-item">
+          <div class="rule-item__info">
+            <span class="rule-item__name">Anticipo zona rural</span>
+            <span class="rule-item__desc">Solicita anticipo cuando se detecta zona sin cobertura</span>
+          </div>
+          <button
+            class="rule-toggle"
+            [class.rule-toggle--on]="reglas().anticipoZonaRural"
+            type="button"
+            (click)="toggleRegla('anticipoZonaRural')"
+            data-proto-skip>
+            <span class="rule-toggle__knob"></span>
+          </button>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-item__info">
+            <span class="rule-item__name">Recuperar carrito 24h</span>
+            <span class="rule-item__desc">Envía secuencia de recuperación a carritos abandonados</span>
+          </div>
+          <button
+            class="rule-toggle"
+            [class.rule-toggle--on]="reglas().recuperarCarrito"
+            type="button"
+            (click)="toggleRegla('recuperarCarrito')"
+            data-proto-skip>
+            <span class="rule-toggle__knob"></span>
+          </button>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-item__info">
+            <span class="rule-item__name">Confirmar pedido verde</span>
+            <span class="rule-item__desc">Confirma automáticamente si huella es verde y wallet OK</span>
+          </div>
+          <button
+            class="rule-toggle"
+            [class.rule-toggle--on]="reglas().confirmarVerde"
+            type="button"
+            (click)="toggleRegla('confirmarVerde')"
+            data-proto-skip>
+            <span class="rule-toggle__knob"></span>
+          </button>
+        </div>
+
+        <div class="rule-item">
+          <div class="rule-item__info">
+            <span class="rule-item__name">Notificar novedades</span>
+            <span class="rule-item__desc">Contacta al cliente cuando hay novedad logística</span>
+          </div>
+          <button
+            class="rule-toggle"
+            [class.rule-toggle--on]="reglas().notificarNovedad"
+            type="button"
+            (click)="toggleRegla('notificarNovedad')"
+            data-proto-skip>
+            <span class="rule-toggle__knob"></span>
+          </button>
+        </div>
+      </div>
+
+      <button class="chatea-page__marketplace-link" type="button" (click)="goToMarketplace()" data-proto-skip>
+        <i class="pi pi-th-large"></i>
+        Ver más reglas en Comunidad →
+      </button>
+    </aside>
+  </div>
 </div>

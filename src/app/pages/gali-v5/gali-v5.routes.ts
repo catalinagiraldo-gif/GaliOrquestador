@@ -218,9 +218,19 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
       import('./pages/proyecto/proyecto-detalle-page.component').then(m => m.ProyectoDetallePageComponent),
   },
   {
-    path: 'marketplace',
+    path: 'proyectos',
     loadComponent: () =>
-      import('./pages/marketplace/marketplace-page.component').then(m => m.MarketplacePageComponent),
+      import('./pages/proyectos/proyectos-list-page.component').then(m => m.ProyectosListPageComponent),
+  },
+  {
+    path: 'skills',
+    loadComponent: () =>
+      import('./pages/skills/skills-page.component').then(m => m.SkillsPageComponent),
+  },
+  {
+    path: 'marketplace',
+    redirectTo: 'skills',
+    pathMatch: 'full',
   },
 
   {

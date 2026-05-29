@@ -116,6 +116,76 @@
     }
   }
 
+  // ── Indicador de objetivo activo ───────────────────────────
+  &__goal {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: 5px $size-3;
+    border: 1px solid $gray-100;
+    border-radius: $radius-md;
+    background: #fafaf8;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: $primary-500;
+      background: $gray-50;
+    }
+  }
+
+  &__goal-icon { font-size: 13px; line-height: 1; }
+
+  &__goal-info { display: flex; flex-direction: column; gap: 3px; }
+
+  &__goal-label {
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-medium;
+    color: $gray-600;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  &__goal-bar {
+    width: 80px;
+    height: 3px;
+    border-radius: 2px;
+    background: $gray-200;
+    overflow: hidden;
+  }
+
+  &__goal-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: $primary-500;
+    transition: width 0.4s ease;
+  }
+
+  &__goal-count {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $gray-800;
+    line-height: 1;
+  }
+
+  &__goal-total { font-weight: $font-regular; color: $gray-400; }
+
+  &__auto-badge {
+    padding: 2px $size-2;
+    border-radius: $radius-full;
+    background: $primary-500;
+    color: $white;
+    font-family: $font-primary;
+    font-size: 9px;
+    font-weight: $font-bold;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  // ─────────────────────────────────────────────────────────────
+
   &__wallet {
     display: flex;
     align-items: center;

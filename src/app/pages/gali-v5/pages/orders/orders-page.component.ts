@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import ordersData from '../../../../../../mocks/gali-v5/orders.json';
+import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface OrderRow {
   id: string;
@@ -21,7 +22,7 @@ type GaliTriageStatus = 'ok' | 'managing' | 'decision' | 'auto';
 @Component({
   selector: 'app-orders-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DropiGaliBarComponent],
   templateUrl: './orders-page.component.html',
   styleUrl: './orders-page.component.scss',
 })
@@ -30,13 +31,12 @@ export class OrdersPageComponent {
   readonly breadcrumbs = ['Pedidos', 'Ordenes'];
   readonly orders: OrderRow[] = ordersData.orders;
 
-  // Gali triage data
-  readonly galiTriage = {
-    autoConfirmadas: 31,
-    managing: 8,
-    decision: 3,
-    totalHoy: 47,
-  };
+  readonly galiStats: GaliBarStat[] = [
+    { value: 31, label: 'confirmadas auto', variant: 'ok' },
+    { value: 8, label: 'Chatea Pro gestionando', variant: 'neutral' },
+    { value: 3, label: 'requieren tu decisión', variant: 'warn' },
+    { value: 47, label: 'pedidos hoy' },
+  ];
 
   // Per-order Gali status (maps order ID → triage status)
   readonly galiStatus: Record<string, GaliTriageStatus> = {

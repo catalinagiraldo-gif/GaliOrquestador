@@ -25,6 +25,33 @@
     </div>
   </header>
 
+  <!-- Skills personalizados para ti -->
+  <section class="mkt__personalized">
+    <div class="mkt__personalized-header">
+      <h2>✦ Personalizado para ti</h2>
+      <span>Basado en tu ROAS 2.9x, novedades Bogotá 15% y Collar GPS activo</span>
+    </div>
+    <div class="mkt__personalized-grid">
+      @for (skill of personalizedSkills; track skill.id) {
+        <div class="mkt-p-card">
+          <div class="mkt-p-card__agent-bar" [style.background]="skill.agentColor + '20'" [style.border-color]="skill.agentColor + '40'">
+            <span class="mkt-p-card__agent-dot" [style.background]="skill.agentColor"></span>
+            <span class="mkt-p-card__agent-name" [style.color]="skill.agentColor">{{ skill.agent }}</span>
+          </div>
+          <strong class="mkt-p-card__title">{{ skill.title }}</strong>
+          <p class="mkt-p-card__reason">{{ skill.reason }}</p>
+          @if (isPersonalizedInstalled(skill.id)) {
+            <span class="mkt-p-card__installed">✓ Activado</span>
+          } @else {
+            <button class="mkt-p-card__cta" type="button" (click)="installPersonalized(skill.id)" data-proto-skip>
+              {{ skill.cta }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
   <!-- Filters bar -->
   <div class="mkt__filters">
     <div class="mkt__search-wrap">

@@ -24,6 +24,7 @@
   --dropi-rail-width: 56px;
   --dropi-section-width: 200px;
   --dropi-section-col: var(--dropi-section-width);
+  --gali-panel-width: 360px;
 
   display: flex;
   flex-direction: column;
@@ -36,11 +37,17 @@
 
   &__body {
     display: grid;
-    grid-template-columns: var(--dropi-rail-width) var(--dropi-section-col) minmax(0, 1fr);
+    grid-template-columns: var(--dropi-rail-width) var(--dropi-section-col) 8px minmax(0, 1fr);
     flex: 1;
     min-height: 0;
     overflow: hidden;
     height: calc(100vh - var(--dropi-header-height));
+    transition: var(--section-transition, grid-template-columns 0.25s ease);
+
+    // cuando no hay section panel, quitar la columna del splitter
+    &.gali-v5-shell--no-section {
+      grid-template-columns: var(--dropi-rail-width) 0 0 minmax(0, 1fr);
+    }
   }
 
   &__content {
@@ -49,6 +56,15 @@
     overflow-y: auto;
     overflow-x: hidden;
     background: $white;
+    // Cuando el panel Gali está abierto, el content se desplaza
+    transition: padding-right 0.25s ease;
+  }
+
+  // Cuando el panel Gali está abierto, desplazar el contenido
+  &--panel-open {
+    .gali-v5-shell__content {
+      padding-right: var(--gali-panel-width);
+    }
   }
 
   &__nav-expand {
@@ -104,6 +120,25 @@
 
   @media (max-width: 767px) {
     --dropi-section-width: 160px;
+    --gali-panel-width: 100vw;
+  }
+
+  // ── Panel overlay (Gali right panel) ────────────────────────
+  &__panel-overlay {
+    position: fixed;
+    top: var(--dropi-header-height, 53px);
+    right: 0;
+    width: var(--gali-panel-width, 360px);
+    height: calc(100vh - var(--dropi-header-height, 53px));
+    z-index: 300;
+
+    // Slide in from right
+    transform: translateX(100%);
+    animation: panelSlideIn 0.25s ease-out forwards;
+
+    &--in {
+      transform: translateX(0);
+    }
   }
 
   &__toast {
@@ -131,6 +166,17 @@
       color: $primary-500;
       flex-shrink: 0;
     }
+  }
+}
+
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 

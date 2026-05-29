@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 export type SignalUrgency = 'alta' | 'media' | 'baja';
@@ -59,6 +59,15 @@ export interface ObjetivoActivo {
   galiMensaje: string;
 }
 
+export interface SectionHealth {
+  key: string;
+  label: string;
+  route: string;
+  status: 'ok' | 'warn' | 'critical';
+  alerts: number;
+  msg?: string;
+}
+
 @Component({
   selector: 'app-dropi-home',
   standalone: true,
@@ -68,6 +77,7 @@ export interface ObjetivoActivo {
 })
 export class DropiHomeComponent {
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   userName = signal('Alejandra');
   modoGaliActivo = signal(false);
@@ -247,6 +257,22 @@ export class DropiHomeComponent {
     pauta: '$66k/día',
   };
 
+  readonly sectionHealth: SectionHealth[] = [
+    { key: 'productos', label: 'Productos', route: '/gali-v5/productos/catalogo', status: 'ok', alerts: 1, msg: '1 oportunidad ADA Spy' },
+    { key: 'pedidos', label: 'Pedidos', route: '/gali-v5/mis-pedidos/mis-pedidos', status: 'warn', alerts: 3, msg: '3 confirmaciones urgentes' },
+    { key: 'logistica', label: 'Logística', route: '/gali-v5/logistica/torre-logistica', status: 'critical', alerts: 1, msg: 'Coordinadora 12% novedad Bogotá' },
+    { key: 'marketing', label: 'Marketing', route: '/gali-v5/marketing/campanas', status: 'ok', alerts: 0 },
+    { key: 'financiero', label: 'Financiero', route: '/gali-v5/financiero/historial-de-cartera', status: 'warn', alerts: 1, msg: 'ROAS real vs declarado' },
+    { key: 'cas', label: 'CAS', route: '/gali-v5/cas/bandeja', status: 'warn', alerts: 2, msg: 'Patrón PQR Collar GPS' },
+    { key: 'proyectos', label: 'Proyectos', route: '/gali-v5/proyectos', status: 'warn', alerts: 1, msg: 'Collar GPS: novedad Cali' },
+    { key: 'skills', label: 'Skills', route: '/gali-v5/skills', status: 'ok', alerts: 0 },
+    { key: 'reportes', label: 'Reportes', route: '/gali-v5/reportes/dashboard', status: 'ok', alerts: 0 },
+  ];
+
+  get totalAlertas(): number {
+    return this.sectionHealth.reduce((sum, s) => sum + s.alerts, 0);
+  }
+
   get progresoObjetivoWidth(): string {
     return `${(this.objetivo.actual / this.objetivo.meta) * 100}%`;
   }
@@ -295,6 +321,49 @@ export class DropiHomeComponent {
       pausado: 'badge--pausado',
       borrador: 'badge--borrador',
     }[estado];
+  }
+
+  // ── Navegación desde botones del hub ──────────────────────────────
+  goToProject(id: string): void {
+    this.router.navigate(['/gali-v5/proyecto', id]);
+  }
+
+  goToProyectos(): void {
+    this.router.navigate(['/gali-v5/proyectos']);
+  }
+
+  goToMarketplace(): void {
+    this.router.navigate(['/gali-v5/skills'], { queryParams: { tab: 'marketplace' } });
+  }
+
+  goToSection(route: string): void {
+    this.router.navigate([route]);
+  }
+
+  sectionHealthClass(status: SectionHealth['status']): string {
+    return `health-cell--${status}`;
+  }
+
+  goToSignalTarget(agente: string): void {
+    const routes: Record<string, string> = {
+      'Vigilante Logístico': '/gali-v5/logistica/torre-logistica',
+      'Vigilante': '/gali-v5/logistica/torre-logistica',
+      'Chatea Pro': '/gali-v5/marketing/chatea-pro',
+      'Roax': '/gali-v5/marketing/roax-informes',
+      'ADA Spy': '/gali-v5/productos/caza-productos',
+    };
+    const route = routes[agente] ?? '/gali-v5';
+    this.router.navigate([route]);
+  }
+
+  goToLoopDetail(entry: LoopEntry): void {
+    const routes: Record<string, string> = {
+      'Roax': '/gali-v5/marketing/roax-informes',
+      'Vigilante': '/gali-v5/logistica/torre-logistica',
+      'Chatea Pro': '/gali-v5/cas/bandeja',
+      'ADA Spy': '/gali-v5/productos/catalogo',
+    };
+    this.router.navigate([routes[entry.agente] ?? '/gali-v5']);
   }
 
   constructor() {

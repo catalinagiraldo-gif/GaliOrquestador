@@ -108,3 +108,57 @@
     }
   }
 }
+
+// ── Gali Agent Bar ──────────────────────────────
+.garantias-agent-bar {
+  margin: 16px 0 0;
+}
+
+.agent-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.06);
+
+  &__left { display: flex; align-items: center; gap: 10px; }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+    flex-shrink: 0;
+    animation: agBar-pulse-w 2s infinite;
+  }
+
+  &__identity { display: flex; flex-direction: column; gap: 2px; }
+
+  &__name { font-size: 12px; font-weight: 600; color: #1c1c1e; }
+
+  &__status { font-size: 11px; color: #f59e0b; }
+
+  &__action { flex: 1; font-size: 12px; color: #6b7280; }
+
+  &__cta {
+    padding: 5px 12px;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    background: transparent;
+    color: #f59e0b;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+
+    &:hover { background: rgba(245, 158, 11, 0.1); }
+  }
+}
+
+@keyframes agBar-pulse-w {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+}

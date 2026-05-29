@@ -2,9 +2,13 @@
   class="gali-v5-shell"
   [class.gali-v5-shell--compact]="isCompactNav()"
   [class.gali-v5-shell--no-section]="!hasSectionPanel()"
-  [class.gali-v5-shell--nav-collapsed]="sectionNavCollapsed()">
+  [class.gali-v5-shell--nav-collapsed]="sectionNavCollapsed()"
+  [class.gali-v5-shell--panel-open]="galiState.galiMode() > 0">
+
   <dropi-header-ia2
     [userName]="(auth.user$ | async)?.name ?? 'Alejandra'"
+    [galiMode]="galiState.galiMode()"
+    [autopilotOn]="galiState.galiMode() === 2"
   />
 
   <div class="gali-v5-shell__body">
@@ -15,6 +19,14 @@
       [panel]="sectionPanel()"
       [collapsed]="sectionNavCollapsed()"
       (collapseRequested)="collapseSectionNav()"
+    />
+
+    <dropi-panel-splitter
+      *ngIf="hasSectionPanel() && !sectionNavCollapsed()"
+      [currentWidth]="sectionWidth()"
+      (widthChange)="onSplitterWidthChange($event)"
+      (dragStart)="onSplitterDragStart()"
+      (dragEnd)="onSplitterDragEnd()"
     />
 
     <main class="gali-v5-shell__content">
@@ -32,6 +44,13 @@
       <router-outlet />
     </main>
   </div>
+
+  <!-- Panel derecho de Gali -->
+  @if (galiState.galiMode() > 0) {
+    <div class="gali-v5-shell__panel-overlay" [class.gali-v5-shell__panel-overlay--in]="galiState.galiMode() > 0">
+      <gali-right-panel (closed)="galiState.togglePanel()" />
+    </div>
+  }
 
   <dropi-menu-action />
 

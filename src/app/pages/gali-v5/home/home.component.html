@@ -154,6 +154,33 @@
   </div>
 
   <!-- ══════════════════════════════════════════════
+       SALUD POR SECCIÓN — mapa del negocio
+  ══════════════════════════════════════════════ -->
+  <section class="hub__health">
+    <div class="health__header">
+      <h2 class="hub__section-title">Salud del negocio por sección</h2>
+      <span class="health__total">{{ totalAlertas }} alertas activas</span>
+    </div>
+    <div class="health-grid">
+      <button
+        *ngFor="let section of sectionHealth; let i = index"
+        type="button"
+        class="health-cell"
+        [class]="sectionHealthClass(section.status)"
+        [style.animation-delay]="(i * 50) + 'ms'"
+        (click)="goToSection(section.route)">
+        <span class="health-cell__label">{{ section.label }}</span>
+        @if (section.alerts > 0) {
+          <span class="health-cell__badge">{{ section.alerts }}</span>
+        }
+        @if (section.msg) {
+          <span class="health-cell__msg">{{ section.msg }}</span>
+        }
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
        LOOP CERRADO — historial de acciones Gali
   ══════════════════════════════════════════════ -->
   <section class="hub__loop">
@@ -190,7 +217,7 @@
   <section class="hub__proyectos">
     <div class="proyectos__header">
       <h2 class="hub__section-title">Mis proyectos</h2>
-      <a [routerLink]="['/gali-v5']" class="proyectos__ver-todos">Ver todos</a>
+      <a [routerLink]="['/gali-v5/proyectos']" class="proyectos__ver-todos">Ver todos</a>
     </div>
 
     <div class="proyectos-list">

@@ -1,4 +1,18 @@
 <div class="garantias-page" *ngIf="config">
+
+  <!-- Vigilante — Agent Working Bar -->
+  <div class="agent-bar agent-bar--vigilante garantias-agent-bar">
+    <div class="agent-bar__left">
+      <span class="agent-bar__dot"></span>
+      <div class="agent-bar__identity">
+        <span class="agent-bar__name">Vigilante · Garantías</span>
+        <span class="agent-bar__status">activo</span>
+      </div>
+    </div>
+    <span class="agent-bar__action">2 garantías pueden cerrarse automáticamente · 1 posible fraude detectado</span>
+    <button class="agent-bar__cta" type="button" data-proto-skip>Autorizar cierres automáticos</button>
+  </div>
+
   <nav class="garantias-page__breadcrumbs" aria-label="Breadcrumb">
     <a routerLink="/gali-v5" class="garantias-page__crumb"><i class="pi pi-home"></i></a>
     <i class="pi pi-chevron-right garantias-page__crumb-sep"></i>

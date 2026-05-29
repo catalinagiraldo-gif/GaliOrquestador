@@ -1,34 +1,10 @@
 <div class="orders-page">
-  <nav class="orders-page__breadcrumbs" aria-label="Breadcrumb">
-    <a routerLink="/gali-v5" class="orders-page__crumb"><i class="pi pi-home"></i></a>
-    <i class="pi pi-chevron-right orders-page__crumb-sep"></i>
-    <span class="orders-page__crumb">{{ breadcrumbs[0] }}</span>
-    <i class="pi pi-chevron-right orders-page__crumb-sep"></i>
-    <span class="orders-page__crumb orders-page__crumb--active">{{ breadcrumbs[1] }}</span>
-  </nav>
-
-  <h1 class="orders-page__title">Ordenes</h1>
-
-  <!-- ✦ GALI TRIAGE BANNER -->
-  <div class="gali-triage-bar">
-    <span class="gali-triage-bar__icon">✦</span>
-    <div class="gali-triage-bar__stats">
-      <span class="gali-triage-stat gali-triage-stat--auto">
-        <i class="pi pi-check-circle"></i>
-        {{ galiTriage.autoConfirmadas }} confirmadas auto
-      </span>
-      <span class="gali-triage-stat gali-triage-stat--managing">
-        <i class="pi pi-spin pi-spinner" style="font-size:11px"></i>
-        {{ galiTriage.managing }} Chatea Pro gestionando
-      </span>
-      <span class="gali-triage-stat gali-triage-stat--decision">
-        <i class="pi pi-exclamation-circle"></i>
-        {{ galiTriage.decision }} requieren tu decisión
-      </span>
-    </div>
-    <span class="gali-triage-bar__total">{{ galiTriage.totalHoy }} pedidos hoy</span>
-    <button type="button" class="gali-triage-bar__cta">Ver pendientes →</button>
-  </div>
+  <dropi-gali-bar
+    agent="Chatea Pro"
+    status="gestionando confirmaciones"
+    [stats]="galiStats"
+    ctaLabel="Ver pendientes"
+  />
 
   <div class="orders-page__toolbar">
     <button type="button" class="orders-page__btn-primary"><i class="pi pi-plus"></i> Orden manual</button>

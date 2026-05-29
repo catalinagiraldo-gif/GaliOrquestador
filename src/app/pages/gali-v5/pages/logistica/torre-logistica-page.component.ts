@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DropiTitulosComponent, DropiButtonNewComponent } from '../../components/shared';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface CarrierIndicator {
   carrier: string;
@@ -15,7 +16,7 @@ interface CarrierIndicator {
 @Component({
   selector: 'app-torre-logistica-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiTitulosComponent, DropiButtonNewComponent],
+  imports: [CommonModule, FormsModule, DropiTitulosComponent, DropiButtonNewComponent, DropiGaliBarComponent],
   templateUrl: './torre-logistica-page.component.html',
   styleUrl: './torre-logistica-page.component.scss',
 })

@@ -1,4 +1,34 @@
 <div class="torre-page">
+
+  <dropi-gali-bar
+    agent="Vigilante"
+    status="activo 24/7"
+    message="Monitoreando 47 pedidos · Smart routing activo · 0 alertas críticas ahora"
+    ctaLabel="Ver log de swaps"
+    secondaryCta="Pausar"
+  />
+
+  <!-- Loop cerrado: última acción del Vigilante -->
+  <div class="vigilante-loop">
+    <div class="vigilante-loop__item">
+      <span class="vigilante-loop__icon">🔄</span>
+      <div class="vigilante-loop__text">
+        <span class="vigilante-loop__accion">Smart swap automático</span>
+        <span class="vigilante-loop__detalle">12 pedidos → Servientrega (Coordinadora 15% novedad en Bogotá)</span>
+      </div>
+      <span class="vigilante-loop__result">4 novedades evitadas</span>
+      <span class="vigilante-loop__time">hace 2h</span>
+    </div>
+    <div class="vigilante-loop__item vigilante-loop__item--projection">
+      <span class="vigilante-loop__icon">📊</span>
+      <div class="vigilante-loop__text">
+        <span class="vigilante-loop__accion">Proyección</span>
+        <span class="vigilante-loop__detalle">A este ritmo, 3 novedades estimadas esta semana en Bogotá</span>
+      </div>
+      <button class="vigilante-loop__action-btn" type="button" data-proto-skip>Ver análisis</button>
+    </div>
+  </div>
+
   <dropi-titulos title="Torre logística" [breadcrumbs]="breadcrumbs" />
 
   <div class="torre-tower">

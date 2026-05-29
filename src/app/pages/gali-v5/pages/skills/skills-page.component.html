@@ -1,0 +1,256 @@
+<div class="skills-page">
+  <gali-chip
+    agentName="Gali"
+    message="4 recetas activas · 1 sugerida nueva según tu patrón de CTR"
+    status="running"
+    ctaLabel="Ver sugerencia"
+  />
+
+  <dropi-titulos title="Skills" [breadcrumbs]="breadcrumbs">
+    <button type="button" class="skills-page__create-btn" (click)="setTab('crear')">
+      Crear skill
+    </button>
+  </dropi-titulos>
+
+  <nav class="skills-page__tabs" aria-label="Secciones de Skills">
+    <button
+      type="button"
+      [class.active]="activeTab() === 'mis-skills'"
+      (click)="setTab('mis-skills')">
+      Mis Skills ({{ skills.length }})
+    </button>
+    <button
+      type="button"
+      [class.active]="activeTab() === 'crear'"
+      (click)="setTab('crear')">
+      Crear skill
+    </button>
+    <button
+      type="button"
+      [class.active]="activeTab() === 'marketplace'"
+      (click)="setTab('marketplace')">
+      Marketplace
+    </button>
+  </nav>
+
+  @if (activeTab() === 'mis-skills') {
+    <section class="skills-page__panel">
+      <div class="skills-page__stats">
+        <div class="skills-stat">
+          <span class="skills-stat__label">Activas</span>
+          <strong>{{ activeSkillsCount }}</strong>
+        </div>
+        <div class="skills-stat">
+          <span class="skills-stat__label">Ejecuciones esta semana</span>
+          <strong>{{ totalEjecuciones }}</strong>
+        </div>
+        <div class="skills-stat">
+          <span class="skills-stat__label">Ahorro estimado</span>
+          <strong>$108k</strong>
+        </div>
+      </div>
+
+      <div class="skills-page__banner">
+        <span>✦ Gali detectó un patrón: tu CTR cae los martes a las 3pm.</span>
+        <button type="button" (click)="setTab('crear')">Crear skill automática</button>
+      </div>
+
+      <div class="skills-page__filters">
+        @for (f of ['todos', 'activas', 'en_prueba', 'pausadas']; track f) {
+          <button
+            type="button"
+            [class.active]="skillFilter() === f"
+            (click)="skillFilter.set($any(f))">
+            {{ f === 'todos' ? 'Todos' : f === 'en_prueba' ? 'En prueba' : f.charAt(0).toUpperCase() + f.slice(1) }}
+          </button>
+        }
+      </div>
+
+      <div class="skills-list">
+        @for (skill of filteredSkills; track skill.id) {
+          <article class="skill-card">
+            <div class="skill-card__main">
+              <div class="skill-card__head">
+                <span class="skill-card__agent" [style.background]="agentColor(skill.agente)">
+                  {{ skill.agente.charAt(0) }}
+                </span>
+                <div>
+                  <h3>{{ skill.nombre }}</h3>
+                  <span class="skill-card__meta">{{ skill.agente }} · {{ skill.proyectos.join(', ') }}</span>
+                </div>
+                <span class="skill-card__estado skill-card__estado--{{ skill.estado }}">
+                  {{ estadoLabel(skill.estado) }}
+                </span>
+              </div>
+              <p class="skill-card__result">
+                Última ejecución: {{ skill.ultimaEjecucion }}
+                @if (skill.resultado) {
+                  · {{ skill.resultado }}
+                }
+              </p>
+              <div class="skill-card__connectors">
+                @for (c of skill.connectors; track c.nombre) {
+                  <span class="connector-chip">{{ c.nombre }}</span>
+                }
+                @if (skill.connectors.length === 0) {
+                  <span class="connector-chip connector-chip--muted">Sin conectores</span>
+                }
+              </div>
+            </div>
+            <div class="skill-card__actions">
+              <button type="button" (click)="openEditor()">Editar</button>
+              <button type="button">{{ skill.estado === 'pausada' ? 'Activar' : 'Pausar' }}</button>
+              <button type="button">Historial</button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (activeTab() === 'crear') {
+    <section class="skills-page__panel skills-page__wizard">
+      <div class="wizard-steps">
+        @for (n of [1, 2, 3, 4]; track n) {
+          <div class="wizard-step" [class.wizard-step--done]="crearStep() > n" [class.wizard-step--active]="crearStep() === n">
+            <span>{{ n }}</span>
+            <small>
+              @switch (n) {
+                @case (1) { Intención }
+                @case (2) { Lógica If/Then }
+                @case (3) { Conocimiento }
+                @case (4) { Alcance y prueba }
+              }
+            </small>
+          </div>
+        }
+      </div>
+
+      @if (crearStep() === 1) {
+        <div class="wizard-panel">
+          <h2>¿Qué quieres que Gali haga automáticamente?</h2>
+          <textarea
+            rows="3"
+            placeholder="Describe en lenguaje natural..."
+            [ngModel]="crearIntencion()"
+            (ngModelChange)="crearIntencion.set($event)"
+          ></textarea>
+          <div class="wizard-ejemplos">
+            @for (ej of crearEjemplos; track ej) {
+              <button type="button" (click)="useEjemplo(ej)">{{ ej }}</button>
+            }
+          </div>
+          @if (crearIntencion()) {
+            <div class="wizard-gali-reply">
+              ✦ Entendido. Propongo: <strong>Si CTR &lt; 0.8% por 48h → pausar creative → notificarte</strong>
+            </div>
+          }
+        </div>
+      }
+
+      @if (crearStep() === 2) {
+        <div class="wizard-panel wizard-if-then">
+          <div class="if-then-block if-then-block--si">SI</div>
+          <div class="if-then-block">
+            <label>Trigger</label>
+            <select>
+              <option>CTR cae por debajo de</option>
+              <option>ROAS cae por debajo de</option>
+              <option>Novedad sin resolver por más de</option>
+            </select>
+            <input type="text" value="0.8%" />
+          </div>
+          <div class="if-then-arrow">→</div>
+          <div class="if-then-block">
+            <label>Entonces</label>
+            <select>
+              <option>Pausar creative activo</option>
+              <option>Escalar presupuesto</option>
+              <option>Notificarme</option>
+            </select>
+          </div>
+          <div class="if-then-arrow">→</div>
+          <div class="if-then-block if-then-block--notify">Notificar</div>
+        </div>
+      }
+
+      @if (crearStep() === 3) {
+        <div class="wizard-panel">
+          <h2>Conecta apps y archivos de contexto</h2>
+          <p class="wizard-hint">La skill sabe quién eres cuando le das tono, catálogo y datos de campañas.</p>
+          <div class="mcp-grid">
+            @for (mcp of mcpConnectors; track mcp.id) {
+              <button
+                type="button"
+                class="mcp-card"
+                [class.mcp-card--connected]="mcp.connected"
+                (click)="toggleConnector(mcp)">
+                <strong>{{ mcp.nombre }}</strong>
+                <span>{{ mcp.descripcion }}</span>
+                <small>{{ mcp.connected ? 'Conectado ✓' : 'Conectar' }}</small>
+              </button>
+            }
+          </div>
+          <div class="upload-zone" (click)="simularArchivo()">
+            <i class="pi pi-upload"></i>
+            <span>Arrastra archivos o haz clic — PDF, XLSX, TXT (tono y voz, catálogo)</span>
+          </div>
+          <div class="attached-files">
+            @for (file of attachedFiles(); track file; let i = $index) {
+              <span class="file-chip">
+                {{ file }}
+                <button type="button" (click)="removeFile(i); $event.stopPropagation()">×</button>
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (crearStep() === 4) {
+        <div class="wizard-panel">
+          <h2>Alcance y dry-run</h2>
+          <label>Nombre de la skill</label>
+          <input type="text" value="Auto-pausa CTR — Roax" />
+          <label>Proyectos</label>
+          <select multiple size="3">
+            <option selected>Collar GPS</option>
+            <option>Skincare K-Beauty</option>
+            <option>Todos los proyectos</option>
+          </select>
+          <div class="dry-run">
+            <strong>Simulación última semana</strong>
+            <p>Trigger activado <strong>3 veces</strong> · Impacto estimado: ROAS +0.3x</p>
+            <ul>
+              <li>May 21 — CTR 0.7% → Video A pausado → CTR 1.6% en 3h</li>
+              <li>May 23 — CTR 0.75% → Video A pausado → CTR 1.4% en 4h</li>
+            </ul>
+          </div>
+        </div>
+      }
+
+      <div class="wizard-nav">
+        @if (crearStep() > 1) {
+          <button type="button" class="btn-secondary" (click)="retrocederCrear()">Volver</button>
+        }
+        @if (crearStep() < 4) {
+          <button type="button" class="btn-primary" (click)="avanzarCrear()">Continuar</button>
+        } @else {
+          <button type="button" class="btn-primary" (click)="activarSkill()">Activar skill</button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (activeTab() === 'marketplace') {
+    <section class="skills-page__panel skills-page__marketplace-embed">
+      <app-marketplace-page />
+    </section>
+  }
+
+  @if (showEditorModal()) {
+    <app-skills-editor-modal
+      agenteNombre="Roax"
+      (closed)="closeEditor()"
+    />
+  }
+</div>

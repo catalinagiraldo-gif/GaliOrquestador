@@ -1,0 +1,615 @@
+@import 'styles/gali-v5-tokens';
+
+// Panel tokens
+$panel-bg:       #141414;
+$panel-surface:  #1e1e1e;
+$panel-border:   rgba(255, 255, 255, 0.08);
+$panel-text:     #f4f4f5;
+$panel-muted:    rgba(255, 255, 255, 0.45);
+$panel-caption:  rgba(255, 255, 255, 0.28);
+$panel-accent:   $primary-500;  // #ff6102
+$panel-success:  #10b981;
+$panel-warning:  #f59e0b;
+$panel-danger:   #ef4444;
+$panel-info:     #3b82f6;
+
+@keyframes pulseDot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($panel-accent, 0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba($panel-accent, 0); }
+}
+
+@keyframes agentPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+:host {
+  display: block;
+  position: fixed;
+  top: 53px;
+  right: 0;
+  width: 360px;
+  height: calc(100vh - 53px);
+  z-index: 300;
+  pointer-events: auto;
+}
+
+.gali-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: $panel-bg;
+  border-left: 1px solid $panel-border;
+  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+
+  // ── Header ──────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $size-3 $size-4;
+    border-bottom: 1px solid $panel-border;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba($primary-500, 0.12) 0%, rgba($primary-500, 0.03) 100%);
+  }
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__glyph {
+    font-size: 16px;
+    color: $panel-accent;
+    animation: agentPulse 3s infinite;
+  }
+
+  &__name {
+    font-family: $font-secondary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    letter-spacing: -0.01em;
+  }
+
+  &__agents-pill {
+    font-size: $font-xs;
+    color: $panel-accent;
+    background: rgba($primary-500, 0.15);
+    border: 1px solid rgba($primary-500, 0.25);
+    border-radius: $radius-full;
+    padding: 2px $size-2;
+    line-height: 1;
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__autopilot {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px $size-2;
+    border: 1px solid $panel-border;
+    border-radius: $radius-full;
+    background: transparent;
+    color: $panel-muted;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $panel-muted;
+      transition: background 0.2s ease;
+    }
+
+    &--on {
+      border-color: $panel-accent;
+      color: $panel-accent;
+      background: rgba($primary-500, 0.1);
+
+      .gali-panel__autopilot-dot {
+        background: $panel-accent;
+        animation: pulseDot 2s infinite;
+      }
+    }
+
+    &:hover {
+      border-color: rgba($primary-500, 0.6);
+      color: $panel-accent;
+    }
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $panel-muted;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .pi { font-size: 12px; }
+
+    &:hover {
+      background: $panel-surface;
+      color: $panel-text;
+    }
+  }
+
+  // ── Tabs ──────────────────────────────────────────
+  &__tabs {
+    display: flex;
+    border-bottom: 1px solid $panel-border;
+    flex-shrink: 0;
+    background: $panel-bg;
+  }
+
+  &__tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $size-1;
+    padding: $size-2 $size-3;
+    border: none;
+    background: transparent;
+    color: $panel-muted;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    margin-bottom: -1px;
+
+    &:hover {
+      color: $panel-text;
+    }
+
+    &--active {
+      color: $panel-accent;
+      border-bottom-color: $panel-accent;
+    }
+  }
+
+  &__tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: $radius-full;
+    background: $panel-danger;
+    color: $white;
+    font-size: 10px;
+    font-weight: $font-bold;
+    line-height: 1;
+  }
+
+  // ── Content ──────────────────────────────────────────
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb { background: $panel-border; border-radius: 2px; }
+  }
+
+  // ── Chat tab ──────────────────────────────────────────
+  &__chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $size-4;
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-thumb { background: $panel-border; border-radius: 2px; }
+  }
+
+  &__quick-actions {
+    display: flex;
+    gap: $size-2;
+    padding: 0 $size-4 $size-3;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  &__quick-btn {
+    padding: 5px $size-3;
+    border: 1px solid $panel-border;
+    border-radius: $radius-full;
+    background: transparent;
+    color: $panel-muted;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+
+    &:hover {
+      border-color: rgba($primary-500, 0.5);
+      color: $panel-accent;
+      background: rgba($primary-500, 0.08);
+    }
+  }
+
+  &__input-row {
+    display: flex;
+    gap: $size-2;
+    padding: $size-3 $size-4;
+    border-top: 1px solid $panel-border;
+    flex-shrink: 0;
+    background: $panel-surface;
+  }
+
+  &__input {
+    flex: 1;
+    padding: $size-2 $size-3;
+    border: 1px solid $panel-border;
+    border-radius: $radius-md;
+    background: $panel-bg;
+    color: $panel-text;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    outline: none;
+    transition: border-color 0.15s ease;
+
+    &::placeholder { color: $panel-caption; }
+
+    &:focus {
+      border-color: rgba($primary-500, 0.5);
+    }
+  }
+
+  &__send {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: $radius-md;
+    background: $panel-accent;
+    color: $white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+
+    .pi { font-size: 13px; }
+
+    &:hover:not(:disabled) {
+      background: darken(#ff6102, 8%);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+
+  // ── Agentes tab ──────────────────────────────────────────
+  &__agentes {
+    padding: $size-3 $size-4;
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+
+  &__agent-actions {
+    display: flex;
+    gap: $size-2;
+    margin-top: $size-2;
+  }
+
+  &__agent-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $size-2;
+    padding: $size-2 $size-3;
+    border: 1px solid $panel-border;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $panel-muted;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .pi { font-size: 11px; }
+
+    &:hover { border-color: rgba(255,255,255,0.2); color: $panel-text; }
+
+    &--primary {
+      border-color: rgba($primary-500, 0.4);
+      color: $panel-accent;
+
+      &:hover { background: rgba($primary-500, 0.1); border-color: $panel-accent; }
+    }
+  }
+
+  &__autopilot-section {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $size-3;
+    margin-top: $size-4;
+    padding: $size-3;
+    border: 1px solid $panel-border;
+    border-radius: $radius-md;
+    background: $panel-surface;
+  }
+
+  &__autopilot-title {
+    display: block;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    margin-bottom: 3px;
+  }
+
+  &__autopilot-desc {
+    font-size: 11px;
+    color: $panel-muted;
+    line-height: 1.4;
+  }
+
+  &__toggle {
+    flex-shrink: 0;
+    width: 36px;
+    height: 20px;
+    border: none;
+    border-radius: $radius-full;
+    background: $panel-border;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+
+    &-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: $white;
+      transition: left 0.2s ease;
+    }
+
+    &--on {
+      background: $panel-accent;
+
+      .gali-panel__toggle-knob {
+        left: 18px;
+      }
+    }
+  }
+
+  // ── Señales tab ──────────────────────────────────────────
+  &__senales {
+    padding: $size-3 $size-4;
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+}
+
+// ── Chat message bubble ──────────────────────────────────────────
+.gali-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: $size-2;
+
+  &--user {
+    flex-direction: row-reverse;
+
+    .gali-msg__bubble {
+      background: rgba($primary-500, 0.15);
+      border: 1px solid rgba($primary-500, 0.25);
+      border-radius: $radius-lg $radius-lg $radius-xs $radius-lg;
+    }
+  }
+
+  &--gali {
+    .gali-msg__bubble {
+      background: $panel-surface;
+      border: 1px solid $panel-border;
+      border-radius: $radius-xs $radius-lg $radius-lg $radius-lg;
+    }
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba($primary-500, 0.15);
+    color: $panel-accent;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  &__bubble {
+    max-width: 84%;
+    padding: $size-2 $size-3;
+  }
+
+  &__text {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $panel-text;
+    line-height: 1.5;
+    margin: 0 0 3px;
+  }
+
+  &__time {
+    font-size: 10px;
+    color: $panel-caption;
+  }
+}
+
+// ── Agent row ──────────────────────────────────────────
+.agent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $size-3;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  background: $panel-surface;
+  transition: background 0.15s ease;
+
+  &:hover { background: lighten(#1e1e1e, 3%); }
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    min-width: 0;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: pulseDot 2.5s infinite;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__name {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    white-space: nowrap;
+  }
+
+  &__action {
+    font-size: 11px;
+    color: $panel-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+
+  &__status {
+    font-size: 11px;
+    color: $panel-muted;
+    flex-shrink: 0;
+
+    &--active {
+      color: $panel-success;
+    }
+  }
+}
+
+// ── Signal item ──────────────────────────────────────────
+.signal-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3;
+  border-radius: $radius-md;
+  border-left: 3px solid transparent;
+  background: $panel-surface;
+
+  &--critica {
+    border-left-color: $panel-danger;
+    background: rgba(239, 68, 68, 0.06);
+  }
+
+  &--sugerencia {
+    border-left-color: $panel-warning;
+    background: rgba(245, 158, 11, 0.06);
+  }
+
+  &--info {
+    border-left-color: $panel-success;
+    background: rgba(16, 185, 129, 0.06);
+  }
+
+  &__emoji {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__msg {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $panel-text;
+    line-height: 1.4;
+    margin: 0 0 3px;
+  }
+
+  &__time {
+    font-size: 10px;
+    color: $panel-caption;
+  }
+
+  &__cta {
+    flex-shrink: 0;
+    padding: 4px $size-2;
+    border: 1px solid $panel-border;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $panel-accent;
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-medium;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: rgba($primary-500, 0.1);
+      border-color: rgba($primary-500, 0.5);
+    }
+  }
+}

@@ -1,0 +1,212 @@
+<div class="cpm-overlay" (click)="closed.emit()" role="dialog" aria-modal="true" aria-label="Crear proyecto">
+  <div class="cpm" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <header class="cpm__head">
+      <div class="cpm__head-left">
+        <span class="cpm__gali-dot"></span>
+        <div>
+          <h2>Nuevo proyecto</h2>
+          <p>Gali coordina a tus agentes desde el inicio</p>
+        </div>
+      </div>
+      <button class="cpm__close" type="button" (click)="closed.emit()" aria-label="Cerrar">
+        <i class="pi pi-times"></i>
+      </button>
+    </header>
+
+    <!-- Stepper -->
+    <div class="cpm__stepper">
+      @for (i of [1,2,3]; track i) {
+        <div
+          class="cpm__step"
+          [class.cpm__step--done]="step() > i"
+          [class.cpm__step--active]="step() === i">
+          <span class="cpm__step-num">
+            @if (step() > i) { <i class="pi pi-check"></i> } @else { {{ i }} }
+          </span>
+          <span class="cpm__step-label">{{ ['Producto', 'Objetivo', 'Agentes'][i - 1] }}</span>
+        </div>
+        @if (i < 3) { <div class="cpm__step-line" [class.cpm__step-line--done]="step() > i"></div> }
+      }
+    </div>
+
+    <!-- Body -->
+    <div class="cpm__body">
+
+      <!-- Paso 1 — Conversacional -->
+      @if (step() === 1) {
+        <div class="cpm__chat">
+          <div class="cpm__messages">
+            @for (msg of conversation(); track msg.text) {
+              <div class="cpm__msg" [class.cpm__msg--gali]="msg.from === 'gali'" [class.cpm__msg--user]="msg.from === 'user'">
+                @if (msg.from === 'gali') {
+                  <span class="cpm__msg-avatar">✦</span>
+                }
+                <p>{{ msg.text }}</p>
+              </div>
+            }
+            @if (isTyping()) {
+              <div class="cpm__msg cpm__msg--gali">
+                <span class="cpm__msg-avatar">✦</span>
+                <div class="cpm__typing">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="cpm__suggestions" *ngIf="!productoPreseleccionado">
+            <p class="cpm__suggestions-label">O elige de tus sugerencias de ADA Spy:</p>
+            @for (p of suggestedProducts; track p.nombre) {
+              <button class="cpm__suggestion-card" type="button" (click)="selectSuggested(p)" data-proto-skip>
+                <span class="cpm__suggestion-score" [class.cpm__suggestion-score--high]="p.fitScore >= 90">{{ p.fitScore }}</span>
+                <div class="cpm__suggestion-info">
+                  <strong>{{ p.nombre }}</strong>
+                  <span>{{ p.margen }} margen · Saturación {{ p.saturacion }}</span>
+                </div>
+                <i class="pi pi-arrow-right"></i>
+              </button>
+            }
+          </div>
+
+          <footer class="cpm__composer">
+            <input
+              type="text"
+              placeholder="Escribe el producto que quieres lanzar…"
+              [value]="userInput()"
+              (input)="userInput.set($any($event.target).value)"
+              (keydown.enter)="sendMessage()"
+            />
+            <button type="button" class="cpm__send" (click)="sendMessage()" data-proto-skip>
+              <i class="pi pi-send"></i>
+            </button>
+          </footer>
+        </div>
+      }
+
+      <!-- Paso 2 — Objetivo -->
+      @if (step() === 2) {
+        <div class="cpm__form">
+          <div class="cpm__gali-hint">
+            <span class="cpm__gali-hint-icon">✦</span>
+            <p>Basado en productos similares en Dropi LATAM, un objetivo de <strong>50 ventas/semana</strong> con presupuesto de <strong>$80k/día</strong> es alcanzable en 3–4 semanas.</p>
+          </div>
+
+          <div class="cpm__field">
+            <label>Nombre del proyecto</label>
+            <input type="text" [value]="nombreProyecto()" (input)="nombreProyecto.set($any($event.target).value)" placeholder="Ej. Collar GPS para mascotas" />
+          </div>
+
+          <div class="cpm__field">
+            <label>Objetivo de ventas semanales</label>
+            <input type="text" [value]="objetivo()" (input)="objetivo.set($any($event.target).value)" placeholder="Ej. 50 ventas/semana" />
+          </div>
+
+          <div class="cpm__field">
+            <label>Presupuesto diario (COP)</label>
+            <input type="number" [value]="presupuesto()" (input)="presupuesto.set($any($event.target).value)" placeholder="80000" min="0" />
+          </div>
+
+          <div class="cpm__field">
+            <label>Ciudades destino</label>
+            <div class="cpm__cities">
+              @for (city of availableCities; track city) {
+                <button
+                  type="button"
+                  class="cpm__city-chip"
+                  [class.cpm__city-chip--active]="ciudades().includes(city)"
+                  (click)="toggleCity(city)"
+                  data-proto-skip>
+                  {{ city }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Paso 3 — Agentes -->
+      @if (step() === 3) {
+        <div class="cpm__agents">
+          <div class="cpm__gali-hint">
+            <span class="cpm__gali-hint-icon">✦</span>
+            <p>Gali coordinará a tus agentes desde el primer día. Puedes pausar cualquiera después.</p>
+          </div>
+
+          <div class="cpm__agent-toggle">
+            <div class="cpm__agent-toggle-left">
+              <span class="cpm__agent-dot cpm__agent-dot--roax"></span>
+              <div>
+                <strong>Roax · Media Buyer</strong>
+                <p>Configura y optimiza campañas Meta Ads automáticamente</p>
+              </div>
+            </div>
+            <label class="cpm__switch">
+              <input type="checkbox" [checked]="enableRoax()" (change)="enableRoax.set(!enableRoax())" />
+              <span class="cpm__switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="cpm__agent-toggle">
+            <div class="cpm__agent-toggle-left">
+              <span class="cpm__agent-dot cpm__agent-dot--chatea"></span>
+              <div>
+                <strong>Chatea Pro · Cierre</strong>
+                <p>Confirma pedidos por WhatsApp y recupera carritos</p>
+              </div>
+            </div>
+            <label class="cpm__switch">
+              <input type="checkbox" [checked]="enableChateaPro()" (change)="enableChateaPro.set(!enableChateaPro())" />
+              <span class="cpm__switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="cpm__agent-toggle">
+            <div class="cpm__agent-toggle-left">
+              <span class="cpm__agent-dot cpm__agent-dot--vigilante"></span>
+              <div>
+                <strong>Vigilante · Logística</strong>
+                <p>Gestiona novedades y hace smart routing de transportadoras</p>
+              </div>
+            </div>
+            <label class="cpm__switch">
+              <input type="checkbox" [checked]="enableVigilante()" (change)="enableVigilante.set(!enableVigilante())" />
+              <span class="cpm__switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="cpm__summary">
+            <h4>Resumen del proyecto</h4>
+            <dl>
+              <dt>Nombre</dt><dd>{{ nombreProyecto() || '(sin nombre)' }}</dd>
+              <dt>Objetivo</dt><dd>{{ objetivo() }}</dd>
+              <dt>Presupuesto</dt><dd>${{ (+presupuesto() / 1000).toFixed(0) }}k/día</dd>
+              <dt>Ciudades</dt><dd>{{ ciudades().join(', ') }}</dd>
+            </dl>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="cpm__footer">
+      @if (step() > 1) {
+        <button class="cpm__btn-back" type="button" (click)="goStep(step() - 1)" data-proto-skip>
+          <i class="pi pi-arrow-left"></i> Atrás
+        </button>
+      }
+      @if (step() < totalSteps) {
+        <button class="cpm__btn-next" type="button" (click)="nextStep()" data-proto-skip>
+          Siguiente: {{ ['Objetivo', 'Agentes'][step() - 1] }} <i class="pi pi-arrow-right"></i>
+        </button>
+      } @else {
+        <button class="cpm__btn-create" type="button" (click)="crearProyecto()" data-proto-skip>
+          <i class="pi pi-sparkles"></i> Crear proyecto y activar agentes
+        </button>
+      }
+    </footer>
+
+  </div>
+</div>

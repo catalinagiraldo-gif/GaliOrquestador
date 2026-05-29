@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 type ProductBadge = 'Variable' | 'Combo';
 
@@ -30,12 +31,13 @@ interface CatalogProduct {
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DropiGaliBarComponent],
   templateUrl: './catalog-page.component.html',
   styleUrl: './catalog-page.component.scss',
 })
 export class CatalogPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   showAiBanner = signal(true);
   searchQuery = '';

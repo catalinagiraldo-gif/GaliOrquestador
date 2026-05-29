@@ -17,6 +17,7 @@ export type UserRole = 'dropshipper' | 'proveedor' | 'admin';
 const IC = 'assets/icons/sidebar/';
 
 const dropshipperNav: NavItem[] = [
+  { label: 'Gali ✦', icon: IC + 'home.svg', route: '/gali-v5' },
   { label: 'Inicio', icon: IC + 'home.svg', route: '/home' },
   { label: 'Dashboard', icon: IC + 'signal.svg', route: '/dashboard' },
   {

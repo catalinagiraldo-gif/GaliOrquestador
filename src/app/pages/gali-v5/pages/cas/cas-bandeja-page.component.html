@@ -1,4 +1,37 @@
 <div class="cas-bandeja">
+
+  <!-- Chatea Pro — Agent Working Bar (ancho completo sobre las columnas) -->
+  <div class="agent-bar agent-bar--chatea cas-agent-bar">
+    <div class="agent-bar__left">
+      <span class="agent-bar__dot"></span>
+      <div class="agent-bar__identity">
+        <span class="agent-bar__name">Chatea Pro</span>
+        <span class="agent-bar__status">activo</span>
+      </div>
+    </div>
+    <div class="agent-bar__stats">
+      <span class="agent-bar__stat agent-bar__stat--ok"><strong>{{ galiStats.managing }}</strong> gestionando</span>
+      <span class="agent-bar__stat-sep">·</span>
+      <span class="agent-bar__stat agent-bar__stat--warn"><strong>{{ galiStats.human }}</strong> requieren decisión</span>
+      <span class="agent-bar__stat-sep">·</span>
+      <span class="agent-bar__stat agent-bar__stat--neutral"><strong>{{ galiStats.resolved }}</strong> resueltos hoy</span>
+      <span class="agent-bar__stat-sep">·</span>
+      <span class="agent-bar__stat"><strong>{{ galiStats.total }}</strong> tickets totales</span>
+    </div>
+    <button class="agent-bar__cta" type="button" (click)="goToChateaPro()" data-proto-skip>
+      Ver centro operativo →
+    </button>
+  </div>
+
+  <gali-chip
+    agentName="Chatea Pro"
+    message="2 patrones PQR superan umbral esta semana"
+    [count]="2"
+    status="warn"
+    ctaLabel="Ver inteligencia"
+    (ctaClick)="scrollToPqr()"
+  />
+
   <aside class="cas-bandeja__inbox">
     <header class="cas-bandeja__inbox-head">
       <h2>Bandeja</h2>
@@ -10,19 +43,29 @@
       <button type="button" [class.active]="activeFilter() === 'mios'" (click)="activeFilter.set('mios')">Asignados a mí</button>
     </div>
     <div class="cas-bandeja__ticket-list">
-      @for (ticket of tickets; track ticket.id) {
+      @for (ticket of sortedTickets; track ticket.id) {
         <button
           type="button"
           class="ticket-card"
           [class.ticket-card--active]="selectedId() === ticket.id"
+          [class.ticket-card--urgent]="ticket.galiStatus === 'human'"
           (click)="selectedId.set(ticket.id)"
+          data-proto-skip
         >
           <div class="ticket-card__top">
             <strong>{{ ticket.id }}</strong>
             <dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" />
           </div>
           <p class="ticket-card__subject">{{ ticket.subject }}</p>
-          <p class="ticket-card__meta">{{ ticket.client }} · {{ ticket.updated }}</p>
+          <div class="ticket-card__footer">
+            <span class="ticket-card__meta">{{ ticket.client }} · {{ ticket.updated }}</span>
+            <span class="chatea-chip"
+              [class.chatea-chip--managing]="ticket.galiStatus === 'managing'"
+              [class.chatea-chip--human]="ticket.galiStatus === 'human'"
+              [class.chatea-chip--resolved]="ticket.galiStatus === 'resolved'">
+              {{ chipLabel(ticket.galiStatus) }}
+            </span>
+          </div>
         </button>
       }
     </div>
@@ -35,10 +78,15 @@
           <h3>{{ ticket.subject }}</h3>
           <span>{{ ticket.id }} · {{ ticket.order }}</span>
         </div>
-        <dropi-tag [label]="ticket.priority" variant="warning" />
+        <div class="cas-bandeja__chat-head-right">
+          <dropi-tag [label]="ticket.priority" variant="warning" />
+          @if (ticket.galiStatus === 'human') {
+            <span class="cas-bandeja__urgent-badge">⚠ Requiere tu decisión</span>
+          }
+        </div>
       </header>
       <div class="cas-bandeja__messages">
-        @for (msg of messages; track msg.time) {
+        @for (msg of chatMessages(); track msg.time) {
           <div class="chat-msg" [class.chat-msg--agent]="msg.from === 'agent'">
             <p>{{ msg.text }}</p>
             <time>{{ msg.time }}</time>
@@ -46,24 +94,56 @@
         }
       </div>
       <footer class="cas-bandeja__composer">
-        <input type="text" placeholder="Escribe un mensaje…" />
-        <button type="button"><i class="pi pi-send"></i></button>
+        <input
+          type="text"
+          placeholder="Escribe un mensaje…"
+          [value]="newMessage()"
+          (input)="newMessage.set($any($event.target).value)"
+          (keydown.enter)="sendMessage()"
+        />
+        <button type="button" (click)="sendMessage()" data-proto-skip>
+          <i class="pi pi-send"></i>
+        </button>
       </footer>
     }
   </main>
 
-  <aside class="cas-bandeja__info">
-    @if (selectedTicket(); as ticket) {
-      <h4>Información del ticket</h4>
-      <dl>
-        <dt>Cliente</dt><dd>{{ ticket.client }}</dd>
-        <dt>Pedido</dt><dd>{{ ticket.order }}</dd>
-        <dt>Agente</dt><dd>{{ ticket.agent }}</dd>
-        <dt>Estado</dt><dd><dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" /></dd>
-        <dt>Prioridad</dt><dd>{{ ticket.priority }}</dd>
-        <dt>Actualizado</dt><dd>{{ ticket.updated }}</dd>
-      </dl>
-      <p class="cas-bandeja__preview">{{ ticket.preview }}</p>
-    }
+  <aside class="cas-bandeja__pqr" id="pqr-panel">
+    <header class="pqr-panel__head">
+      <h4>Inteligencia PQR · Esta semana</h4>
+      <p>Basado en {{ galiStats.total }} tickets clasificados por Gali</p>
+    </header>
+
+    <div class="pqr-panel__list">
+      @for (patron of pqrPatterns; track patron.id) {
+        <article
+          class="pqr-card"
+          [class]="'pqr-card--' + pqrSeverity(patron.tipo)"
+          [class.pqr-card--rising]="patron.tendencia === 'subiendo'">
+          <div class="pqr-card__top">
+            <span class="pqr-card__producto">{{ patron.producto }}</span>
+            <span class="pqr-card__tipo">{{ patron.tipo }}</span>
+          </div>
+          <div class="pqr-card__stats">
+            <strong>{{ patron.count }}</strong> tickets · {{ patron.pct }}
+            @if (patron.tendencia === 'subiendo') {
+              <span class="pqr-card__trend">↑ subiendo</span>
+            } @else if (patron.tendencia === 'bajando') {
+              <span class="pqr-card__trend pqr-card__trend--down">↓ bajando</span>
+            }
+          </div>
+          <p class="pqr-card__motivo">{{ patron.motivo }}</p>
+          <p class="pqr-card__insight">{{ patron.galiInsight }}</p>
+          <p class="pqr-card__impacto">{{ patron.impacto }}</p>
+          <button
+            type="button"
+            class="pqr-card__cta"
+            (click)="ejecutarAccion(patron)"
+            data-proto-skip>
+            {{ patron.accionSugerida }}
+          </button>
+        </article>
+      }
+    </div>
   </aside>
 </div>

@@ -8,6 +8,7 @@ import {
   DropiTagVariant,
 } from '../../components/shared';
 import campanasData from '../../../../../../mocks/gali-v5/marketing-campanas.json';
+import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface CampanaRow {
   id: string;
@@ -26,6 +27,7 @@ interface CampanaRow {
     DropiButtonNewComponent,
     DropiTagComponent,
     DropiPaginatorComponent,
+    DropiGaliBarComponent,
   ],
   templateUrl: './campanas-page.component.html',
   styleUrl: './campanas-page.component.scss',
@@ -33,6 +35,12 @@ interface CampanaRow {
 export class CampanasPageComponent {
   activeChannel: 'sms' | 'email' = 'sms';
   readonly breadcrumbs = ['Marketing', 'SMS y Correo', 'Campañas masivas'];
+
+  readonly galiStats: GaliBarStat[] = [
+    { value: 2, label: 'campañas escalando', variant: 'ok' },
+    { value: 1, label: 'pausada por CTR bajo', variant: 'warn' },
+    { value: '$66k/día', label: 'pauta total' },
+  ];
   readonly campaigns: CampanaRow[] = campanasData.campaigns;
 
   get filteredRows(): CampanaRow[] {

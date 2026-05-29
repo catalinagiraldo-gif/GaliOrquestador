@@ -145,3 +145,52 @@
     margin-left: $size-2;
   }
 }
+
+// ── Gali badge en header principal ─────────────────────────────────
+.header__gali-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(255, 97, 2, 0.1);
+  border: 1px solid rgba(255, 97, 2, 0.3);
+  color: #ff6102;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+
+  &:hover { background: rgba(255, 97, 2, 0.18); }
+}
+
+.header__gali-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6102;
+  animation: hdrGaliPulse 2s infinite;
+  flex-shrink: 0;
+}
+
+.header__gali-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@keyframes hdrGaliPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

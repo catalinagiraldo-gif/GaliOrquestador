@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <header class="header">
       <div class="header__left">
@@ -16,6 +16,13 @@ import { AuthService } from '../../services/auth.service';
       </div>
 
       <div class="header__right">
+        <!-- Badge Gali siempre visible -->
+        <a routerLink="/gali-v5" class="header__gali-badge" title="Abrir Gali — Modo IA">
+          <span class="header__gali-dot"></span>
+          <span>✦ Gali</span>
+          <span class="header__gali-count">3</span>
+        </a>
+
         <div class="header__wallet">
           <i class="pi pi-wallet"></i>
           <span>{{ walletBalance | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
