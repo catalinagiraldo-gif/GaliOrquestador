@@ -5,7 +5,7 @@
       <button
         type="button"
         class="mode-btn"
-        [class.mode-btn--active]="ws.activeMode() === mode.id"
+        [class.mode-btn--active]="activeMode === mode.id"
         (click)="setMode(mode.id)"
         [title]="mode.description"
         data-proto-skip>
@@ -14,6 +14,14 @@
       </button>
     }
   </nav>
+
+  <!-- Breadcrumb cuando estamos en sub-rutas -->
+  @if (currentSubRoute) {
+    <div class="mode-bar__subroute">
+      <span class="mode-bar__subroute-sep">/</span>
+      <span class="mode-bar__subroute-label">{{ currentSubRoute }}</span>
+    </div>
+  }
 
   <!-- Center: objective progress -->
   <div class="mode-bar__objetivo">

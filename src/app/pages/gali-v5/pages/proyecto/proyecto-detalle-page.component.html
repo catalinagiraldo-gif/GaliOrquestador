@@ -45,9 +45,9 @@
       <span class="proyecto__gali-icon">✦</span>
       <p class="proyecto__gali-msg">{{ proyecto.galiAlerta }}</p>
       <div class="proyecto__gali-actions">
-        <button type="button" class="btn-alert btn-alert--primary">{{ proyecto.galiCta }}</button>
-        <button type="button" class="btn-alert btn-alert--ghost">Ver análisis</button>
-        <button type="button" class="btn-alert btn-alert--ghost">Ignorar</button>
+        <button type="button" class="btn-alert btn-alert--primary" (click)="goToSignals()">Ver señales en Gali</button>
+        <button type="button" class="btn-alert btn-alert--ghost" (click)="goToSkillEditor()">Crear skill automática</button>
+        <button type="button" class="btn-alert btn-alert--ghost" (click)="goToMedir()">Ver P&L</button>
       </div>
     </div>
   </header>
@@ -311,9 +311,4 @@
   (actionExecuted)="showDiagnostic.set(false)">
 </app-diagnostico-modal>
 
-<app-skills-editor-modal
-  *ngIf="showSkillsEditor()"
-  [agenteNombre]="skillsEditorAgente()"
-  (closed)="showSkillsEditor.set(false)"
-  (saved)="showSkillsEditor.set(false)">
-</app-skills-editor-modal>
+<!-- SkillsEditorModal superseded by SkillEditorPage (/gali-v5/skills/nueva) -->

@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 type SkillStatus = 'active' | 'paused' | 'executing';
 
@@ -33,6 +34,8 @@ export interface SkillRule {
   styleUrl: './gali-skill-builder-v2.component.scss',
 })
 export class GaliSkillBuilderV2Component {
+  private router = inject(Router);
+
   @Input() skill!: SkillRule;
   @Input() editMode = false;
   @Output() saved = new EventEmitter<SkillRule>();
@@ -40,9 +43,16 @@ export class GaliSkillBuilderV2Component {
   @Output() toggled = new EventEmitter<{ id: string; newStatus: SkillStatus }>();
 
   readonly isEditing = signal(false);
+  readonly localStatus = signal<SkillStatus | null>(null);
+
+  get currentStatus(): SkillStatus {
+    return this.localStatus() ?? this.skill.status;
+  }
 
   startEdit(): void {
-    this.isEditing.set(true);
+    this.router.navigate(['/gali-v5/skills/nueva'], {
+      queryParams: { id: this.skill.id, agente: this.skill.trigger.agent },
+    });
   }
 
   cancelEdit(): void {
@@ -56,8 +66,19 @@ export class GaliSkillBuilderV2Component {
   }
 
   toggleStatus(): void {
-    const newStatus: SkillStatus = this.skill.status === 'active' ? 'paused' : 'active';
+    const newStatus: SkillStatus = this.currentStatus === 'active' ? 'paused' : 'active';
+    this.localStatus.set(newStatus);
     this.toggled.emit({ id: this.skill.id, newStatus });
+  }
+
+  goToProyectos(): void {
+    this.router.navigate(['/gali-v5/proyectos']);
+  }
+
+  newFromHistory(): void {
+    this.router.navigate(['/gali-v5/skills/nueva'], {
+      queryParams: { agente: this.skill.trigger.agent, basado_en: this.skill.id },
+    });
   }
 
   get agentLabel(): string {

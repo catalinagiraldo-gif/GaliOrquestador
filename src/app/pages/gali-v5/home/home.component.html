@@ -52,7 +52,7 @@
         <section class="os-panel os-panel--agents">
           <div class="os-panel__header">
             <h2 class="os-panel__title">Agentes</h2>
-            <button type="button" class="os-panel__action-btn" data-proto-skip>Config.</button>
+            <button type="button" class="os-panel__action-btn" (click)="goToSkills()">Skills →</button>
           </div>
           <div class="os-panel__scroll">
             @for (agent of agentes; track agent.id) {
@@ -80,40 +80,64 @@
     @case ('lanzar') {
       <div class="os-workspace__lanzar">
 
-        <!-- Conversación -->
+        <!-- Conversación con Gali -->
         <section class="os-panel os-panel--conversation">
           <div class="os-panel__header">
             <h2 class="os-panel__title">✦ Gali — Lanzar proyecto</h2>
+            <span class="os-panel__meta">ADA Spy conectado</span>
           </div>
-          <div class="os-panel__scroll lanzar-chat">
 
-            <div class="lanzar-msg lanzar-msg--gali">
-              <span class="lanzar-msg__avatar">✦</span>
-              <div class="lanzar-msg__bubble">
-                ¿Qué quieres lanzar? Puedo ayudarte a elegir un producto, definir el objetivo o empezar desde una oportunidad que detecté.
+          <!-- Messages -->
+          <div class="os-panel__scroll lanzar-chat" #lanzarScroll>
+            @for (msg of lanzarMessages(); track $index) {
+              <div class="lanzar-msg" [class.lanzar-msg--gali]="msg.from === 'gali'" [class.lanzar-msg--user]="msg.from === 'user'">
+                @if (msg.from === 'gali') {
+                  <span class="lanzar-msg__avatar">✦</span>
+                }
+                <div class="lanzar-msg__bubble">{{ msg.text }}</div>
               </div>
-            </div>
+            }
 
-            <div class="lanzar-suggestions">
-              <button type="button" class="lanzar-suggestion" data-proto-skip>
-                <span>Tengo un producto en mente</span>
-                <span class="lanzar-suggestion__arrow">→</span>
-              </button>
-              <button type="button" class="lanzar-suggestion" data-proto-skip>
-                <span>Muéstrame sugerencias de ADA Spy</span>
-                <span class="lanzar-suggestion__arrow">→</span>
-              </button>
-              <button type="button" class="lanzar-suggestion" data-proto-skip>
-                <span>Empezar desde un objetivo de venta</span>
-                <span class="lanzar-suggestion__arrow">→</span>
-              </button>
-            </div>
+            @if (lanzarTyping()) {
+              <div class="lanzar-msg lanzar-msg--gali">
+                <span class="lanzar-msg__avatar">✦</span>
+                <div class="lanzar-msg__bubble lanzar-typing">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            }
 
+            <!-- Quick suggestions — only show if just 1 message -->
+            @if (lanzarMessages().length === 1 && !lanzarTyping()) {
+              <div class="lanzar-suggestions">
+                <button type="button" class="lanzar-suggestion"
+                  (click)="sendLanzar('Tengo un producto en mente')">
+                  <span>Tengo un producto en mente</span>
+                  <span class="lanzar-suggestion__arrow">→</span>
+                </button>
+                <button type="button" class="lanzar-suggestion"
+                  (click)="sendLanzar('Muéstrame sugerencias de ADA Spy')">
+                  <span>Muéstrame sugerencias de ADA Spy</span>
+                  <span class="lanzar-suggestion__arrow">→</span>
+                </button>
+                <button type="button" class="lanzar-suggestion"
+                  (click)="sendLanzar('Empezar desde un objetivo de venta')">
+                  <span>Empezar desde un objetivo de venta</span>
+                  <span class="lanzar-suggestion__arrow">→</span>
+                </button>
+              </div>
+            }
           </div>
 
           <div class="lanzar-input-row">
-            <input type="text" class="lanzar-input" placeholder="Escríbele a Gali…" />
-            <button type="button" class="lanzar-send" data-proto-skip>Enviar →</button>
+            <input type="text" class="lanzar-input"
+              placeholder="Escríbele a Gali…"
+              [ngModel]="lanzarInput()"
+              (ngModelChange)="lanzarInput.set($event)"
+              (keydown.enter)="sendLanzar()" />
+            <button type="button" class="lanzar-send"
+              [disabled]="!lanzarInput().trim() || lanzarTyping()"
+              (click)="sendLanzar()">Enviar →</button>
           </div>
         </section>
 
@@ -127,7 +151,9 @@
             <p class="lanzar-ctx-label">Top oportunidades esta semana</p>
 
             @for (op of adaOportunidades; track op.nombre) {
-              <div class="ada-opp" [class.ada-opp--top]="op.score >= 80">
+              <div class="ada-opp"
+                [class.ada-opp--top]="op.score >= 80"
+                [class.ada-opp--selected]="selectedOpp() === op.nombre">
                 <div class="ada-opp__header">
                   <span class="ada-opp__score">{{ op.score }}/100</span>
                   <strong class="ada-opp__name">{{ op.nombre }}</strong>
@@ -137,9 +163,14 @@
                   <span>·</span>
                   <span>Ventana: {{ op.ventana }}</span>
                 </div>
-                <button type="button" class="ada-opp__cta" data-proto-skip>
-                  Seleccionar este →
-                </button>
+                @if (selectedOpp() === op.nombre) {
+                  <div class="ada-opp__selected-badge">✓ Seleccionado — Gali está configurando el proyecto</div>
+                } @else {
+                  <button type="button" class="ada-opp__cta"
+                    (click)="selectOportunidad(op.nombre)">
+                    Seleccionar este →
+                  </button>
+                }
               </div>
             }
           </div>
@@ -151,30 +182,269 @@
     <!-- ── MODO MEDIR ─────────────────────────── -->
     @case ('medir') {
       <div class="os-workspace__medir">
+
+        <!-- ── P&L por Proyecto ── -->
         <section class="os-panel os-panel--pl">
           <div class="os-panel__header">
             <h2 class="os-panel__title">📊 P&L por Proyecto</h2>
+            <span class="os-panel__meta">Semana 3 de 4 · Mayo 2026</span>
           </div>
+
+          <!-- KPI summary -->
+          <div class="pl-summary">
+            <div class="pl-kpi">
+              <span class="pl-kpi__label">Ganancia total</span>
+              <strong class="pl-kpi__val pl-kpi__val--ok">$632k</strong>
+              <span class="pl-kpi__delta">+$77k vs sem anterior</span>
+            </div>
+            <div class="pl-kpi">
+              <span class="pl-kpi__label">Revenue bruto</span>
+              <strong class="pl-kpi__val">$2.74M</strong>
+              <span class="pl-kpi__delta">70 pedidos/sem</span>
+            </div>
+            <div class="pl-kpi">
+              <span class="pl-kpi__label">Margen neto</span>
+              <strong class="pl-kpi__val">23%</strong>
+              <span class="pl-kpi__delta">Objetivo: 20%</span>
+            </div>
+            <div class="pl-kpi">
+              <span class="pl-kpi__label">ROAS real</span>
+              <strong class="pl-kpi__val pl-kpi__val--ok">2.6x</strong>
+              <span class="pl-kpi__delta pl-kpi__delta--muted">vs 4.2x declarado Meta</span>
+            </div>
+          </div>
+
+          <!-- ROAS disclaimer -->
+          <div class="pl-roas-alert">
+            <span class="pl-roas-alert__icon">💡</span>
+            <span class="pl-roas-alert__text">
+              <strong>Meta reporta 4.2x ROAS</strong> — Gali calcula el real en <strong>2.6x</strong> después de COGS, flete, novedades y garantías. La diferencia es tu costo oculto.
+            </span>
+          </div>
+
           <div class="os-panel__scroll">
-            @for (proyecto of proyectos; track proyecto.id) {
-              <div class="medir-row">
-                <span class="medir-row__name">{{ proyecto.nombre }}</span>
-                <span class="medir-row__roas">ROAS {{ proyecto.roas }}</span>
-                <span class="medir-row__pedidos">{{ proyecto.pedidos }}</span>
-                <span class="medir-row__ganancia">{{ proyecto.ganancia }}</span>
+            @for (p of proyectosPL; track p.id) {
+              <!-- Project row (collapsed) -->
+              <div class="pl-project" [class.pl-project--expanded]="expandedPLId() === p.id"
+                [class.pl-project--pausado]="p.estado === 'pausado'">
+
+                <div class="pl-project__header" (click)="togglePL(p.id)">
+                  <div class="pl-project__left">
+                    <span class="pl-project__estado" [class]="'pl-project__estado--' + p.estado">
+                      {{ p.estado === 'escala' ? '↑ En escala' : p.estado === 'activo' ? '● Activo' : '○ Pausado' }}
+                    </span>
+                    <strong class="pl-project__nombre">{{ p.nombre }}</strong>
+                  </div>
+                  <div class="pl-project__summary">
+                    <span class="pl-project__roas-tag">
+                      <span class="pl-project__roas-meta">{{ p.roas_meta }} Meta</span>
+                      <span class="pl-project__roas-sep">→</span>
+                      <span class="pl-project__roas-real">{{ p.roas_dropi }} real</span>
+                    </span>
+                    <span class="pl-project__ganancia">{{ p.ganancia_neta }}</span>
+                    <span class="pl-project__margen" [class.pl-project__margen--ok]="p.margen >= 20">
+                      {{ p.margen }}%
+                    </span>
+                    <span class="pl-project__chevron">{{ expandedPLId() === p.id ? '▲' : '▼' }}</span>
+                  </div>
+                </div>
+
+                <!-- Expanded: full breakdown -->
+                @if (expandedPLId() === p.id && p.estado !== 'pausado') {
+                  <div class="pl-breakdown">
+                    <div class="pl-breakdown__waterfall">
+                      <div class="pl-wf-row pl-wf-row--revenue">
+                        <span class="pl-wf-label">Revenue bruto</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" style="width:100%"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.revenue }}</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--cost">
+                        <span class="pl-wf-label">Costo producto</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.cogs_pct"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.cogs }} ({{ p.cogs_pct }}%)</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--cost">
+                        <span class="pl-wf-label">Flete</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.flete_pct"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.flete }} ({{ p.flete_pct }}%)</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--cost">
+                        <span class="pl-wf-label">Pauta (ads)</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.pauta_pct"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.pauta }} ({{ p.pauta_pct }}%)</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--risk">
+                        <span class="pl-wf-label">Novedades</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.novedades_pct"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.novedades }} ({{ p.novedades_pct }}%)</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--risk">
+                        <span class="pl-wf-label">Garantías</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.garantias_pct"></span>
+                        </span>
+                        <span class="pl-wf-val">{{ p.garantias }} ({{ p.garantias_pct }}%)</span>
+                      </div>
+                      <div class="pl-wf-row pl-wf-row--net">
+                        <span class="pl-wf-label">Ganancia neta</span>
+                        <span class="pl-wf-bar">
+                          <span class="pl-wf-fill" [style.width.%]="p.margen"></span>
+                        </span>
+                        <strong class="pl-wf-val pl-wf-val--net">{{ p.ganancia_neta }} ({{ p.margen }}%)</strong>
+                      </div>
+                    </div>
+
+                    <!-- Gali nota -->
+                    <div class="pl-gali-nota">
+                      <span class="pl-gali-nota__icon">✦</span>
+                      <span class="pl-gali-nota__text">{{ p.gali_nota }}</span>
+                    </div>
+
+                    <div class="pl-delta" [class.pl-delta--ok]="p.semana_delta_ok">
+                      {{ p.semana_delta }}
+                    </div>
+                  </div>
+                }
+
+                @if (expandedPLId() === p.id && p.estado === 'pausado') {
+                  <div class="pl-breakdown">
+                    <div class="pl-gali-nota">
+                      <span class="pl-gali-nota__icon">✦</span>
+                      <span class="pl-gali-nota__text">{{ p.gali_nota }}</span>
+                    </div>
+                    <div class="pl-pausado-ctas">
+                      <button type="button" class="pl-cta pl-cta--primary"
+                        (click)="ws.setMode('lanzar')">Reanudar con Gali →</button>
+                      <button type="button" class="pl-cta"
+                        (click)="router.navigate(['/gali-v5/proyectos'])">Ver proyectos</button>
+                    </div>
+                  </div>
+                }
               </div>
             }
           </div>
         </section>
+
+        <!-- ── Campañas + Atribución (Roax) ── -->
         <section class="os-panel os-panel--campanias">
           <div class="os-panel__header">
-            <h2 class="os-panel__title">Campañas + Atribución</h2>
+            <h2 class="os-panel__title">⚡ Campañas · Roax</h2>
+            <a class="os-panel__action-btn" (click)="router.navigate(['/gali-v5/marketing/campanas'])">
+              Ver todas →
+            </a>
           </div>
           <div class="os-panel__scroll">
-            <div class="placeholder-content">
-              <p>Conectando datos de Roax…</p>
-              <p class="placeholder-sub">Atribución real disponible en el modo de campaña activa</p>
+
+            <!-- Roax status -->
+            <div class="roax-status">
+              <span class="roax-status__dot roax-status__dot--on"></span>
+              <span class="roax-status__label">Roax activo · $66k/día pauta total</span>
+              <span class="roax-status__skills">2 skills corriendo</span>
             </div>
+
+            <!-- Campaign cards -->
+            @for (c of campanasMedir; track c.id) {
+              <div class="campana-card" [class.campana-card--pausada]="c.estado === 'pausada'"
+                [class.campana-card--escalando]="c.estado === 'escalando'">
+                <div class="campana-card__header">
+                  <div class="campana-card__title-row">
+                    <span class="campana-card__dot"
+                      [class.campana-card__dot--on]="c.estado === 'activa' || c.estado === 'escalando'"
+                      [class.campana-card__dot--off]="c.estado === 'pausada'">
+                    </span>
+                    <strong class="campana-card__nombre">{{ c.nombre }}</strong>
+                    @if (c.estado === 'escalando') {
+                      <span class="campana-card__badge campana-card__badge--escala">↑ Escalando</span>
+                    }
+                    @if (c.estado === 'pausada') {
+                      <span class="campana-card__badge campana-card__badge--pausa">Pausada</span>
+                    }
+                  </div>
+                  <span class="campana-card__proyecto">{{ c.proyecto }}</span>
+                </div>
+
+                <div class="campana-card__metrics">
+                  <div class="campana-card__metric">
+                    <span class="campana-card__m-label">CTR</span>
+                    <span class="campana-card__m-val"
+                      [class.campana-card__m-val--ok]="c.ctr_trend === 'up'"
+                      [class.campana-card__m-val--warn]="c.ctr_trend === 'down'">
+                      {{ c.ctr }}
+                      @if (c.ctr_trend === 'up') { <span>↑</span> }
+                      @if (c.ctr_trend === 'down') { <span>↓</span> }
+                    </span>
+                  </div>
+                  <div class="campana-card__metric">
+                    <span class="campana-card__m-label">ROAS</span>
+                    <span class="campana-card__m-val">{{ c.roas }}</span>
+                  </div>
+                  <div class="campana-card__metric">
+                    <span class="campana-card__m-label">Pauta</span>
+                    <span class="campana-card__m-val">{{ c.spend_dia }}</span>
+                  </div>
+                  <div class="campana-card__metric">
+                    <span class="campana-card__m-label">Pedidos</span>
+                    <span class="campana-card__m-val">{{ c.conversiones }}/sem</span>
+                  </div>
+                </div>
+
+                @if (c.skill) {
+                  <div class="campana-card__skill" [class.campana-card__skill--active]="c.skill !== 'Sin skill activa'">
+                    <span>{{ c.skill !== 'Sin skill activa' ? '⚙' : '○' }}</span>
+                    <span>{{ c.skill }}</span>
+                    @if (c.skill === 'Sin skill activa') {
+                      <button type="button" class="campana-card__skill-cta"
+                        (click)="router.navigate(['/gali-v5/skills/nueva'], {queryParams: {agente: 'roax', contexto: 'campana'}})">
+                        + Crear skill
+                      </button>
+                    }
+                  </div>
+                }
+
+                @if (c.gali_accion) {
+                  <div class="campana-card__gali-nota">
+                    <span>✦</span>
+                    <span>{{ c.gali_accion }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Atribución -->
+            <div class="atribucion-section">
+              <p class="atribucion-section__title">Atribución de revenue esta semana</p>
+              <div class="atribucion-bars">
+                <div class="attr-row">
+                  <span class="attr-row__label">Directo (Dropi)</span>
+                  <div class="attr-row__bar"><div class="attr-row__fill" style="width:62%"></div></div>
+                  <span class="attr-row__pct">62%</span>
+                </div>
+                <div class="attr-row">
+                  <span class="attr-row__label">Meta Ads</span>
+                  <div class="attr-row__bar"><div class="attr-row__fill attr-row__fill--blue" style="width:28%"></div></div>
+                  <span class="attr-row__pct">28%</span>
+                </div>
+                <div class="attr-row">
+                  <span class="attr-row__label">WhatsApp / CAS</span>
+                  <div class="attr-row__bar"><div class="attr-row__fill attr-row__fill--green" style="width:8%"></div></div>
+                  <span class="attr-row__pct">8%</span>
+                </div>
+              </div>
+              <p class="atribucion-section__nota">
+                Meta atribuye el 89% a sus campañas — Gali recalcula usando pedidos confirmados en Dropi.
+              </p>
+            </div>
+
           </div>
         </section>
       </div>
@@ -186,7 +456,10 @@
         <section class="os-panel os-panel--skills-list">
           <div class="os-panel__header">
             <h2 class="os-panel__title">🔧 Mis Skills</h2>
-              <button type="button" class="os-panel__action-btn" data-proto-skip (click)="openNewSkill()">+ Nueva skill</button>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="os-panel__action-btn" (click)="goToSkills()">Ver todas</button>
+              <button type="button" class="os-panel__action-btn" (click)="openNewSkill()">+ Nueva</button>
+            </div>
           </div>
           <div class="os-panel__scroll">
             <div class="skill-list-item skill-list-item--active">
@@ -200,9 +473,11 @@
               </p>
               <p class="skill-list-item__last">Última ejecución: hace 2h · 7 veces en total</p>
               <div class="skill-list-item__actions">
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Editar</button>
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Pausar</button>
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Ver historial</button>
+                <button type="button" class="skill-list-item__btn"
+                  (click)="router.navigate(['/gali-v5/skills/nueva'], {queryParams:{agente:'roax'}})">Editar</button>
+                <button type="button" class="skill-list-item__btn"
+                  (click)="ws.addLiveEvent({agente:'Roax',agente_id:'roax',mensaje:'Skill Auto-pausa CTR pausada manualmente',tipo:'action'})">Pausar</button>
+                <button type="button" class="skill-list-item__btn" (click)="goToSkills()">Ver historial</button>
               </div>
             </div>
 
@@ -217,9 +492,11 @@
               </p>
               <p class="skill-list-item__last">Última ejecución: hace 4h · 3 veces</p>
               <div class="skill-list-item__actions">
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Editar</button>
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Pausar</button>
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Ver historial</button>
+                <button type="button" class="skill-list-item__btn"
+                  (click)="router.navigate(['/gali-v5/skills/nueva'], {queryParams:{agente:'roax'}})">Editar</button>
+                <button type="button" class="skill-list-item__btn"
+                  (click)="ws.addLiveEvent({agente:'Roax',agente_id:'roax',mensaje:'Skill Escalado ROAS pausada manualmente',tipo:'action'})">Pausar</button>
+                <button type="button" class="skill-list-item__btn" (click)="goToSkills()">Ver historial</button>
               </div>
             </div>
 
@@ -234,19 +511,24 @@
               </p>
               <p class="skill-list-item__last">Última ejecución: hace 3 días</p>
               <div class="skill-list-item__actions">
-                <button type="button" class="skill-list-item__btn skill-list-item__btn--accent" data-proto-skip>Reactivar</button>
-                <button type="button" class="skill-list-item__btn" data-proto-skip>Editar</button>
+                <button type="button" class="skill-list-item__btn skill-list-item__btn--accent"
+                  (click)="ws.addLiveEvent({agente:'Vigilante',agente_id:'vigilante',mensaje:'Smart routing novedad reactivada',tipo:'action'})">Reactivar</button>
+                <button type="button" class="skill-list-item__btn"
+                  (click)="router.navigate(['/gali-v5/skills/nueva'], {queryParams:{agente:'vigilante'}})">Editar</button>
               </div>
             </div>
           </div>
         </section>
 
-        <button type="button" class="os-panel__action-btn" data-proto-skip (click)="openNewSkill()">+ Nueva skill</button>
+        <div style="display:flex;gap:8px;padding:0 12px 4px;">
+          <button type="button" class="os-panel__action-btn" (click)="openNewSkill()">+ Nueva skill</button>
+          <button type="button" class="os-panel__action-btn" (click)="goToSkills()">Ver todas →</button>
+        </div>
 
         <section class="os-panel os-panel--skill-detail">
           <div class="os-panel__header">
             <h2 class="os-panel__title">Historial · Auto-pausa CTR</h2>
-            <span class="os-panel__meta">7 ejecuciones</span>
+            <button type="button" class="os-panel__action-btn" (click)="goToSkills()">Detalle completo →</button>
           </div>
           <div class="os-panel__scroll">
             <div class="run-history">
@@ -261,12 +543,16 @@
             </div>
 
             <div class="panel-divider"></div>
-            <p class="marketplace-heading">Del marketplace</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <p class="marketplace-heading" style="margin:0;">Del marketplace</p>
+              <button type="button" class="os-panel__action-btn" (click)="ws.setMode('comunidad')">Ver todo →</button>
+            </div>
             @for (mkt of marketplaceSkills; track mkt.nombre) {
               <div class="mkt-skill">
                 <strong class="mkt-skill__name">{{ mkt.nombre }}</strong>
                 <span class="mkt-skill__uses">{{ mkt.uses }}</span>
-                <button type="button" class="mkt-skill__cta" data-proto-skip>Activar</button>
+                <button type="button" class="mkt-skill__cta"
+                  (click)="ws.setMode('comunidad')">Ver más →</button>
               </div>
             }
           </div>
@@ -284,13 +570,18 @@
           </div>
           <div class="os-panel__scroll comunidad-grid">
             @for (skill of communitySkills; track skill.id) {
-              <div class="community-skill-card">
+              <div class="community-skill-card" [class.community-skill-card--installed]="isInstalled(skill.id)">
                 <span class="community-skill-card__category">{{ skill.category }}</span>
                 <h4 class="community-skill-card__name">{{ skill.nombre }}</h4>
                 <p class="community-skill-card__desc">{{ skill.descripcion }}</p>
                 <div class="community-skill-card__footer">
                   <span class="community-skill-card__uses">{{ skill.uses }} activaciones</span>
-                  <button type="button" class="community-skill-card__cta" data-proto-skip>Activar</button>
+                  @if (isInstalled(skill.id)) {
+                    <span class="community-skill-card__installed">✓ Instalada</span>
+                  } @else {
+                    <button type="button" class="community-skill-card__cta"
+                      (click)="installSkill(skill.id)">Instalar →</button>
+                  }
                 </div>
               </div>
             }
@@ -302,9 +593,3 @@
   }
 </div>
 
-@if (showNewSkill()) {
-  <gali-new-skill-overlay
-    (closed)="showNewSkill.set(false)"
-    (created)="showNewSkill.set(false)"
-  />
-}

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import { CrearProyectoModalComponent } from '../../components/crear-proyecto-modal/crear-proyecto-modal.component';
+import { DiagnosticoModalComponent } from '../../components/diagnostico-modal/diagnostico-modal.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 type ProyectoEstado = 'en_escala' | 'activo' | 'pausado' | 'borrador';
 type GaliStatusType = 'warn' | 'ok' | 'info' | 'neutral';
@@ -23,13 +25,14 @@ interface Proyecto {
 @Component({
   selector: 'app-proyectos-list-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, DropiGaliBarComponent, CrearProyectoModalComponent],
+  imports: [CommonModule, RouterModule, DropiGaliBarComponent, CrearProyectoModalComponent, DiagnosticoModalComponent],
   templateUrl: './proyectos-list-page.component.html',
   styleUrl: './proyectos-list-page.component.scss',
 })
 export class ProyectosListPageComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private ws = inject(GaliWorkspaceService);
 
   readonly breadcrumbs = ['Gali Hub'];
   activeFilter = signal<'todos' | 'activos' | 'pausados' | 'borradores'>('todos');
@@ -116,11 +119,18 @@ export class ProyectosListPageComponent {
   }
 
   newProject(): void {
-    this.showCrearModal.set(true);
+    this.ws.setMode('lanzar');
+    this.router.navigate(['/gali-v5']);
   }
 
   get activeCount(): number {
     return this.proyectos.filter(p => p.estado === 'activo' || p.estado === 'en_escala').length;
+  }
+
+  readonly showDiagnostico = signal(false);
+
+  openDiagnostico(): void {
+    this.showDiagnostico.set(true);
   }
 
   goToHub(): void {

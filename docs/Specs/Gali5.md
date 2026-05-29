@@ -35,21 +35,24 @@ CAPA 3 — SKILLS RUNTIME (automatizaciones vivas)
 
 ---
 
-## Estética: Dark Command OS
+## Estética: Light Command OS
 
-Gali tiene un shell oscuro que lo distingue visualmente del Dropi tradicional. El contraste señala: "estás en el OS, no en un módulo de producto".
+Gali mantiene identidad visual propia dentro de Dropi con fondos ligeramente diferenciados del blanco puro (#fff) y tipografía Syne/DM Sans. El OS usa `#f4f4f7` (gris muy suave) vs el `#fff` de los módulos de Dropi.
 
 | Token | Valor | Uso |
 |---|---|---|
-| `$os-bg` | `#0e0e10` | Fondo del workspace |
-| `$os-surface` | `#17171a` | Paneles y headers |
-| `$os-surface-2` | `#1e1e23` | Cards dentro de paneles |
-| `$os-surface-3` | `#252529` | Hover / filas seleccionadas |
+| `$os-bg` | `#f4f4f7` | Fondo del workspace (gris suave) |
+| `$os-surface` | `#ffffff` | Paneles y headers |
+| `$os-surface-2` | `#f8f8fb` | Cards dentro de paneles |
+| `$os-surface-3` | `#f0f0f4` | Hover / filas seleccionadas |
+| `$os-text-primary` | `#1a1a22` | Texto principal |
+| `$os-text-secondary` | `#5a5a6e` | Texto secundario |
+| `$os-text-muted` | `#9898a8` | Texto apagado |
 | `$os-accent` | `#ff6102` | Naranja Dropi — brand continuidad |
 | `$os-ok` | `#22c55e` | Estado positivo / activo |
 | `$os-warn` | `#f59e0b` | Alertas / decisiones |
 | `$os-crit` | `#ef4444` | Señales críticas |
-| `$os-font-display` | `'Syne'` | Títulos del OS |
+| `$os-font-display` | `'Syne'` | Títulos del OS (identidad diferenciadora) |
 | `$os-font-body` | `'DM Sans'` | Cuerpo y labels |
 
 Tokens definidos en: `src/styles/_gali-os-tokens.scss`
@@ -153,6 +156,23 @@ TRIGGER → CONDICIÓN → ACCIÓN → NOTIFICACIÓN
 ```
 
 Con barra de estado (activo/pausado/total ejecuciones) y tabla de historial de runs con columnas: fecha, estado, detalle, impacto.
+
+---
+
+### SkillEditorPageComponent (NUEVO)
+**Path**: `src/app/pages/gali-v5/pages/skills/skill-editor-page.component.*`
+**Ruta**: `/gali-v5/skills/nueva`
+
+Editor full-page de skills con 2 columnas:
+- **Izquierda**: Configurador con secciones por bloque (Agente, Trigger, Condición, Acción, Notificación)
+- **Derecha**: Preview en vivo del pipeline + info de configuración + plantillas del marketplace
+
+Triggers soportados:
+- **Por tiempo**: cada 30min a 24h
+- **Por evento**: específico por agente (ej: "Cuando se detecta una novedad", "Al crear un pedido")
+- **Por umbral**: primera vez que una métrica cruza un valor
+
+Múltiples condiciones con lógica AND/OR. Pre-rellena desde query params `?agente=roax&contexto=campana&metrica=CTR` para integración desde señales y campañas.
 
 Interface de skill:
 ```typescript

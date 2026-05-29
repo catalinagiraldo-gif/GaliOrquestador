@@ -1,8 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import ordersData from '../../../../../../mocks/gali-v5/orders.json';
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 interface OrderRow {
   id: string;
@@ -27,8 +29,16 @@ type GaliTriageStatus = 'ok' | 'managing' | 'decision' | 'auto';
   styleUrl: './orders-page.component.scss',
 })
 export class OrdersPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
   searchQuery = '';
   readonly breadcrumbs = ['Pedidos', 'Ordenes'];
+
+  goToSignals(): void {
+    this.ws.setMode('operar');
+    this.router.navigate(['/gali-v5']);
+  }
   readonly orders: OrderRow[] = ordersData.orders;
 
   readonly galiStats: GaliBarStat[] = [

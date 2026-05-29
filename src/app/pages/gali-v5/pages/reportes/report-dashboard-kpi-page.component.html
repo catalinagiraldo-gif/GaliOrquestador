@@ -3,7 +3,10 @@
     agent="Gali"
     status="analizando reportes"
     message="Gap detectado: ganancia real $18.9M vs Meta $27.9M declarado · ROAS real: 2.1x"
-    ctaLabel="Ver diagnóstico"
+    ctaLabel="Ver P&L completo →"
+    secondaryCta="Roax Informes"
+    (ctaClick)="goToMedir()"
+    (secondaryClick)="router.navigate(['/gali-v5/marketing/roax-informes'])"
   />
 
   <dropi-titulos title="Dashboard" [breadcrumbs]="breadcrumbs" />

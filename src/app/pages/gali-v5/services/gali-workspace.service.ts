@@ -27,12 +27,20 @@ export interface LiveEvent {
   tipo: 'ok' | 'warn' | 'action';
 }
 
+export interface GaliToast {
+  message: string;
+  agente: string;
+  tipo: 'ok' | 'warn' | 'action';
+  id: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GaliWorkspaceService implements OnDestroy {
   readonly activeMode = signal<WorkspaceMode>('operar');
   readonly galiPaused = signal(false);
   readonly autopilot = signal(false);
   readonly liveEventsVisible = signal(true);
+  readonly toast = signal<GaliToast | null>(null);
 
   /** Live feed — last N agent events */
   readonly liveEvents = signal<LiveEvent[]>([
@@ -85,12 +93,7 @@ export class GaliWorkspaceService implements OnDestroy {
       if (!this.autopilot() || this.galiPaused()) return;
       const pool = this.eventPool;
       const raw = pool[Math.floor(Math.random() * pool.length)];
-      const event: LiveEvent = {
-        ...raw,
-        id: `e-${Date.now()}`,
-        timestamp: 'ahora mismo',
-      };
-      this.liveEvents.update(events => [event, ...events].slice(0, 8));
+      this.addLiveEvent(raw);
     }, 4000);
   }
 
@@ -129,8 +132,16 @@ export class GaliWorkspaceService implements OnDestroy {
   }
 
   addLiveEvent(event: Omit<LiveEvent, 'id' | 'timestamp'>): void {
-    this.liveEvents.update(events =>
-      [{ ...event, id: `e-${Date.now()}`, timestamp: 'ahora mismo' }, ...events].slice(0, 8),
-    );
+    const full = { ...event, id: `e-${Date.now()}`, timestamp: 'ahora mismo' };
+    this.liveEvents.update(events => [full, ...events].slice(0, 8));
+    // Show toast for action-type events
+    if (event.tipo === 'action' || event.tipo === 'warn') {
+      this.showToast({ message: event.mensaje, agente: event.agente, tipo: event.tipo, id: full.id });
+    }
+  }
+
+  showToast(toast: GaliToast): void {
+    this.toast.set(toast);
+    setTimeout(() => this.toast.set(null), 4000);
   }
 }

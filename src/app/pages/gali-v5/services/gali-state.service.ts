@@ -29,6 +29,7 @@ export interface ChatMessage {
   text: string;
   time: string;
   actions?: ChatAction[];
+  modeChip?: string;  // chip visual "→ Modo X activado"
 }
 
 export interface ChatAction {
@@ -37,10 +38,40 @@ export interface ChatAction {
   isPrimary?: boolean;
 }
 
+export interface GaliPanelContext {
+  id: string;
+  title: string;
+  subtitle?: string;
+  type: 'table' | 'metrics';
+  columns?: { key: string; label: string; mono?: boolean }[];
+  rows?: Record<string, string>[];
+  metrics?: { label: string; value: string; delta?: string; tone?: 'ok' | 'warn' | 'crit' }[];
+}
+
 // Context-aware Gali responses
-const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[] }> = {
+const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; context?: GaliPanelContext }> = {
   'novedad': {
     text: 'Coordinadora tiene 15% de novedad en Bogotá — 3× el umbral. Tengo 12 pedidos en riesgo hoy. Puedo reasignarlos a Servientrega (tasa actual 3.8%) o crear una regla automática para el futuro.',
+    context: {
+      id: 'pedidos-riesgo',
+      title: 'Pedidos en riesgo',
+      subtitle: 'Coordinadora · Bogotá · hoy',
+      type: 'table',
+      columns: [
+        { key: 'id', label: 'Pedido', mono: true },
+        { key: 'cliente', label: 'Cliente' },
+        { key: 'ciudad', label: 'Ciudad' },
+        { key: 'estado', label: 'Estado' },
+      ],
+      rows: [
+        { id: 'P-8841', cliente: 'María L.', ciudad: 'Bogotá', estado: 'En camino' },
+        { id: 'P-8839', cliente: 'Carlos M.', ciudad: 'Bogotá', estado: 'En camino' },
+        { id: 'P-8835', cliente: 'Sandra P.', ciudad: 'Bogotá', estado: 'Entregando' },
+        { id: 'P-8832', cliente: 'Jorge R.', ciudad: 'Bogotá', estado: 'En camino' },
+        { id: 'P-8828', cliente: 'Ana T.', ciudad: 'Bogotá', estado: 'En camino' },
+        { id: 'P-8824', cliente: 'Luis G.', ciudad: 'Bogotá', estado: 'En camino' },
+      ],
+    },
     actions: [
       { label: 'Reasignar ahora', action: 'reasignar-pedidos', isPrimary: true },
       { label: 'Crear skill de routing', action: 'crear-skill-routing' },
@@ -48,13 +79,37 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[] }> 
   },
   'roas': {
     text: 'Roax tiene ROAS 2.9x hoy — por encima del objetivo de 2.5x durante 52h. La skill "Escalado ROAS" se activó hace 4h y subió el presupuesto de $57.5k a $66k/día. ¿Quieres que siga subiendo?',
+    context: {
+      id: 'roas-snapshot',
+      title: 'ROAS · Collar GPS',
+      subtitle: 'Últimas 48h',
+      type: 'metrics',
+      metrics: [
+        { label: 'ROAS actual', value: '2.9x', delta: '+0.3x', tone: 'ok' },
+        { label: 'Presupuesto/día', value: '$66k', delta: '+15%', tone: 'ok' },
+        { label: 'CTR creativo B', value: '1.8%', delta: '+0.6pp', tone: 'ok' },
+        { label: 'Objetivo', value: '2.5x', tone: 'warn' },
+      ],
+    },
     actions: [
       { label: 'Ver skill activa', action: 'ver-skill-roas' },
       { label: 'Ajustar umbral', action: 'editar-skill' },
     ],
   },
   'hoy': {
-    text: '📊 Resumen de hoy:\n• ROAS: 2.9x (↑ desde 2.6x)\n• Pedidos: 47 confirmados, 1 pendiente de tu decisión\n• Señales críticas: 1 (Coordinadora Bogotá)\n• Acciones de Gali: 3 (cambio de video, routing, confirmaciones)\n• Ganancia estimada: $411k',
+    text: 'Resumen de hoy: ROAS 2.9x, 47 pedidos confirmados, 1 pendiente de tu decisión, 1 señal crítica y ganancia estimada $411k.',
+    context: {
+      id: 'resumen-hoy',
+      title: 'Resumen del día',
+      subtitle: '29 mayo 2026',
+      type: 'metrics',
+      metrics: [
+        { label: 'ROAS', value: '2.9x', delta: '↑ desde 2.6x', tone: 'ok' },
+        { label: 'Pedidos', value: '47', delta: '1 pendiente', tone: 'warn' },
+        { label: 'Señales críticas', value: '1', tone: 'crit' },
+        { label: 'Ganancia est.', value: '$411k', tone: 'ok' },
+      ],
+    },
     actions: [
       { label: 'Ver señal crítica', action: 'ir-a-senales', isPrimary: true },
       { label: 'Ver P&L completo', action: 'ir-medir' },
@@ -114,7 +169,7 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[] }> 
   },
 };
 
-function matchResponse(text: string): { text: string; actions?: ChatAction[] } {
+function matchResponse(text: string): { text: string; actions?: ChatAction[]; context?: GaliPanelContext } {
   const lower = text.toLowerCase();
   if (lower.includes('novedad') || lower.includes('coordinadora') || lower.includes('transportadora')) return SMART_RESPONSES['novedad'];
   if (lower.includes('roas') || lower.includes('campaña') || lower.includes('roax') || lower.includes('presupuesto')) return SMART_RESPONSES['roas'];
@@ -176,6 +231,51 @@ export class GaliStateService {
   readonly criticalCount = signal(1);
   readonly isTyping = signal(false);
 
+  /** Ancho del panel derecho — redimensionable estilo editor */
+  readonly panelWidth = signal(parseInt(localStorage.getItem('gali-panel-width') ?? '520', 10));
+  /** Ancho del panel de contexto (tablas/datos) dentro del chat */
+  readonly contextSplitWidth = signal(parseInt(localStorage.getItem('gali-context-split') ?? '55', 10));
+  /** Panel de datos activo (tabla, métricas) */
+  readonly activeContext = signal<GaliPanelContext | null>({
+    id: 'pedidos-riesgo',
+    title: 'Pedidos en riesgo',
+    subtitle: 'Coordinadora · Bogotá · hoy',
+    type: 'table',
+    columns: [
+      { key: 'id', label: 'Pedido', mono: true },
+      { key: 'cliente', label: 'Cliente' },
+      { key: 'ciudad', label: 'Ciudad' },
+      { key: 'estado', label: 'Estado' },
+    ],
+    rows: [
+      { id: 'P-8841', cliente: 'María L.', ciudad: 'Bogotá', estado: 'En camino' },
+      { id: 'P-8839', cliente: 'Carlos M.', ciudad: 'Bogotá', estado: 'En camino' },
+      { id: 'P-8835', cliente: 'Sandra P.', ciudad: 'Bogotá', estado: 'Entregando' },
+      { id: 'P-8832', cliente: 'Jorge R.', ciudad: 'Bogotá', estado: 'En camino' },
+    ],
+  });
+
+  setPanelWidth(w: number): void {
+    const clamped = Math.max(380, Math.min(Math.floor(window.innerWidth * 0.78), w));
+    this.panelWidth.set(clamped);
+    localStorage.setItem('gali-panel-width', String(clamped));
+    document.documentElement.style.setProperty('--gali-panel-width', `${clamped}px`);
+  }
+
+  setContextSplitPercent(pct: number): void {
+    const clamped = Math.max(35, Math.min(70, pct));
+    this.contextSplitWidth.set(clamped);
+    localStorage.setItem('gali-context-split', String(clamped));
+  }
+
+  clearContext(): void {
+    this.activeContext.set(null);
+  }
+
+  constructor() {
+    document.documentElement.style.setProperty('--gali-panel-width', `${this.panelWidth()}px`);
+  }
+
   togglePanel(): void {
     this.galiMode.update(m => (m === 0 ? 1 : 0));
   }
@@ -184,6 +284,16 @@ export class GaliStateService {
     this.galiMode.set(on ? 2 : 1);
     if (on) this.ws.enableAutopilot();
     else this.ws.disableAutopilot();
+  }
+
+  private getModeChip(text: string): string | undefined {
+    const lower = text.toLowerCase();
+    if (lower.includes('señal') || lower.includes('operar')) return '→ Modo Operar activado';
+    if (lower.includes('medir') || lower.includes('ventas') || lower.includes('p&l')) return '→ Modo Medir activado';
+    if (lower.includes('skill') || lower.includes('construir') || lower.includes('automatiza')) return '→ Modo Construir activado';
+    if (lower.includes('lanzar') || lower.includes('producto')) return '→ Modo Lanzar activado';
+    if (lower.includes('autopilot')) return '→ Autopilot activado';
+    return undefined;
   }
 
   sendMessage(text: string): void {
@@ -195,12 +305,16 @@ export class GaliStateService {
     setTimeout(() => {
       this.isTyping.set(false);
       const response = matchResponse(text);
+      if (response.context) {
+        this.activeContext.set(response.context);
+      }
       const galiMsg: ChatMessage = {
         id: `g-${Date.now()}`,
         from: 'gali',
         text: response.text,
         time: 'ahora',
         actions: response.actions,
+        modeChip: this.getModeChip(text),
       };
       this.chatHistory.update(h => [...h, galiMsg]);
     }, delay);

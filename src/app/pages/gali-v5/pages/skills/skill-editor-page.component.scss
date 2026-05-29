@@ -1,7 +1,8 @@
 @import '../../../../../styles/gali-os-tokens';
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -58,7 +59,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  flex: 1;        // fills remaining space after mode-bar
   overflow: hidden;
   font-family: $os-font-body;
   color: $os-text-primary;

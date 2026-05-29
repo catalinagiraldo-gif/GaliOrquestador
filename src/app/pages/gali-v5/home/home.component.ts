@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { GaliWorkspaceService } from '../services/gali-workspace.service';
+import { GaliStateService } from '../services/gali-state.service';
 import { GaliWorkspaceModeBarComponent } from '../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 import {
   GaliSignalCardV2Component,
@@ -12,7 +14,6 @@ import {
   GaliProjectPanelComponent,
   ProjectPanelData,
 } from '../components/gali-project-panel/gali-project-panel.component';
-import { GaliNewSkillOverlayComponent } from '../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 
 type AgentStatus = 'activo' | 'esperando' | 'pausa';
 
@@ -26,25 +27,117 @@ interface AgentLive {
   color: string;
 }
 
+interface ProyectoPL {
+  id: string;
+  nombre: string;
+  estado: 'escala' | 'activo' | 'pausado';
+  pedidos_sem: number;
+  revenue: string;
+  cogs: string;
+  cogs_pct: number;
+  flete: string;
+  flete_pct: number;
+  pauta: string;
+  pauta_pct: number;
+  novedades: string;
+  novedades_pct: number;
+  garantias: string;
+  garantias_pct: number;
+  ganancia_neta: string;
+  margen: number;
+  roas_meta: string;
+  roas_dropi: string;
+  semana_delta: string;
+  semana_delta_ok: boolean;
+  gali_nota: string;
+  trend: 'up' | 'down' | 'stable';
+}
+
+interface CampanaMedir {
+  id: string;
+  nombre: string;
+  proyecto: string;
+  estado: 'activa' | 'escalando' | 'pausada';
+  ctr: string;
+  ctr_trend: 'up' | 'down' | 'stable';
+  roas: string;
+  spend_dia: string;
+  conversiones: number;
+  skill: string;
+  gali_accion?: string;
+}
+
+interface LanzarMsg { from: 'gali' | 'user'; text: string; time: string; }
+
+const LANZAR_RESPONSES: Record<string, string> = {
+  'producto': '¡Perfecto! Dame el nombre del producto y en segundos te digo: margen estimado, nivel de competencia y si hay ventana de oportunidad esta semana.',
+  'sugerencias': 'A la derecha tienes las 4 mejores oportunidades de ADA Spy. El Difusor de aromaterapia lidera con score 87/100 y margen del 68% — ventana de 10–14 días. ¿Lo lanzamos?',
+  'objetivo': 'Cuéntame tu objetivo en pedidos por semana. Con ese número configuro automáticamente el presupuesto inicial de Roax y los umbrales de las skills de escalado.',
+  'difusor': 'Difusor de aromaterapia: precio mercado $180k–$220k, COGS estimado ~$65k (Alibaba), margen bruto ~65%. Roax necesita ~$25k/día de pauta para 15 pedidos/sem. ROAS objetivo: 2.5x. ¿Arrancamos?',
+  'default': 'Entendido. Para lanzar este producto necesito: 1) Precio de venta, 2) Costo del producto, 3) Objetivo de pedidos/sem. Puedo estimarlo yo si me das el nombre del producto.',
+};
+
+function matchLanzar(text: string): string {
+  const l = text.toLowerCase();
+  if (l.includes('difusor') || l.includes('aromaterapia')) return LANZAR_RESPONSES['difusor'];
+  if (l.includes('sugerencia') || l.includes('ada') || l.includes('muéstrame')) return LANZAR_RESPONSES['sugerencias'];
+  if (l.includes('objetivo') || l.includes('pedidos') || l.includes('venta')) return LANZAR_RESPONSES['objetivo'];
+  if (l.includes('producto') || l.includes('tengo') || l.includes('mente')) return LANZAR_RESPONSES['producto'];
+  return LANZAR_RESPONSES['default'];
+}
+
 @Component({
   selector: 'app-dropi-home',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     GaliWorkspaceModeBarComponent,
     GaliSignalCardV2Component,
     GaliProjectPanelComponent,
-    GaliNewSkillOverlayComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class DropiHomeComponent {
+export class DropiHomeComponent implements AfterViewChecked {
   readonly ws = inject(GaliWorkspaceService);
-  private router = inject(Router);
+  readonly router = inject(Router);
+  readonly gali = inject(GaliStateService);
   private auth = inject(AuthService);
 
+  @ViewChild('lanzarScroll') lanzarScrollEl?: ElementRef<HTMLElement>;
+  private shouldScrollLanzar = false;
+
   userName = signal('Alejandra');
+
+  // Lanzar mode chat
+  readonly lanzarMessages = signal<LanzarMsg[]>([
+    { from: 'gali', text: '¿Qué quieres lanzar? Puedo ayudarte a elegir un producto, definir el objetivo o empezar desde una oportunidad que detecté.', time: 'ahora' },
+  ]);
+  readonly lanzarInput = signal('');
+  readonly lanzarTyping = signal(false);
+
+  sendLanzar(text?: string): void {
+    const msg = (text ?? this.lanzarInput()).trim();
+    if (!msg) return;
+    this.lanzarMessages.update(m => [...m, { from: 'user', text: msg, time: 'ahora' }]);
+    this.lanzarInput.set('');
+    this.lanzarTyping.set(true);
+    this.shouldScrollLanzar = true;
+    setTimeout(() => {
+      this.lanzarTyping.set(false);
+      this.lanzarMessages.update(m => [...m, { from: 'gali', text: matchLanzar(msg), time: 'ahora' }]);
+      this.shouldScrollLanzar = true;
+    }, 900 + Math.random() * 400);
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollLanzar && this.lanzarScrollEl) {
+      const el = this.lanzarScrollEl.nativeElement;
+      el.scrollTop = el.scrollHeight;
+      this.shouldScrollLanzar = false;
+    }
+  }
 
   readonly signals: GaliSignalData[] = [
     {
@@ -218,6 +311,112 @@ export class DropiHomeComponent {
     },
   ];
 
+  readonly expandedPLId = signal<string | null>('collar-gps');
+
+  readonly proyectosPL: ProyectoPL[] = [
+    {
+      id: 'collar-gps',
+      nombre: 'Collar GPS para mascotas',
+      estado: 'escala',
+      pedidos_sem: 47,
+      revenue: '$1.82M',
+      cogs: '-$728k',  cogs_pct: 40,
+      flete: '-$146k', flete_pct: 8,
+      pauta: '-$462k', pauta_pct: 25,
+      novedades: '-$55k', novedades_pct: 3,
+      garantias: '-$18k', garantias_pct: 1,
+      ganancia_neta: '$411k',
+      margen: 22,
+      roas_meta: '5.0x',
+      roas_dropi: '2.9x',
+      semana_delta: '+$89k vs sem anterior',
+      semana_delta_ok: true,
+      gali_nota: 'ROAS real 2.9x estable. Skill de escalado subió pauta +15% hace 4h. Margen por encima del objetivo (20%).',
+      trend: 'up',
+    },
+    {
+      id: 'skincare-kbeauty',
+      nombre: 'Skincare K-Beauty',
+      estado: 'activo',
+      pedidos_sem: 23,
+      revenue: '$920k',
+      cogs: '-$368k',  cogs_pct: 40,
+      flete: '-$74k',  flete_pct: 8,
+      pauta: '-$230k', pauta_pct: 25,
+      novedades: '-$18k', novedades_pct: 2,
+      garantias: '-$9k',  garantias_pct: 1,
+      ganancia_neta: '$221k',
+      margen: 24,
+      roas_meta: '3.8x',
+      roas_dropi: '2.1x',
+      semana_delta: '-$12k vs sem anterior',
+      semana_delta_ok: false,
+      gali_nota: 'Tendencia levemente negativa — CTR bajó a 1.1%. Roax evaluando cambio de creativo. Margen aún por encima del umbral.',
+      trend: 'down',
+    },
+    {
+      id: 'fitness-bands',
+      nombre: 'Bandas de Fitness',
+      estado: 'pausado',
+      pedidos_sem: 0,
+      revenue: '$0',
+      cogs: '-',    cogs_pct: 0,
+      flete: '-',   flete_pct: 0,
+      pauta: '-',   pauta_pct: 0,
+      novedades: '-', novedades_pct: 0,
+      garantias: '-', garantias_pct: 0,
+      ganancia_neta: '$0',
+      margen: 0,
+      roas_meta: '—',
+      roas_dropi: '—',
+      semana_delta: 'Pausado — CTR recuperado',
+      semana_delta_ok: true,
+      gali_nota: 'Pausado hace 5 días. CTR se recuperó a 1.4%. Roax sugiere reanudar con presupuesto reducido ($20k/día).',
+      trend: 'stable',
+    },
+  ];
+
+  readonly campanasMedir: CampanaMedir[] = [
+    {
+      id: 'c1',
+      nombre: 'Collar GPS — Video B (UGC)',
+      proyecto: 'Collar GPS',
+      estado: 'escalando',
+      ctr: '1.8%',
+      ctr_trend: 'up',
+      roas: '3.1x',
+      spend_dia: '$66k/día',
+      conversiones: 31,
+      skill: 'Escalado ROAS automático',
+      gali_accion: 'Roax subió presupuesto +15% hace 4h · ROAS ≥ 2.8x por 52h',
+    },
+    {
+      id: 'c2',
+      nombre: 'Collar GPS — Video A (Demo)',
+      proyecto: 'Collar GPS',
+      estado: 'pausada',
+      ctr: '0.7%',
+      ctr_trend: 'down',
+      roas: '1.2x',
+      spend_dia: '$0',
+      conversiones: 0,
+      skill: 'Auto-pausa CTR',
+      gali_accion: 'Pausada por Auto-pausa CTR — CTR cayó a 0.7% por 48h',
+    },
+    {
+      id: 'c3',
+      nombre: 'Skincare K-Beauty — Carrusel',
+      proyecto: 'Skincare K-Beauty',
+      estado: 'activa',
+      ctr: '1.1%',
+      ctr_trend: 'down',
+      roas: '2.1x',
+      spend_dia: '$32k/día',
+      conversiones: 23,
+      skill: 'Sin skill activa',
+    },
+  ];
+
   readonly adaOportunidades = [
     { nombre: 'Difusor aromaterapia', score: 87, margen: '68%', ventana: '10–14 días' },
     { nombre: 'Collar GPS v2', score: 82, margen: '42%', ventana: '14–21 días' },
@@ -258,11 +457,39 @@ export class DropiHomeComponent {
   readonly showNewSkill = signal(false);
 
   openNewSkill(): void {
-    this.showNewSkill.set(true);
+    this.router.navigate(['/gali-v5/skills/nueva']);
+  }
+
+  goToSkills(): void {
+    this.router.navigate(['/gali-v5/skills']);
   }
 
   goToMode(mode: 'lanzar' | 'construir' | 'medir'): void {
     this.ws.setMode(mode);
+  }
+
+  togglePL(id: string): void {
+    this.expandedPLId.update(cur => (cur === id ? null : id));
+  }
+
+  readonly installedSkills = signal<string[]>([]);
+
+  installSkill(id: string): void {
+    this.installedSkills.update(s => s.includes(id) ? s : [...s, id]);
+    // After 600ms navigate to skills page to show it installed
+    setTimeout(() => this.router.navigate(['/gali-v5/skills']), 800);
+  }
+
+  isInstalled(id: string): boolean {
+    return this.installedSkills().includes(id);
+  }
+
+  readonly selectedOpp = signal<string | null>(null);
+  readonly lanzarStep = signal<'seleccionar' | 'configurando' | 'listo'>('seleccionar');
+
+  selectOportunidad(nombre: string): void {
+    this.selectedOpp.set(nombre);
+    this.lanzarStep.set('configurando');
   }
 
   constructor() {

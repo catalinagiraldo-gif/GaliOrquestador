@@ -1,7 +1,7 @@
 # Gali v5 — Status del Prototipo
 
-**Última actualización**: Mayo 29, 2026  
-**Arquitectura actual**: OS Architecture v2.0 (reescritura completa)
+**Última actualización**: Mayo 29, 2026 (v2.5 — Plan completo ejecutado: chips de modo, skill builder editable, toasts cross-módulo, marketplace tabs, status pill→Live)
+**Arquitectura actual**: OS Architecture v2.1
 
 ---
 
@@ -9,16 +9,21 @@
 
 | Capa | Estado | Descripción |
 |---|---|---|
-| Workspace OS | ✅ Implementado | Shell oscuro + 5 modos + barra de modos |
-| Señales con intervención | ✅ Implementado | GaliSignalCardV2 con lifecycle completo |
+| Workspace OS | ✅ Implementado | Shell light + 5 modos + barra de modos |
+| Señales con intervención | ✅ Implementado | GaliSignalCardV2 con lifecycle + link a SkillEditor |
 | Proyectos como lente | ✅ Implementado | GaliProjectPanelComponent con acciones inline |
 | Intervention Overlay | ✅ Implementado | Decisión contextual A/B/C + ejecución simulada |
 | Skills Runtime | ✅ Implementado | GaliSkillBuilderV2 con pipeline + historial |
-| Modo Lanzar | ✅ Implementado | Split panel conversación + ADA Spy context |
-| Modo Medir | ✅ Implementado | P&L básico por proyecto (layout) |
+| Skill Editor Full-Page | ✅ Implementado | SkillEditorPageComponent en `/gali-v5/skills/nueva` |
+| Modo Lanzar | ✅ Implementado | Chat interactivo conectado, sugerencias funcionales, typing indicator, ADA Spy con selección |
+| Modo Medir | ✅ Implementado | P&L real con waterfall, ROAS real vs Meta, campañas Roax, atribución |
 | Modo Comunidad | ✅ Implementado | Marketplace grid de skills |
-| Skills Page | ✅ Implementado | Página dedicada con GaliSkillBuilderV2 |
-| Dark OS Theme | ✅ Implementado | _gali-os-tokens.scss + fuentes Syne/DM Sans |
+| Skills Page | ✅ Implementado | Página dedicada + link a editor |
+| Light OS Theme | ✅ Implementado | _gali-os-tokens.scss convertido a light mode |
+| Live Mode / Autopilot | ✅ Implementado | Toggle bidireccional + badge "EN VIVO" + eventos enriquecidos |
+| Chat → Workspace | ✅ Implementado | 9 comandos que cambian modo del workspace |
+| Campañas → Skill | ✅ Implementado | CTA navega a SkillEditor con agente=roax preconfigurado |
+| Responsive Fix | ✅ Implementado | Section nav collapse sin romper layout; mobile panel fix |
 
 ---
 
@@ -26,13 +31,15 @@
 
 | Componente | Path | Estado |
 |---|---|---|
-| `GaliWorkspaceService` | `services/gali-workspace.service.ts` | ✅ |
-| `GaliWorkspaceModeBarComponent` | `components/gali-workspace-mode-bar/` | ✅ |
-| `GaliSignalCardV2Component` | `components/gali-signal-card-v2/` | ✅ |
+| `GaliWorkspaceService` | `services/gali-workspace.service.ts` | ✅ Toggle autopilot real + 13 eventos en pool |
+| `GaliStateService` | `services/gali-state.service.ts` | ✅ 9 respuestas workspace-aware + acción autopilot |
+| `GaliWorkspaceModeBarComponent` | `components/gali-workspace-mode-bar/` | ✅ Badge "EN VIVO" pulsante |
+| `GaliSignalCardV2Component` | `components/gali-signal-card-v2/` | ✅ Followup CTA navega a SkillEditor |
 | `GaliProjectPanelComponent` | `components/gali-project-panel/` | ✅ |
 | `GaliInterventionOverlayComponent` | `components/gali-intervention-overlay/` | ✅ |
 | `GaliSkillBuilderV2Component` | `components/gali-skill-builder-v2/` | ✅ |
-| `_gali-os-tokens.scss` | `src/styles/` | ✅ |
+| `SkillEditorPageComponent` | `pages/skills/skill-editor-page.component.*` | ✅ NUEVO |
+| `_gali-os-tokens.scss` | `src/styles/` | ✅ Light mode |
 
 ---
 
@@ -62,7 +69,8 @@
 | Ruta | Componente | Estado |
 |---|---|---|
 | `/gali-v5` | `DropiHomeComponent` (OS Workspace) | ✅ Workspace Hub |
-| `/gali-v5/skills` | `SkillsPageComponent` (OS Dark Theme) | ✅ Modo Construir |
+| `/gali-v5/skills` | `SkillsPageComponent` | ✅ Modo Construir |
+| `/gali-v5/skills/nueva` | `SkillEditorPageComponent` | ✅ Editor full-page con preview en vivo |
 | `/gali-v5/proyectos` | `ProyectosListPageComponent` | ✅ Lista de proyectos |
 | `/gali-v5/proyecto/:id` | `ProyectoDetallePageComponent` | ✅ Detalle |
 
@@ -111,13 +119,40 @@ Shell (gali-v5-shell)
 
 ---
 
-## Próximos Pasos Sugeridos
+## Flujos Adyacentes Implementados (v2.4)
+
+| Módulo | Gali Integration | Acción |
+|---|---|---|
+| Catálogo | ADA Spy GaliBar | "Lanzar con Gali →" → Modo Lanzar |
+| Pedidos | Chatea Pro GaliBar | "Ver señales →" → Modo Operar |
+| Novedades | Banner Gali clasificación | "Ver señales en Gali →" → Modo Operar |
+| Proveedores | ADA Spy GaliBar | "Lanzar producto →" → Modo Lanzar |
+| Automatización | Banner conexión skills | "Crear skill Gali" por fila → SkillEditor |
+| Proyectos lista | GaliBar + "Nuevo" | → Modo Lanzar |
+| Proyecto detalle | Alert bar conectado | → Señales / SkillEditor / Medir |
+| Roax Lanzador | Stepper + éxito | → Modo Medir al completar |
+| Roax Informes | Waterfall + Skills | "→ SkillEditor" / "→ Medir" |
+| Campañas | Skill banner | "Crear skill Roax →" → SkillEditor |
+
+## Completado en v2.5 (plan final)
+
+| Item del plan | Estado |
+|---|---|
+| Chat mode-switch chips ("→ Modo Operar activado") | ✅ |
+| GaliSkillBuilderV2 "Editar" → navega al SkillEditor | ✅ |
+| Footer skill builder: "Ver en Proyectos" + "Nueva desde historial" | ✅ |
+| Toasts cross-módulo cuando Gali ejecuta acciones | ✅ |
+| Status pill → abre right panel | ✅ |
+| Marketplace tabs en Skills: Populares / Por agente / Nuevas | ✅ |
+| Skills + Hub como módulo unificado (mode-bar en sub-rutas) | ✅ |
+| Skill toggle status con estado local reactivo | ✅ |
+
+## Próximos Pasos Sugeridos (post-plan)
 
 1. **Conexión con backend real**: Los skills deben conectarse al interceptor mock para simular ejecuciones persistentes entre navegaciones
-2. **Modo Medir completo**: P&L real calculado desde datos de pedidos + campañas
-3. **Skill editor inline**: Formulario de edición dentro del GaliSkillBuilderV2 (actualmente solo vista)
-4. **Notificaciones push**: Cuando un skill ejecuta mientras el usuario está en otro módulo, mostrar toast desde GaliWorkspaceService
-5. **Proyectos desde Figma**: El diseño del detalle de proyecto necesita actualización para el nuevo OS
+2. **Onboarding de objetivo**: "¿Cuál es tu meta de 30 días?" para configurar el objetivo en el mode-bar
+3. **Agentes configuración**: Página para activar/desactivar skills por agente
+4. **Proyectos desde Figma**: El diseño del detalle de proyecto necesita actualización para el nuevo OS
 
 ---
 

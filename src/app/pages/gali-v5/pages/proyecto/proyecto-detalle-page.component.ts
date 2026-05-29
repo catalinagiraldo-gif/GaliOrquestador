@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DiagnosticoModalComponent } from '../../components/diagnostico-modal/diagnostico-modal.component';
 import { SkillsEditorModalComponent } from '../../components/skills-editor-modal/skills-editor-modal.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 export type TabId = 'resumen' | 'producto' | 'estrategia' | 'creativos' | 'campanas' | 'pedidos' | 'pl';
 export type AgentStatus = 'activo' | 'esperando' | 'pausa';
@@ -67,10 +68,29 @@ interface PlLine {
   styleUrl: './proyecto-detalle-page.component.scss',
 })
 export class ProyectoDetallePageComponent implements OnInit {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
   activeTab = signal<TabId>('resumen');
   showDiagnostic = signal(false);
   showSkillsEditor = signal(false);
   skillsEditorAgente = signal('Roax');
+
+  goToSignals(): void {
+    this.ws.setMode('operar');
+    this.router.navigate(['/gali-v5']);
+  }
+
+  goToSkillEditor(agente = 'vigilante'): void {
+    this.router.navigate(['/gali-v5/skills/nueva'], {
+      queryParams: { agente, contexto: 'proyecto' },
+    });
+  }
+
+  goToMedir(): void {
+    this.ws.setMode('medir');
+    this.router.navigate(['/gali-v5']);
+  }
 
   readonly tabs: { id: TabId; label: string }[] = [
     { id: 'resumen',    label: 'Resumen' },
@@ -214,8 +234,13 @@ export class ProyectoDetallePageComponent implements OnInit {
   readonly siguienteAccion = 'Expandir a Medellín — hay demanda sin competencia activa. Estimo +$200k/día con el mismo creative.';
 
   openSkillsEditor(agente: string): void {
-    this.skillsEditorAgente.set(agente);
-    this.showSkillsEditor.set(true);
+    // Navigate to the full skill editor with agent context
+    const agentMap: Record<string, string> = {
+      'Roax': 'roax', 'ADA Spy': 'ada', 'Vigilante': 'vigilante', 'Chatea Pro': 'chatea',
+    };
+    this.router.navigate(['/gali-v5/skills/nueva'], {
+      queryParams: { agente: agentMap[agente] ?? 'roax', contexto: 'proyecto' },
+    });
   }
 
   ngOnInit(): void {}

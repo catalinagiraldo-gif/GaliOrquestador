@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { DropiTitulosComponent } from '../../components/shared';
 import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
@@ -12,7 +13,14 @@ import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gal
   styleUrl: './report-dashboard-kpi-page.component.scss',
 })
 export class ReportDashboardKpiPageComponent {
+  readonly router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
   readonly breadcrumbs = ['Reportes', 'Dashboard'];
+
+  goToMedir(): void {
+    this.ws.setMode('medir');
+    this.router.navigate(['/gali-v5']);
+  }
 
   readonly profile = {
     name: 'María Carolina Hernández Rodríguez',

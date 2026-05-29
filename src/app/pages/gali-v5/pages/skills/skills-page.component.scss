@@ -1,7 +1,8 @@
 @import '../../../../../styles/gali-os-tokens';
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -12,7 +13,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  flex: 1;
   overflow: hidden;
   background: $os-bg;
   color: $os-text-primary;
@@ -130,6 +131,26 @@
     }
   }
 
+  &__mkt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $os-2 $os-2 $os-2;
+  }
+
+  &__mkt-ver-todo {
+    font-family: $os-font-body;
+    font-size: 10px;
+    font-weight: 600;
+    color: $os-accent-text;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity $os-transition;
+    &:hover { opacity: 0.7; }
+  }
+
   &__mkt-section {
     margin-top: $os-4;
     display: flex;
@@ -214,6 +235,39 @@
     font-size: 10px;
     color: $os-text-muted;
   }
+}
+
+// Marketplace tabs
+.skills-mkt-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: $os-2;
+  background: $os-surface-2;
+  border-radius: $os-radius-sm;
+  padding: 3px;
+}
+
+.skills-mkt-tab {
+  flex: 1;
+  font-family: $os-font-body;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: $os-text-muted;
+  cursor: pointer;
+  transition: all $os-transition;
+  white-space: nowrap;
+
+  &--active {
+    background: $os-surface;
+    color: $os-text-primary;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  &:hover:not(&--active) { color: $os-text-secondary; }
 }
 
 .mkt-preview {

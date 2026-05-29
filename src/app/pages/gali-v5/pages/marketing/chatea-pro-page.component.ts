@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DropiTitulosComponent } from '../../components/shared';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 type EstadoConv = 'anticipo_pendiente' | 'confirmado' | 'carrito' | 'novedad';
 
@@ -24,12 +26,18 @@ interface ChatMsg {
 @Component({
   selector: 'app-chatea-pro-page',
   standalone: true,
-  imports: [CommonModule, DropiTitulosComponent],
+  imports: [CommonModule, DropiTitulosComponent, DropiGaliBarComponent],
   templateUrl: './chatea-pro-page.component.html',
   styleUrl: './chatea-pro-page.component.scss',
 })
 export class ChateaProPageComponent {
   private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
+  goToSignals(): void {
+    this.ws.setMode('operar');
+    this.router.navigate(['/gali-v5']);
+  }
 
   readonly breadcrumbs = ['Marketing', 'Chatea Pro'];
 

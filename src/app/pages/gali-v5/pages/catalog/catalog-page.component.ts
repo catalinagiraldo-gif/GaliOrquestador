@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 type ProductBadge = 'Variable' | 'Combo';
 
@@ -38,6 +39,12 @@ interface CatalogProduct {
 export class CatalogPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
+  goToLanzar(): void {
+    this.ws.setMode('lanzar');
+    this.router.navigate(['/gali-v5']);
+  }
 
   showAiBanner = signal(true);
   searchQuery = '';

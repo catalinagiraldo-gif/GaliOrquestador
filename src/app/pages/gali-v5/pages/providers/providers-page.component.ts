@@ -1,7 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 interface ProviderCard {
   name: string;
@@ -16,15 +18,23 @@ interface ProviderCard {
 @Component({
   selector: 'app-providers-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DropiGaliBarComponent],
   templateUrl: './providers-page.component.html',
   styleUrl: './providers-page.component.scss',
 })
 export class ProvidersPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
   showFavorites = signal(false);
   searchQuery = '';
   city = '';
   category = 'Todas';
+
+  goToLanzar(): void {
+    this.ws.setMode('lanzar');
+    this.router.navigate(['/gali-v5']);
+  }
 
   readonly breadcrumbs = ['Productos', 'Catálogo', 'Proveedores'];
 

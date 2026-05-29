@@ -8,8 +8,8 @@
       <strong>Gali clasificó {{ rows.length }} novedades</strong>
       <span>{{ galiSummary.recuperables }} recuperables · {{ galiSummary.irreversibles }} irreversibles · puede resolver {{ galiSummary.puedeResolver }} sin tu intervención</span>
     </div>
-    <button type="button" class="gali-nov-banner__cta">
-      Resolver todas las recuperables →
+    <button type="button" class="gali-nov-banner__cta" (click)="goToOperar()">
+      Ver señales en Gali →
     </button>
   </div>
 

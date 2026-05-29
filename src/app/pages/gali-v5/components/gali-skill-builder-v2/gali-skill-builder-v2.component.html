@@ -11,9 +11,9 @@
       <h3 class="skill-builder__name">{{ skill.nombre }}</h3>
     </div>
     <div class="skill-builder__header-actions">
-      <button type="button" class="skill-builder__btn" data-proto-skip (click)="startEdit()">Editar</button>
-      <button type="button" class="skill-builder__btn" data-proto-skip (click)="toggleStatus()">
-        {{ skill.status === 'active' ? 'Pausar skill' : 'Reactivar' }}
+      <button type="button" class="skill-builder__btn" (click)="startEdit()">Editar pipeline →</button>
+      <button type="button" class="skill-builder__btn" (click)="toggleStatus()">
+        {{ currentStatus === 'active' ? 'Pausar skill' : 'Reactivar' }}
       </button>
     </div>
   </div>
@@ -69,10 +69,10 @@
   <div class="skill-statusbar">
     <span class="skill-statusbar__item">
       <span class="skill-statusbar__dot"
-        [class.skill-statusbar__dot--on]="skill.status === 'active'"
-        [class.skill-statusbar__dot--off]="skill.status === 'paused'">
+        [class.skill-statusbar__dot--on]="currentStatus === 'active'"
+        [class.skill-statusbar__dot--off]="currentStatus === 'paused'">
       </span>
-      {{ skill.status === 'active' ? 'Activo' : (skill.status === 'paused' ? 'Pausado' : 'Ejecutando…') }}
+      {{ currentStatus === 'active' ? 'Activo' : (currentStatus === 'paused' ? 'Pausado' : 'Ejecutando…') }}
     </span>
     <span class="skill-statusbar__sep">|</span>
     <span class="skill-statusbar__item">Última vez: {{ skill.ultima_ejecucion }}</span>
@@ -109,10 +109,10 @@
 
   <!-- ── FOOTER ACTIONS ─────────────────────────────────────────────── -->
   <div class="skill-builder__footer">
-    <button type="button" class="skill-builder__btn skill-builder__btn--ghost" data-proto-skip>
-      Ver en Proyectos
+    <button type="button" class="skill-builder__btn skill-builder__btn--ghost" (click)="goToProyectos()">
+      Ver en Proyectos →
     </button>
-    <button type="button" class="skill-builder__btn skill-builder__btn--accent" data-proto-skip>
+    <button type="button" class="skill-builder__btn skill-builder__btn--accent" (click)="newFromHistory()">
       + Nueva skill desde este historial
     </button>
   </div>

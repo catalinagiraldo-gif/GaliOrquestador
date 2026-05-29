@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GaliStateService } from '../../services/gali-state.service';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import { DropiPanelSplitterComponent } from '../dropi-panel-splitter/dropi-panel-splitter.component';
 
 type PanelTab = 'chat' | 'agentes' | 'senales' | 'live';
 
 @Component({
   selector: 'gali-right-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DropiPanelSplitterComponent],
   templateUrl: './gali-right-panel.component.html',
   styleUrl: './gali-right-panel.component.scss',
 })
@@ -19,6 +20,7 @@ export class GaliRightPanelComponent implements AfterViewChecked {
 
   readonly gali = inject(GaliStateService);
   readonly ws = inject(GaliWorkspaceService);
+  readonly Math = Math;
   private router = inject(Router);
 
   activeTab = signal<PanelTab>('chat');
@@ -79,6 +81,29 @@ export class GaliRightPanelComponent implements AfterViewChecked {
     if (!text) return;
     this.chatInput.set('');
     this.gali.sendMessage(text);
+  }
+
+  onContextSplitChange(pct: number): void {
+    this.gali.setContextSplitPercent(pct);
+  }
+
+  contextDragStart(): void {
+    document.documentElement.style.setProperty('--gali-split-transition', 'none');
+  }
+
+  contextDragEnd(): void {
+    document.documentElement.style.removeProperty('--gali-split-transition');
+  }
+
+  /** Maps split % to pixel width for the internal splitter */
+  contextSplitPx(): number {
+    const panelW = this.gali.panelWidth();
+    return Math.round(panelW * (this.gali.contextSplitWidth() / 100));
+  }
+
+  onContextSplitPxChange(px: number): void {
+    const pct = Math.round((px / this.gali.panelWidth()) * 100);
+    this.gali.setContextSplitPercent(pct);
   }
 
   ngAfterViewChecked(): void {

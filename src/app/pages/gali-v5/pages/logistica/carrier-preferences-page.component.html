@@ -1,4 +1,13 @@
 <div class="carriers-page">
+
+  <dropi-gali-bar
+    agent="Vigilante"
+    status="monitoreando transportadoras"
+    message="Coordinadora Bogotá: 15% novedad (3× el umbral) · Smart routing disponible · 12 pedidos en riesgo"
+    ctaLabel="Ver señal crítica →"
+    (ctaClick)="goToSignals()"
+  />
+
   <nav class="carriers-page__breadcrumbs" aria-label="Breadcrumb">
     <a routerLink="/gali-v5" class="carriers-page__crumb"><i class="pi pi-home"></i></a>
     <i class="pi pi-chevron-right carriers-page__crumb-sep"></i>

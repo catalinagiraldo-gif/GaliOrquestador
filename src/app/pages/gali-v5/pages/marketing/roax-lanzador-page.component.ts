@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { DropiTitulosComponent, DropiButtonNewComponent } from '../../components/shared';
 import { GALI_V5_DROPI_LOGO } from '../../gali-v5.constants';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 interface CanalOption {
   id: string;
@@ -19,7 +21,10 @@ interface CanalOption {
   styleUrl: './roax-lanzador-page.component.scss',
 })
 export class RoaxLanzadorPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
   readonly dropiLogo = GALI_V5_DROPI_LOGO;
+  readonly launched = signal(false);
   readonly breadcrumbs = ['Marketing', 'ROAX', 'Lanzador de campañas'];
   readonly steps = [
     'Canal de venta',
@@ -54,6 +59,12 @@ export class RoaxLanzadorPageComponent {
   continuar(): void {
     if (this.currentStep < this.steps.length - 1) {
       this.currentStep += 1;
+    } else {
+      this.launched.set(true);
+      setTimeout(() => {
+        this.ws.setMode('medir');
+        this.router.navigate(['/gali-v5']);
+      }, 2000);
     }
   }
 }

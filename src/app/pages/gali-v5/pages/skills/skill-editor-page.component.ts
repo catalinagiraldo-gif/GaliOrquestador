@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { GaliWorkspaceModeBarComponent } from '../../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 
 export type TriggerType = 'tiempo' | 'evento' | 'umbral';
 
@@ -79,7 +80,7 @@ const ACTIONS: Record<string, { id: string; label: string }[]> = {
 @Component({
   selector: 'app-skill-editor-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, GaliWorkspaceModeBarComponent],
   templateUrl: './skill-editor-page.component.html',
   styleUrl: './skill-editor-page.component.scss',
 })

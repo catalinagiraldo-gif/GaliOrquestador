@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 interface CarrierRow {
   rank: number;
@@ -18,12 +20,19 @@ interface DeptAccordion {
 @Component({
   selector: 'app-carrier-preferences-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DropiGaliBarComponent],
   templateUrl: './carrier-preferences-page.component.html',
   styleUrl: './carrier-preferences-page.component.scss',
 })
 export class CarrierPreferencesPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
   readonly breadcrumbs = ['Logística', 'Transportadoras'];
+
+  goToSignals(): void {
+    this.ws.setMode('operar');
+    this.router.navigate(['/gali-v5']);
+  }
 
   readonly favorites: CarrierRow[] = [
     { rank: 1, name: 'ENVIA', insureDefault: true },

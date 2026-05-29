@@ -4,7 +4,10 @@
     agent="Gali"
     status="orquestando proyectos"
     message="{{ activeCount }} proyectos activos · {{ proyectos.length }} en total · ADA Spy tiene 2 análisis listos"
-    ctaLabel="Diagnóstico cruzado"
+    ctaLabel="Diagnóstico cruzado →"
+    secondaryCta="Ver en Hub"
+    (ctaClick)="openDiagnostico()"
+    (secondaryClick)="goToHub()"
   />
 
   <!-- Breadcrumb -->
@@ -146,4 +149,8 @@
     (closed)="showCrearModal.set(false)"
     (created)="goToProject($event)"
   />
+}
+
+@if (showDiagnostico()) {
+  <app-diagnostico-modal (closed)="showDiagnostico.set(false)" />
 }

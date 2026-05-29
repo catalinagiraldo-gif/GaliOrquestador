@@ -1,6 +1,16 @@
 <div class="roax-lanzador-page">
   <dropi-titulos title="Lanzador de campañas" [breadcrumbs]="breadcrumbs" />
 
+  @if (launched()) {
+    <div class="roax-launched-overlay">
+      <div class="roax-launched-card">
+        <span class="roax-launched-icon">✓</span>
+        <h3>Campaña lanzada con Roax</h3>
+        <p>Gali está configurando las skills automáticas. Redirigiendo a Medir…</p>
+      </div>
+    </div>
+  }
+
   <div class="roax-lanzador-page__top">
     <img class="roax-lanzador-page__logo" [src]="dropiLogo" alt="roax" />
     <div class="roax-lanzador-page__top-actions">

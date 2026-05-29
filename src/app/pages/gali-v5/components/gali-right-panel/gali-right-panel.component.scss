@@ -25,11 +25,9 @@ $panel-info:     #3b82f6;
 
 :host {
   display: block;
-  position: fixed;
-  top: 53px;
-  right: 0;
-  width: 360px;
-  height: calc(100vh - 53px);
+  flex: 1;
+  min-width: 0;
+  height: 100%;
   z-index: 300;
   pointer-events: auto;
 }
@@ -37,6 +35,7 @@ $panel-info:     #3b82f6;
 .gali-panel {
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
   background: $panel-bg;
   border-left: 1px solid $panel-border;
@@ -235,9 +234,106 @@ $panel-info:     #3b82f6;
   // ── Chat tab ──────────────────────────────────────────
   &__chat {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     height: 100%;
     overflow: hidden;
+    min-height: 0;
+
+    &--split {
+      .gali-panel__chat-pane {
+        min-width: 240px;
+      }
+    }
+  }
+
+  &__chat-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__context {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    min-width: 200px;
+    max-width: 70%;
+    border-right: 1px solid $panel-border;
+    background: $panel-surface;
+    overflow: hidden;
+    transition: flex-basis var(--gali-split-transition, 0.2s ease);
+  }
+
+  &__context-splitter {
+    flex-shrink: 0;
+    width: 8px;
+    height: 100%;
+  }
+
+  &__context-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $size-2;
+    padding: $size-3 $size-3 $size-2;
+    border-bottom: 1px solid $panel-border;
+    flex-shrink: 0;
+    background: rgba($primary-500, 0.04);
+  }
+
+  &__context-titles {
+    min-width: 0;
+  }
+
+  &__context-title {
+    margin: 0;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  &__context-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 10px;
+    color: $panel-muted;
+  }
+
+  &__context-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $panel-muted;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: $panel-text;
+    }
+
+    .pi { font-size: 10px; }
+  }
+
+  &__context-body {
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+    padding: $size-2;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: $panel-border; border-radius: 2px; }
   }
 
   &__messages {
@@ -481,7 +577,7 @@ $panel-info:     #3b82f6;
   }
 
   &__bubble {
-    max-width: 84%;
+    max-width: 100%;
     padding: $size-2 $size-3;
   }
 
@@ -639,7 +735,8 @@ $panel-info:     #3b82f6;
     flex-direction: column;
     gap: 6px;
     flex: 1;
-    max-width: 85%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__actions {
@@ -672,6 +769,30 @@ $panel-info:     #3b82f6;
 
       &:hover { background: rgba($primary-500, 0.25); }
     }
+  }
+}
+
+// Mode chip — shown when Gali switches the workspace mode
+.gali-msg__mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: 700;
+  color: $panel-accent;
+  background: rgba($primary-500, 0.08);
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-full;
+  padding: 2px 8px;
+  margin-top: 4px;
+  width: fit-content;
+
+  &-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: $panel-accent;
   }
 }
 
@@ -759,6 +880,61 @@ $panel-info:     #3b82f6;
       border-color: rgba(16, 185, 129, 0.3);
       animation: agentPulse 2s ease infinite;
     }
+  }
+}
+
+// Day summary strip
+.live-day-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: $panel-border;
+  border-bottom: 1px solid $panel-border;
+  flex-shrink: 0;
+}
+
+.live-day-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: $size-2 $size-1;
+  background: $panel-bg;
+
+  &__val {
+    font-family: $font-primary;
+    font-size: $font-base;
+    font-weight: $font-bold;
+    color: $panel-text;
+
+    &--ok { color: $panel-success; }
+    &--warn { color: $panel-warning; }
+  }
+
+  &__label {
+    font-family: $font-primary;
+    font-size: 9px;
+    color: $panel-muted;
+    text-align: center;
+    line-height: 1.3;
+  }
+}
+
+.live-autopilot-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-2;
+  padding: $size-2 $size-4;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid $panel-border;
+  flex-shrink: 0;
+
+  &__text {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $panel-muted;
+    line-height: 1.4;
   }
 }
 
@@ -872,4 +1048,92 @@ $panel-info:     #3b82f6;
 @keyframes liveEventFade {
   from { opacity: 0; transform: translateX(8px); }
   to { opacity: 1; transform: none; }
+}
+
+// ── Context data table (editor-style) ───────────────────────────────────
+.gali-data-table-wrap {
+  overflow-x: auto;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  background: $panel-bg;
+}
+
+.gali-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: $font-primary;
+  font-size: 11px;
+
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    text-align: left;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.04);
+    color: $panel-muted;
+    font-weight: $font-semibold;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid $panel-border;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 7px 8px;
+    color: $panel-text;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+  }
+
+  tbody tr:hover td {
+    background: rgba($primary-500, 0.04);
+  }
+
+  &__mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: $primary-500;
+  }
+}
+
+.gali-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $size-2;
+}
+
+.gali-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: $size-3;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  background: $panel-bg;
+
+  &--ok .gali-metric__value { color: $panel-success; }
+  &--warn .gali-metric__value { color: $panel-warning; }
+  &--crit .gali-metric__value { color: $panel-danger; }
+
+  &__label {
+    font-size: 10px;
+    color: $panel-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__value {
+    font-family: $font-secondary;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    color: $panel-text;
+    line-height: 1.1;
+  }
+
+  &__delta {
+    font-size: 10px;
+    color: $panel-muted;
+  }
 }

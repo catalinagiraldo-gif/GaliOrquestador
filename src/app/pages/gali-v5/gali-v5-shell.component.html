@@ -19,6 +19,7 @@
       [panel]="sectionPanel()"
       [collapsed]="sectionNavCollapsed()"
       (collapseRequested)="collapseSectionNav()"
+      (expandRequested)="toggleSectionNav()"
     />
 
     <dropi-panel-splitter
@@ -30,25 +31,36 @@
     />
 
     <main class="gali-v5-shell__content" [class.gali-v5-shell__content--os]="isOsWorkspace()">
-      <button
-        *ngIf="hasSectionPanel() && sectionNavCollapsed()"
-        type="button"
-        class="gali-v5-shell__nav-expand"
-        data-proto-skip
-        (click)="toggleSectionNav()"
-        aria-label="Expandir menú de secciones">
-        <i class="pi pi-angle-double-right"></i>
-        <span>Secciones</span>
-      </button>
-
       <router-outlet />
     </main>
   </div>
 
   <!-- Panel derecho de Gali -->
   @if (galiState.galiMode() > 0) {
-    <div class="gali-v5-shell__panel-overlay" [class.gali-v5-shell__panel-overlay--in]="galiState.galiMode() > 0">
+    <div
+      class="gali-v5-shell__panel-overlay"
+      [class.gali-v5-shell__panel-overlay--in]="galiState.galiMode() > 0"
+      [style.width.px]="galiState.panelWidth()">
+      <dropi-panel-splitter
+        class="gali-v5-shell__panel-resize"
+        edge="left"
+        [currentWidth]="galiState.panelWidth()"
+        [minWidth]="380"
+        [maxWidth]="panelMaxWidth()"
+        (widthChange)="onGaliPanelWidthChange($event)"
+        (dragStart)="onSplitterDragStart()"
+        (dragEnd)="onSplitterDragEnd()"
+      />
       <gali-right-panel (closed)="galiState.togglePanel()" />
+    </div>
+  }
+
+  <!-- Toast de Gali (cross-módulo) -->
+  @if (ws.toast(); as t) {
+    <div class="gali-v5-shell__gali-toast" [class.gali-v5-shell__gali-toast--warn]="t.tipo === 'warn'">
+      <span class="gali-toast__agent-dot" [style.background]="agentColor(t.agente)"></span>
+      <span class="gali-toast__agent">{{ t.agente }}</span>
+      <span class="gali-toast__msg">{{ t.message }}</span>
     </div>
   }
 

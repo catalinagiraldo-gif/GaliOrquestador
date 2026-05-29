@@ -2,19 +2,20 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import { GaliWorkspaceModeBarComponent } from '../../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 import { GaliSkillBuilderV2Component, SkillRule } from '../../components/gali-skill-builder-v2/gali-skill-builder-v2.component';
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 
 @Component({
   selector: 'app-skills-page',
   standalone: true,
-  imports: [CommonModule, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent],
+  imports: [CommonModule, GaliWorkspaceModeBarComponent, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent],
   templateUrl: './skills-page.component.html',
   styleUrl: './skills-page.component.scss',
 })
 export class SkillsPageComponent {
   readonly ws = inject(GaliWorkspaceService);
-  private router = inject(Router);
+  readonly router = inject(Router);
 
   readonly selectedSkillId = signal<string>('skill-001');
 
@@ -88,6 +89,20 @@ export class SkillsPageComponent {
   }
 
   readonly showNewSkill = signal(false);
+  readonly activeMktTab = signal<'populares' | 'por-agente' | 'nuevas'>('populares');
+
+  readonly marketplaceByAgent = [
+    { id: 'ma-1', nombre: 'Smart routing novedad Cali', category: 'Logística', agent: 'vigilante', uses: '3.4k', descripcion: 'Reasigna pedidos cuando la novedad supera el umbral en ciudades específicas.' },
+    { id: 'ma-2', nombre: 'Escalado gradual ROAS', category: 'Marketing', agent: 'roax', uses: '4.5k', descripcion: 'Sube el presupuesto +10% cada 24h mientras el ROAS se mantiene.' },
+    { id: 'ma-3', nombre: 'Resolución PQR automática', category: 'CAS', agent: 'chatea', uses: '2.1k', descripcion: 'Clasifica y responde PQRs recurrentes con plantillas verificadas.' },
+    { id: 'ma-4', nombre: 'Alerta saturación de nicho', category: 'Research', agent: 'ada', uses: '987', descripcion: 'Avisa cuando 3+ competidores nuevos entran a tu nicho en 7 días.' },
+  ];
+
+  readonly marketplaceNew = [
+    { id: 'mn-1', nombre: 'Confirmación inteligente pedidos', category: 'Pedidos', agent: 'chatea', uses: '312', descripcion: 'Confirma pedidos con huella verde automáticamente en horario configurado.' },
+    { id: 'mn-2', nombre: 'Detector de productos trending', category: 'Research', agent: 'ada', uses: '198', descripcion: 'Detecta productos con tendencia creciente antes de que saturen.' },
+    { id: 'mn-3', nombre: 'Anti-fatiga de audiencia', category: 'Marketing', agent: 'roax', uses: '445', descripcion: 'Rota creativos automáticamente cuando la frecuencia supera 2.5x.' },
+  ];
 
   goToHub(): void {
     this.ws.setMode('construir');

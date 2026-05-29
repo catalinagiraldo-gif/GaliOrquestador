@@ -22,6 +22,27 @@
     flex-shrink: 0;
   }
 
+  &__subroute {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  &__subroute-sep {
+    font-family: $os-font-body;
+    font-size: 14px;
+    color: $os-text-muted;
+    font-weight: 300;
+  }
+
+  &__subroute-label {
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
   &__objetivo {
     display: flex;
     align-items: center;

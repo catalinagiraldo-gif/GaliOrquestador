@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
   template: `
     <div
       class="splitter"
+      [class.splitter--edge-left]="edge === 'left'"
       (mousedown)="onMouseDown($event)"
       title="Arrastrar para redimensionar">
       <div class="splitter__grip">
@@ -21,6 +22,10 @@ import { CommonModule } from '@angular/common';
 })
 export class DropiPanelSplitterComponent {
   @Input() currentWidth = 200;
+  @Input() minWidth = 140;
+  @Input() maxWidth = 340;
+  /** 'right' = drag right increases width (section nav). 'left' = drag left increases width (gali panel). */
+  @Input() edge: 'right' | 'left' = 'right';
   @Output() widthChange = new EventEmitter<number>();
   @Output() dragStart = new EventEmitter<void>();
   @Output() dragEnd = new EventEmitter<void>();
@@ -32,8 +37,9 @@ export class DropiPanelSplitterComponent {
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent): void {
     if (!this.dragging) return;
-    const delta = e.clientX - this.startX;
-    const newWidth = Math.max(140, Math.min(340, this.startWidth + delta));
+    const rawDelta = e.clientX - this.startX;
+    const delta = this.edge === 'left' ? -rawDelta : rawDelta;
+    const newWidth = Math.max(this.minWidth, Math.min(this.maxWidth, this.startWidth + delta));
     this.widthChange.emit(newWidth);
   }
 

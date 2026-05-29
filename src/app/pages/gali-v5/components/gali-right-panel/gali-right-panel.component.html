@@ -55,7 +55,81 @@
 
   <!-- ── TAB: Chat ── -->
   @if (activeTab() === 'chat') {
-    <div class="gali-panel__content gali-panel__chat">
+    <div class="gali-panel__content gali-panel__chat"
+      [class.gali-panel__chat--split]="gali.activeContext()">
+
+      @if (gali.activeContext(); as ctx) {
+        <!-- Panel de contexto (datos / tablas) — estilo editor -->
+        <section class="gali-panel__context"
+          [style.flex-basis.%]="gali.contextSplitWidth()">
+          <header class="gali-panel__context-header">
+            <div class="gali-panel__context-titles">
+              <h3 class="gali-panel__context-title">{{ ctx.title }}</h3>
+              @if (ctx.subtitle) {
+                <span class="gali-panel__context-sub">{{ ctx.subtitle }}</span>
+              }
+            </div>
+            <button type="button" class="gali-panel__context-close" title="Ocultar panel de datos"
+              (click)="gali.clearContext()" data-proto-skip aria-label="Ocultar panel de datos">
+              <i class="pi pi-times"></i>
+            </button>
+          </header>
+
+          <div class="gali-panel__context-body">
+            @if (ctx.type === 'table' && ctx.columns && ctx.rows) {
+              <div class="gali-data-table-wrap">
+                <table class="gali-data-table">
+                  <thead>
+                    <tr>
+                      @for (col of ctx.columns; track col.key) {
+                        <th>{{ col.label }}</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of ctx.rows; track $index) {
+                      <tr>
+                        @for (col of ctx.columns; track col.key) {
+                          <td [class.gali-data-table__mono]="col.mono">{{ row[col.key] }}</td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+
+            @if (ctx.type === 'metrics' && ctx.metrics) {
+              <div class="gali-metrics-grid">
+                @for (m of ctx.metrics; track m.label) {
+                  <div class="gali-metric" [class.gali-metric--ok]="m.tone === 'ok'"
+                    [class.gali-metric--warn]="m.tone === 'warn'"
+                    [class.gali-metric--crit]="m.tone === 'crit'">
+                    <span class="gali-metric__label">{{ m.label }}</span>
+                    <span class="gali-metric__value">{{ m.value }}</span>
+                    @if (m.delta) {
+                      <span class="gali-metric__delta">{{ m.delta }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <dropi-panel-splitter
+          class="gali-panel__context-splitter"
+          [currentWidth]="contextSplitPx()"
+          [minWidth]="200"
+          [maxWidth]="Math.floor(gali.panelWidth() * 0.7)"
+          (widthChange)="onContextSplitPxChange($event)"
+          (dragStart)="contextDragStart()"
+          (dragEnd)="contextDragEnd()"
+        />
+      }
+
+      <!-- Hilo de chat -->
+      <section class="gali-panel__chat-pane">
       <div class="gali-panel__messages">
 
         @for (msg of gali.chatHistory(); track msg.id) {
@@ -68,6 +142,12 @@
                 <p class="gali-msg__text">{{ msg.text }}</p>
                 <span class="gali-msg__time">{{ msg.time }}</span>
               </div>
+              @if (msg.modeChip) {
+                <div class="gali-msg__mode-chip">
+                  <span class="gali-msg__mode-chip-dot"></span>
+                  {{ msg.modeChip }}
+                </div>
+              }
               @if (msg.actions?.length) {
                 <div class="gali-msg__actions">
                   @for (action of msg.actions; track action.action) {
@@ -126,6 +206,7 @@
           <i class="pi pi-send"></i>
         </button>
       </div>
+      </section>
     </div>
   }
 
@@ -210,32 +291,54 @@
     <div class="gali-panel__content gali-panel__live">
 
       <div class="live-header">
-        <span class="live-header__label">Actividad en tiempo real</span>
+        <span class="live-header__label">Actividad de agentes</span>
         <span class="live-header__badge" [class.live-header__badge--on]="ws.autopilot()">
-          {{ ws.autopilot() ? '● EN VIVO' : '○ Pausado' }}
+          {{ ws.autopilot() ? '● EN VIVO' : '○ Manual' }}
         </span>
       </div>
 
+      <!-- Resumen del día -->
+      <div class="live-day-summary">
+        <div class="live-day-stat">
+          <span class="live-day-stat__val live-day-stat__val--ok">8</span>
+          <span class="live-day-stat__label">Acciones auto</span>
+        </div>
+        <div class="live-day-stat">
+          <span class="live-day-stat__val live-day-stat__val--warn">1</span>
+          <span class="live-day-stat__label">Requieren decisión</span>
+        </div>
+        <div class="live-day-stat">
+          <span class="live-day-stat__val">$480k</span>
+          <span class="live-day-stat__label">Pérdidas evitadas</span>
+        </div>
+      </div>
+
       @if (!ws.autopilot()) {
-        <div class="live-empty">
-          <p>Activa el autopilot para ver el feed en tiempo real</p>
-          <button type="button" class="live-activate-btn" data-proto-skip (click)="toggleAutopilot()">
+        <div class="live-autopilot-cta">
+          <span class="live-autopilot-cta__text">Autopilot desactivado — Gali espera tus instrucciones</span>
+          <button type="button" class="live-activate-btn" (click)="toggleAutopilot()">
             Activar autopilot ✦
           </button>
         </div>
       }
 
+      <!-- Feed de eventos -->
       @for (event of ws.liveEvents(); track event.id) {
-        <div class="live-event" [class.live-event--ok]="event.tipo === 'ok'"
+        <div class="live-event"
           [class.live-event--warn]="event.tipo === 'warn'"
           [class.live-event--action]="event.tipo === 'action'">
-          <span class="live-event__agent-dot"
-            [style.background]="agentColor(event.agente_id)"></span>
+          <span class="live-event__agent-dot" [style.background]="agentColor(event.agente_id)"></span>
           <div class="live-event__body">
             <span class="live-event__agent">{{ event.agente }}</span>
             <p class="live-event__msg">{{ event.mensaje }}</p>
           </div>
           <span class="live-event__time">{{ event.timestamp }}</span>
+        </div>
+      }
+
+      @if (ws.liveEvents().length === 0) {
+        <div class="live-empty">
+          <p>Sin actividad reciente</p>
         </div>
       }
     </div>

@@ -16,6 +16,7 @@ import {
 } from './dropi-sections.config';
 import { DropiPrototypeFeedbackService } from './services/dropi-prototype-feedback.service';
 import { GaliStateService } from './services/gali-state.service';
+import { GaliWorkspaceService } from './services/gali-workspace.service';
 
 @Component({
   selector: 'app-gali-v5-shell',
@@ -38,6 +39,19 @@ export class GaliV5ShellComponent {
   private router = inject(Router);
   readonly feedback = inject(DropiPrototypeFeedbackService);
   readonly galiState = inject(GaliStateService);
+  readonly ws = inject(GaliWorkspaceService);
+
+  private readonly agentColors: Record<string, string> = {
+    'Roax': '#f97316', 'roax': '#f97316',
+    'Vigilante': '#fbbf24', 'vigilante': '#fbbf24',
+    'Chatea Pro': '#34d399', 'chatea': '#34d399',
+    'ADA Spy': '#818cf8', 'ada': '#818cf8',
+    'Gali': '#ff6102',
+  };
+
+  agentColor(name: string): string {
+    return this.agentColors[name] ?? '#9898a8';
+  }
 
   sectionPanel = signal<SectionPanel>(HOME_OVERVIEW_PANEL);
   sectionNavCollapsed = signal(false);
@@ -48,6 +62,7 @@ export class GaliV5ShellComponent {
   constructor() {
     this.syncNav(this.router.url);
     this.updateViewport();
+    this.galiState.setPanelWidth(this.galiState.panelWidth());
 
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
@@ -111,6 +126,14 @@ export class GaliV5ShellComponent {
 
   private updateViewport(): void {
     this.isCompactNav.set(window.innerWidth < 1024);
+  }
+
+  panelMaxWidth(): number {
+    return Math.floor(window.innerWidth * 0.78);
+  }
+
+  onGaliPanelWidthChange(w: number): void {
+    this.galiState.setPanelWidth(w);
   }
 
   onSplitterWidthChange(w: number): void {

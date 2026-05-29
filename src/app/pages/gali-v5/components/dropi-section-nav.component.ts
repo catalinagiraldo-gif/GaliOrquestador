@@ -14,23 +14,40 @@ import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
       [class.section-nav--collapsed]="collapsed()"
       [attr.aria-label]="panel().title">
       <div class="section-nav__head">
-        <h2 class="section-nav__title">{{ panel().title }}</h2>
+        @if (!collapsed()) {
+          <h2 class="section-nav__title">{{ panel().title }}</h2>
+        }
         <button
           type="button"
           class="section-nav__collapse"
           data-proto-skip
-          title="Colapsar menú"
-          aria-label="Colapsar menú"
-          (click)="collapseRequested.emit()">
-          <i class="pi pi-angle-double-left"></i>
+          [title]="collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+          [attr.aria-label]="collapsed() ? 'Expandir menú' : 'Colapsar menú'"
+          (click)="collapsed() ? expandRequested.emit() : collapseRequested.emit()">
+          <i class="pi" [class.pi-angle-double-right]="collapsed()" [class.pi-angle-double-left]="!collapsed()"></i>
         </button>
       </div>
 
       <ul class="section-nav__list">
         <li *ngFor="let item of panel().items" class="section-nav__item">
-          <span *ngIf="item.type === 'header'" class="section-nav__group-label">{{ item.label }}</span>
+          <span *ngIf="item.type === 'header' && !collapsed()" class="section-nav__group-label">{{ item.label }}</span>
           <ng-container *ngIf="item.type !== 'header' && item.children?.length; else flatItem">
+            <a
+              *ngIf="collapsed() && item.children?.[0]?.route as firstRoute"
+              [routerLink]="firstRoute"
+              routerLinkActive="section-nav__row--active"
+              class="section-nav__row section-nav__row--icon-only"
+              [class.section-nav__row--child-active]="isChildRouteActive(item)"
+              [title]="item.label"
+              [attr.aria-label]="item.label">
+              <span
+                *ngIf="item.icon"
+                class="section-nav__icon"
+                [style.--icon-url]="'url(' + item.icon + ')'"
+                aria-hidden="true"></span>
+            </a>
             <button
+              *ngIf="!collapsed()"
               type="button"
               class="section-nav__row section-nav__row--parent"
               data-proto-skip
@@ -49,7 +66,7 @@ import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
                 [class.pi-chevron-down]="!isExpanded(item.id)"
                 [class.section-nav__chevron--active]="isChildRouteActive(item)"></i>
             </button>
-            <ul *ngIf="isExpanded(item.id)" class="section-nav__tree">
+            <ul *ngIf="!collapsed() && isExpanded(item.id)" class="section-nav__tree">
               <li *ngFor="let child of item.children">
                 <a
                   [routerLink]="child.route"
@@ -69,15 +86,18 @@ import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
               [routerLink]="item.route!"
               routerLinkActive="section-nav__row--active"
               [routerLinkActiveOptions]="{ exact: false }"
-              class="section-nav__row">
+              class="section-nav__row"
+              [class.section-nav__row--icon-only]="collapsed()"
+              [title]="collapsed() ? item.label : null"
+              [attr.aria-label]="collapsed() ? item.label : null">
               <span
                 *ngIf="item.icon"
                 class="section-nav__icon"
                 [style.--icon-url]="'url(' + item.icon + ')'"
                 aria-hidden="true"></span>
-              <span class="section-nav__label">{{ item.label }}</span>
-              <span *ngIf="item.badge === 'nuevo'" class="section-nav__badge section-nav__badge--nuevo">Nuevo</span>
-              <span *ngIf="item.badge === 'beta'" class="section-nav__badge section-nav__badge--beta">Beta</span>
+              <span *ngIf="!collapsed()" class="section-nav__label">{{ item.label }}</span>
+              <span *ngIf="!collapsed() && item.badge === 'nuevo'" class="section-nav__badge section-nav__badge--nuevo">Nuevo</span>
+              <span *ngIf="!collapsed() && item.badge === 'beta'" class="section-nav__badge section-nav__badge--beta">Beta</span>
             </a>
           </ng-template>
         </li>
@@ -90,6 +110,7 @@ export class DropiSectionNavComponent {
   panel = input.required<SectionPanel>();
   collapsed = input(false);
   collapseRequested = output<void>();
+  expandRequested = output<void>();
 
   private router = inject(Router);
   currentUrl = signal(this.router.url);

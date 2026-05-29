@@ -1,14 +1,23 @@
+<!-- Mode bar — igual que en el Hub, mantiene la coherencia de OS -->
+<gali-workspace-mode-bar
+  [objetivoActual]="38"
+  [objetivoMeta]="50"
+  [objetivoLabel]="'50 ventas/semana'"
+  [objetivoPeriodo]="'Sem 3 de 4'"
+/>
+
 <div class="skills-os">
 
-  <!-- Header -->
+  <!-- Action bar -->
   <div class="skills-os__header">
     <div class="skills-os__header-left">
-      <h1 class="skills-os__title">🔧 Skills — Automatizaciones</h1>
-      <span class="skills-os__sub">Trigger + Condición + Acción + Historial</span>
+      <h1 class="skills-os__title">Mis Skills</h1>
+      <span class="skills-os__sub">{{ skills.length }} skills · Trigger + Condición + Acción</span>
     </div>
     <div class="skills-os__header-right">
-      <button type="button" class="skills-os__btn skills-os__btn--ghost" data-proto-skip (click)="goToHub()">
-        ← Hub de Gali
+      <button type="button" class="skills-os__btn skills-os__btn--ghost"
+        (click)="ws.setMode('comunidad'); router.navigate(['/gali-v5'])">
+        🌐 Marketplace
       </button>
       <button type="button" class="skills-os__btn skills-os__btn--accent" (click)="goToNewSkill()">
         + Nueva skill
@@ -32,7 +41,6 @@
           class="skill-item"
           [class.skill-item--selected]="selectedSkillId() === skill.id"
           [class.skill-item--paused]="skill.status === 'paused'"
-          data-proto-skip
           (click)="selectSkill(skill.id)">
           <span class="skill-item__dot"
             [class.skill-item__dot--on]="skill.status === 'active'"
@@ -40,21 +48,63 @@
           </span>
           <div class="skill-item__content">
             <strong class="skill-item__name">{{ skill.nombre }}</strong>
-            <span class="skill-item__meta">{{ skill.ejecuciones_total }} ejecuciones · {{ skill.ultima_ejecucion }}</span>
+            <span class="skill-item__meta">{{ skill.ejecuciones_total }} ejec. · {{ skill.ultima_ejecucion }}</span>
           </div>
         </button>
       }
 
-      <!-- Marketplace preview -->
+      <!-- Marketplace con tabs -->
       <div class="skills-os__mkt-section">
-        <span class="skills-os__sidebar-label">MARKETPLACE</span>
-        @for (mkt of marketplaceSkills; track mkt.id) {
-          <div class="mkt-preview">
-            <span class="mkt-preview__category">{{ mkt.category }}</span>
-            <strong class="mkt-preview__name">{{ mkt.nombre }}</strong>
-            <span class="mkt-preview__uses">{{ mkt.uses }} activaciones</span>
-            <button type="button" class="mkt-preview__cta" data-proto-skip>Activar</button>
-          </div>
+        <div class="skills-os__mkt-header">
+          <span class="skills-os__sidebar-label">MARKETPLACE</span>
+          <button type="button" class="skills-os__mkt-ver-todo"
+            (click)="ws.setMode('comunidad'); router.navigate(['/gali-v5'])">
+            Ver todo →
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="skills-mkt-tabs">
+          <button type="button" class="skills-mkt-tab"
+            [class.skills-mkt-tab--active]="activeMktTab() === 'populares'"
+            (click)="activeMktTab.set('populares')">Populares</button>
+          <button type="button" class="skills-mkt-tab"
+            [class.skills-mkt-tab--active]="activeMktTab() === 'por-agente'"
+            (click)="activeMktTab.set('por-agente')">Por agente</button>
+          <button type="button" class="skills-mkt-tab"
+            [class.skills-mkt-tab--active]="activeMktTab() === 'nuevas'"
+            (click)="activeMktTab.set('nuevas')">Nuevas</button>
+        </div>
+
+        @if (activeMktTab() === 'populares') {
+          @for (mkt of marketplaceSkills; track mkt.id) {
+            <div class="mkt-preview">
+              <span class="mkt-preview__category">{{ mkt.category }}</span>
+              <strong class="mkt-preview__name">{{ mkt.nombre }}</strong>
+              <span class="mkt-preview__uses">{{ mkt.uses }} activaciones</span>
+              <button type="button" class="mkt-preview__cta" (click)="goToNewSkill()">Instalar</button>
+            </div>
+          }
+        }
+        @if (activeMktTab() === 'por-agente') {
+          @for (mkt of marketplaceByAgent; track mkt.id) {
+            <div class="mkt-preview">
+              <span class="mkt-preview__category">{{ mkt.agent | uppercase }}</span>
+              <strong class="mkt-preview__name">{{ mkt.nombre }}</strong>
+              <span class="mkt-preview__uses">{{ mkt.uses }} activaciones</span>
+              <button type="button" class="mkt-preview__cta" (click)="goToNewSkill()">Instalar</button>
+            </div>
+          }
+        }
+        @if (activeMktTab() === 'nuevas') {
+          @for (mkt of marketplaceNew; track mkt.id) {
+            <div class="mkt-preview">
+              <span class="mkt-preview__category">{{ mkt.category }}</span>
+              <strong class="mkt-preview__name">{{ mkt.nombre }}</strong>
+              <span class="mkt-preview__uses">{{ mkt.uses }} activaciones</span>
+              <button type="button" class="mkt-preview__cta" (click)="goToNewSkill()">Instalar</button>
+            </div>
+          }
         }
       </div>
     </aside>
@@ -65,8 +115,9 @@
         <gali-skill-builder-v2 [skill]="selectedSkill" />
       } @else {
         <div class="skills-os__empty">
-          <p>Selecciona una skill para ver el detalle</p>
-          <button type="button" class="skills-os__btn skills-os__btn--accent" data-proto-skip (click)="showNewSkill.set(true)" style="margin-top: 12px; font-size: 13px; padding: 8px 20px;">
+          <p>Selecciona una skill para ver el detalle y el historial de ejecuciones</p>
+          <button type="button" class="skills-os__btn skills-os__btn--accent"
+            (click)="goToNewSkill()" style="margin-top: 12px; font-size: 13px; padding: 8px 20px;">
             + Crear primera skill
           </button>
         </div>

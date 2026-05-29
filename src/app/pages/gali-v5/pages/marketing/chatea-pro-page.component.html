@@ -1,6 +1,14 @@
 <div class="chatea-page">
   <dropi-titulos title="Chatea Pro" [breadcrumbs]="breadcrumbs" />
 
+  <dropi-gali-bar
+    agent="Chatea Pro"
+    status="gestionando confirmaciones"
+    message="{{ stats.confirmados }} confirmados · {{ stats.anticiposPendientes }} anticipos · resolvió 8 novedades automáticamente"
+    ctaLabel="Ver señales en Gali →"
+    (ctaClick)="goToSignals()"
+  />
+
   <!-- Status bar operativo -->
   <div class="chatea-page__status-bar">
     <div class="chatea-status-bar">

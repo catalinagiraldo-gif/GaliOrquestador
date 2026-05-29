@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import {
   DropiTitulosComponent,
   DropiButtonNewComponent,
@@ -33,8 +35,16 @@ type NovedadTipo = 'recuperable' | 'irreversible' | 'cliente' | 'transportadora'
   styleUrl: './novedades-page.component.scss',
 })
 export class NovedadesPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
   searchQuery = '';
   readonly breadcrumbs = ['Pedidos', 'Novedades'];
+
+  goToOperar(): void {
+    this.ws.setMode('operar');
+    this.router.navigate(['/gali-v5']);
+  }
   readonly rows: NovedadRow[] = novedadesData.novedades;
 
   resolvedByGali = signal<string[]>([]);
