@@ -1,231 +1,154 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { GaliWorkspaceService } from '../services/gali-workspace.service';
+import { GaliWorkspaceModeBarComponent } from '../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
+import {
+  GaliSignalCardV2Component,
+  GaliSignalData,
+} from '../components/gali-signal-card-v2/gali-signal-card-v2.component';
+import {
+  GaliProjectPanelComponent,
+  ProjectPanelData,
+} from '../components/gali-project-panel/gali-project-panel.component';
+import { GaliNewSkillOverlayComponent } from '../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 
-export type SignalUrgency = 'alta' | 'media' | 'baja';
-export type AgentStatus = 'activo' | 'esperando' | 'pausa';
-export type ProjectStatus = 'activo' | 'en_escala' | 'pausado' | 'borrador';
+type AgentStatus = 'activo' | 'esperando' | 'pausa';
 
-export interface GaliSignal {
-  id: string;
-  icon: string;
-  titulo: string;
-  contexto: string;
-  cta: string;
-  urgencia: SignalUrgency;
-  timestamp: string;
-  agente: string;
-  loopResult?: { antes: string; despues: string; label: string };
-}
-
-export interface GaliAgent {
+interface AgentLive {
   id: string;
   nombre: string;
-  herramienta: string;
   icono: string;
   estado: AgentStatus;
   descripcion: string;
   ultimaAccion: string;
-}
-
-export interface LoopEntry {
-  id: string;
-  icon: string;
-  agente: string;
-  accion: string;
-  resultado: string;
-  hace: string;
-  tipo: 'positivo' | 'neutro' | 'pendiente';
-  cta?: string;
-}
-
-export interface Proyecto {
-  id: string;
-  nombre: string;
-  estado: ProjectStatus;
-  roas: string;
-  pedidos: string;
-  galiMessage: string;
-  signalType: 'ok' | 'warning' | 'info';
-}
-
-export interface ObjetivoActivo {
-  titulo: string;
-  meta: number;
-  actual: number;
-  unidad: string;
-  semana: string;
-  galiMensaje: string;
-}
-
-export interface SectionHealth {
-  key: string;
-  label: string;
-  route: string;
-  status: 'ok' | 'warn' | 'critical';
-  alerts: number;
-  msg?: string;
+  color: string;
 }
 
 @Component({
   selector: 'app-dropi-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    GaliWorkspaceModeBarComponent,
+    GaliSignalCardV2Component,
+    GaliProjectPanelComponent,
+    GaliNewSkillOverlayComponent,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class DropiHomeComponent {
-  private auth = inject(AuthService);
+  readonly ws = inject(GaliWorkspaceService);
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   userName = signal('Alejandra');
-  modoGaliActivo = signal(false);
 
-  readonly objetivo: ObjetivoActivo = {
-    titulo: '50 ventas/semana',
-    meta: 50,
-    actual: 38,
-    unidad: 'ventas',
-    semana: 'Sem 3 de 4',
-    galiMensaje: 'Vas a 38. Aumenté la pauta 15% para las próximas 48h.',
-  };
-
-  readonly agentes: GaliAgent[] = [
+  readonly signals: GaliSignalData[] = [
     {
-      id: 'ada-spy',
-      nombre: 'ADA Spy',
-      herramienta: 'Producto Research',
-      icono: '🔍',
-      estado: 'esperando',
-      descripcion: '3 competidores entraron al nicho esta semana',
-      ultimaAccion: 'Diagnóstico de saturación listo · hace 4h',
-    },
-    {
-      id: 'roax',
-      nombre: 'Roax',
-      herramienta: 'Media Buyer',
-      icono: '⚡',
-      estado: 'activo',
-      descripcion: 'ROAS 2.9x · Pauta $66k/día · Video B ganando',
-      ultimaAccion: 'Escaló presupuesto +15% · hace 2h',
-    },
-    {
-      id: 'chatea-pro',
-      nombre: 'Chatea Pro',
-      herramienta: 'Cierre & Logística',
-      icono: '💬',
-      estado: 'activo',
-      descripcion: '43/47 confirmados · 3 anticipo zona rural',
-      ultimaAccion: 'Resolvió 8 novedades hoy · hace 1h',
-    },
-  ];
-
-  readonly signals: GaliSignal[] = [
-    {
-      id: 'sig-critica-1',
-      icon: '⚠',
-      titulo: 'Coordinadora Bogotá: 15% novedad hoy',
-      contexto: 'Tasa 3× por encima del umbral. Gali recomienda reasignar 12 pedidos de hoy.',
-      cta: 'Cambiar ahora',
-      urgencia: 'alta',
-      timestamp: 'hace 18 min',
-      agente: 'Vigilante Logístico',
-    },
-    {
-      id: 'sig-ok-1',
-      icon: '✓',
-      titulo: '8 novedades resueltas por Chatea Pro',
-      contexto: 'Sin intervención tuya. 1 caso pendiente de tu decisión.',
-      cta: 'Ver caso pendiente',
-      urgencia: 'media',
-      timestamp: 'hace 1h',
-      agente: 'Chatea Pro',
-    },
-    {
-      id: 'sig-sug-1',
-      icon: '💡',
-      titulo: 'Video B tiene mejor CTR (+50%). ¿Creo una receta?',
-      contexto: 'CTR: 1.2% → 1.8% después de activarlo. Podría automatizar este switch.',
-      cta: 'Crear receta',
-      urgencia: 'baja',
-      timestamp: 'hace 3h',
-      agente: 'Roax',
-    },
-    {
-      id: 'sig-sug-2',
-      icon: '🎯',
-      titulo: 'Difusor de aromaterapia: +340% ventas esta semana',
-      contexto: 'Encaja con tu perfil (margen 68%). Ventana de 10-14 días antes de saturación.',
-      cta: 'Ver análisis',
-      urgencia: 'baja',
-      timestamp: 'hace 1h',
-      agente: 'ADA Spy',
-    },
-  ];
-
-  readonly loopEntries: LoopEntry[] = [
-    {
-      id: 'lp-1',
-      icon: '⚡',
-      agente: 'Roax',
-      accion: 'Pausé Video A (CTR -40%) → activé Video B',
-      resultado: 'CTR: 1.2%→1.8% · ROAS: 2.6x→2.9x',
-      hace: 'hace 2h',
-      tipo: 'positivo',
-      cta: 'Ver detalle',
-    },
-    {
-      id: 'lp-2',
-      icon: '🚛',
+      id: 'sig-001',
       agente: 'Vigilante',
-      accion: 'Cambié 12 pedidos Coordinadora → Servientrega',
-      resultado: '4 novedades ahorradas estimadas',
-      hace: 'hace 4h',
-      tipo: 'positivo',
-      cta: 'Ver detalle',
+      agente_id: 'vigilante',
+      tipo: 'critica',
+      estado: 'pending_decision',
+      titulo: 'Coordinadora Bogotá: 15% novedad hoy',
+      contexto:
+        'Tasa 3× por encima del umbral (5%). 12 pedidos de hoy en riesgo. Último pico: hace 3 días con 11%.',
+      timestamp: 'hace 18 min',
+      urgencia: 'alta',
+      afectados: 12,
+      metrica_label: 'Novedad Coordinadora',
+      metrica_valor: '15%',
+      umbral: '5%',
+      opciones: [
+        { id: 'a', label: 'Cambiar todos → Servientrega', sublabel: 'Tasa actual: 3.8%' },
+        { id: 'b', label: 'Cambiar solo los de hoy', sublabel: 'Esperar datos de mañana' },
+        { id: 'c', label: 'Crear regla automática', sublabel: 'Para futuros picos' },
+      ],
+      tabla_label: 'pedidos afectados',
+      tabla_items: [
+        { id: 'P-8841', cliente: 'María L.', ciudad: 'Bogotá', transportadora: 'Coordinadora', estado: 'En camino' },
+        { id: 'P-8839', cliente: 'Carlos M.', ciudad: 'Bogotá', transportadora: 'Coordinadora', estado: 'En camino' },
+        { id: 'P-8835', cliente: 'Sandra P.', ciudad: 'Bogotá', transportadora: 'Coordinadora', estado: 'Entregando' },
+        { id: 'P-8832', cliente: 'Jorge R.', ciudad: 'Bogotá', transportadora: 'Coordinadora', estado: 'En camino' },
+      ],
     },
     {
-      id: 'lp-3',
-      icon: '✅',
-      agente: 'Chatea Pro',
-      accion: 'Resolvió 8 novedades · 1 requiere tu decisión',
-      resultado: 'Pedido con reporte inusual de transportadora',
-      hace: 'hace 6h',
-      tipo: 'pendiente',
-      cta: 'Decidir ahora',
-    },
-    {
-      id: 'lp-4',
-      icon: '📊',
-      agente: 'ADA Spy',
-      accion: 'Detectó: 3 competidores entraron al nicho',
-      resultado: 'Ángulo "mamá" posiblemente saturando. Diagnóstico listo.',
-      hace: 'hace 8h',
-      tipo: 'neutro',
-      cta: 'Ver diagnóstico',
-    },
-    {
-      id: 'lp-5',
-      icon: '⚡',
+      id: 'sig-002',
       agente: 'Roax',
-      accion: 'Escalé presupuesto +15% (ROAS ≥ 2.8x por 48h)',
-      resultado: '$57.500 → $66.000/día',
-      hace: 'hace 10h',
-      tipo: 'positivo',
-      cta: 'Revertir',
+      agente_id: 'roax',
+      tipo: 'completada',
+      estado: 'completed',
+      titulo: 'Cambié Video A → Video B (CTR mejora)',
+      contexto: 'Video A cayó a CTR 0.7% durante 48h. Activé Video B automáticamente.',
+      timestamp: 'hace 2h',
+      urgencia: 'baja',
+      resultado_antes: 'CTR: 1.2% · ROAS: 2.6x',
+      resultado_despues: 'CTR: 1.8% · ROAS: 2.9x',
+      cta_followup: '¿Crear skill para esto?',
+      cta_followup_label: 'Crear skill',
+    },
+    {
+      id: 'sig-003',
+      agente: 'Chatea Pro',
+      agente_id: 'chatea',
+      tipo: 'decision',
+      estado: 'pending_decision',
+      titulo: '1 novedad requiere tu decisión',
+      contexto:
+        '8 novedades resueltas automáticamente. Pedido P-8801 tiene reporte inusual de transportadora.',
+      timestamp: 'hace 1h',
+      urgencia: 'media',
+      afectados: 1,
+      opciones: [
+        { id: 'a', label: 'Autorizar devolución', sublabel: 'Crédito automático al cliente' },
+        { id: 'b', label: 'Llamar al cliente', sublabel: 'Verificar antes de resolver' },
+        { id: 'c', label: 'Escalar a CAS', sublabel: 'Asignar a agente humano' },
+      ],
+    },
+    {
+      id: 'sig-004',
+      agente: 'ADA Spy',
+      agente_id: 'ada',
+      tipo: 'oportunidad',
+      estado: 'pending_decision',
+      titulo: 'Difusor aromaterapia: +340% ventas',
+      contexto: 'Margen est: 68%. Ventana de 10–14 días antes de saturación. Score: 87/100.',
+      timestamp: 'hace 1h',
+      urgencia: 'baja',
+      metrica_label: 'Score oportunidad',
+      metrica_valor: '87/100',
+      opciones: [
+        { id: 'a', label: 'Lanzar proyecto', sublabel: 'Ir a Modo Lanzar' },
+        { id: 'b', label: 'Ver análisis completo', sublabel: 'Caza Productos' },
+        { id: 'c', label: 'Guardar para después', sublabel: 'Alerta si baja el score' },
+      ],
     },
   ];
 
-  readonly proyectos: Proyecto[] = [
+  readonly proyectos: ProjectPanelData[] = [
     {
       id: 'collar-gps-2026',
       nombre: 'Collar GPS para mascotas',
       estado: 'en_escala',
       roas: '2.9x',
       pedidos: '47/sem',
-      galiMessage: 'Revisar novedad en Cali',
-      signalType: 'warning',
+      ganancia: '$411k',
+      alertaActiva: true,
+      alertaMensaje: 'Novedad alta en Cali',
+      galiMensaje: 'Tu novedad en Cali está afectando el margen. Actúa hoy.',
+      agentes: [
+        { nombre: 'Roax', id: 'roax', activo: true },
+        { nombre: 'Vigilante', id: 'vigilante', activo: true },
+        { nombre: 'Chatea Pro', id: 'chatea', activo: true },
+      ],
+      skills: [
+        { nombre: 'Auto-pausa CTR', activa: true },
+        { nombre: 'Escalado ROAS', activa: true },
+        { nombre: 'Smart routing', activa: false },
+      ],
     },
     {
       id: 'skincare-kbeauty',
@@ -233,8 +156,14 @@ export class DropiHomeComponent {
       estado: 'activo',
       roas: '2.1x',
       pedidos: '23/sem',
-      galiMessage: 'Todo normal',
-      signalType: 'ok',
+      ganancia: '$187k',
+      alertaActiva: false,
+      galiMensaje: 'Todo en orden. Margen estable esta semana.',
+      agentes: [
+        { nombre: 'Roax', id: 'roax', activo: true },
+        { nombre: 'ADA Spy', id: 'ada', activo: false },
+      ],
+      skills: [{ nombre: 'Auto-pausa CTR', activa: true }],
     },
     {
       id: 'fitness-bands',
@@ -242,128 +171,98 @@ export class DropiHomeComponent {
       estado: 'pausado',
       roas: '—',
       pedidos: '—',
-      galiMessage: 'CTR se recuperó. ¿Reanudamos?',
-      signalType: 'info',
+      ganancia: '—',
+      alertaActiva: false,
+      galiMensaje: 'CTR se recuperó. ¿Reanudamos?',
+      agentes: [{ nombre: 'ADA Spy', id: 'ada', activo: false }],
+      skills: [],
     },
   ];
 
-  readonly kpisHoy = {
-    ganancia: '$411k',
-    gananciaTendencia: -4,
-    pedidos: 47,
-    roas: '2.9x',
-    roasTendencia: 1,
-    semana: 'Semana 21',
-    pauta: '$66k/día',
-  };
-
-  readonly sectionHealth: SectionHealth[] = [
-    { key: 'productos', label: 'Productos', route: '/gali-v5/productos/catalogo', status: 'ok', alerts: 1, msg: '1 oportunidad ADA Spy' },
-    { key: 'pedidos', label: 'Pedidos', route: '/gali-v5/mis-pedidos/mis-pedidos', status: 'warn', alerts: 3, msg: '3 confirmaciones urgentes' },
-    { key: 'logistica', label: 'Logística', route: '/gali-v5/logistica/torre-logistica', status: 'critical', alerts: 1, msg: 'Coordinadora 12% novedad Bogotá' },
-    { key: 'marketing', label: 'Marketing', route: '/gali-v5/marketing/campanas', status: 'ok', alerts: 0 },
-    { key: 'financiero', label: 'Financiero', route: '/gali-v5/financiero/historial-de-cartera', status: 'warn', alerts: 1, msg: 'ROAS real vs declarado' },
-    { key: 'cas', label: 'CAS', route: '/gali-v5/cas/bandeja', status: 'warn', alerts: 2, msg: 'Patrón PQR Collar GPS' },
-    { key: 'proyectos', label: 'Proyectos', route: '/gali-v5/proyectos', status: 'warn', alerts: 1, msg: 'Collar GPS: novedad Cali' },
-    { key: 'skills', label: 'Skills', route: '/gali-v5/skills', status: 'ok', alerts: 0 },
-    { key: 'reportes', label: 'Reportes', route: '/gali-v5/reportes/dashboard', status: 'ok', alerts: 0 },
+  readonly agentes: AgentLive[] = [
+    {
+      id: 'roax',
+      nombre: 'Roax',
+      icono: '⚡',
+      estado: 'activo',
+      descripcion: 'ROAS 2.9x · Pauta $66k/día · Video B ganando',
+      ultimaAccion: 'Escaló presupuesto +15% · hace 2h',
+      color: '#f97316',
+    },
+    {
+      id: 'vigilante',
+      nombre: 'Vigilante',
+      icono: '🚛',
+      estado: 'activo',
+      descripcion: '12 pedidos en zona de riesgo (Coordinadora)',
+      ultimaAccion: 'Detectó novedad 15% Bogotá · hace 18 min',
+      color: '#fbbf24',
+    },
+    {
+      id: 'chatea',
+      nombre: 'Chatea Pro',
+      icono: '💬',
+      estado: 'activo',
+      descripcion: '43/47 confirmados · 1 caso pendiente',
+      ultimaAccion: 'Resolvió 8 novedades · hace 1h',
+      color: '#34d399',
+    },
+    {
+      id: 'ada',
+      nombre: 'ADA Spy',
+      icono: '🔍',
+      estado: 'esperando',
+      descripcion: '3 oportunidades analizadas esta semana',
+      ultimaAccion: 'Difusor aromaterapia · hace 1h',
+      color: '#818cf8',
+    },
   ];
 
-  get totalAlertas(): number {
-    return this.sectionHealth.reduce((sum, s) => sum + s.alerts, 0);
+  readonly adaOportunidades = [
+    { nombre: 'Difusor aromaterapia', score: 87, margen: '68%', ventana: '10–14 días' },
+    { nombre: 'Collar GPS v2', score: 82, margen: '42%', ventana: '14–21 días' },
+    { nombre: 'Bandas fitness premium', score: 71, margen: '38%', ventana: '21–28 días' },
+    { nombre: 'Purificador de agua mini', score: 65, margen: '44%', ventana: '7–10 días' },
+  ];
+
+  readonly skillHistory = [
+    { fecha: '29/05 14:30', resultado: 'ejecutado', detalle: 'CTR Video A fue 0.7% — Pausé, activé B', impacto: 'CTR: 1.2%→1.8%' },
+    { fecha: '28/05 10:15', resultado: 'ejecutado', detalle: 'CTR Video C fue 0.6% — Pausé', impacto: 'ROAS estabilizado' },
+    { fecha: '27/05 —', resultado: 'no_activado', detalle: 'CTR sobre umbral todo el día', impacto: '—' },
+    { fecha: '26/05 08:00', resultado: 'ejecutado', detalle: 'CTR cayó 0.5% — Pausé, activé backup', impacto: 'CTR: 0.5%→1.4%' },
+  ];
+
+  readonly marketplaceSkills = [
+    { nombre: 'Smart routing novedad', uses: '3.4k' },
+    { nombre: 'P&L real vs ROAS', uses: '1.2k' },
+    { nombre: 'Restock alerta proveedor', uses: '890' },
+  ];
+
+  readonly communitySkills = [
+    { id: 'cs-1', category: 'Logística', nombre: 'Auto-reasignación por novedad', descripcion: 'Cambia automáticamente la transportadora cuando la novedad supera el umbral en cualquier ciudad.', uses: '3.4k' },
+    { id: 'cs-2', category: 'Marketing', nombre: 'Escalado ROAS inteligente', descripcion: 'Incrementa el presupuesto de forma gradual cuando el ROAS supera 2.5x durante 24h.', uses: '2.1k' },
+    { id: 'cs-3', category: 'Financiero', nombre: 'P&L real vs ROAS declarado', descripcion: 'Detecta discrepancias entre el ROAS reportado por la plataforma y el P&L real del negocio.', uses: '1.2k' },
+    { id: 'cs-4', category: 'Productos', nombre: 'Alerta saturación de nicho', descripcion: 'Monitorea cuando 3+ competidores nuevos entran a tu nicho en 7 días.', uses: '987' },
+    { id: 'cs-5', category: 'CAS', nombre: 'Resolución automática de novedades comunes', descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención humana.', uses: '756' },
+    { id: 'cs-6', category: 'Marketing', nombre: 'Pausa-por-CTR + A/B automático', descripcion: 'Pausa el creativo con CTR bajo y activa el alternativo. Registra el resultado.', uses: '1.8k' },
+  ];
+
+  get pendingSignals(): number {
+    return this.signals.filter(s => s.estado === 'pending_decision').length;
   }
 
-  get progresoObjetivoWidth(): string {
-    return `${(this.objetivo.actual / this.objetivo.meta) * 100}%`;
-  }
-
-  toggleModoGali(): void {
-    this.modoGaliActivo.update(v => !v);
-  }
-
-  getAgentStatusClass(estado: AgentStatus): string {
-    return {
-      activo: 'agent-status--active',
-      esperando: 'agent-status--waiting',
-      pausa: 'agent-status--paused',
-    }[estado];
-  }
-
-  getSignalClass(urgencia: SignalUrgency): string {
-    return {
-      alta: 'signal--critical',
-      media: 'signal--ok',
-      baja: 'signal--suggestion',
-    }[urgencia];
-  }
-
-  getLoopTypeClass(tipo: LoopEntry['tipo']): string {
-    return {
-      positivo: 'loop-chip--positive',
-      neutro: 'loop-chip--neutral',
-      pendiente: 'loop-chip--pending',
-    }[tipo];
-  }
-
-  getProjectStatusLabel(estado: ProjectStatus): string {
-    return {
-      activo: 'Activo',
-      en_escala: 'En escala',
-      pausado: 'Pausado',
-      borrador: 'Borrador',
-    }[estado];
-  }
-
-  getProjectStatusClass(estado: ProjectStatus): string {
-    return {
-      activo: 'badge--activo',
-      en_escala: 'badge--escala',
-      pausado: 'badge--pausado',
-      borrador: 'badge--borrador',
-    }[estado];
-  }
-
-  // ── Navegación desde botones del hub ──────────────────────────────
   goToProject(id: string): void {
     this.router.navigate(['/gali-v5/proyecto', id]);
   }
 
-  goToProyectos(): void {
-    this.router.navigate(['/gali-v5/proyectos']);
+  readonly showNewSkill = signal(false);
+
+  openNewSkill(): void {
+    this.showNewSkill.set(true);
   }
 
-  goToMarketplace(): void {
-    this.router.navigate(['/gali-v5/skills'], { queryParams: { tab: 'marketplace' } });
-  }
-
-  goToSection(route: string): void {
-    this.router.navigate([route]);
-  }
-
-  sectionHealthClass(status: SectionHealth['status']): string {
-    return `health-cell--${status}`;
-  }
-
-  goToSignalTarget(agente: string): void {
-    const routes: Record<string, string> = {
-      'Vigilante Logístico': '/gali-v5/logistica/torre-logistica',
-      'Vigilante': '/gali-v5/logistica/torre-logistica',
-      'Chatea Pro': '/gali-v5/marketing/chatea-pro',
-      'Roax': '/gali-v5/marketing/roax-informes',
-      'ADA Spy': '/gali-v5/productos/caza-productos',
-    };
-    const route = routes[agente] ?? '/gali-v5';
-    this.router.navigate([route]);
-  }
-
-  goToLoopDetail(entry: LoopEntry): void {
-    const routes: Record<string, string> = {
-      'Roax': '/gali-v5/marketing/roax-informes',
-      'Vigilante': '/gali-v5/logistica/torre-logistica',
-      'Chatea Pro': '/gali-v5/cas/bandeja',
-      'ADA Spy': '/gali-v5/productos/catalogo',
-    };
-    this.router.navigate([routes[entry.agente] ?? '/gali-v5']);
+  goToMode(mode: 'lanzar' | 'construir' | 'medir'): void {
+    this.ws.setMode(mode);
   }
 
   constructor() {

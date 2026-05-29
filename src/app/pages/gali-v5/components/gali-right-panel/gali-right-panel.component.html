@@ -3,22 +3,25 @@
   <!-- Header -->
   <div class="gali-panel__header">
     <div class="gali-panel__identity">
-      <span class="gali-panel__glyph">✦</span>
+      <span class="gali-panel__glyph" [class.gali-panel__glyph--spin]="ws.autopilot()">✦</span>
       <span class="gali-panel__name">Gali</span>
-      <span class="gali-panel__agents-pill">{{ gali.agents().length }} agentes activos</span>
+      <span class="gali-panel__live-dot"
+        [class.gali-panel__live-dot--active]="!gali.galiMode() || gali.galiMode() > 0"
+        [title]="ws.galiStatusLabel">
+      </span>
     </div>
     <div class="gali-panel__header-actions">
       <button
         class="gali-panel__autopilot"
-        [class.gali-panel__autopilot--on]="autopilot()"
+        [class.gali-panel__autopilot--on]="ws.autopilot()"
         type="button"
-        title="Modo autopiloto"
+        title="Activar autopilot — Gali opera sin preguntar"
         (click)="toggleAutopilot()"
         data-proto-skip>
         <span class="gali-panel__autopilot-dot"></span>
-        Auto
+        {{ ws.autopilot() ? 'Auto ●' : 'Auto' }}
       </button>
-      <button class="gali-panel__close" type="button" aria-label="Cerrar panel Gali" (click)="close()" data-proto-skip>
+      <button class="gali-panel__close" type="button" aria-label="Cerrar panel" (click)="close()" data-proto-skip>
         <i class="pi pi-times"></i>
       </button>
     </div>
@@ -26,98 +29,124 @@
 
   <!-- Tabs -->
   <div class="gali-panel__tabs" role="tablist">
-    <button
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'chat'"
-      class="gali-panel__tab"
-      [class.gali-panel__tab--active]="activeTab() === 'chat'"
-      type="button"
-      (click)="setTab('chat')"
-      data-proto-skip>
-      Chat
-    </button>
-    <button
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'agentes'"
-      class="gali-panel__tab"
-      [class.gali-panel__tab--active]="activeTab() === 'agentes'"
-      type="button"
-      (click)="setTab('agentes')"
-      data-proto-skip>
-      Agentes
-    </button>
-    <button
-      role="tab"
-      [attr.aria-selected]="activeTab() === 'senales'"
-      class="gali-panel__tab"
-      [class.gali-panel__tab--active]="activeTab() === 'senales'"
-      type="button"
-      (click)="setTab('senales')"
-      data-proto-skip>
+    <button role="tab" [attr.aria-selected]="activeTab() === 'chat'"
+      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'chat'"
+      type="button" (click)="setTab('chat')" data-proto-skip>Chat</button>
+    <button role="tab" [attr.aria-selected]="activeTab() === 'agentes'"
+      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'agentes'"
+      type="button" (click)="setTab('agentes')" data-proto-skip>Agentes</button>
+    <button role="tab" [attr.aria-selected]="activeTab() === 'senales'"
+      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'senales'"
+      type="button" (click)="setTab('senales')" data-proto-skip>
       Señales
       @if (gali.criticalCount() > 0) {
         <span class="gali-panel__tab-badge">{{ gali.criticalCount() }}</span>
       }
     </button>
+    <button role="tab" [attr.aria-selected]="activeTab() === 'live'"
+      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'live'"
+      type="button" (click)="setTab('live')" data-proto-skip>
+      Live
+      @if (ws.autopilot()) {
+        <span class="gali-panel__tab-live-dot"></span>
+      }
+    </button>
   </div>
 
-  <!-- TAB: Chat -->
+  <!-- ── TAB: Chat ── -->
   @if (activeTab() === 'chat') {
     <div class="gali-panel__content gali-panel__chat">
       <div class="gali-panel__messages">
+
         @for (msg of gali.chatHistory(); track msg.id) {
           <div class="gali-msg" [class.gali-msg--gali]="msg.from === 'gali'" [class.gali-msg--user]="msg.from === 'user'">
             @if (msg.from === 'gali') {
               <span class="gali-msg__avatar">✦</span>
             }
-            <div class="gali-msg__bubble">
-              <p class="gali-msg__text">{{ msg.text }}</p>
-              <span class="gali-msg__time">{{ msg.time }}</span>
+            <div class="gali-msg__bubble-wrap">
+              <div class="gali-msg__bubble">
+                <p class="gali-msg__text">{{ msg.text }}</p>
+                <span class="gali-msg__time">{{ msg.time }}</span>
+              </div>
+              @if (msg.actions?.length) {
+                <div class="gali-msg__actions">
+                  @for (action of msg.actions; track action.action) {
+                    <button type="button"
+                      class="gali-msg__action-btn"
+                      [class.gali-msg__action-btn--primary]="action.isPrimary"
+                      data-proto-skip
+                      (click)="executeAction(action.action)">
+                      {{ action.label }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (gali.isTyping()) {
+          <div class="gali-msg gali-msg--gali">
+            <span class="gali-msg__avatar">✦</span>
+            <div class="gali-msg__bubble gali-msg__bubble--typing">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
             </div>
           </div>
         }
         <div #chatEnd></div>
       </div>
 
+      <!-- Quick actions -->
       <div class="gali-panel__quick-actions">
-        <button class="gali-panel__quick-btn" type="button" data-proto-skip>¿Qué pasó hoy?</button>
-        <button class="gali-panel__quick-btn" type="button" data-proto-skip>Ver señales críticas</button>
-        <button class="gali-panel__quick-btn" type="button" data-proto-skip>Mi P&amp;L de hoy</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip
+          (click)="quickAsk('¿Qué pasó hoy?')">¿Qué pasó hoy?</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip
+          (click)="quickAsk('¿Cuál es el ROAS actual?')">Ver ROAS</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip
+          (click)="quickAsk('Muéstrame mis skills activas')">Mis skills</button>
+        <button class="gali-panel__quick-btn" type="button" data-proto-skip
+          (click)="quickAsk('Quiero lanzar un nuevo producto')">Lanzar</button>
       </div>
 
+      <!-- Input -->
       <div class="gali-panel__input-row">
         <input
           class="gali-panel__input"
           type="text"
-          placeholder="Pídele algo a Gali..."
+          placeholder="Pídele algo a Gali…"
           [value]="chatInput()"
           (input)="onInputChange($event)"
           (keydown)="onKeyDown($event)"
           aria-label="Mensaje para Gali"
         />
-        <button
-          class="gali-panel__send"
-          type="button"
-          [disabled]="!chatInput().trim()"
-          (click)="send()"
-          data-proto-skip
-          aria-label="Enviar">
+        <button class="gali-panel__send" type="button"
+          [disabled]="!chatInput().trim()" (click)="send()" data-proto-skip>
           <i class="pi pi-send"></i>
         </button>
       </div>
     </div>
   }
 
-  <!-- TAB: Agentes -->
+  <!-- ── TAB: Agentes ── -->
   @if (activeTab() === 'agentes') {
     <div class="gali-panel__content gali-panel__agentes">
       @for (agent of gali.agents(); track agent.id) {
         <div class="agent-row">
           <div class="agent-row__left">
-            <span class="agent-row__dot" [style.background]="agent.color"></span>
+            <span class="agent-row__dot" [style.background]="agent.color"
+              [class.agent-row__dot--pulse]="agent.status === 'activo'"></span>
             <div class="agent-row__info">
               <span class="agent-row__name">{{ agent.name }}</span>
               <span class="agent-row__action">{{ agent.action }}</span>
+              @if (agent.skills.length) {
+                <div class="agent-row__skills">
+                  @for (skill of agent.skills; track skill) {
+                    <span class="agent-row__skill-tag">{{ skill }}</span>
+                  }
+                </div>
+              }
             </div>
           </div>
           <span class="agent-row__status" [class.agent-row__status--active]="agent.status === 'activo'">
@@ -127,45 +156,86 @@
       }
 
       <div class="gali-panel__agent-actions">
-        <button class="gali-panel__agent-btn" type="button" data-proto-skip>
-          <i class="pi pi-pause"></i> Pausar todos
+        <button class="gali-panel__agent-btn" type="button" data-proto-skip
+          (click)="gali.setAutopilot(!ws.autopilot())">
+          <i class="pi pi-{{ ws.autopilot() ? 'pause' : 'play' }}"></i>
+          {{ ws.autopilot() ? 'Desactivar autopilot' : 'Activar autopilot' }}
         </button>
-        <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button" data-proto-skip>
-          <i class="pi pi-plus"></i> Añadir agente
+        <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button" data-proto-skip
+          (click)="navigateTo('/gali-v5/skills')">
+          <i class="pi pi-cog"></i> Gestionar skills
         </button>
       </div>
 
       <div class="gali-panel__autopilot-section">
         <div class="gali-panel__autopilot-info">
-          <span class="gali-panel__autopilot-title">Modo autopiloto</span>
-          <span class="gali-panel__autopilot-desc">Gali opera en background y solo escala al humano decisiones estratégicas</span>
+          <span class="gali-panel__autopilot-title">Modo autopilot</span>
+          <span class="gali-panel__autopilot-desc">Gali opera sin preguntar y solo escala al humano decisiones estratégicas</span>
         </div>
-        <button
-          class="gali-panel__toggle"
-          [class.gali-panel__toggle--on]="autopilot()"
+        <button class="gali-panel__toggle"
+          [class.gali-panel__toggle--on]="ws.autopilot()"
           type="button"
-          (click)="toggleAutopilot()"
-          data-proto-skip
-          [attr.aria-label]="autopilot() ? 'Desactivar autopiloto' : 'Activar autopiloto'">
+          (click)="toggleAutopilot()" data-proto-skip
+          [attr.aria-label]="ws.autopilot() ? 'Desactivar autopilot' : 'Activar autopilot'">
           <span class="gali-panel__toggle-knob"></span>
         </button>
       </div>
     </div>
   }
 
-  <!-- TAB: Señales -->
+  <!-- ── TAB: Señales ── -->
   @if (activeTab() === 'senales') {
     <div class="gali-panel__content gali-panel__senales">
       @for (sig of gali.galiSignals(); track sig.id) {
-        <div class="signal-item" [class.signal-item--critica]="sig.type === 'critica'" [class.signal-item--sugerencia]="sig.type === 'sugerencia'" [class.signal-item--info]="sig.type === 'info'">
+        <div class="signal-item"
+          [class.signal-item--critica]="sig.type === 'critica'"
+          [class.signal-item--sugerencia]="sig.type === 'sugerencia'"
+          [class.signal-item--info]="sig.type === 'info'">
           <span class="signal-item__emoji">{{ sig.emoji }}</span>
           <div class="signal-item__body">
             <p class="signal-item__msg">{{ sig.message }}</p>
             <span class="signal-item__time">{{ sig.time }}</span>
           </div>
-          @if (sig.cta) {
-            <button class="signal-item__cta" type="button" (click)="navigateToSignal(sig.id)" data-proto-skip>{{ sig.cta }}</button>
+          @if (sig.cta && sig.ctaAction) {
+            <button class="signal-item__cta" type="button"
+              (click)="executeAction(sig.ctaAction!)" data-proto-skip>{{ sig.cta }}</button>
           }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── TAB: Live ── -->
+  @if (activeTab() === 'live') {
+    <div class="gali-panel__content gali-panel__live">
+
+      <div class="live-header">
+        <span class="live-header__label">Actividad en tiempo real</span>
+        <span class="live-header__badge" [class.live-header__badge--on]="ws.autopilot()">
+          {{ ws.autopilot() ? '● EN VIVO' : '○ Pausado' }}
+        </span>
+      </div>
+
+      @if (!ws.autopilot()) {
+        <div class="live-empty">
+          <p>Activa el autopilot para ver el feed en tiempo real</p>
+          <button type="button" class="live-activate-btn" data-proto-skip (click)="toggleAutopilot()">
+            Activar autopilot ✦
+          </button>
+        </div>
+      }
+
+      @for (event of ws.liveEvents(); track event.id) {
+        <div class="live-event" [class.live-event--ok]="event.tipo === 'ok'"
+          [class.live-event--warn]="event.tipo === 'warn'"
+          [class.live-event--action]="event.tipo === 'action'">
+          <span class="live-event__agent-dot"
+            [style.background]="agentColor(event.agente_id)"></span>
+          <div class="live-event__body">
+            <span class="live-event__agent">{{ event.agente }}</span>
+            <p class="live-event__msg">{{ event.mensaje }}</p>
+          </div>
+          <span class="live-event__time">{{ event.timestamp }}</span>
         </div>
       }
     </div>

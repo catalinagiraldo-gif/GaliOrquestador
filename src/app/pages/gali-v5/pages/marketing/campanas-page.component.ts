@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   DropiTitulosComponent,
   DropiButtonNewComponent,
@@ -9,6 +10,8 @@ import {
 } from '../../components/shared';
 import campanasData from '../../../../../../mocks/gali-v5/marketing-campanas.json';
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 interface CampanaRow {
   id: string;
@@ -28,11 +31,16 @@ interface CampanaRow {
     DropiTagComponent,
     DropiPaginatorComponent,
     DropiGaliBarComponent,
+    GaliNewSkillOverlayComponent,
   ],
   templateUrl: './campanas-page.component.html',
   styleUrl: './campanas-page.component.scss',
 })
 export class CampanasPageComponent {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
+  readonly showNewSkill = signal(false);
   activeChannel: 'sms' | 'email' = 'sms';
   readonly breadcrumbs = ['Marketing', 'SMS y Correo', 'Campañas masivas'];
 
@@ -55,5 +63,11 @@ export class CampanasPageComponent {
       case 'Pausada': return 'warning';
       default: return 'neutral';
     }
+  }
+
+  goToSkillEditor(): void {
+    this.router.navigate(['/gali-v5/skills/nueva'], {
+      queryParams: { agente: 'roax', contexto: 'campana', metrica: 'CTR' },
+    });
   }
 }

@@ -7,6 +7,18 @@
     ctaLabel="Ver reglas activas"
   />
 
+  <!-- Skill interconnection banner -->
+  <div class="campanas-skill-banner">
+    <span class="campanas-skill-banner__icon">🔧</span>
+    <div class="campanas-skill-banner__text">
+      <strong>¿Quieres que Roax reaccione automáticamente?</strong>
+      Crea una skill que pausé campañas cuando el CTR cae o escale presupuesto cuando el ROAS sube.
+    </div>
+    <button type="button" class="campanas-skill-banner__btn" (click)="goToSkillEditor()">
+      Crear skill de Roax →
+    </button>
+  </div>
+
   <dropi-titulos title="Campañas masivas" [breadcrumbs]="breadcrumbs">
     <dropi-button-new titulosActions label="Nueva campaña" icon="pi-chevron-down" hierarchy="primary" [width]="200" />
   </dropi-titulos>
@@ -59,3 +71,10 @@
     </div>
   </div>
 </div>
+
+@if (showNewSkill()) {
+  <gali-new-skill-overlay
+    (closed)="showNewSkill.set(false)"
+    (created)="showNewSkill.set(false)"
+  />
+}

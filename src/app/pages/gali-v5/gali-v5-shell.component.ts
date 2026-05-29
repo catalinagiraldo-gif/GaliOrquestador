@@ -90,14 +90,22 @@ export class GaliV5ShellComponent {
     this.sectionNavCollapsed.set(true);
   }
 
+  /** True when the active route is the Gali OS workspace (home, no section panel) */
+  readonly isOsWorkspace = signal(false);
+
   private syncNav(url: string): void {
     const panel = resolveSectionPanel(url);
     if (panel) {
       this.sectionPanel.set(panel);
       this.hasSectionPanel.set(true);
       this.sectionNavCollapsed.set(false);
+      this.isOsWorkspace.set(false);
     } else {
       this.hasSectionPanel.set(false);
+      this.sectionNavCollapsed.set(false);
+      // Mark as OS workspace if we're at the gali-v5 root
+      const isRoot = /^\/gali-v5\/?$/.test(url.split('?')[0]);
+      this.isOsWorkspace.set(isRoot);
     }
   }
 

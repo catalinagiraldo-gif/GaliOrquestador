@@ -1,12 +1,12 @@
 @import 'styles/gali-v5-tokens';
 
-// Panel tokens
-$panel-bg:       #141414;
-$panel-surface:  #1e1e1e;
-$panel-border:   rgba(255, 255, 255, 0.08);
-$panel-text:     #f4f4f5;
-$panel-muted:    rgba(255, 255, 255, 0.45);
-$panel-caption:  rgba(255, 255, 255, 0.28);
+// Panel tokens — Light mode
+$panel-bg:       #ffffff;
+$panel-surface:  #f8f8fb;
+$panel-border:   rgba(0, 0, 0, 0.07);
+$panel-text:     #1a1a22;
+$panel-muted:    rgba(0, 0, 0, 0.4);
+$panel-caption:  rgba(0, 0, 0, 0.35);
 $panel-accent:   $primary-500;  // #ff6102
 $panel-success:  #10b981;
 $panel-warning:  #f59e0b;
@@ -64,6 +64,24 @@ $panel-info:     #3b82f6;
     font-size: 16px;
     color: $panel-accent;
     animation: agentPulse 3s infinite;
+
+    &--spin {
+      animation: galiOsRotate 4s linear infinite;
+    }
+  }
+
+  &__live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $panel-muted;
+    transition: background 0.3s;
+
+    &--active {
+      background: $panel-success;
+      box-shadow: 0 0 6px $panel-success;
+      animation: pulseDot 2s infinite;
+    }
   }
 
   &__name {
@@ -348,7 +366,7 @@ $panel-info:     #3b82f6;
 
     .pi { font-size: 11px; }
 
-    &:hover { border-color: rgba(255,255,255,0.2); color: $panel-text; }
+    &:hover { border-color: rgba(0,0,0,0.2); color: $panel-text; }
 
     &--primary {
       border-color: rgba($primary-500, 0.4);
@@ -492,7 +510,7 @@ $panel-info:     #3b82f6;
   background: $panel-surface;
   transition: background 0.15s ease;
 
-  &:hover { background: lighten(#1e1e1e, 3%); }
+  &:hover { background: rgba(0, 0, 0, 0.04); }
 
   &__left {
     display: flex;
@@ -612,4 +630,246 @@ $panel-info:     #3b82f6;
       border-color: rgba($primary-500, 0.5);
     }
   }
+}
+
+// ── Chat action buttons ──────────────────────────────────────────────────
+.gali-msg {
+  &__bubble-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    max-width: 85%;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__action-btn {
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid $panel-border;
+    background: rgba(0, 0, 0, 0.03);
+    color: $panel-text;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.06);
+      color: $panel-text;
+    }
+
+    &--primary {
+      background: rgba($primary-500, 0.15);
+      border-color: rgba($primary-500, 0.5);
+      color: $primary-500;
+
+      &:hover { background: rgba($primary-500, 0.25); }
+    }
+  }
+}
+
+// Typing indicator
+.gali-msg__bubble--typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $panel-muted;
+  animation: typingBounce 1.2s ease infinite;
+
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.4s; }
+}
+
+// Agent skills tags
+.agent-row {
+  &__skills {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  &__skill-tag {
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 100px;
+    background: rgba($primary-500, 0.1);
+    color: $primary-500;
+    border: 1px solid rgba($primary-500, 0.2);
+    white-space: nowrap;
+  }
+
+  &__dot--pulse {
+    animation: agentPulse 2s ease infinite;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// ── Live tab ──────────────────────────────────────────────────────────────
+.gali-panel__live {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.live-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $size-3 $size-4;
+  border-bottom: 1px solid $panel-border;
+  flex-shrink: 0;
+
+  &__label {
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: 600;
+    color: $panel-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__badge {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    color: $panel-muted;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid $panel-border;
+
+    &--on {
+      color: $panel-success;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      animation: agentPulse 2s ease infinite;
+    }
+  }
+}
+
+.live-empty {
+  padding: $size-8 $size-4;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $size-3;
+  color: $panel-muted;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  line-height: 1.5;
+}
+
+.live-activate-btn {
+  padding: 7px 18px;
+  background: rgba($primary-500, 0.15);
+  border: 1px solid rgba($primary-500, 0.4);
+  border-radius: $radius-full;
+  color: $primary-500;
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: rgba($primary-500, 0.25); }
+}
+
+.live-event {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-2;
+  padding: $size-2 $size-4;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  animation: liveEventFade 0.3s ease;
+
+  &--warn {
+    background: rgba(245, 158, 11, 0.05);
+    border-left: 2px solid $panel-warning;
+  }
+
+  &--action {
+    background: rgba($primary-500, 0.04);
+  }
+
+  &__agent-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__agent {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: 600;
+    color: $panel-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+  }
+
+  &__msg {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $panel-text;
+    margin: 1px 0 0;
+    line-height: 1.35;
+  }
+
+  &__time {
+    font-size: 10px;
+    color: $panel-caption;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+}
+
+// ── Tab live dot ──────────────────────────────────────────────────────────
+.gali-panel__tab-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $panel-success;
+  margin-left: 4px;
+  animation: agentPulse 1.5s ease infinite;
+  vertical-align: middle;
+}
+
+// ── Animations ─────────────────────────────────────────────────────────────
+@keyframes galiOsRotate {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+@keyframes liveEventFade {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: none; }
 }

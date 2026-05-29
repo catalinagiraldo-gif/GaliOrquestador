@@ -29,7 +29,7 @@
       (dragEnd)="onSplitterDragEnd()"
     />
 
-    <main class="gali-v5-shell__content">
+    <main class="gali-v5-shell__content" [class.gali-v5-shell__content--os]="isOsWorkspace()">
       <button
         *ngIf="hasSectionPanel() && sectionNavCollapsed()"
         type="button"

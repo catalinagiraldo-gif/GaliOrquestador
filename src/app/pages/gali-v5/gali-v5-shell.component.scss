@@ -58,12 +58,25 @@
     background: $white;
     // Cuando el panel Gali está abierto, el content se desplaza
     transition: padding-right 0.25s ease;
+
+    // OS Workspace (home route) — panels scroll internally, not the container
+    &--os {
+      overflow: hidden;
+      background: #f4f4f7;
+    }
   }
 
   // Cuando el panel Gali está abierto, desplazar el contenido
   &--panel-open {
     .gali-v5-shell__content {
       padding-right: var(--gali-panel-width);
+    }
+  }
+
+  // En mobile el panel ocupa 100vw — no necesita padding al content
+  @media (max-width: 767px) {
+    &--panel-open .gali-v5-shell__content {
+      padding-right: 0;
     }
   }
 
@@ -105,13 +118,18 @@
       display: none;
     }
 
-    .gali-v5-shell__content {
-      grid-column: 2 / -1;
+    .gali-v5-shell__body {
+      grid-template-columns: var(--dropi-rail-width) minmax(0, 1fr);
     }
   }
 
   &--nav-collapsed {
     --dropi-section-col: 0px;
+
+    dropi-section-nav {
+      pointer-events: none;
+      overflow: hidden;
+    }
   }
 
   &--compact {

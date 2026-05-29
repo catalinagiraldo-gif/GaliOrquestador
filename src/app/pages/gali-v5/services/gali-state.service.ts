@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { GaliWorkspaceService } from './gali-workspace.service';
 
 export type GaliMode = 0 | 1 | 2;
 
@@ -8,6 +10,7 @@ export interface AgentStatus {
   color: string;
   status: 'activo' | 'esperando' | 'pausado';
   action: string;
+  skills: string[];
 }
 
 export interface GaliSignal {
@@ -17,6 +20,7 @@ export interface GaliSignal {
   message: string;
   time: string;
   cta?: string;
+  ctaAction?: string;
 }
 
 export interface ChatMessage {
@@ -24,99 +28,153 @@ export interface ChatMessage {
   from: 'gali' | 'user';
   text: string;
   time: string;
+  actions?: ChatAction[];
+}
+
+export interface ChatAction {
+  label: string;
+  action: string;
+  isPrimary?: boolean;
+}
+
+// Context-aware Gali responses
+const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[] }> = {
+  'novedad': {
+    text: 'Coordinadora tiene 15% de novedad en Bogotá — 3× el umbral. Tengo 12 pedidos en riesgo hoy. Puedo reasignarlos a Servientrega (tasa actual 3.8%) o crear una regla automática para el futuro.',
+    actions: [
+      { label: 'Reasignar ahora', action: 'reasignar-pedidos', isPrimary: true },
+      { label: 'Crear skill de routing', action: 'crear-skill-routing' },
+    ],
+  },
+  'roas': {
+    text: 'Roax tiene ROAS 2.9x hoy — por encima del objetivo de 2.5x durante 52h. La skill "Escalado ROAS" se activó hace 4h y subió el presupuesto de $57.5k a $66k/día. ¿Quieres que siga subiendo?',
+    actions: [
+      { label: 'Ver skill activa', action: 'ver-skill-roas' },
+      { label: 'Ajustar umbral', action: 'editar-skill' },
+    ],
+  },
+  'hoy': {
+    text: '📊 Resumen de hoy:\n• ROAS: 2.9x (↑ desde 2.6x)\n• Pedidos: 47 confirmados, 1 pendiente de tu decisión\n• Señales críticas: 1 (Coordinadora Bogotá)\n• Acciones de Gali: 3 (cambio de video, routing, confirmaciones)\n• Ganancia estimada: $411k',
+    actions: [
+      { label: 'Ver señal crítica', action: 'ir-a-senales', isPrimary: true },
+      { label: 'Ver P&L completo', action: 'ir-medir' },
+    ],
+  },
+  'skill': {
+    text: 'Tienes 3 skills activas: "Auto-pausa CTR" (se activó hace 2h), "Escalado ROAS" (se activó hace 4h), y "Smart routing novedad" (pausada). ¿Quieres crear una nueva o ver el historial?',
+    actions: [
+      { label: 'Crear nueva skill', action: 'crear-skill', isPrimary: true },
+      { label: 'Ver historial', action: 'ir-construir' },
+    ],
+  },
+  'proyecto': {
+    text: 'Collar GPS está en escala con ROAS 2.9x y 47 pedidos/sem. Hay una alerta activa: novedad alta en Cali. Skincare K-Beauty está normal. Bandas de Fitness está pausado — el CTR se recuperó.',
+    actions: [
+      { label: 'Ver proyectos', action: 'ir-operar' },
+      { label: 'Lanzar nuevo proyecto', action: 'ir-lanzar' },
+    ],
+  },
+  'lanzar': {
+    text: 'Para lanzar un producto, cambio al modo Lanzar donde puedes hablar conmigo sobre el producto mientras ADA Spy te muestra oportunidades en tiempo real. ¿Tienes un producto en mente o quieres ver mis sugerencias?',
+    actions: [
+      { label: 'Ir a Modo Lanzar', action: 'ir-lanzar', isPrimary: true },
+    ],
+  },
+  'senales': {
+    text: 'Yendo al modo Operar. Tienes 2 señales pendientes de decisión: una crítica (Coordinadora Bogotá 15% novedad) y una de oportunidad (Difusor aromaterapia score 87). ¿Las revisamos?',
+    actions: [
+      { label: 'Ver señales', action: 'ir-a-senales', isPrimary: true },
+    ],
+  },
+  'medir': {
+    text: 'Cambiando a Modo Medir. Tu mejor proyecto esta semana es Collar GPS con ROAS 2.9x y $411k de ganancia estimada. Skincare K-Beauty está en 1.8x — en el umbral de corte.',
+    actions: [
+      { label: 'Ver P&L completo', action: 'ir-medir', isPrimary: true },
+    ],
+  },
+  'construir': {
+    text: 'Cambiando a Modo Construir. Tienes 2 skills activas y 1 pausada. La de Smart Routing novedad necesita tu atención — lleva 2 días pausada.',
+    actions: [
+      { label: 'Ver mis skills', action: 'ir-construir', isPrimary: true },
+      { label: 'Nueva skill', action: 'crear-skill' },
+    ],
+  },
+  'autopilot': {
+    text: 'Activando autopilot. Gali tomará decisiones rutinarias por ti: routing de novedades, pausa de creativos con CTR bajo y confirmación de pedidos con huella verde. Siempre te aviso en el feed en vivo.',
+    actions: [
+      { label: 'Activar autopilot', action: 'toggle-autopilot', isPrimary: true },
+    ],
+  },
+  'default': {
+    text: 'Entendido. Voy a procesar eso. Mientras tanto, recuerda que tienes 1 señal crítica activa (Coordinadora 15% novedad) y el ROAS está en 2.9x. ¿Quieres que priorice algo específico?',
+    actions: [
+      { label: 'Ver señales', action: 'ir-a-senales' },
+      { label: 'Ver todo el resumen', action: 'hoy' },
+    ],
+  },
+};
+
+function matchResponse(text: string): { text: string; actions?: ChatAction[] } {
+  const lower = text.toLowerCase();
+  if (lower.includes('novedad') || lower.includes('coordinadora') || lower.includes('transportadora')) return SMART_RESPONSES['novedad'];
+  if (lower.includes('roas') || lower.includes('campaña') || lower.includes('roax') || lower.includes('presupuesto')) return SMART_RESPONSES['roas'];
+  if (lower.includes('hoy') || lower.includes('resumen') || lower.includes('pasó')) return SMART_RESPONSES['hoy'];
+  if (lower.includes('skill') || lower.includes('automatiza') || lower.includes('regla') || lower.includes('construir')) return SMART_RESPONSES['skill'];
+  if (lower.includes('proyecto') || lower.includes('collar') || lower.includes('skincare')) return SMART_RESPONSES['proyecto'];
+  if (lower.includes('lanzar') || lower.includes('nuevo producto') || lower.includes('lanzamiento')) return SMART_RESPONSES['lanzar'];
+  if (lower.includes('señal') || lower.includes('señales') || lower.includes('critica') || lower.includes('crítica') || lower.includes('operar')) return SMART_RESPONSES['senales'];
+  if (lower.includes('medir') || lower.includes('ventas') || lower.includes('ganancia') || lower.includes('p&l')) return SMART_RESPONSES['medir'];
+  if (lower.includes('autopilot') || lower.includes('auto') || lower.includes('automático')) return SMART_RESPONSES['autopilot'];
+  return SMART_RESPONSES['default'];
 }
 
 @Injectable({ providedIn: 'root' })
 export class GaliStateService {
+  private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
+
   readonly galiMode = signal<GaliMode>(0);
 
   readonly agents = signal<AgentStatus[]>([
-    {
-      id: 'ada',
-      name: 'ADA Spy',
-      color: '#3b82f6',
-      status: 'activo',
-      action: 'Evaluando 3 productos · ventana 18 días',
-    },
-    {
-      id: 'roax',
-      name: 'Roax',
-      color: '#ff6102',
-      status: 'activo',
-      action: 'ROAS 2.9x · pauta $66k/día activa',
-    },
-    {
-      id: 'chatea',
-      name: 'Chatea Pro',
-      color: '#10b981',
-      status: 'activo',
-      action: '43 de 47 pedidos confirmados',
-    },
-    {
-      id: 'vigilante',
-      name: 'Vigilante Logístico',
-      color: '#f59e0b',
-      status: 'activo',
-      action: 'Smart routing activo · 0 alertas',
-    },
+    { id: 'roax', name: 'Roax', color: '#f97316', status: 'activo', action: 'ROAS 2.9x · pauta $66k/día activa', skills: ['Auto-pausa CTR', 'Escalado ROAS'] },
+    { id: 'vigilante', name: 'Vigilante', color: '#fbbf24', status: 'activo', action: 'Detectó novedad 15% Coordinadora Bogotá', skills: ['Smart routing novedad'] },
+    { id: 'chatea', name: 'Chatea Pro', color: '#34d399', status: 'activo', action: '43 de 47 pedidos confirmados · 1 pendiente', skills: [] },
+    { id: 'ada', name: 'ADA Spy', color: '#818cf8', status: 'esperando', action: 'Evaluando 3 productos · ventana 18 días', skills: [] },
   ]);
 
   readonly galiSignals = signal<GaliSignal[]>([
-    {
-      id: 's1',
-      type: 'critica',
-      emoji: '⚠',
-      message: 'Coordinadora Bogotá 15% novedad · 12 pedidos en riesgo',
-      time: 'hace 14 min',
-      cta: 'Ver opciones',
-    },
-    {
-      id: 's2',
-      type: 'sugerencia',
-      emoji: '⚡',
-      message: 'Video B de Collar GPS: CTR +50% · Roax aumentó pauta 15%',
-      time: 'hace 2h',
-      cta: 'Ver campaña',
-    },
-    {
-      id: 's3',
-      type: 'info',
-      emoji: '✓',
-      message: '8 novedades resueltas hoy · $480k en pérdidas evitadas',
-      time: 'hace 3h',
-    },
-    {
-      id: 's4',
-      type: 'sugerencia',
-      emoji: '💡',
-      message: 'Proyector Portátil pausado: el CTR se recuperó. ¿Reanudamos?',
-      time: 'hace 5h',
-      cta: 'Reanudar',
-    },
+    { id: 's1', type: 'critica', emoji: '⚠', message: 'Coordinadora Bogotá 15% novedad · 12 pedidos en riesgo', time: 'hace 18 min', cta: 'Resolver', ctaAction: 'ir-a-senales' },
+    { id: 's2', type: 'sugerencia', emoji: '⚡', message: 'Video B CTR +50% · Roax escaló presupuesto +15%', time: 'hace 2h', cta: 'Ver skill', ctaAction: 'ver-skill-roas' },
+    { id: 's3', type: 'info', emoji: '✓', message: '8 novedades resueltas hoy · $480k en pérdidas evitadas', time: 'hace 3h' },
+    { id: 's4', type: 'sugerencia', emoji: '💡', message: 'Bandas de Fitness: CTR recuperado. ¿Reanudamos?', time: 'hace 5h', cta: 'Reanudar', ctaAction: 'ir-operar' },
   ]);
 
   readonly chatHistory = signal<ChatMessage[]>([
     {
       id: 'c1',
       from: 'gali',
-      text: 'Hola Valentina. Tienes 1 señal crítica activa: Coordinadora tiene 15% de novedad en Bogotá. Tengo 3 alternativas listas. ¿Las veo?',
-      time: 'hace 14 min',
+      text: '¡Hola! Tienes 1 señal crítica: Coordinadora tiene 15% de novedad en Bogotá — 12 pedidos en riesgo. ¿Lo resolvemos ahora?',
+      time: 'hace 18 min',
+      actions: [
+        { label: 'Ver la señal', action: 'ir-a-senales', isPrimary: true },
+        { label: 'Reasignar pedidos', action: 'reasignar-pedidos' },
+      ],
     },
-    {
-      id: 'c2',
-      from: 'user',
-      text: 'Sí, muéstrame las opciones',
-      time: 'hace 12 min',
-    },
+    { id: 'c2', from: 'user', text: 'Muéstrame las opciones', time: 'hace 16 min' },
     {
       id: 'c3',
       from: 'gali',
-      text: 'Servientrega tiene 3.8% novedad en Bogotá esta semana. Envía tiene 4.1%. Coordinadora sigue en 15%. Recomiendo cambiar los 12 pedidos a Servientrega. ¿Lo hago?',
-      time: 'hace 11 min',
+      text: 'Tengo 3 opciones: A) Cambiar los 12 pedidos a Servientrega (tasa 3.8%), B) Cambiar solo los de hoy y esperar, C) Crear una regla automática para el futuro. ¿Cuál prefieres?',
+      time: 'hace 15 min',
+      actions: [
+        { label: 'Opción A — Cambiar todo', action: 'reasignar-pedidos', isPrimary: true },
+        { label: 'Crear regla automática', action: 'crear-skill-routing' },
+      ],
     },
   ]);
 
   readonly criticalCount = signal(1);
+  readonly isTyping = signal(false);
 
   togglePanel(): void {
     this.galiMode.update(m => (m === 0 ? 1 : 0));
@@ -124,25 +182,88 @@ export class GaliStateService {
 
   setAutopilot(on: boolean): void {
     this.galiMode.set(on ? 2 : 1);
+    if (on) this.ws.enableAutopilot();
+    else this.ws.disableAutopilot();
   }
 
   sendMessage(text: string): void {
-    const msg: ChatMessage = {
-      id: `u-${Date.now()}`,
-      from: 'user',
-      text,
-      time: 'ahora',
-    };
-    this.chatHistory.update(h => [...h, msg]);
+    const userMsg: ChatMessage = { id: `u-${Date.now()}`, from: 'user', text, time: 'ahora' };
+    this.chatHistory.update(h => [...h, userMsg]);
+    this.isTyping.set(true);
 
+    const delay = 600 + Math.random() * 600;
     setTimeout(() => {
-      const reply: ChatMessage = {
+      this.isTyping.set(false);
+      const response = matchResponse(text);
+      const galiMsg: ChatMessage = {
         id: `g-${Date.now()}`,
         from: 'gali',
-        text: 'Entendido. Estoy procesando tu solicitud y te aviso en cuanto tenga resultados.',
+        text: response.text,
         time: 'ahora',
+        actions: response.actions,
       };
-      this.chatHistory.update(h => [...h, reply]);
-    }, 800);
+      this.chatHistory.update(h => [...h, galiMsg]);
+    }, delay);
+  }
+
+  executeAction(action: string): void {
+    switch (action) {
+      case 'ir-a-senales':
+        this.ws.setMode('operar');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0); // close panel to see workspace
+        break;
+      case 'ir-operar':
+        this.ws.setMode('operar');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'ir-lanzar':
+        this.ws.setMode('lanzar');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'ir-construir':
+        this.ws.setMode('construir');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'ir-medir':
+        this.ws.setMode('medir');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'crear-skill':
+      case 'crear-skill-routing':
+        this.ws.setMode('construir');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        this.sendMessage('Quiero crear una nueva skill de routing automático');
+        break;
+      case 'ver-skill-roas':
+        this.ws.setMode('construir');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'reasignar-pedidos':
+        this.ws.addLiveEvent({ agente: 'Vigilante', agente_id: 'vigilante', mensaje: 'Reasignando 12 pedidos a Servientrega…', tipo: 'action' });
+        this.sendMessage('Confirmo reasignación');
+        setTimeout(() => {
+          this.ws.addLiveEvent({ agente: 'Vigilante', agente_id: 'vigilante', mensaje: '✓ 12 pedidos reasignados a Servientrega', tipo: 'ok' });
+        }, 2000);
+        break;
+      case 'toggle-autopilot':
+        this.ws.toggleAutopilot();
+        if (this.ws.autopilot()) {
+          this.ws.addLiveEvent({ agente: 'Gali', agente_id: 'gali', mensaje: 'Autopilot activado — Gali opera sin preguntar', tipo: 'action' });
+        }
+        this.galiMode.set(0);
+        break;
+      case 'ir-senales':
+        this.ws.setMode('operar');
+        this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+    }
   }
 }
