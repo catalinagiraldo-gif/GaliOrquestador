@@ -12,6 +12,7 @@
   />
 
   <div class="gali-v5-shell__body">
+    <dropi-ia-rail />
     <dropi-icon-rail />
 
     <dropi-section-nav
@@ -31,7 +32,11 @@
     />
 
     <main class="gali-v5-shell__content" [class.gali-v5-shell__content--os]="isOsWorkspace()">
-      <router-outlet />
+      <gali-context-strip [contextKey]="currentContextKey()" />
+      <gali-intent-bar />
+      <div class="gali-v5-shell__outlet">
+        <router-outlet />
+      </div>
     </main>
   </div>
 
@@ -39,7 +44,6 @@
   @if (galiState.galiMode() > 0) {
     <div
       class="gali-v5-shell__panel-overlay"
-      [class.gali-v5-shell__panel-overlay--in]="galiState.galiMode() > 0"
       [style.width.px]="galiState.panelWidth()">
       <dropi-panel-splitter
         class="gali-v5-shell__panel-resize"

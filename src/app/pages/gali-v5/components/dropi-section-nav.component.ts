@@ -1,8 +1,23 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
+import { GaliStateService } from '../services/gali-state.service';
+
+// Mapeo de route patterns → agent data para el prototipo
+const ROUTE_AGENT_MAP: Array<{ pattern: string; name: string; color: string }> = [
+  { pattern: 'pedidos',    name: 'Vigilante', color: '#fbbf24' },
+  { pattern: 'novedades',  name: 'Vigilante', color: '#fbbf24' },
+  { pattern: 'logistica',  name: 'Vigilante', color: '#fbbf24' },
+  { pattern: 'marketing',  name: 'Roax',      color: '#f97316' },
+  { pattern: 'roax',       name: 'Roax',      color: '#f97316' },
+];
+
+const ROUTE_PENDING_MAP: Record<string, number> = {
+  pedidos: 3,
+  novedades: 3,
+};
 
 @Component({
   selector: 'dropi-section-nav',
@@ -85,7 +100,7 @@ import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
               *ngIf="item.type !== 'header' && item.route"
               [routerLink]="item.route!"
               routerLinkActive="section-nav__row--active"
-              [routerLinkActiveOptions]="{ exact: false }"
+              [routerLinkActiveOptions]="linkActiveOptions(item.route!)"
               class="section-nav__row"
               [class.section-nav__row--icon-only]="collapsed()"
               [title]="collapsed() ? item.label : null"
@@ -98,10 +113,28 @@ import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
               <span *ngIf="!collapsed()" class="section-nav__label">{{ item.label }}</span>
               <span *ngIf="!collapsed() && item.badge === 'nuevo'" class="section-nav__badge section-nav__badge--nuevo">Nuevo</span>
               <span *ngIf="!collapsed() && item.badge === 'beta'" class="section-nav__badge section-nav__badge--beta">Beta</span>
+              <!-- Indicador de agente activo -->
+              <ng-container *ngIf="!collapsed() && agentForItem(item); let ag">
+                <span class="section-nav__agent-dot" [style.background]="ag.color" [title]="ag.name + ' activo'"></span>
+                <span *ngIf="pendingForItem(item) > 0" class="section-nav__agent-badge">{{ pendingForItem(item) }}</span>
+              </ng-container>
             </a>
           </ng-template>
         </li>
       </ul>
+
+      @if (!collapsed() && panel().agentFooter; as af) {
+        <div class="section-nav__agent-footer" [style.--af-color]="af.color">
+          <span class="section-nav__af-dot" aria-hidden="true"></span>
+          <div class="section-nav__af-info">
+            <span class="section-nav__af-label">{{ af.label }}</span>
+            <span class="section-nav__af-status">{{ af.statusLabel }}</span>
+          </div>
+          <button type="button" class="section-nav__af-btn" title="Abrir agente" aria-label="Abrir agente">
+            <i class="pi pi-arrow-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      }
     </nav>
   `,
   styleUrl: './dropi-section-nav.component.scss',
@@ -113,29 +146,33 @@ export class DropiSectionNavComponent {
   expandRequested = output<void>();
 
   private router = inject(Router);
+  private galiState = inject(GaliStateService);
   currentUrl = signal(this.router.url);
-  expanded = signal<Record<string, boolean>>({});
+  // User-toggled overrides — separate from panel defaults
+  private readonly userOverrides = signal<Record<string, boolean>>({});
+  // Panel defaults derived reactively via computed (no effect needed)
+  private readonly panelDefaults = computed<Record<string, boolean>>(() => {
+    const defaults: Record<string, boolean> = {};
+    this.panel().items.forEach((item: SectionNavItem) => {
+      if (item.defaultExpanded) defaults[item.id] = true;
+    });
+    return defaults;
+  });
 
   constructor() {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(e => this.currentUrl.set(e.urlAfterRedirects));
-
-    effect(() => {
-      const defaults: Record<string, boolean> = {};
-      this.panel().items.forEach((item: SectionNavItem) => {
-        if (item.defaultExpanded) defaults[item.id] = true;
-      });
-      this.expanded.set(defaults);
-    });
   }
 
   isExpanded(id: string): boolean {
-    return this.expanded()[id] ?? true;
+    const override = this.userOverrides()[id];
+    if (override !== undefined) return override;
+    return this.panelDefaults()[id] ?? true;
   }
 
   toggleExpand(id: string): void {
-    this.expanded.update(m => ({ ...m, [id]: !this.isExpanded(id) }));
+    this.userOverrides.update(m => ({ ...m, [id]: !this.isExpanded(id) }));
   }
 
   isChildRouteActive(item: SectionNavItem): boolean {
@@ -144,5 +181,34 @@ export class DropiSectionNavComponent {
     return item.children.some(
       child => path === child.route || path.startsWith(`${child.route}/`),
     );
+  }
+
+  agentForItem(item: SectionNavItem): { name: string; color: string } | null {
+    const route = item.route ?? '';
+    const match = ROUTE_AGENT_MAP.find(m => route.includes(m.pattern));
+    if (!match) return null;
+    // Solo mostrar si el agente está activo
+    const isActive = this.galiState.agents().some(a => a.name === match.name && a.status === 'activo');
+    return isActive ? { name: match.name, color: match.color } : null;
+  }
+
+  pendingForItem(item: SectionNavItem): number {
+    const route = item.route ?? '';
+    const key = Object.keys(ROUTE_PENDING_MAP).find(k => route.includes(k));
+    return key ? ROUTE_PENDING_MAP[key] : 0;
+  }
+
+  // Objetos estáticos para evitar cambios de referencia en cada ciclo de change detection
+  // (nuevo objeto en cada llamada hace que RouterLinkActive dispare update() continuamente)
+  private static readonly EXACT_OPTS = { exact: true } as const;
+  private static readonly INEXACT_OPTS = { exact: false } as const;
+
+  /** Hub y rutas con query deben ser exactas para no marcar todo el árbol como activo */
+  linkActiveOptions(route: string): { exact: boolean } {
+    const path = route.split('?')[0];
+    if (path === '/gali-v5' || path === '/gali-v5/' || route.includes('?')) {
+      return DropiSectionNavComponent.EXACT_OPTS;
+    }
+    return DropiSectionNavComponent.INEXACT_OPTS;
   }
 }

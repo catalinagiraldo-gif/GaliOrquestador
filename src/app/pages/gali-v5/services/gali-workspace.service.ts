@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, OnDestroy } from '@angular/core';
+import { Injectable, NgZone, inject, signal, computed, OnDestroy } from '@angular/core';
 
 export type WorkspaceMode = 'operar' | 'lanzar' | 'medir' | 'construir' | 'comunidad';
 
@@ -34,6 +34,16 @@ export interface GaliToast {
   id: string;
 }
 
+/** Banner contextual en Gali Hub cuando el usuario viene de otro flujo */
+export interface HubEntryContext {
+  source: 'ada-spy' | 'caza' | 'proyecto' | 'campana';
+  productName?: string;
+  productId?: string;
+  message: string;
+  ctaLabel: string;
+  ctaRoute: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GaliWorkspaceService implements OnDestroy {
   readonly activeMode = signal<WorkspaceMode>('operar');
@@ -41,6 +51,7 @@ export class GaliWorkspaceService implements OnDestroy {
   readonly autopilot = signal(false);
   readonly liveEventsVisible = signal(true);
   readonly toast = signal<GaliToast | null>(null);
+  readonly hubEntryContext = signal<HubEntryContext | null>(null);
 
   /** Live feed — last N agent events */
   readonly liveEvents = signal<LiveEvent[]>([
@@ -83,18 +94,22 @@ export class GaliWorkspaceService implements OnDestroy {
     { agente: 'Roax', agente_id: 'roax', mensaje: 'Video C CTR 0.7% — por debajo del umbral. Evaluando pausa.', tipo: 'warn' },
   ];
 
+  private ngZone = inject(NgZone);
+
   constructor() {
-    // Simulate live events when autopilot is on
+    // Simulate live events outside Angular zone to avoid continuous change detection
     this.startLiveSimulation();
   }
 
   startLiveSimulation(): void {
-    this.liveTimer = setInterval(() => {
-      if (!this.autopilot() || this.galiPaused()) return;
-      const pool = this.eventPool;
-      const raw = pool[Math.floor(Math.random() * pool.length)];
-      this.addLiveEvent(raw);
-    }, 4000);
+    this.ngZone.runOutsideAngular(() => {
+      this.liveTimer = setInterval(() => {
+        if (!this.autopilot() || this.galiPaused()) return;
+        const pool = this.eventPool;
+        const raw = pool[Math.floor(Math.random() * pool.length)];
+        this.ngZone.run(() => this.addLiveEvent(raw));
+      }, 4000);
+    });
   }
 
   ngOnDestroy(): void {
@@ -143,5 +158,13 @@ export class GaliWorkspaceService implements OnDestroy {
   showToast(toast: GaliToast): void {
     this.toast.set(toast);
     setTimeout(() => this.toast.set(null), 4000);
+  }
+
+  setHubEntryContext(ctx: HubEntryContext | null): void {
+    this.hubEntryContext.set(ctx);
+  }
+
+  clearHubEntryContext(): void {
+    this.hubEntryContext.set(null);
   }
 }

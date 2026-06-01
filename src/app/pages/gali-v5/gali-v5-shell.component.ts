@@ -9,8 +9,12 @@ import { DropiMenuActionComponent } from './components/dropi-menu-action.compone
 import { DropiSectionNavComponent } from './components/dropi-section-nav.component';
 import { GaliRightPanelComponent } from './components/gali-right-panel/gali-right-panel.component';
 import { DropiPanelSplitterComponent } from './components/dropi-panel-splitter/dropi-panel-splitter.component';
+import { GaliContextStripComponent, ContextKey } from './components/gali-context-strip/gali-context-strip.component';
+import { GaliIntentBarComponent } from './components/gali-intent-bar/gali-intent-bar.component';
+import { DropiIaRailComponent } from './components/dropi-ia-rail/dropi-ia-rail.component';
 import {
-  HOME_OVERVIEW_PANEL,
+  GALI_MISSION_PANEL,
+  resolveActiveRailKey,
   resolveSectionPanel,
   SectionPanel,
 } from './dropi-sections.config';
@@ -30,6 +34,9 @@ import { GaliWorkspaceService } from './services/gali-workspace.service';
     DropiSectionNavComponent,
     GaliRightPanelComponent,
     DropiPanelSplitterComponent,
+    GaliContextStripComponent,
+    GaliIntentBarComponent,
+    DropiIaRailComponent,
   ],
   templateUrl: './gali-v5-shell.component.html',
   styleUrl: './gali-v5-shell.component.scss',
@@ -53,11 +60,12 @@ export class GaliV5ShellComponent {
     return this.agentColors[name] ?? '#9898a8';
   }
 
-  sectionPanel = signal<SectionPanel>(HOME_OVERVIEW_PANEL);
+  sectionPanel = signal<SectionPanel>(GALI_MISSION_PANEL);
   sectionNavCollapsed = signal(false);
   hasSectionPanel = signal(true);
   isCompactNav = signal(false);
   sectionWidth = signal(parseInt(localStorage.getItem('dropi-section-width') ?? '200', 10));
+  currentContextKey = signal<ContextKey>(null);
 
   constructor() {
     this.syncNav(this.router.url);
@@ -118,10 +126,29 @@ export class GaliV5ShellComponent {
     } else {
       this.hasSectionPanel.set(false);
       this.sectionNavCollapsed.set(false);
-      // Mark as OS workspace if we're at the gali-v5 root
-      const isRoot = /^\/gali-v5\/?$/.test(url.split('?')[0]);
-      this.isOsWorkspace.set(isRoot);
+      this.isOsWorkspace.set(false);
     }
+    this.currentContextKey.set(this.resolveContextKey(url));
+  }
+
+  private resolveContextKey(url: string): ContextKey {
+    const railKey = resolveActiveRailKey(url);
+    const map: Record<string, ContextKey> = {
+      pedidos: 'pedidos',
+      marketing: 'marketing',
+      productos: 'productos',
+      financiero: 'financiero',
+      logistica: 'logistica',
+      reportes: 'reportes',
+      proyectos: 'proyectos',
+      home: 'home',
+      agentes: 'home',
+      skills: 'home',
+      reglas: 'home',
+      marketplace: 'home',
+      conexiones: 'home',
+    };
+    return map[railKey] ?? null;
   }
 
   private updateViewport(): void {
