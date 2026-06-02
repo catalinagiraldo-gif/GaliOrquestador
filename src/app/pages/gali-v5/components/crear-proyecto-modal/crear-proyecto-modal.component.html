@@ -1,212 +1,124 @@
-<div class="cpm-overlay" (click)="closed.emit()" role="dialog" aria-modal="true" aria-label="Crear proyecto">
-  <div class="cpm" (click)="$event.stopPropagation()">
+<div class="crear-modal-overlay" (click)="step() === 1 && close()">
+  <div class="crear-modal" (click)="$event.stopPropagation()">
 
-    <!-- Header -->
-    <header class="cpm__head">
-      <div class="cpm__head-left">
-        <span class="cpm__gali-dot"></span>
-        <div>
-          <h2>Nuevo proyecto</h2>
-          <p>Gali coordina a tus agentes desde el inicio</p>
-        </div>
+    <!-- Gali header -->
+    <div class="crear-modal__header">
+      <div class="crear-modal__gali">
+        <span class="crear-modal__gali-icon">✦</span>
+        <span class="crear-modal__gali-label">Gali</span>
       </div>
-      <button class="cpm__close" type="button" (click)="closed.emit()" aria-label="Cerrar">
-        <i class="pi pi-times"></i>
-      </button>
-    </header>
+      <button type="button" class="crear-modal__close" (click)="close()">✕</button>
+    </div>
 
     <!-- Stepper -->
-    <div class="cpm__stepper">
-      @for (i of [1,2,3]; track i) {
-        <div
-          class="cpm__step"
-          [class.cpm__step--done]="step() > i"
-          [class.cpm__step--active]="step() === i">
-          <span class="cpm__step-num">
-            @if (step() > i) { <i class="pi pi-check"></i> } @else { {{ i }} }
-          </span>
-          <span class="cpm__step-label">{{ ['Producto', 'Objetivo', 'Agentes'][i - 1] }}</span>
-        </div>
-        @if (i < 3) { <div class="cpm__step-line" [class.cpm__step-line--done]="step() > i"></div> }
-      }
+    <div class="crear-modal__stepper">
+      <div class="crear-modal__step" [class.crear-modal__step--active]="step() >= 1" [class.crear-modal__step--done]="step() > 1">
+        <span>1</span><label>Producto</label>
+      </div>
+      <div class="crear-modal__step-line"></div>
+      <div class="crear-modal__step" [class.crear-modal__step--active]="step() >= 2" [class.crear-modal__step--done]="step() > 2">
+        <span>2</span><label>Confirmar</label>
+      </div>
+      <div class="crear-modal__step-line"></div>
+      <div class="crear-modal__step" [class.crear-modal__step--active]="step() >= 3">
+        <span>3</span><label>Lanzar</label>
+      </div>
     </div>
 
-    <!-- Body -->
-    <div class="cpm__body">
-
-      <!-- Paso 1 — Conversacional -->
-      @if (step() === 1) {
-        <div class="cpm__chat">
-          <div class="cpm__messages">
-            @for (msg of conversation(); track msg.text) {
-              <div class="cpm__msg" [class.cpm__msg--gali]="msg.from === 'gali'" [class.cpm__msg--user]="msg.from === 'user'">
-                @if (msg.from === 'gali') {
-                  <span class="cpm__msg-avatar">✦</span>
-                }
-                <p>{{ msg.text }}</p>
-              </div>
-            }
-            @if (isTyping()) {
-              <div class="cpm__msg cpm__msg--gali">
-                <span class="cpm__msg-avatar">✦</span>
-                <div class="cpm__typing">
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
-            }
-          </div>
-
-          <div class="cpm__suggestions" *ngIf="!productoPreseleccionado">
-            <p class="cpm__suggestions-label">O elige de tus sugerencias de ADA Spy:</p>
-            @for (p of suggestedProducts; track p.nombre) {
-              <button class="cpm__suggestion-card" type="button" (click)="selectSuggested(p)" data-proto-skip>
-                <span class="cpm__suggestion-score" [class.cpm__suggestion-score--high]="p.fitScore >= 90">{{ p.fitScore }}</span>
-                <div class="cpm__suggestion-info">
-                  <strong>{{ p.nombre }}</strong>
-                  <span>{{ p.margen }} margen · Saturación {{ p.saturacion }}</span>
-                </div>
-                <i class="pi pi-arrow-right"></i>
-              </button>
-            }
-          </div>
-
-          <footer class="cpm__composer">
-            <input
-              type="text"
-              placeholder="Escribe el producto que quieres lanzar…"
-              [value]="userInput()"
-              (input)="userInput.set($any($event.target).value)"
-              (keydown.enter)="sendMessage()"
-            />
-            <button type="button" class="cpm__send" (click)="sendMessage()" data-proto-skip>
-              <i class="pi pi-send"></i>
-            </button>
-          </footer>
+    <!-- Step 1: ¿Qué quieres vender? -->
+    @if (step() === 1) {
+      <div class="crear-modal__body">
+        <h2 class="crear-modal__question">¿Qué quieres vender?</h2>
+        <p class="crear-modal__hint">Cuéntame el producto o nicho y ADA buscará las mejores opciones disponibles en el catálogo.</p>
+        <input
+          type="text"
+          class="crear-modal__input"
+          placeholder="Ej: collar GPS para mascotas, suplementos, proyector..."
+          [value]="productQuery()"
+          (input)="productQuery.set($any($event.target).value)"
+          (keydown.enter)="step.set(2)"
+          autofocus
+        />
+        <div class="crear-modal__actions">
+          <button type="button" class="crear-modal__cta" (click)="step.set(2)" [disabled]="!productQuery().trim()">
+            Buscar con ADA →
+          </button>
         </div>
-      }
+      </div>
+    }
 
-      <!-- Paso 2 — Objetivo -->
-      @if (step() === 2) {
-        <div class="cpm__form">
-          <div class="cpm__gali-hint">
-            <span class="cpm__gali-hint-icon">✦</span>
-            <p>Basado en productos similares en Dropi LATAM, un objetivo de <strong>50 ventas/semana</strong> con presupuesto de <strong>$80k/día</strong> es alcanzable en 3–4 semanas.</p>
-          </div>
+    <!-- Step 2: Seleccionar producto y nombre -->
+    @if (step() === 2) {
+      <div class="crear-modal__body">
+        <h2 class="crear-modal__question">ADA encontró estas opciones</h2>
+        <p class="crear-modal__hint">Selecciona el producto que quieres escalar.</p>
 
-          <div class="cpm__field">
-            <label>Nombre del proyecto</label>
-            <input type="text" [value]="nombreProyecto()" (input)="nombreProyecto.set($any($event.target).value)" placeholder="Ej. Collar GPS para mascotas" />
-          </div>
-
-          <div class="cpm__field">
-            <label>Objetivo de ventas semanales</label>
-            <input type="text" [value]="objetivo()" (input)="objetivo.set($any($event.target).value)" placeholder="Ej. 50 ventas/semana" />
-          </div>
-
-          <div class="cpm__field">
-            <label>Presupuesto diario (COP)</label>
-            <input type="number" [value]="presupuesto()" (input)="presupuesto.set($any($event.target).value)" placeholder="80000" min="0" />
-          </div>
-
-          <div class="cpm__field">
-            <label>Ciudades destino</label>
-            <div class="cpm__cities">
-              @for (city of availableCities; track city) {
-                <button
-                  type="button"
-                  class="cpm__city-chip"
-                  [class.cpm__city-chip--active]="ciudades().includes(city)"
-                  (click)="toggleCity(city)"
-                  data-proto-skip>
-                  {{ city }}
-                </button>
+        <div class="crear-modal__products">
+          @for (p of suggestedProducts; track p.id) {
+            <button
+              type="button"
+              class="crear-prod-card"
+              [class.crear-prod-card--selected]="selectedProduct()?.id === p.id"
+              (click)="selectedProduct.set(p); projectName.set(p.name)">
+              <div class="crear-prod-card__score" [style.background]="p.score >= 80 ? '#f97316' : p.score >= 70 ? '#f59e0b' : '#6b7280'">{{ p.score }}</div>
+              <div class="crear-prod-card__info">
+                <strong>{{ p.name }}</strong>
+                <span>{{ p.proveedor }} · Stock: {{ p.stock }}</span>
+              </div>
+              @if (selectedProduct()?.id === p.id) {
+                <span class="crear-prod-card__check">✓</span>
               }
-            </div>
-          </div>
+            </button>
+          }
         </div>
-      }
 
-      <!-- Paso 3 — Agentes -->
-      @if (step() === 3) {
-        <div class="cpm__agents">
-          <div class="cpm__gali-hint">
-            <span class="cpm__gali-hint-icon">✦</span>
-            <p>Gali coordinará a tus agentes desde el primer día. Puedes pausar cualquiera después.</p>
-          </div>
-
-          <div class="cpm__agent-toggle">
-            <div class="cpm__agent-toggle-left">
-              <span class="cpm__agent-dot cpm__agent-dot--roax"></span>
-              <div>
-                <strong>Roax · Media Buyer</strong>
-                <p>Configura y optimiza campañas Meta Ads automáticamente</p>
-              </div>
-            </div>
-            <label class="cpm__switch">
-              <input type="checkbox" [checked]="enableRoax()" (change)="enableRoax.set(!enableRoax())" />
-              <span class="cpm__switch-slider"></span>
-            </label>
-          </div>
-
-          <div class="cpm__agent-toggle">
-            <div class="cpm__agent-toggle-left">
-              <span class="cpm__agent-dot cpm__agent-dot--chatea"></span>
-              <div>
-                <strong>Chatea Pro · Cierre</strong>
-                <p>Confirma pedidos por WhatsApp y recupera carritos</p>
-              </div>
-            </div>
-            <label class="cpm__switch">
-              <input type="checkbox" [checked]="enableChateaPro()" (change)="enableChateaPro.set(!enableChateaPro())" />
-              <span class="cpm__switch-slider"></span>
-            </label>
-          </div>
-
-          <div class="cpm__agent-toggle">
-            <div class="cpm__agent-toggle-left">
-              <span class="cpm__agent-dot cpm__agent-dot--vigilante"></span>
-              <div>
-                <strong>Vigilante · Logística</strong>
-                <p>Gestiona novedades y hace smart routing de transportadoras</p>
-              </div>
-            </div>
-            <label class="cpm__switch">
-              <input type="checkbox" [checked]="enableVigilante()" (change)="enableVigilante.set(!enableVigilante())" />
-              <span class="cpm__switch-slider"></span>
-            </label>
-          </div>
-
-          <div class="cpm__summary">
-            <h4>Resumen del proyecto</h4>
-            <dl>
-              <dt>Nombre</dt><dd>{{ nombreProyecto() || '(sin nombre)' }}</dd>
-              <dt>Objetivo</dt><dd>{{ objetivo() }}</dd>
-              <dt>Presupuesto</dt><dd>${{ (+presupuesto() / 1000).toFixed(0) }}k/día</dd>
-              <dt>Ciudades</dt><dd>{{ ciudades().join(', ') }}</dd>
-            </dl>
-          </div>
+        <div class="crear-modal__name-group">
+          <label>Nombre del proyecto</label>
+          <input
+            type="text"
+            class="crear-modal__input"
+            [value]="projectName()"
+            (input)="projectName.set($any($event.target).value)"
+            placeholder="Ej: Collar GPS · Lanzamiento Mayo"
+          />
         </div>
-      }
 
-    </div>
+        <div class="crear-modal__actions">
+          <button type="button" class="crear-modal__back" (click)="step.set(1)">← Volver</button>
+          <button type="button" class="crear-modal__cta" (click)="step.set(3)" [disabled]="!selectedProduct() || !projectName().trim()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+    }
 
-    <!-- Footer -->
-    <footer class="cpm__footer">
-      @if (step() > 1) {
-        <button class="cpm__btn-back" type="button" (click)="goStep(step() - 1)" data-proto-skip>
-          <i class="pi pi-arrow-left"></i> Atrás
-        </button>
-      }
-      @if (step() < totalSteps) {
-        <button class="cpm__btn-next" type="button" (click)="nextStep()" data-proto-skip>
-          Siguiente: {{ ['Objetivo', 'Agentes'][step() - 1] }} <i class="pi pi-arrow-right"></i>
-        </button>
-      } @else {
-        <button class="cpm__btn-create" type="button" (click)="crearProyecto()" data-proto-skip>
-          <i class="pi pi-sparkles"></i> Crear proyecto y activar agentes
-        </button>
-      }
-    </footer>
+    <!-- Step 3: ¿Cuándo empezamos? -->
+    @if (step() === 3) {
+      <div class="crear-modal__body">
+        <h2 class="crear-modal__question">¿Cuándo empezamos?</h2>
+        <p class="crear-modal__hint">El proyecto <strong>{{ projectName() }}</strong> está listo para configurarse.</p>
 
+        <div class="crear-modal__launch-options">
+          <button type="button" class="crear-launch-option crear-launch-option--primary" (click)="launchNow()">
+            <span class="crear-launch-option__icon">🚀</span>
+            <div>
+              <strong>Lanzar ahora</strong>
+              <span>Gali abre el workspace de lanzamiento y te guía paso a paso</span>
+            </div>
+          </button>
+          <button type="button" class="crear-launch-option" (click)="saveDraft()">
+            <span class="crear-launch-option__icon">📋</span>
+            <div>
+              <strong>Guardar como borrador</strong>
+              <span>El proyecto queda guardado. Puedes lanzarlo cuando quieras</span>
+            </div>
+          </button>
+        </div>
+
+        <div class="crear-modal__actions">
+          <button type="button" class="crear-modal__back" (click)="step.set(2)">← Volver</button>
+        </div>
+      </div>
+    }
   </div>
 </div>

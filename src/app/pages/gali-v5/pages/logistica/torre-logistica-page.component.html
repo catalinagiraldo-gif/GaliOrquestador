@@ -1,20 +1,25 @@
 <div class="torre-page">
 
-  <dropi-gali-bar
-    agent="Vigilante"
-    status="activo 24/7"
-    message="Monitoreando 47 pedidos · Smart routing activo · 0 alertas críticas ahora"
-    ctaLabel="Ver log de swaps"
-    secondaryCta="Pausar"
+  <gali-agent-alert
+    agent="vigilante"
+    variant="monitoring"
+    message="Monitoreando 47 pedidos · Smart routing activo · Coordinadora Bogotá 15% novedad → reasignando a Servientrega"
+    primaryCta="Ver smart routing"
+    primaryRoute="/gali-v5/logistica/torre-logistica"
+    secondaryCta="Ver señales →"
+    secondaryRoute="/gali-v5"
   />
 
-  <!-- Loop cerrado: última acción del Vigilante -->
+  <!-- Última acción del Vigilante — explicada en lenguaje claro -->
   <div class="vigilante-loop">
     <div class="vigilante-loop__item">
       <span class="vigilante-loop__icon">🔄</span>
       <div class="vigilante-loop__text">
-        <span class="vigilante-loop__accion">Smart swap automático</span>
-        <span class="vigilante-loop__detalle">12 pedidos → Servientrega (Coordinadora 15% novedad en Bogotá)</span>
+        <span class="vigilante-loop__accion">
+          <abbr title="Swap automático: Vigilante cambia de transportadora de forma automática cuando una tiene muchas novedades (pedidos no entregados), para proteger tus ventas sin que tengas que hacer nada.">Swap automático</abbr>
+          — Vigilante cambió la transportadora
+        </span>
+        <span class="vigilante-loop__detalle">Movió 12 pedidos de Coordinadora a Servientrega porque Coordinadora tuvo 15% de novedades en Bogotá</span>
       </div>
       <span class="vigilante-loop__result">4 novedades evitadas</span>
       <span class="vigilante-loop__time">hace 2h</span>
@@ -27,6 +32,62 @@
       </div>
       <button class="vigilante-loop__action-btn" type="button" data-proto-skip>Ver análisis</button>
     </div>
+  </div>
+
+  <!-- ── SMART ROUTING PANEL ── -->
+  <div class="smart-routing-panel">
+    <div class="smart-routing-panel__header">
+      <div class="smart-routing-panel__title-group">
+        <span class="smart-routing-panel__dot"></span>
+        <strong>Smart Routing activo · Vigilante</strong>
+        <span class="smart-routing-panel__sub">Recomendaciones basadas en datos de novedad en tiempo real</span>
+      </div>
+      @if (!smartRoutingApplied()) {
+        <button type="button" class="smart-routing-panel__apply" (click)="applySmartRouting()" data-proto-skip>
+          Aplicar todas las sugerencias
+        </button>
+      } @else {
+        <span class="smart-routing-panel__applied">✓ Routing aplicado</span>
+      }
+    </div>
+
+    <div class="smart-routing-table">
+      <div class="smart-routing-table__head">
+        <span>Ciudad</span>
+        <span>Actual</span>
+        <span>→ Sugerida</span>
+        <span>Novedad</span>
+        <span>Pedidos</span>
+        <span>Estado</span>
+      </div>
+      @for (row of smartRoutingRows; track row.ciudad) {
+        <div class="smart-routing-table__row" [class.smart-routing-table__row--alert]="row.estado === 'activo'"
+          [class.smart-routing-table__row--ok]="row.estado === 'ok'">
+          <span class="srt-ciudad">{{ row.ciudad }}</span>
+          <span class="srt-carrier srt-carrier--actual">{{ row.transportadoraActual }}</span>
+          <span class="srt-carrier srt-carrier--sugerida"
+            [class.srt-carrier--same]="row.transportadoraActual === row.transportadoraSugerida">
+            {{ row.transportadoraActual === row.transportadoraSugerida ? '— sin cambio' : '→ ' + row.transportadoraSugerida }}
+          </span>
+          <span class="srt-novedad" [class.srt-novedad--high]="row.motivoNovedad > 8"
+            [galiInsight]="'Novedad ' + row.motivoNovedad + '% en ' + row.ciudad + '. ' + (row.motivoNovedad > 8 ? 'Por encima del umbral de alerta (8%). Vigilante recomienda cambio de transportadora.' : 'Dentro del rango aceptable (<8%).')">
+            {{ row.motivoNovedad }}%
+          </span>
+          <span class="srt-pedidos">{{ row.pedidosPendientes > 0 ? row.pedidosPendientes + ' pend.' : '—' }}</span>
+          <span class="srt-estado" [class]="'srt-estado--' + row.estado">
+            {{ row.estado === 'activo' ? '⚠ Aplicando' : row.estado === 'aplicar' ? 'Revisar' : '✓ OK' }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="torre-intro">
+    <h2 class="torre-intro__title">¿Qué es la Torre Logística?</h2>
+    <p class="torre-intro__text">
+      Es el centro de control donde <strong>Vigilante</strong> vigila tus guías en tiempo real: elige transportadora por ciudad,
+      detecta guías estancadas y activa <em>swap automático</em> cuando una transportadora sube de novedad.
+    </p>
   </div>
 
   <dropi-titulos title="Torre logística" [breadcrumbs]="breadcrumbs" />
@@ -89,7 +150,7 @@
                 <div class="indicator-section__bar">
                   <div class="indicator-section__fill indicator-section__fill--green" [style.width.%]="ind.myOpEffectiveness"></div>
                 </div>
-                <strong>{{ ind.myOpEffectiveness }}%</strong>
+                <strong [galiInsight]="'Efectividad de ' + ind.carrier + ' en tu operación: ' + ind.myOpEffectiveness + '%. Calculado con los últimos 30 días. Incluye novedades, rechazos y devoluciones.'">{{ ind.myOpEffectiveness }}%</strong>
               </div>
               <div class="indicator-section__metrics">
                 <div>

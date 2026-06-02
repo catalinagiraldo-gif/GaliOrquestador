@@ -59,12 +59,18 @@
     </div>
   }
 
-  <!-- Toast de Gali (cross-módulo) -->
+  <!-- Toast de Gali (cross-módulo) con link a Memoria -->
   @if (ws.toast(); as t) {
     <div class="gali-v5-shell__gali-toast" [class.gali-v5-shell__gali-toast--warn]="t.tipo === 'warn'">
       <span class="gali-toast__agent-dot" [style.background]="agentColor(t.agente)"></span>
-      <span class="gali-toast__agent">{{ t.agente }}</span>
-      <span class="gali-toast__msg">{{ t.message }}</span>
+      <div class="gali-toast__content">
+        <span class="gali-toast__agent">{{ t.agente }}</span>
+        <span class="gali-toast__msg">{{ t.message }}</span>
+      </div>
+      <button type="button" class="gali-toast__memory-link" (click)="galiState.openPanelToMemory()" data-proto-skip>
+        Ver en Memoria →
+      </button>
+      <button type="button" class="gali-toast__dismiss" (click)="ws.toast.set(null)" data-proto-skip aria-label="Cerrar">✕</button>
     </div>
   }
 

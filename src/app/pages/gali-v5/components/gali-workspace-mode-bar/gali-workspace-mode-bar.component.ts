@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -8,11 +8,12 @@ import {
   WorkspaceMode,
 } from '../../services/gali-workspace.service';
 import { GaliStateService } from '../../services/gali-state.service';
+import { GaliAutopilotConfigComponent } from '../gali-autopilot-config/gali-autopilot-config.component';
 
 @Component({
   selector: 'gali-workspace-mode-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GaliAutopilotConfigComponent],
   templateUrl: './gali-workspace-mode-bar.component.html',
   styleUrl: './gali-workspace-mode-bar.component.scss',
 })
@@ -26,6 +27,17 @@ export class GaliWorkspaceModeBarComponent {
   private gali = inject(GaliStateService);
   private router = inject(Router);
   readonly modes = WORKSPACE_MODES;
+  readonly showAutopilotConfig = signal(false);
+
+  onAutopilotClick(): void {
+    if (this.ws.autopilot()) {
+      // Already on — turn off directly
+      this.ws.toggleAutopilot();
+    } else {
+      // Turn on — show config first
+      this.showAutopilotConfig.set(true);
+    }
+  }
 
   private isOnHome(): boolean {
     const url = this.router.url.split('?')[0];

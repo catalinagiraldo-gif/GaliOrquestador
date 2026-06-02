@@ -3,8 +3,11 @@
 
 :host {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .orders-page {
@@ -17,6 +20,19 @@
     gap: $size-2;
     min-width: 280px;
   }
+}
+
+.orders-risk {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: $radius-sm;
+  font-size: 10px;
+  font-weight: $font-bold;
+  white-space: nowrap;
+
+  &--verde { background: rgba(34, 197, 94, 0.12); color: #15803d; }
+  &--amarillo { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+  &--rojo { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
 }
 
 .orders-table-wrap {

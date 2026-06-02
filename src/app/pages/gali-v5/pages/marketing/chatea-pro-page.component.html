@@ -132,73 +132,103 @@
 
     <!-- Columna derecha: reglas activas -->
     <aside class="chatea-page__rules">
-      <h3>Reglas activas</h3>
+      <div class="rules-header">
+        <h3>Reglas de Chatea Pro</h3>
+        <button type="button" class="rules-header__add" (click)="showNewRule.set(true)" data-proto-skip>+ Nueva</button>
+      </div>
+      <p class="rules-concept-note">
+        Las reglas son condicionales simples de Chatea Pro. Son distintas de las <strong>Skills de Gali</strong> — las skills tienen historial auditable y contexto de negocio.
+      </p>
+
       <div class="rules-list">
-        <div class="rule-item">
-          <div class="rule-item__info">
-            <span class="rule-item__name">Anticipo zona rural</span>
-            <span class="rule-item__desc">Solicita anticipo cuando se detecta zona sin cobertura</span>
+        <div class="rule-item-v2">
+          <div class="rule-item-v2__logic">
+            <span class="rule-item-v2__if">SI</span>
+            <span class="rule-item-v2__condition">zona rural detectada</span>
+            <span class="rule-item-v2__then">→</span>
+            <span class="rule-item-v2__action">solicitar anticipo $25k</span>
           </div>
-          <button
-            class="rule-toggle"
-            [class.rule-toggle--on]="reglas().anticipoZonaRural"
-            type="button"
-            (click)="toggleRegla('anticipoZonaRural')"
-            data-proto-skip>
-            <span class="rule-toggle__knob"></span>
-          </button>
+          <div class="rule-item-v2__footer">
+            <span class="rule-item-v2__agent">Chatea Pro</span>
+            <button
+              class="rule-toggle"
+              [class.rule-toggle--on]="reglas().anticipoZonaRural"
+              type="button"
+              (click)="toggleRegla('anticipoZonaRural')"
+              data-proto-skip>
+              <span class="rule-toggle__knob"></span>
+            </button>
+          </div>
         </div>
 
-        <div class="rule-item">
-          <div class="rule-item__info">
-            <span class="rule-item__name">Recuperar carrito 24h</span>
-            <span class="rule-item__desc">Envía secuencia de recuperación a carritos abandonados</span>
+        <div class="rule-item-v2">
+          <div class="rule-item-v2__logic">
+            <span class="rule-item-v2__if">SI</span>
+            <span class="rule-item-v2__condition">carrito abandonado +6h</span>
+            <span class="rule-item-v2__then">→</span>
+            <span class="rule-item-v2__action">enviar secuencia recuperación</span>
           </div>
-          <button
-            class="rule-toggle"
-            [class.rule-toggle--on]="reglas().recuperarCarrito"
-            type="button"
-            (click)="toggleRegla('recuperarCarrito')"
-            data-proto-skip>
-            <span class="rule-toggle__knob"></span>
-          </button>
+          <div class="rule-item-v2__footer">
+            <span class="rule-item-v2__agent">Chatea Pro</span>
+            <button
+              class="rule-toggle"
+              [class.rule-toggle--on]="reglas().recuperarCarrito"
+              type="button"
+              (click)="toggleRegla('recuperarCarrito')"
+              data-proto-skip>
+              <span class="rule-toggle__knob"></span>
+            </button>
+          </div>
         </div>
 
-        <div class="rule-item">
-          <div class="rule-item__info">
-            <span class="rule-item__name">Confirmar pedido verde</span>
-            <span class="rule-item__desc">Confirma automáticamente si huella es verde y wallet OK</span>
+        <div class="rule-item-v2">
+          <div class="rule-item-v2__logic">
+            <span class="rule-item-v2__if">SI</span>
+            <span class="rule-item-v2__condition">huella verde + wallet OK</span>
+            <span class="rule-item-v2__then">→</span>
+            <span class="rule-item-v2__action">confirmar automáticamente</span>
           </div>
-          <button
-            class="rule-toggle"
-            [class.rule-toggle--on]="reglas().confirmarVerde"
-            type="button"
-            (click)="toggleRegla('confirmarVerde')"
-            data-proto-skip>
-            <span class="rule-toggle__knob"></span>
-          </button>
+          <div class="rule-item-v2__footer">
+            <span class="rule-item-v2__agent">Chatea Pro</span>
+            <button
+              class="rule-toggle"
+              [class.rule-toggle--on]="reglas().confirmarVerde"
+              type="button"
+              (click)="toggleRegla('confirmarVerde')"
+              data-proto-skip>
+              <span class="rule-toggle__knob"></span>
+            </button>
+          </div>
         </div>
 
-        <div class="rule-item">
-          <div class="rule-item__info">
-            <span class="rule-item__name">Notificar novedades</span>
-            <span class="rule-item__desc">Contacta al cliente cuando hay novedad logística</span>
+        <div class="rule-item-v2">
+          <div class="rule-item-v2__logic">
+            <span class="rule-item-v2__if">SI</span>
+            <span class="rule-item-v2__condition">novedad logística detectada</span>
+            <span class="rule-item-v2__then">→</span>
+            <span class="rule-item-v2__action">notificar cliente WhatsApp</span>
           </div>
-          <button
-            class="rule-toggle"
-            [class.rule-toggle--on]="reglas().notificarNovedad"
-            type="button"
-            (click)="toggleRegla('notificarNovedad')"
-            data-proto-skip>
-            <span class="rule-toggle__knob"></span>
-          </button>
+          <div class="rule-item-v2__footer">
+            <span class="rule-item-v2__agent">Chatea Pro</span>
+            <button
+              class="rule-toggle"
+              [class.rule-toggle--on]="reglas().notificarNovedad"
+              type="button"
+              (click)="toggleRegla('notificarNovedad')"
+              data-proto-skip>
+              <span class="rule-toggle__knob"></span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <button class="chatea-page__marketplace-link" type="button" (click)="goToMarketplace()" data-proto-skip>
-        <i class="pi pi-th-large"></i>
-        Ver más reglas en Comunidad →
-      </button>
+      <div class="rules-vs-skills">
+        <span class="rules-vs-skills__label">¿Necesitas más poder?</span>
+        <p>Convierte una regla en <strong>Skill de Gali</strong> para agregar condiciones complejas, historial y ejecución multi-agente.</p>
+        <button type="button" class="rules-vs-skills__cta" (click)="goToMarketplace()" data-proto-skip>
+          Crear skill desde regla →
+        </button>
+      </div>
     </aside>
   </div>
 </div>

@@ -1,15 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
-import { GaliWorkspaceModeBarComponent } from '../../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 import { GaliSkillBuilderV2Component, SkillRule } from '../../components/gali-skill-builder-v2/gali-skill-builder-v2.component';
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 
 @Component({
   selector: 'app-skills-page',
   standalone: true,
-  imports: [CommonModule, GaliWorkspaceModeBarComponent, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent],
+  imports: [CommonModule, RouterModule, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent],
   templateUrl: './skills-page.component.html',
   styleUrl: './skills-page.component.scss',
 })
@@ -18,6 +17,7 @@ export class SkillsPageComponent {
   readonly router = inject(Router);
 
   readonly selectedSkillId = signal<string>('skill-001');
+  readonly selectedAgentId = signal<string | null>(null);
 
   readonly skills: SkillRule[] = [
     {
@@ -75,9 +75,9 @@ export class SkillsPageComponent {
   ];
 
   readonly marketplaceSkills = [
-    { id: 'mkt-1', nombre: 'P&L real vs ROAS declarado', category: 'Financiero', uses: '1.2k', descripcion: 'Detecta discrepancias entre el ROAS reportado y el P&L real.' },
-    { id: 'mkt-2', nombre: 'Alerta saturación de nicho', category: 'Productos', uses: '987', descripcion: 'Monitorea cuando 3+ competidores nuevos entran a tu nicho.' },
-    { id: 'mkt-3', nombre: 'Resolución automática novedades', category: 'CAS', uses: '756', descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención.' },
+    { id: 'mkt-1', nombre: 'P&L real vs ROAS declarado', category: 'Financiero', uses: '1.2k', rating: 4.8, forks: 89, descripcion: 'Detecta discrepancias entre el ROAS reportado y el P&L real.' },
+    { id: 'mkt-2', nombre: 'Alerta saturación de nicho', category: 'Productos', uses: '987', rating: 4.7, forks: 64, descripcion: 'Monitorea cuando 3+ competidores nuevos entran a tu nicho.' },
+    { id: 'mkt-3', nombre: 'Resolución automática novedades', category: 'CAS', uses: '756', rating: 4.6, forks: 41, descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención.' },
   ];
 
   get selectedSkill(): SkillRule | undefined {
@@ -89,7 +89,74 @@ export class SkillsPageComponent {
   }
 
   readonly showNewSkill = signal(false);
-  readonly activeMktTab = signal<'populares' | 'por-agente' | 'nuevas'>('populares');
+  readonly activeMktTab = signal<'populares' | 'por-seccion' | 'nuevas' | 'expertos'>('populares');
+  readonly activeSectionFilter = signal<string | null>(null);
+
+  readonly dropiRecomendaciones = [
+    { id: 'dr-1', nombre: 'Smart routing novedad', tipo: 'Operación', secciones: ['Pedidos', 'Logística'], uses: '3.4k', rating: 4.9, autor: 'Dropi Team', descripcion: 'Cambia automáticamente la transportadora cuando la novedad supera el umbral.' },
+    { id: 'dr-2', nombre: 'Auto-confirmación pedidos', tipo: 'Operación', secciones: ['Pedidos'], uses: '2.1k', rating: 4.8, autor: 'Dropi Team', descripcion: 'Confirma pedidos con huella verde automáticamente sin intervención manual.' },
+  ];
+
+  readonly expertosSkills = [
+    {
+      id: 'ex-1', nombre: 'Scaling vertical — 20% cada 48h', tipo: 'Experto',
+      secciones: ['Marketing'], uses: '847', rating: 4.9, forks: 203,
+      autor: 'Alejandro Torres', handle: '@AlejandroTorres',
+      autorBio: 'Dropshipper top · 1.200+ ventas/mes · 3 años en Dropi',
+      autorAvatar: 'AT', autorColor: '#f97316',
+      descripcion: 'Escala presupuesto +20% cada 48h si el ROAS se mantiene sobre el objetivo. Con límites inteligentes y rollback automático.',
+      comments: 34, shared: true,
+    },
+    {
+      id: 'ex-2', nombre: 'P&L simplificado para declarar', tipo: 'Experto',
+      secciones: ['Finanzas'], uses: '623', rating: 4.7, forks: 118,
+      autor: 'Carlos Pérez CPA', handle: '@ContadorDropi',
+      autorBio: 'Contador certificado · especialista en dropshipping',
+      autorAvatar: 'CP', autorColor: '#3b82f6',
+      descripcion: 'Calcula automáticamente tu utilidad real descontando flete, novedad, pauta y COGS. Compatible con declaración de renta.',
+      comments: 19, shared: true,
+    },
+    {
+      id: 'ex-3', nombre: 'Bundle mascotas: 5 productos ganadores', tipo: 'Experto',
+      secciones: ['Productos'], uses: '412', rating: 4.6, forks: 76,
+      autor: 'María Gómez', handle: '@PetDropper',
+      autorBio: 'Nicho mascotas · Top seller noviembre 2025',
+      autorAvatar: 'MG', autorColor: '#10b981',
+      descripcion: 'Alerta cuando los 5 productos clave del nicho mascotas tienen ventana simultánea. Incluye configuración de scoring.',
+      comments: 12, shared: false,
+    },
+    {
+      id: 'ex-4', nombre: 'CAS → Recuperación carrito abandonado', tipo: 'Experto',
+      secciones: ['CAS', 'Marketing'], uses: '389', rating: 4.8, forks: 91,
+      autor: 'Luis Vargas', handle: '@ChateaProLuis',
+      autorBio: 'Chatea Pro power user · tasa recuperación 38%',
+      autorAvatar: 'LV', autorColor: '#8b5cf6',
+      descripcion: 'Secuencia de 3 mensajes WhatsApp: recordatorio suave → urgencia → oferta final. Personalizado con nombre del producto.',
+      comments: 27, shared: true,
+    },
+  ];
+
+  readonly showShareModal = signal(false);
+  readonly shareSkillName = signal('');
+
+  openShareModal(skillName: string): void {
+    this.shareSkillName.set(skillName);
+    this.showShareModal.set(true);
+  }
+
+  forkSkill(skillId: string): void {
+    this.goToNewSkill();
+  }
+
+  readonly sectionFilters = ['Pedidos', 'Marketing', 'Finanzas', 'Logística', 'Productos', 'CAS'];
+
+  filteredMarketplaceSkills = computed(() => {
+    const section = this.activeSectionFilter();
+    if (!section) return this.marketplaceByAgent;
+    return this.marketplaceByAgent.filter(s =>
+      (s as any).sections?.includes(section) || s.category === section
+    );
+  });
 
   readonly marketplaceByAgent = [
     { id: 'ma-1', nombre: 'Smart routing novedad Cali', category: 'Logística', agent: 'vigilante', uses: '3.4k', descripcion: 'Reasigna pedidos cuando la novedad supera el umbral en ciudades específicas.' },

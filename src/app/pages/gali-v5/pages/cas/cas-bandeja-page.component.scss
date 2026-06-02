@@ -2,32 +2,134 @@
 
 :host {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 100%;
   overflow: hidden;
+}
+
+.cas-page-intro {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  padding: $size-3 $size-6;
+  border-bottom: 1px solid $gray-100;
+  background: $white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-6;
+  flex-wrap: wrap;
+
+  &__left { flex: 1; min-width: 200px; }
+
+  &__title {
+    margin: 0 0 4px;
+    font-size: $font-base;
+    font-weight: $font-bold;
+    color: $gray-800;
+  }
+
+  &__text {
+    margin: 0;
+    font-size: $font-sm;
+    color: $gray-500;
+    line-height: 1.4;
+  }
+
+  &__flow {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+  }
+}
+
+.cas-flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: $size-2 $size-3;
+  border-radius: $radius-md;
+  background: $gray-50;
+  border: 1px solid $gray-100;
+  min-width: 90px;
+
+  &--agent {
+    background: rgba(52, 211, 153, 0.07);
+    border-color: rgba(52, 211, 153, 0.25);
+  }
+
+  &--human {
+    background: rgba($primary-500, 0.06);
+    border-color: rgba($primary-500, 0.2);
+  }
+
+  &__icon { font-size: 16px; }
+
+  &__label {
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-semibold;
+    color: $gray-700;
+    text-align: center;
+  }
+
+  &__sub {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-400;
+    text-align: center;
+  }
+}
+
+.cas-flow-arrow {
+  font-size: $font-sm;
+  color: $gray-300;
+  flex-shrink: 0;
 }
 
 .cas-bandeja {
   display: grid;
   grid-template-columns: 360px 1fr 320px;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto auto 1fr;
   height: 100%;
   background: $white;
 
+  @media (max-width: 1100px) {
+    grid-template-columns: 300px 1fr;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+
+  dropi-gali-bar {
+    grid-row: 3;
+    grid-column: 1 / -1;
+  }
+
+  .cas-explainer {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
   gali-chip {
+    grid-row: 4;
     grid-column: 1 / -1;
     margin: $size-3 $size-4 0;
   }
 
   &__inbox {
     width: auto;
-    grid-row: 3;
+    grid-row: 5;
     grid-column: 1;
     flex-shrink: 0;
     border-right: 1px solid $gray-100;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0;
   }
 
   &__inbox-head {
@@ -73,11 +175,13 @@
   }
 
   &__chat {
-    grid-row: 3;
+    grid-row: 5;
     grid-column: 2;
     min-width: 0;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     border-right: 1px solid $gray-100;
   }
 
@@ -140,8 +244,9 @@
   }
 
   &__pqr {
-    grid-row: 3;
+    grid-row: 5;
     grid-column: 3;
+    min-height: 0;
     overflow-y: auto;
     padding: $size-4;
     background: $gray-50;
@@ -555,4 +660,229 @@
       background: rgba($primary-500, 0.06);
     }
   }
+}
+
+// Explainer conceptual: cómo funciona Chatea Pro en el CAS
+.cas-explainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-4;
+  padding: $size-3 $size-4;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: $radius-md;
+  flex-wrap: wrap;
+
+  &__flow {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex-wrap: wrap;
+  }
+
+  &__node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-align: center;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-600;
+    min-width: 100px;
+
+    &--agent { color: #0284c7; }
+    &--human { color: $primary-600; }
+
+    strong {
+      display: block;
+      font-size: $font-xs;
+      font-weight: $font-bold;
+    }
+  }
+
+  &__node-icon { font-size: 18px; }
+
+  &__arrow {
+    font-size: $font-sm;
+    color: $gray-400;
+    flex-shrink: 0;
+  }
+
+  &__close {
+    height: 28px;
+    padding: 0 $size-3;
+    border: 1px solid #93c5fd;
+    border-radius: $radius-sm;
+    background: $white;
+    color: #0284c7;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    &:hover { background: #eff6ff; }
+  }
+}
+
+// ── Ticket category headers ─────────────────────────────────────────────────
+.ticket-category {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: $gray-400;
+  position: sticky;
+  top: 0;
+  background: $white;
+  z-index: 1;
+
+  &--urgent { color: #ef4444; }
+  &--waiting { color: $primary-600; }
+  &--resolved { color: #22c55e; }
+
+  &__icon { font-size: 13px; }
+  &__count {
+    margin-left: auto;
+    background: $gray-100;
+    border-radius: 100px;
+    padding: 0 6px;
+    font-size: 10px;
+    color: $gray-600;
+    font-weight: 700;
+  }
+}
+
+.ticket-card--resolved {
+  opacity: 0.7;
+}
+
+// ── Chatea Pro suggested response ───────────────────────────────────────────
+.cas-suggested {
+  margin: 8px 12px;
+  border: 2px solid rgba(#34d399, 0.4);
+  border-radius: 16px;
+  background: rgba(#34d399, 0.04);
+  overflow: hidden;
+  flex-shrink: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid rgba(#34d399, 0.2);
+  }
+
+  &__agent {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(#34d399, 0.9);
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d399;
+    animation: dot-pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__edit-btn {
+    border: none;
+    background: rgba(#34d399, 0.12);
+    color: rgba(#34d399, 0.9);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: $font-primary;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(#34d399, 0.22); }
+  }
+
+  &__text {
+    font-size: 13px;
+    color: $gray-700;
+    line-height: 1.6;
+    margin: 0;
+    padding: 10px 14px;
+    font-style: italic;
+  }
+
+  &__editor {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: $gray-700;
+    line-height: 1.6;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    resize: vertical;
+    outline: none;
+    font-family: $font-primary;
+  }
+
+  &__footer {
+    display: flex;
+    gap: 8px;
+    padding: 8px 14px 12px;
+  }
+
+  &__send {
+    flex: 1;
+    padding: 8px 14px;
+    background: #34d399;
+    color: $white;
+    border: none;
+    border-radius: $radius-md;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: $font-primary;
+    transition: background 0.15s, box-shadow 0.15s;
+
+    &:hover {
+      background: darken(#34d399, 8%);
+      box-shadow: 0 3px 10px rgba(#34d399, 0.3);
+    }
+  }
+
+  &__skip {
+    padding: 8px 12px;
+    background: transparent;
+    color: $gray-400;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: $font-primary;
+    transition: border-color 0.15s, color 0.15s;
+
+    &:hover { border-color: #ef4444; color: #ef4444; }
+  }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
 }

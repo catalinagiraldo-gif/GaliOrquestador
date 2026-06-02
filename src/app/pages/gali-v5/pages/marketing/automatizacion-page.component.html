@@ -69,4 +69,34 @@
   </div>
 
   <dropi-paginator />
+
+  <!-- Visual flow: Automatizaciones → Skills → Agente -->
+  <div class="auto-flow-diagram">
+    <div class="auto-flow-diagram__title">¿Cómo funcionan las Skills de Gali?</div>
+    <div class="auto-flow-diagram__steps">
+      <div class="auto-flow-step">
+        <div class="auto-flow-step__icon auto-flow-step__icon--auto">SMS</div>
+        <strong>Automatización</strong>
+        <span>Flujo de SMS/email configurado manualmente. Sin contexto de negocio.</span>
+      </div>
+      <div class="auto-flow-diagram__arrow">→</div>
+      <div class="auto-flow-step auto-flow-step--skill">
+        <div class="auto-flow-step__icon auto-flow-step__icon--skill">⚙</div>
+        <strong>Skill de Gali</strong>
+        <span>Trigger + Condición inteligente + Acción con historial auditable.</span>
+      </div>
+      <div class="auto-flow-diagram__arrow">→</div>
+      <div class="auto-flow-step auto-flow-step--agent">
+        <div class="auto-flow-step__icon auto-flow-step__icon--agent">✦</div>
+        <strong>Agente ejecuta</strong>
+        <span>Roax, Vigilante o Chatea Pro la ejecutan en segundo plano con contexto completo.</span>
+      </div>
+      <div class="auto-flow-diagram__arrow">→</div>
+      <div class="auto-flow-step auto-flow-step--result">
+        <div class="auto-flow-step__icon auto-flow-step__icon--result">📊</div>
+        <strong>Resultado visible</strong>
+        <span>Historial, impacto medido, señal en el workspace de Gali.</span>
+      </div>
+    </div>
+  </div>
 </div>

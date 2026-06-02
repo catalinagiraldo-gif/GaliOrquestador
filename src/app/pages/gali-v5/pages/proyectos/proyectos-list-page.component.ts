@@ -119,8 +119,7 @@ export class ProyectosListPageComponent {
   }
 
   newProject(): void {
-    this.ws.setMode('lanzar');
-    this.router.navigate(['/gali-v5']);
+    this.router.navigate(['/gali-v5/proyectos/nuevo']);
   }
 
   get activeCount(): number {

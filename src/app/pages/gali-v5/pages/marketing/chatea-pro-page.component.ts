@@ -59,6 +59,7 @@ export class ChateaProPageComponent {
   ]);
 
   newMsg = signal('');
+  showNewRule = signal(false);
 
   reglas = signal({
     anticipoZonaRural: true,

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   DropiTitulosComponent,
   DropiButtonNewComponent,
@@ -31,6 +32,7 @@ interface SoldProduct {
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     DropiTitulosComponent,
     DropiButtonNewComponent,
     DropiSearchOficialComponent,

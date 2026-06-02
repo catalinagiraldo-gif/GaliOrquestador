@@ -1,27 +1,62 @@
 <div class="cas-bandeja">
 
-  <!-- Chatea Pro — Agent Working Bar (ancho completo sobre las columnas) -->
-  <div class="agent-bar agent-bar--chatea cas-agent-bar">
-    <div class="agent-bar__left">
-      <span class="agent-bar__dot"></span>
-      <div class="agent-bar__identity">
-        <span class="agent-bar__name">Chatea Pro</span>
-        <span class="agent-bar__status">activo</span>
+  <header class="cas-page-intro">
+    <div class="cas-page-intro__left">
+      <h1 class="cas-page-intro__title">Centro de Atención · CAS</h1>
+      <p class="cas-page-intro__text">
+        Chatea Pro maneja el 88% de los casos solo. Aquí llegan <strong>solo los que necesitan tu decisión</strong>.
+      </p>
+    </div>
+    <div class="cas-page-intro__flow">
+      <div class="cas-flow-step">
+        <span class="cas-flow-step__icon">💬</span>
+        <span class="cas-flow-step__label">Cliente escribe</span>
+      </div>
+      <span class="cas-flow-arrow">→</span>
+      <div class="cas-flow-step cas-flow-step--agent">
+        <span class="cas-flow-step__icon">✦</span>
+        <span class="cas-flow-step__label">Chatea Pro responde</span>
+        <span class="cas-flow-step__sub">automático · 88% resueltos</span>
+      </div>
+      <span class="cas-flow-arrow">→</span>
+      <div class="cas-flow-step cas-flow-step--human">
+        <span class="cas-flow-step__icon">👤</span>
+        <span class="cas-flow-step__label">Tú decides</span>
+        <span class="cas-flow-step__sub">12% requieren tu criterio</span>
       </div>
     </div>
-    <div class="agent-bar__stats">
-      <span class="agent-bar__stat agent-bar__stat--ok"><strong>{{ galiStats.managing }}</strong> gestionando</span>
-      <span class="agent-bar__stat-sep">·</span>
-      <span class="agent-bar__stat agent-bar__stat--warn"><strong>{{ galiStats.human }}</strong> requieren decisión</span>
-      <span class="agent-bar__stat-sep">·</span>
-      <span class="agent-bar__stat agent-bar__stat--neutral"><strong>{{ galiStats.resolved }}</strong> resueltos hoy</span>
-      <span class="agent-bar__stat-sep">·</span>
-      <span class="agent-bar__stat"><strong>{{ galiStats.total }}</strong> tickets totales</span>
+  </header>
+
+  <!-- Panel conceptual: qué es el CAS y cómo funciona Chatea Pro -->
+  <div class="cas-explainer" *ngIf="showExplainer" (click)="showExplainer = false" style="cursor:pointer">
+    <div class="cas-explainer__flow">
+      <div class="cas-explainer__node cas-explainer__node--client">
+        <span class="cas-explainer__node-icon">💬</span>
+        <span>Cliente escribe</span>
+      </div>
+      <div class="cas-explainer__arrow">→</div>
+      <div class="cas-explainer__node cas-explainer__node--agent">
+        <span class="cas-explainer__node-icon">🤖</span>
+        <strong>Chatea Pro analiza</strong>
+        <span>Respuesta automática</span>
+      </div>
+      <div class="cas-explainer__arrow">→</div>
+      <div class="cas-explainer__node cas-explainer__node--human">
+        <span class="cas-explainer__node-icon">👤</span>
+        <span>Si no puede resolverlo</span>
+        <strong>Aparece aquí para que tú decidas</strong>
+      </div>
     </div>
-    <button class="agent-bar__cta" type="button" (click)="goToChateaPro()" data-proto-skip>
-      Ver centro operativo →
-    </button>
+    <button class="cas-explainer__close" type="button">Entendido ×</button>
   </div>
+
+  <dropi-gali-bar
+    agent="Chatea Pro"
+    status="activo en bandeja CAS"
+    [stats]="galiBarStats"
+    ctaLabel="Ver centro operativo"
+    (ctaClick)="goToChateaPro()"
+  />
 
   <gali-chip
     agentName="Chatea Pro"
@@ -43,31 +78,70 @@
       <button type="button" [class.active]="activeFilter() === 'mios'" (click)="activeFilter.set('mios')">Asignados a mí</button>
     </div>
     <div class="cas-bandeja__ticket-list">
-      @for (ticket of sortedTickets; track ticket.id) {
-        <button
-          type="button"
-          class="ticket-card"
-          [class.ticket-card--active]="selectedId() === ticket.id"
-          [class.ticket-card--urgent]="ticket.galiStatus === 'human'"
-          (click)="selectedId.set(ticket.id)"
-          data-proto-skip
-        >
-          <div class="ticket-card__top">
-            <strong>{{ ticket.id }}</strong>
-            <dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" />
-          </div>
-          <p class="ticket-card__subject">{{ ticket.subject }}</p>
-          <div class="ticket-card__footer">
-            <span class="ticket-card__meta">{{ ticket.client }} · {{ ticket.updated }}</span>
-            <span class="chatea-chip"
-              [class.chatea-chip--managing]="ticket.galiStatus === 'managing'"
-              [class.chatea-chip--human]="ticket.galiStatus === 'human'"
-              [class.chatea-chip--resolved]="ticket.galiStatus === 'resolved'">
-              {{ chipLabel(ticket.galiStatus) }}
-            </span>
-          </div>
-        </button>
+
+      <!-- 🔴 Urgente -->
+      @if (urgentTickets.length > 0) {
+        <div class="ticket-category ticket-category--urgent">
+          <span class="ticket-category__icon">🔴</span>
+          <span>Urgente</span>
+          <span class="ticket-category__count">{{ urgentTickets.length }}</span>
+        </div>
+        @for (ticket of urgentTickets; track ticket.id) {
+          <button type="button" class="ticket-card ticket-card--urgent"
+            [class.ticket-card--active]="selectedId() === ticket.id"
+            (click)="selectedId.set(ticket.id)" data-proto-skip>
+            <div class="ticket-card__top">
+              <strong>{{ ticket.client }}</strong>
+              <dropi-tag [label]="ticket.status" [variant]="statusVariant(ticket.status)" />
+            </div>
+            <p class="ticket-card__subject">{{ ticket.subject }}</p>
+            <span class="ticket-card__meta">{{ ticket.id }} · {{ ticket.updated }}</span>
+          </button>
+        }
       }
+
+      <!-- 🟡 Chatea Pro gestionando -->
+      @if (waitingTickets.length > 0) {
+        <div class="ticket-category ticket-category--waiting">
+          <span class="ticket-category__icon">🟡</span>
+          <span>Chatea Pro gestionando</span>
+          <span class="ticket-category__count">{{ waitingTickets.length }}</span>
+        </div>
+        @for (ticket of waitingTickets; track ticket.id) {
+          <button type="button" class="ticket-card"
+            [class.ticket-card--active]="selectedId() === ticket.id"
+            (click)="selectedId.set(ticket.id)" data-proto-skip>
+            <div class="ticket-card__top">
+              <strong>{{ ticket.client }}</strong>
+              <span class="chatea-chip chatea-chip--managing">✦ Gali</span>
+            </div>
+            <p class="ticket-card__subject">{{ ticket.subject }}</p>
+            <span class="ticket-card__meta">{{ ticket.id }} · {{ ticket.updated }}</span>
+          </button>
+        }
+      }
+
+      <!-- ✅ Resueltos 24h -->
+      @if (resolvedTickets.length > 0) {
+        <div class="ticket-category ticket-category--resolved">
+          <span class="ticket-category__icon">✅</span>
+          <span>Resueltos 24h</span>
+          <span class="ticket-category__count">{{ resolvedTickets.length }}</span>
+        </div>
+        @for (ticket of resolvedTickets; track ticket.id) {
+          <button type="button" class="ticket-card ticket-card--resolved"
+            [class.ticket-card--active]="selectedId() === ticket.id"
+            (click)="selectedId.set(ticket.id)" data-proto-skip>
+            <div class="ticket-card__top">
+              <strong>{{ ticket.client }}</strong>
+              <span class="chatea-chip chatea-chip--resolved">✓ Resuelto</span>
+            </div>
+            <p class="ticket-card__subject">{{ ticket.subject }}</p>
+            <span class="ticket-card__meta">{{ ticket.id }} · {{ ticket.updated }}</span>
+          </button>
+        }
+      }
+
     </div>
   </aside>
 
@@ -93,6 +167,41 @@
           </div>
         }
       </div>
+      <!-- Chatea Pro suggested response -->
+      @if (!suggestedSent() && ticket.galiStatus === 'human') {
+        <div class="cas-suggested">
+          <div class="cas-suggested__header">
+            <div class="cas-suggested__agent">
+              <span class="cas-suggested__dot"></span>
+              <strong>Chatea Pro sugiere</strong>
+            </div>
+            <div class="cas-suggested__actions">
+              <button type="button" class="cas-suggested__edit-btn"
+                (click)="isEditingSuggested.set(!isEditingSuggested())"
+                data-proto-skip>
+                {{ isEditingSuggested() ? 'Vista previa' : 'Editar' }}
+              </button>
+            </div>
+          </div>
+          @if (isEditingSuggested()) {
+            <textarea class="cas-suggested__editor"
+              [ngModel]="suggestedResponse()"
+              (ngModelChange)="suggestedResponse.set($event)"
+              rows="4"></textarea>
+          } @else {
+            <p class="cas-suggested__text">"{{ suggestedResponse() }}"</p>
+          }
+          <div class="cas-suggested__footer">
+            <button type="button" class="cas-suggested__send" (click)="sendSuggested()" data-proto-skip>
+              ✓ Enviar esta respuesta
+            </button>
+            <button type="button" class="cas-suggested__skip" (click)="suggestedSent.set(true)" data-proto-skip>
+              Escalar a humano
+            </button>
+          </div>
+        </div>
+      }
+
       <footer class="cas-bandeja__composer">
         <input
           type="text"

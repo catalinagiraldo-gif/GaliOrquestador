@@ -5,9 +5,25 @@
     status="analizando proveedores"
     message="Detecté 2 proveedores con productos de alto margen · Difusor aromaterapia 68% · Collar GPS v2 42% · Ventana: 14 días"
     ctaLabel="Lanzar producto con Gali →"
-    secondaryCta="Ver análisis completo"
+    secondaryCta="Ver análisis ADA Spy"
     (ctaClick)="goToLanzar()"
+    (secondaryClick)="verAnalisisCompleto()"
   />
+
+  <!-- Gali insight: proveedor contextual -->
+  <div class="providers-gali-insight">
+    <div class="providers-gali-insight__gali">
+      <span class="providers-gali-insight__icon">✦</span>
+      <div class="providers-gali-insight__text">
+        <strong>Para tu proyecto activo (Collar GPS),</strong> PetStore Colombia tiene 847 unidades disponibles y 98% de calidad histórica.
+        Precio proveedor: $28.500 · Margen estimado: $18.500/u después de flete y novedad.
+      </div>
+    </div>
+    <div class="providers-gali-insight__actions">
+      <button type="button" class="providers-gali-insight__cta" (click)="goToLanzar()">Contactar proveedor →</button>
+      <button type="button" class="providers-gali-insight__secondary" data-proto-skip>Ver historial calidad</button>
+    </div>
+  </div>
 
   <nav class="providers-page__breadcrumbs" aria-label="Breadcrumb">
     <a routerLink="/gali-v5" class="providers-page__crumb providers-page__crumb--home">

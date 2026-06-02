@@ -3,8 +3,11 @@
 
 :host {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .garantias-page {

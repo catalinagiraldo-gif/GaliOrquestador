@@ -13,6 +13,7 @@ $nav-icon-gray: #32394d;
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
+  mask-mode: alpha; // Force alpha channel masking — fixes SVGs with overflow="visible"
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
   -webkit-mask-size: contain;

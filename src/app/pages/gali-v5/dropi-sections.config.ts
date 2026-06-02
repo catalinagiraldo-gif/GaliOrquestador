@@ -25,6 +25,7 @@ export interface SectionPanel {
   railKey: string;
   title: string;
   items: SectionNavItem[];
+  agentFooter?: AgentFooter;
 }
 
 export interface DropiScreen {
@@ -43,30 +44,21 @@ export interface IconRailItem {
   icon: string;
   piIcon: string;
   route: string;
-  group: 'main' | 'utility';
+  group: 'main' | 'ai' | 'utility';
   matchPrefixes: string[];
 }
 
-/** Rail 56px — Manu 1/Default (Figma: Home → Dashboard → Productos → …) */
+export interface AgentFooter {
+  agentId: 'roax' | 'vigilante' | 'chatea' | 'ada' | 'gali';
+  label: string;
+  color: string;
+  statusLabel: string;
+  contextKey: string;
+}
+
+/** Rail 56px — Gali v5: main (ops) → ai (orchestration) → utility */
 export const DROPI_ICON_RAIL: IconRailItem[] = [
-  {
-    key: 'home',
-    label: 'Inicio',
-    icon: 'assets/icons/sidebar/home.svg',
-    piIcon: 'pi-home',
-    route: '/gali-v5',
-    group: 'main',
-    matchPrefixes: ['/gali-v5'],
-  },
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: 'assets/icons/sidebar/chat-arrow-grow.svg',
-    piIcon: 'pi-chart-bar',
-    route: '/gali-v5/reportes/dashboard',
-    group: 'main',
-    matchPrefixes: ['/gali-v5/reportes/dashboard'],
-  },
+  // ── Módulos operativos ──────────────────────────────────────────────
   {
     key: 'productos',
     label: 'Productos',
@@ -99,7 +91,7 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     label: 'Reportes',
     icon: 'assets/icons/sidebar/signal.svg',
     piIcon: 'pi-chart-line',
-    route: '/gali-v5/reportes/productos-vendidos',
+    route: '/gali-v5/reportes/dashboard',
     group: 'main',
     matchPrefixes: ['/gali-v5/reportes'],
   },
@@ -113,15 +105,6 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     matchPrefixes: ['/gali-v5/financiero', '/gali-v5/dropi-card'],
   },
   {
-    key: 'dropicard',
-    label: 'Dropi Card',
-    icon: 'assets/icons/sidebar/card.svg',
-    piIcon: 'pi-credit-card',
-    route: '/gali-v5/dropi-card/cards',
-    group: 'main',
-    matchPrefixes: [],
-  },
-  {
     key: 'marketing',
     label: 'Marketing',
     icon: 'assets/icons/sidebar/megaphone.svg',
@@ -130,14 +113,33 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     group: 'main',
     matchPrefixes: ['/gali-v5/marketing'],
   },
+  // ── Orquestación IA ─────────────────────────────────────────────────
+  {
+    key: 'home',
+    label: 'Gali Hub',
+    icon: 'assets/icons/sidebar/home.svg',
+    piIcon: 'pi-home',
+    route: '/gali-v5',
+    group: 'ai',
+    matchPrefixes: ['/gali-v5'],
+  },
   {
     key: 'proyectos',
     label: 'Proyectos',
     icon: `${G5}/boxes.svg`,
     piIcon: 'pi-folder',
     route: '/gali-v5/proyectos',
-    group: 'main',
+    group: 'ai',
     matchPrefixes: ['/gali-v5/proyectos', '/gali-v5/proyecto'],
+  },
+  {
+    key: 'agentes',
+    label: 'Agentes',
+    icon: `${G5}/id-badge.svg`,
+    piIcon: 'pi-android',
+    route: '/gali-v5/agentes',
+    group: 'ai',
+    matchPrefixes: ['/gali-v5/agentes'],
   },
   {
     key: 'skills',
@@ -145,9 +147,37 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     icon: `${G5}/apps-add.svg`,
     piIcon: 'pi-sparkles',
     route: '/gali-v5/skills',
-    group: 'main',
-    matchPrefixes: ['/gali-v5/skills', '/gali-v5/marketplace'],
+    group: 'ai',
+    matchPrefixes: ['/gali-v5/skills'],
   },
+  {
+    key: 'reglas',
+    label: 'Reglas',
+    icon: `${G5}/page-check.svg`,
+    piIcon: 'pi-sliders-h',
+    route: '/gali-v5/reglas',
+    group: 'ai',
+    matchPrefixes: ['/gali-v5/reglas'],
+  },
+  {
+    key: 'marketplace',
+    label: 'Marketplace',
+    icon: `${G5}/handshake.svg`,
+    piIcon: 'pi-shop',
+    route: '/gali-v5/marketplace',
+    group: 'ai',
+    matchPrefixes: ['/gali-v5/marketplace'],
+  },
+  {
+    key: 'conexiones',
+    label: 'Conexiones',
+    icon: `${G5}/page-check.svg`,
+    piIcon: 'pi-link',
+    route: '/gali-v5/conexiones',
+    group: 'ai',
+    matchPrefixes: ['/gali-v5/conexiones'],
+  },
+  // ── Utilidades ──────────────────────────────────────────────────────
   {
     key: 'cas',
     label: 'CAS',
@@ -208,6 +238,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         badge: 'beta',
       },
     ],
+    agentFooter: {
+      agentId: 'ada',
+      label: 'ADA Spy',
+      color: '#818cf8',
+      statusLabel: '3 productos evaluados',
+      contextKey: 'productos',
+    },
   },
   pedidos: {
     railKey: 'pedidos',
@@ -247,6 +284,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         ],
       },
     ],
+    agentFooter: {
+      agentId: 'vigilante',
+      label: 'Vigilante',
+      color: '#fbbf24',
+      statusLabel: '47 órdenes · 3 críticas',
+      contextKey: 'pedidos',
+    },
   },
   logistica: {
     railKey: 'logistica',
@@ -387,6 +431,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         icon: 'assets/icons/sidebar/page.svg',
       },
     ],
+    agentFooter: {
+      agentId: 'roax',
+      label: 'Roax',
+      color: '#f97316',
+      statusLabel: 'ROAS 2.9x · 3 campañas',
+      contextKey: 'marketing',
+    },
   },
   cas: {
     railKey: 'cas',
@@ -471,30 +522,189 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       },
     ],
   },
+  agentes: {
+    railKey: 'agentes',
+    title: 'Agentes',
+    items: [
+      { id: 'hdr-mis-agentes', label: 'Mis agentes', type: 'header' as const },
+      {
+        id: 'roax-agent',
+        label: 'Roax · Media Buyer',
+        route: '/gali-v5/agentes',
+        icon: `${G5}/megaphone.svg`,
+      },
+      {
+        id: 'vigilante-agent',
+        label: 'Vigilante · Logística',
+        route: '/gali-v5/agentes',
+        icon: `${G5}/bell-ring.svg`,
+      },
+      {
+        id: 'chatea-agent',
+        label: 'Chatea Pro · CAS',
+        route: '/gali-v5/agentes',
+        icon: 'assets/icons/sidebar/comments-dots.svg',
+      },
+      {
+        id: 'ada-agent',
+        label: 'ADA Spy · Research',
+        route: '/gali-v5/agentes',
+        icon: 'assets/icons/sidebar/search.svg',
+      },
+      { id: 'hdr-config-agentes', label: 'Configuración', type: 'header' as const },
+      { id: 'nav-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
+      { id: 'nav-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
+      { id: 'nav-marketplace', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+    ],
+    agentFooter: {
+      agentId: 'gali',
+      label: 'Gali',
+      color: '#ff6102',
+      statusLabel: '4 agentes orquestados',
+      contextKey: 'agentes',
+    },
+  },
   skills: {
     railKey: 'skills',
     title: 'Skills',
     items: [
+      { id: 'hdr-mis', label: 'Mis skills', type: 'header' as const },
       {
         id: 'mis-skills',
         label: 'Mis Skills',
         route: '/gali-v5/skills',
         icon: `${G5}/apps-add.svg`,
-        badge: 'nuevo' as SectionBadge,
       },
       {
         id: 'crear-skill',
-        label: 'Crear skill',
-        route: '/gali-v5/skills?tab=crear',
+        label: 'Crear nueva skill',
+        route: '/gali-v5/skills/nueva',
         icon: `${G5}/pencil.svg`,
       },
+      { id: 'hdr-comunidad', label: 'Comunidad', type: 'header' as const },
       {
-        id: 'marketplace',
+        id: 'marketplace-skills',
         label: 'Marketplace',
-        route: '/gali-v5/skills?tab=marketplace',
+        route: '/gali-v5/skills/comunidad',
         icon: `${G5}/trophy.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+      { id: 'hdr-nav', label: 'Orquestación IA', type: 'header' as const },
+      { id: 'nav-agentes', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
+      { id: 'nav-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
+    ],
+    agentFooter: {
+      agentId: 'gali',
+      label: 'Gali',
+      color: '#ff6102',
+      statusLabel: '3 skills activas',
+      contextKey: 'home',
+    },
+  },
+  reglas: {
+    railKey: 'reglas',
+    title: 'Reglas',
+    items: [
+      { id: 'hdr-reglas', label: 'Mis reglas', type: 'header' as const },
+      {
+        id: 'reglas-chatea',
+        label: 'Reglas Chatea Pro',
+        route: '/gali-v5/reglas',
+        icon: 'assets/icons/sidebar/comments-dots.svg',
+      },
+      { id: 'hdr-orq-reglas', label: 'Orquestación IA', type: 'header' as const },
+      { id: 'nav-agentes-r', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
+      { id: 'nav-skills-r', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
+      { id: 'nav-mkt-r', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+    ],
+    agentFooter: {
+      agentId: 'chatea',
+      label: 'Chatea Pro',
+      color: '#34d399',
+      statusLabel: 'reglas WhatsApp activas',
+      contextKey: 'home',
+    },
+  },
+  marketplace: {
+    railKey: 'marketplace',
+    title: 'Marketplace',
+    items: [
+      { id: 'hdr-explore', label: 'Explorar', type: 'header' as const },
+      {
+        id: 'mkt-skills',
+        label: 'Skills',
+        route: '/gali-v5/skills/comunidad',
+        icon: `${G5}/apps-add.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+      { id: 'hdr-mis-mkt', label: 'Mis skills', type: 'header' as const },
+      {
+        id: 'mis-skills-mkt',
+        label: 'Mis Skills activas',
+        route: '/gali-v5/skills',
+        icon: `${G5}/apps-add.svg`,
+      },
+      {
+        id: 'nueva-skill-mkt',
+        label: 'Crear nueva skill',
+        route: '/gali-v5/skills/nueva',
+        icon: `${G5}/pencil.svg`,
+      },
+      { id: 'hdr-nav-mkt', label: 'Orquestación', type: 'header' as const },
+      { id: 'nav-agentes-m', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
+      { id: 'nav-reglas-m', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
+    ],
+    agentFooter: {
+      agentId: 'gali',
+      label: 'Gali',
+      color: '#ff6102',
+      statusLabel: 'comunidad activa',
+      contextKey: 'home',
+    },
+  },
+  conexiones: {
+    railKey: 'conexiones',
+    title: 'Conexiones',
+    items: [
+      {
+        id: 'mcp-publicidad',
+        label: 'Publicidad',
+        route: '/gali-v5/conexiones',
+        icon: 'assets/icons/sidebar/megaphone.svg',
+        type: 'link' as const,
+      },
+      {
+        id: 'mcp-contabilidad',
+        label: 'Contabilidad',
+        route: '/gali-v5/conexiones',
+        icon: `${G5}/page-check.svg`,
+      },
+      {
+        id: 'mcp-comunicacion',
+        label: 'Comunicación',
+        route: '/gali-v5/conexiones',
+        icon: 'assets/icons/sidebar/comments-dots.svg',
+      },
+      {
+        id: 'mcp-research',
+        label: 'Research',
+        route: '/gali-v5/conexiones',
+        icon: 'assets/icons/sidebar/search.svg',
+      },
+      {
+        id: 'mcp-datos',
+        label: 'Datos cruzados',
+        route: '/gali-v5/conexiones',
+        icon: `${G5}/money-coin.svg`,
       },
     ],
+    agentFooter: {
+      agentId: 'gali',
+      label: 'Gali',
+      color: '#ff6102',
+      statusLabel: 'orquestador MCP activo',
+      contextKey: 'conexiones',
+    },
   },
 };
 
@@ -525,9 +735,10 @@ export const DROPI_SCREENS: DropiScreen[] = [
 ];
 
 const HOME_EXACT = new Set(['/gali-v5', '/gali-v5/']);
-const GALI_HUB_PREFIXES = [
-  '/gali-v5/marketplace',
-];
+const GALI_HUB_PREFIXES: string[] = [];
+
+/** Rutas de orquestación IA sin panel lateral de módulo */
+const ORCHESTRATION_RAIL_KEYS = new Set(['home', 'proyectos', 'agentes', 'skills', 'reglas', 'marketplace', 'conexiones']);
 
 /** Resuelve rail activo desde URL */
 export function resolveActiveRailKey(url: string): string {
@@ -553,51 +764,65 @@ export function resolveActiveRailKey(url: string): string {
   return best?.key ?? 'home';
 }
 
-/** Panel en Home — Gali Hub acceso rápido a secciones core */
+/** @deprecated Usar GALI_MISSION_PANEL */
 export const HOME_OVERVIEW_PANEL: SectionPanel = {
   railKey: 'home',
   title: 'Gali',
   items: [
-    {
-      id: 'gali-hub',
-      label: 'Gali Hub',
-      route: '/gali-v5',
-      icon: 'assets/icons/sidebar/home.svg',
-    },
-    {
-      id: 'hdr-secciones',
-      label: 'Secciones',
-      type: 'header' as const,
-    },
+    { id: 'gali-hub', label: 'Gali Hub', route: '/gali-v5', icon: 'assets/icons/sidebar/home.svg' },
+    { id: 'hdr-secciones', label: 'Secciones', type: 'header' as const },
     ...DROPI_ICON_RAIL.filter(i => i.key !== 'home').map(item => ({
-      id: item.key,
-      label: item.label,
-      route: item.route,
-      icon: item.icon,
+      id: item.key, label: item.label, route: item.route, icon: item.icon,
     })),
   ],
 };
 
+/** Panel del home — Mission Control: proyectos, skills, señales, agentes */
+export const GALI_MISSION_PANEL: SectionPanel = {
+  railKey: 'home',
+  title: 'Gali',
+  items: [
+    { id: 'gali-hub', label: 'Gali Hub', route: '/gali-v5', icon: 'assets/icons/sidebar/home.svg' },
+    { id: 'hdr-proyectos', label: 'Proyectos', type: 'header' as const },
+    { id: 'proyecto-collar', label: '● Collar GPS v2', route: '/gali-v5/proyecto/collar-gps' },
+    { id: 'proyecto-skincare', label: '● Skincare Pack', route: '/gali-v5/proyecto/skincare' },
+    { id: 'proyecto-fitness', label: '○ Fitness (pausado)', route: '/gali-v5/proyecto/fitness' },
+    {
+      id: 'nuevo-proyecto',
+      label: '+ Nuevo proyecto',
+      route: '/gali-v5/proyectos?nuevo=true',
+      badge: 'nuevo' as SectionBadge,
+    },
+    { id: 'hdr-orq', label: 'Orquestación', type: 'header' as const },
+    { id: 'ver-agentes', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
+    { id: 'mis-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
+    { id: 'mis-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
+      { id: 'marketplace', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+  ],
+  agentFooter: {
+    agentId: 'gali',
+    label: 'Gali',
+    color: '#ff6102',
+    statusLabel: 'orquestador activo',
+    contextKey: 'home',
+  },
+};
+
+// academy never has a section panel; IA keys now have dedicated panels
 const NO_PANEL_RAIL_KEYS = new Set(['academy']);
 
-const DASHBOARD_RAIL_KEY = 'dashboard';
-
-/** Panel secundario visible solo en secciones con sub-nav */
+/** Panel secundario visible en todas las secciones (home → GALI_MISSION_PANEL) */
 export function resolveSectionPanel(url: string): SectionPanel | null {
   const path = url.split('?')[0];
-  // Gali OS home — full-width workspace, sin panel lateral de secciones
   if (HOME_EXACT.has(path)) {
-    return null;
+    return GALI_MISSION_PANEL;
   }
   if (GALI_HUB_PREFIXES.some(p => path.startsWith(p))) {
-    return HOME_OVERVIEW_PANEL;
+    return GALI_MISSION_PANEL;
   }
 
   const railKey = resolveActiveRailKey(url);
   if (NO_PANEL_RAIL_KEYS.has(railKey)) return null;
-  // Dashboard vive en Reportes pero tiene acceso rápido propio en el rail
-  if (railKey === DASHBOARD_RAIL_KEY) {
-    return DROPI_SECTION_PANELS['reportes'] ?? null;
-  }
+  if (ORCHESTRATION_RAIL_KEYS.has(railKey) && !DROPI_SECTION_PANELS[railKey]) return null;
   return DROPI_SECTION_PANELS[railKey] ?? null;
 }

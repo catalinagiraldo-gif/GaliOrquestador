@@ -10,9 +10,11 @@ $hub-bg: #fafaf8;
 
 :host {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .mkt {

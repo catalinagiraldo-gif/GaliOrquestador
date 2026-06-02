@@ -101,6 +101,11 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
       import('./pages/reportes/report-dashboard-kpi-page.component').then(m => m.ReportDashboardKpiPageComponent),
   },
   {
+    path: 'reportes/dashboard-financiero',
+    loadComponent: () =>
+      import('./pages/reportes/dashboard-financiero-page.component').then(m => m.DashboardFinancieroPageComponent),
+  },
+  {
     path: 'reportes/productos-vendidos',
     loadComponent: () =>
       import('./pages/reportes/productos-vendidos-page.component').then(m => m.ProductosVendidosPageComponent),
@@ -194,8 +199,7 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
   {
     path: 'academy',
     loadComponent: () =>
-      import('./screens/dropi-screen-page.component').then(m => m.DropiScreenPageComponent),
-    data: { screenId: 'academy' },
+      import('./pages/akademy/akademy-page.component').then(m => m.AkademyPageComponent),
   },
 
   // ── Configuraciones ──
@@ -218,9 +222,19 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
       import('./pages/proyecto/proyecto-detalle-page.component').then(m => m.ProyectoDetallePageComponent),
   },
   {
+    path: 'proyectos/nuevo',
+    loadComponent: () =>
+      import('./pages/proyectos/nuevo-proyecto-page.component').then(m => m.NuevoProyectoPageComponent),
+  },
+  {
     path: 'proyectos',
     loadComponent: () =>
       import('./pages/proyectos/proyectos-list-page.component').then(m => m.ProyectosListPageComponent),
+  },
+  {
+    path: 'agentes',
+    loadComponent: () =>
+      import('./pages/agentes/agentes-page.component').then(m => m.AgentesPageComponent),
   },
   {
     path: 'skills/nueva',
@@ -228,14 +242,29 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
       import('./pages/skills/skill-editor-page.component').then(m => m.SkillEditorPageComponent),
   },
   {
+    path: 'skills/comunidad',
+    loadComponent: () =>
+      import('./pages/skills/skills-comunidad-page.component').then(m => m.SkillsComunidadPageComponent),
+  },
+  {
     path: 'skills',
     loadComponent: () =>
       import('./pages/skills/skills-page.component').then(m => m.SkillsPageComponent),
   },
   {
+    path: 'reglas',
+    loadComponent: () =>
+      import('./pages/reglas/reglas-page.component').then(m => m.ReglasPageComponent),
+  },
+  {
     path: 'marketplace',
-    redirectTo: 'skills',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('./pages/marketplace/marketplace-page.component').then(m => m.MarketplacePageComponent),
+  },
+  {
+    path: 'conexiones',
+    loadComponent: () =>
+      import('./pages/conexiones/conexiones-page.component').then(m => m.ConexionesPageComponent),
   },
 
   {

@@ -7,6 +7,8 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
 
 :host {
   display: block;
+  grid-column: 2;
+  grid-row: 1;
   width: var(--dropi-rail-width, 56px);
   height: 100%;
   min-height: 0;
@@ -148,16 +150,5 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
 
   &__item--active .icon-rail__svg {
     @include nav-icon-active-white;
-  }
-
-  &__dot {
-    position: absolute;
-    top: 5px;
-    right: 4px;
-    width: 8px;
-    height: 8px;
-    border-radius: $radius-lg;
-    background: $primary-500;
-    pointer-events: none;
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import {
   DropiTitulosComponent,
   DropiButtonNewComponent,
@@ -12,6 +12,7 @@ import campanasData from '../../../../../../mocks/gali-v5/marketing-campanas.jso
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import { GaliInsightDirective } from '../../directives/gali-insight.directive';
 
 interface CampanaRow {
   id: string;
@@ -26,12 +27,14 @@ interface CampanaRow {
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     DropiTitulosComponent,
     DropiButtonNewComponent,
     DropiTagComponent,
     DropiPaginatorComponent,
     DropiGaliBarComponent,
     GaliNewSkillOverlayComponent,
+    GaliInsightDirective,
   ],
   templateUrl: './campanas-page.component.html',
   styleUrl: './campanas-page.component.scss',

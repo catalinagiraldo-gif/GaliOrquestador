@@ -23,13 +23,21 @@ export interface GaliSignal {
   ctaAction?: string;
 }
 
+export interface ExecutionCard {
+  phase: 'running' | 'done';
+  skillName: string;
+  affectedModules: Array<{ label: string; route: string }>;
+  resultSummary?: string;
+}
+
 export interface ChatMessage {
   id: string;
   from: 'gali' | 'user';
   text: string;
   time: string;
   actions?: ChatAction[];
-  modeChip?: string;  // chip visual "→ Modo X activado"
+  modeChip?: string;
+  executionCard?: ExecutionCard;
 }
 
 export interface ChatAction {
@@ -160,6 +168,25 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
       { label: 'Activar autopilot', action: 'toggle-autopilot', isPrimary: true },
     ],
   },
+  'arma-mi-dia': {
+    text: '📋 Aquí tu día — Semana 22:',
+    actions: [
+      { label: 'Ver novedades', action: 'ir-a-senales', isPrimary: true },
+      { label: 'Conectar Siigo', action: 'ir-operar' },
+    ],
+  },
+  'personalizar': {
+    text: 'Abriendo el panel de personalización del dashboard. Puedes activar o desactivar: Insight de Gali, Anatomía del proyecto, Señales activas, Chat y Recomendaciones Akademy.',
+    actions: [
+      { label: 'Abrir personalización', action: 'abrir-customizer', isPrimary: true },
+    ],
+  },
+  'akademy': {
+    text: 'Basado en tus métricas actuales, te recomiendo en Akademy: "Optimización de P&L real en Meta Ads" (38 min) — porque tu ROAS declarado es 2.9x pero el real es 1.93x. La diferencia está en las novedades de Cali.',
+    actions: [
+      { label: 'Ir a Akademy', action: 'ir-akademy', isPrimary: true },
+    ],
+  },
   'default': {
     text: 'Entendido. Voy a procesar eso. Mientras tanto, recuerda que tienes 1 señal crítica activa (Coordinadora 15% novedad) y el ROAS está en 2.9x. ¿Quieres que priorice algo específico?',
     actions: [
@@ -171,6 +198,7 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
 
 function matchResponse(text: string): { text: string; actions?: ChatAction[]; context?: GaliPanelContext } {
   const lower = text.toLowerCase();
+  if (lower.includes('arma') || lower.includes('qué hay') || lower.includes('resumen del día') || lower.includes('cómo voy')) return SMART_RESPONSES['arma-mi-dia'];
   if (lower.includes('novedad') || lower.includes('coordinadora') || lower.includes('transportadora')) return SMART_RESPONSES['novedad'];
   if (lower.includes('roas') || lower.includes('campaña') || lower.includes('roax') || lower.includes('presupuesto')) return SMART_RESPONSES['roas'];
   if (lower.includes('hoy') || lower.includes('resumen') || lower.includes('pasó')) return SMART_RESPONSES['hoy'];
@@ -180,7 +208,38 @@ function matchResponse(text: string): { text: string; actions?: ChatAction[]; co
   if (lower.includes('señal') || lower.includes('señales') || lower.includes('critica') || lower.includes('crítica') || lower.includes('operar')) return SMART_RESPONSES['senales'];
   if (lower.includes('medir') || lower.includes('ventas') || lower.includes('ganancia') || lower.includes('p&l')) return SMART_RESPONSES['medir'];
   if (lower.includes('autopilot') || lower.includes('auto') || lower.includes('automático')) return SMART_RESPONSES['autopilot'];
+  if (lower.includes('personaliz') || lower.includes('dashboard') || lower.includes('sección') || lower.includes('config')) return SMART_RESPONSES['personalizar'];
+  if (lower.includes('akademy') || lower.includes('academy') || lower.includes('aprender') || lower.includes('curso')) return SMART_RESPONSES['akademy'];
   return SMART_RESPONSES['default'];
+}
+
+// Detecta si el texto es una instrucción de ejecución
+function isExecutionIntent(text: string): { isExecution: boolean; skillName: string; modules: Array<{ label: string; route: string }> } {
+  const lower = text.toLowerCase();
+  if (lower.includes('ejecuta') || lower.includes('activa') || lower.includes('lanza') || lower.includes('pausa') || lower.includes('reasigna') || lower.includes('confirma')) {
+    if (lower.includes('ctr') || lower.includes('pausa')) {
+      return { isExecution: true, skillName: 'Auto-pausa CTR', modules: [
+        { label: 'Marketing', route: '/gali-v5/marketing/roax-informes' },
+        { label: 'Reportes', route: '/gali-v5/reportes/dashboard' },
+      ] };
+    }
+    if (lower.includes('roas') || lower.includes('escala') || lower.includes('presupuesto')) {
+      return { isExecution: true, skillName: 'Escalado ROAS automático', modules: [
+        { label: 'Marketing', route: '/gali-v5/marketing/roax-informes' },
+        { label: 'Finanzas', route: '/gali-v5/financiero/historial-de-cartera' },
+      ] };
+    }
+    if (lower.includes('routing') || lower.includes('pedido') || lower.includes('reasigna') || lower.includes('coordinadora')) {
+      return { isExecution: true, skillName: 'Smart routing novedad', modules: [
+        { label: 'Pedidos', route: '/gali-v5/mis-pedidos/novedades' },
+        { label: 'Logística', route: '/gali-v5/logistica/transportadoras' },
+      ] };
+    }
+    return { isExecution: true, skillName: 'Skill de Gali', modules: [
+      { label: 'Señales', route: '/gali-v5' },
+    ] };
+  }
+  return { isExecution: false, skillName: '', modules: [] };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -189,6 +248,15 @@ export class GaliStateService {
   private ws = inject(GaliWorkspaceService);
 
   readonly galiMode = signal<GaliMode>(0);
+
+  readonly showCustomizer = signal(false);
+  /** Tab solicitado al abrir el panel desde una notificación de agente */
+  readonly requestedPanelTab = signal<string | null>(null);
+
+  openPanelToMemory(): void {
+    this.requestedPanelTab.set('memory');
+    this.galiMode.set(1);
+  }
 
   readonly agents = signal<AgentStatus[]>([
     { id: 'roax', name: 'Roax', color: '#f97316', status: 'activo', action: 'ROAS 2.9x · pauta $66k/día activa', skills: ['Auto-pausa CTR', 'Escalado ROAS'] },
@@ -299,9 +367,35 @@ export class GaliStateService {
   sendMessage(text: string): void {
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, from: 'user', text, time: 'ahora' };
     this.chatHistory.update(h => [...h, userMsg]);
-    this.isTyping.set(true);
 
+    const { isExecution, skillName, modules } = isExecutionIntent(text);
+
+    if (isExecution) {
+      // Insertar execution card en fase "running"
+      const execId = `exec-${Date.now()}`;
+      const execMsg: ChatMessage = {
+        id: execId,
+        from: 'gali',
+        text: '',
+        time: 'ahora',
+        executionCard: { phase: 'running', skillName, affectedModules: modules },
+      };
+      this.chatHistory.update(h => [...h, execMsg]);
+
+      // Después de 1.8s: marcar como "done" con resultado
+      setTimeout(() => {
+        this.chatHistory.update(h => h.map(m => m.id === execId
+          ? { ...m, executionCard: { ...m.executionCard!, phase: 'done', resultSummary: `${skillName} ejecutada con éxito. Módulos actualizados.` } }
+          : m
+        ));
+        this.ws.addLiveEvent({ agente: 'Gali', agente_id: 'gali', mensaje: `${skillName} ejecutada desde chat`, tipo: 'action' });
+      }, 1800);
+      return;
+    }
+
+    this.isTyping.set(true);
     const delay = 600 + Math.random() * 600;
+    const lower = text.toLowerCase();
     setTimeout(() => {
       this.isTyping.set(false);
       const response = matchResponse(text);
@@ -317,6 +411,15 @@ export class GaliStateService {
         modeChip: this.getModeChip(text),
       };
       this.chatHistory.update(h => [...h, galiMsg]);
+
+      // Auto-ejecutar customizer sin necesidad de hacer clic en el botón
+      if (lower.includes('personaliz') || (lower.includes('dashboard') && (lower.includes('config') || lower.includes('secci')))) {
+        setTimeout(() => {
+          this.router.navigate(['/gali-v5']);
+          this.showCustomizer.set(true);
+          this.galiMode.set(0);
+        }, 500);
+      }
     }, delay);
   }
 
@@ -376,6 +479,19 @@ export class GaliStateService {
       case 'ir-senales':
         this.ws.setMode('operar');
         this.router.navigate(['/gali-v5']);
+        this.galiMode.set(0);
+        break;
+      case 'ir-akademy':
+        this.router.navigate(['/gali-v5/academy']);
+        this.galiMode.set(0);
+        break;
+      case 'editar-skill':
+        this.router.navigate(['/gali-v5/skills/nueva']);
+        this.galiMode.set(0);
+        break;
+      case 'abrir-customizer':
+        this.router.navigate(['/gali-v5']);
+        this.showCustomizer.set(true);
         this.galiMode.set(0);
         break;
     }

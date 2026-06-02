@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DropiSearchOficialComponent, DropiTagComponent } from '../../components/shared';
 import { GaliChipComponent } from '../../components/gali-chip/gali-chip.component';
+import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import casData from '../../../../../../mocks/gali-v5/cas-tickets.json';
 import pqrPatternsData from '../../../../../../mocks/gali-v5/pqr-patterns.json';
 
@@ -39,13 +40,14 @@ interface PqrPattern {
 @Component({
   selector: 'app-cas-bandeja-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, GaliChipComponent],
+  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, GaliChipComponent, DropiGaliBarComponent],
   templateUrl: './cas-bandeja-page.component.html',
   styleUrl: './cas-bandeja-page.component.scss',
 })
 export class CasBandejaPageComponent {
   private router = inject(Router);
 
+  showExplainer = true;
   searchQuery = '';
   activeFilter = signal<'todos' | 'abiertos' | 'mios'>('todos');
 
@@ -56,6 +58,41 @@ export class CasBandejaPageComponent {
 
   chatMessages = signal([...casData.messages]);
   newMessage = signal('');
+
+  // Chatea Pro suggested response — editable before sending
+  readonly suggestedResponse = signal('Hola, revisamos tu caso y notamos que la guía de tu pedido está en proceso de actualización con la transportadora. Te confirmaremos el estado exacto en las próximas 2 horas. Disculpa la espera y muchas gracias por tu paciencia.');
+  readonly isEditingSuggested = signal(false);
+  readonly suggestedSent = signal(false);
+
+  sendSuggested(): void {
+    const text = this.suggestedResponse().trim();
+    if (!text) return;
+    this.chatMessages.update(msgs => [...msgs, { from: 'agent', text, time: 'ahora' }]);
+    this.suggestedSent.set(true);
+    this.isEditingSuggested.set(false);
+  }
+
+  get urgentTickets(): Ticket[] {
+    return this.sortedTickets.filter(t => t.galiStatus === 'human');
+  }
+
+  get waitingTickets(): Ticket[] {
+    return this.sortedTickets.filter(t => t.galiStatus === 'managing' || t.galiStatus === 'pending');
+  }
+
+  get resolvedTickets(): Ticket[] {
+    return this.sortedTickets.filter(t => t.galiStatus === 'resolved');
+  }
+
+  get galiBarStats(): GaliBarStat[] {
+    const s = this.galiStats;
+    return [
+      { value: s.managing, label: 'gestionando', variant: 'ok' },
+      { value: s.human, label: 'requieren decisión', variant: 'warn' },
+      { value: s.resolved, label: 'resueltos hoy', variant: 'neutral' },
+      { value: s.total, label: 'tickets totales' },
+    ];
+  }
 
   get galiStats() {
     return {

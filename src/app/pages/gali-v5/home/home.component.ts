@@ -1,11 +1,10 @@
 import { Component, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { GaliWorkspaceService } from '../services/gali-workspace.service';
 import { GaliStateService } from '../services/gali-state.service';
-import { GaliWorkspaceModeBarComponent } from '../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 import {
   GaliSignalCardV2Component,
   GaliSignalData,
@@ -14,6 +13,10 @@ import {
   GaliProjectPanelComponent,
   ProjectPanelData,
 } from '../components/gali-project-panel/gali-project-panel.component';
+import {
+  GaliGoalOnboardingComponent,
+  shouldShowOnboarding,
+} from '../components/gali-goal-onboarding/gali-goal-onboarding.component';
 
 type AgentStatus = 'activo' | 'esperando' | 'pausa';
 
@@ -92,9 +95,10 @@ function matchLanzar(text: string): string {
   imports: [
     CommonModule,
     FormsModule,
-    GaliWorkspaceModeBarComponent,
+    RouterModule,
     GaliSignalCardV2Component,
     GaliProjectPanelComponent,
+    GaliGoalOnboardingComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -103,12 +107,35 @@ export class DropiHomeComponent implements AfterViewChecked {
   readonly ws = inject(GaliWorkspaceService);
   readonly router = inject(Router);
   readonly gali = inject(GaliStateService);
+
+  readonly showOnboarding = signal(shouldShowOnboarding());
   private auth = inject(AuthService);
 
   @ViewChild('lanzarScroll') lanzarScrollEl?: ElementRef<HTMLElement>;
   private shouldScrollLanzar = false;
 
   userName = signal('Alejandra');
+
+  // Dashboard customizer — signal lives in service so chat can open it
+  readonly showCustomizer = this.gali.showCustomizer;
+  readonly customizerSaved = signal(false);
+  readonly dashboardSections = signal({
+    insight: true,
+    anatomy: true,
+    signals: true,
+    chat: true,
+    akademy: true,
+  });
+
+  toggleSection(key: string): void {
+    this.dashboardSections.update(s => ({ ...s, [key]: !s[key as keyof typeof s] }));
+  }
+
+  saveAndCloseCustomizer(): void {
+    this.gali.showCustomizer.set(false);
+    this.customizerSaved.set(true);
+    setTimeout(() => this.customizerSaved.set(false), 5000);
+  }
 
   // Lanzar mode chat
   readonly lanzarMessages = signal<LanzarMsg[]>([
@@ -445,6 +472,98 @@ export class DropiHomeComponent implements AfterViewChecked {
     { id: 'cs-5', category: 'CAS', nombre: 'Resolución automática de novedades comunes', descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención humana.', uses: '756' },
     { id: 'cs-6', category: 'Marketing', nombre: 'Pausa-por-CTR + A/B automático', descripcion: 'Pausa el creativo con CTR bajo y activa el alternativo. Registra el resultado.', uses: '1.8k' },
   ];
+
+  // ── Anatomy grid interactivo ──────────────────────────────────────────────
+  readonly activeNode = signal<string | null>(null);
+
+  toggleNode(id: string): void {
+    this.activeNode.update(cur => cur === id ? null : id);
+  }
+
+  readonly nodeDetailMap: Record<string, { agentName: string; color: string; description: string; lastAction: string; impacts: Array<{ label: string; route: string }>; ctaLabel: string; ctaRoute: string }> = {
+    'producto': {
+      agentName: 'ADA Spy', color: '#818cf8',
+      description: '3 oportunidades · stock 847u (18 días)',
+      lastAction: 'Difusor aromaterapia score 87/100 · hace 1h',
+      impacts: [
+        { label: 'Proyectos', route: '/gali-v5/proyectos' },
+        { label: 'Marketing', route: '/gali-v5/marketing/roax-lanzador' },
+      ],
+      ctaLabel: 'Ver catálogo', ctaRoute: '/gali-v5/productos/catalogo',
+    },
+    'marketing': {
+      agentName: 'Roax', color: '#f97316',
+      description: 'ROAS 2.9x · $66k/día · Video B ganando',
+      lastAction: 'Escaló presupuesto +15% por CTR 1.8% · hace 2h',
+      impacts: [
+        { label: 'Pedidos (+47)', route: '/gali-v5/mis-pedidos/mis-pedidos' },
+        { label: 'Finanzas (34% margen)', route: '/gali-v5/financiero/historial-de-cartera' },
+      ],
+      ctaLabel: 'Ver campañas', ctaRoute: '/gali-v5/marketing/roax-informes',
+    },
+    'pedidos': {
+      agentName: 'Vigilante', color: '#fbbf24',
+      description: '47 activas · 3 pendientes tu decisión',
+      lastAction: 'Detectó novedad 15% Coordinadora · hace 18 min',
+      impacts: [
+        { label: 'Logística (smart routing)', route: '/gali-v5/logistica/transportadoras' },
+        { label: 'Finanzas (28 sin facturar)', route: '/gali-v5/financiero/historial-de-cartera' },
+      ],
+      ctaLabel: 'Ver órdenes', ctaRoute: '/gali-v5/mis-pedidos/mis-pedidos',
+    },
+    'logistica': {
+      agentName: 'Vigilante', color: '#fbbf24',
+      description: 'Smart routing activo · 12 pedidos redirigidos',
+      lastAction: 'Redirigió pedidos a Servientrega · hace 18 min',
+      impacts: [
+        { label: 'Pedidos (riesgo)', route: '/gali-v5/mis-pedidos/novedades' },
+        { label: 'Finanzas (margen +3pts)', route: '/gali-v5/financiero/historial-de-cartera' },
+      ],
+      ctaLabel: 'Ver transportadoras', ctaRoute: '/gali-v5/logistica/transportadoras',
+    },
+    'finanzas': {
+      agentName: 'Gali', color: '#ff6102',
+      description: '$450k pendiente · Siigo sin conectar',
+      lastAction: 'Detectó discrepancia ROAS Meta vs real · hace 3h',
+      impacts: [
+        { label: 'Conexiones (Siigo)', route: '/gali-v5/conexiones' },
+        { label: 'Reportes (P&L)', route: '/gali-v5/reportes/dashboard' },
+      ],
+      ctaLabel: 'Conectar Siigo', ctaRoute: '/gali-v5/conexiones',
+    },
+    'rendimiento': {
+      agentName: 'Roax', color: '#f97316',
+      description: 'CPA $21.4k · Margen neto 34%',
+      lastAction: 'Actualizó ROAS real 2.9x vs Meta 3.1x · hace 2h',
+      impacts: [
+        { label: 'Marketing (ROAS)', route: '/gali-v5/marketing/roax-informes' },
+        { label: 'Finanzas (P&L)', route: '/gali-v5/financiero/historial-de-cartera' },
+      ],
+      ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
+    },
+    'reportes': {
+      agentName: 'Roax', color: '#f97316',
+      description: 'ROAS real 1.93x vs Meta 2.9x · CPA $21.4k · Margen neto 34%',
+      lastAction: 'Detectó discrepancia ROAS: 40% del margen absorbido por novedades en Cali · hace 2h',
+      impacts: [
+        { label: 'Marketing (optimizar ROAS)', route: '/gali-v5/marketing/roax-informes' },
+        { label: 'Finanzas (P&L completo)', route: '/gali-v5/financiero/historial-de-cartera' },
+      ],
+      ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
+    },
+  };
+
+  activeNodeDetail() {
+    const key = this.activeNode();
+    return key ? (this.nodeDetailMap[key] ?? null) : null;
+  }
+
+  openChatWithNode(nodeId: string): void {
+    const detail = this.nodeDetailMap[nodeId];
+    if (!detail) return;
+    this.gali.togglePanel();
+    setTimeout(() => this.gali.sendMessage(`Cuéntame sobre ${detail.agentName} en ${nodeId}`), 300);
+  }
 
   get pendingSignals(): number {
     return this.signals.filter(s => s.estado === 'pending_decision').length;

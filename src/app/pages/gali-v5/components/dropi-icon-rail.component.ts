@@ -13,8 +13,10 @@ import {
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav class="icon-rail" aria-label="Navegación principal">
+    <nav class="icon-rail" aria-label="Módulos operativos">
       <div class="icon-rail__main">
+
+        <!-- Módulos operativos -->
         <div class="icon-rail__group">
           @for (item of mainItems; track item.key) {
             <a
@@ -30,15 +32,13 @@ import {
                   [style.--icon-url]="'url(' + item.icon + ')'"
                   aria-hidden="true"></span>
               </span>
-              @if (item.key === 'productos' && activeKey() !== 'productos') {
-                <span class="icon-rail__dot" aria-hidden="true"></span>
-              }
             </a>
           }
         </div>
 
         <div class="icon-rail__divider" aria-hidden="true"></div>
 
+        <!-- Utilidades -->
         <div class="icon-rail__group">
           @for (item of utilityItems; track item.key) {
             <a
@@ -57,6 +57,7 @@ import {
             </a>
           }
         </div>
+
       </div>
 
       <div class="icon-rail__footer">

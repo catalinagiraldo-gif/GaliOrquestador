@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject, signal, ViewChild, ElementRef, AfterViewChecked, NgZone } from '@angular/core';
+import { Component, EventEmitter, Output, computed, effect, inject, signal, ViewChild, ElementRef, AfterViewChecked, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { GaliStateService } from '../../services/gali-state.service';
@@ -44,6 +44,16 @@ export class GaliRightPanelComponent implements AfterViewChecked {
 
   agentColor(id: string): string {
     return this.agentColors[id.toLowerCase()] ?? '#9b9ba8';
+  }
+
+  constructor() {
+    effect(() => {
+      const req = this.gali.requestedPanelTab();
+      if (req) {
+        this.activeTab.set(req as PanelTab);
+        this.gali.requestedPanelTab.set(null);
+      }
+    }, { allowSignalWrites: true });
   }
 
   setTab(tab: PanelTab): void {

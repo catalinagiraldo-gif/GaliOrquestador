@@ -8,6 +8,10 @@
 // ── Chatea Pro — Centro Operativo ─────────────────────────────────
 .chatea-page {
   @include marketing-page-inner;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
 
   &__status-bar {
     margin-bottom: $size-4;
@@ -20,7 +24,8 @@
     border: 1px solid $gray-200;
     border-radius: $radius-lg;
     overflow: hidden;
-    min-height: 520px;
+    flex: 1;
+    min-height: 0;
     background: $white;
 
     @media (max-width: 1100px) {
@@ -458,10 +463,145 @@
   background: #e5e7eb; cursor: pointer; position: relative; margin-top: 2px;
   transition: background 0.2s ease;
 
-  &-knob {
+  &__knob {
     position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
     border-radius: 50%; background: white; transition: left 0.2s ease;
   }
 
   &--on { background: #10b981; .rule-toggle__knob { left: 18px; } }
+}
+
+// ── Rules v2 redesign ────────────────────────────────────────────────────────
+.rules-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $size-3 $size-4;
+  border-bottom: 1px solid $gray-200;
+
+  h3 {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-700;
+    margin: 0;
+    border: none;
+    padding: 0;
+  }
+
+  &__add {
+    font-size: 11px;
+    font-weight: 600;
+    color: $primary-500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    &:hover { opacity: 0.7; }
+  }
+}
+
+.rules-concept-note {
+  font-size: 10px;
+  color: $gray-500;
+  line-height: 1.5;
+  padding: $size-2 $size-4;
+  border-bottom: 1px solid $gray-100;
+  margin: 0;
+
+  strong { color: $gray-700; }
+}
+
+.rule-item-v2 {
+  padding: $size-2 $size-4;
+  border-bottom: 1px solid $gray-100;
+
+  &__logic {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  &__if {
+    font-size: 9px;
+    font-weight: 700;
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.08);
+    padding: 2px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__condition {
+    font-size: 11px;
+    font-weight: 500;
+    color: $gray-700;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  &__then {
+    font-size: 12px;
+    color: $gray-400;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__action {
+    font-size: 11px;
+    font-weight: 600;
+    color: $primary-600;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__agent {
+    font-size: 9px;
+    color: $gray-400;
+    font-weight: 500;
+  }
+}
+
+.rules-vs-skills {
+  margin: $size-3 $size-4;
+  padding: $size-3;
+  background: rgba(99, 102, 241, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: $radius-md;
+
+  &__label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6366f1;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 10px;
+    color: $gray-600;
+    margin: 0 0 $size-2;
+    line-height: 1.4;
+
+    strong { color: $gray-800; }
+  }
+
+  &__cta {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6366f1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    &:hover { opacity: 0.7; }
+  }
 }

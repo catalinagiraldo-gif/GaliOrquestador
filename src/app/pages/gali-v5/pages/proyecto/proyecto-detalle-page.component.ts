@@ -99,7 +99,7 @@ export class ProyectoDetallePageComponent implements OnInit {
     { id: 'creativos',  label: 'Creativos' },
     { id: 'campanas',   label: 'Campañas' },
     { id: 'pedidos',    label: 'Pedidos' },
-    { id: 'pl',         label: 'P&L Real' },
+    { id: 'pl',         label: 'P&L Real (Ganancias)' },
   ];
 
   readonly proyecto = {

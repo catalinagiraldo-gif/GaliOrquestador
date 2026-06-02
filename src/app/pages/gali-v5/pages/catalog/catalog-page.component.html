@@ -1,13 +1,130 @@
 <div class="catalog-page">
 
-  <dropi-gali-bar
-    agent="ADA Spy"
-    status="analizando catálogo"
-    message="3 oportunidades detectadas · Ventana promedio: 18 días · Scores actualizados hace 2h"
-    ctaLabel="Lanzar con Gali →"
-    secondaryCta="Ver análisis"
-    (ctaClick)="goToLanzar()"
-  />
+  <!-- ADA Spy: Panel de oportunidades detectadas (única alerta por sección) -->
+  <div class="catalog-ada-strip" [class.catalog-ada-strip--collapsed]="adaStripCollapsed()">
+    <div class="catalog-ada-strip__header">
+      <div class="catalog-ada-strip__title-group">
+        <span class="catalog-ada-strip__dot"></span>
+        <strong class="catalog-ada-strip__title">ADA recomienda para ti</strong>
+        <span class="catalog-ada-strip__meta">Actualizado hace 2h · 3 oportunidades detectadas</span>
+      </div>
+      <button type="button" class="catalog-ada-strip__toggle" (click)="adaStripCollapsed.set(!adaStripCollapsed())" data-proto-skip>
+        {{ adaStripCollapsed() ? 'Ver oportunidades' : 'Ocultar' }}
+      </button>
+    </div>
+
+    @if (!adaStripCollapsed()) {
+      <div class="catalog-ada-strip__cards">
+        <div class="ada-opp-card ada-opp-card--hot" (click)="selectAdaProduct('collar-gps')" role="button" tabindex="0">
+          <div class="ada-opp-card__score">87</div>
+          <div class="ada-opp-card__content">
+            <strong>Collar GPS Mascotas</strong>
+            <span class="ada-opp-card__stock">Stock: 847 un · PetStore CO</span>
+            <div class="ada-opp-card__metrics">
+              <span class="ada-opp-card__metric">Tendencia ↑ Cali, Bogotá, Med</span>
+              <span class="ada-opp-card__margin">Margen real ~$18.500/u</span>
+            </div>
+            <span class="ada-opp-card__window">Ventana: 14 días</span>
+          </div>
+          <button type="button" class="ada-opp-card__cta ada-opp-card__cta--ghost" (click)="verAnalisis('collar-gps'); $event.stopPropagation()">Ver análisis</button>
+          <button type="button" class="ada-opp-card__cta" (click)="goToLanzar('collar-gps'); $event.stopPropagation()">Lanzar →</button>
+        </div>
+
+        <div class="ada-opp-card" (click)="selectAdaProduct('difusor')" role="button" tabindex="0">
+          <div class="ada-opp-card__score ada-opp-card__score--mid">74</div>
+          <div class="ada-opp-card__content">
+            <strong>Difusor Aromaterapia Premium</strong>
+            <span class="ada-opp-card__stock">Stock: 312 un · HomeStore</span>
+            <div class="ada-opp-card__metrics">
+              <span class="ada-opp-card__metric">Tendencia ↑ Bogotá, Bucaramanga</span>
+              <span class="ada-opp-card__margin">Margen real ~$24.000/u</span>
+            </div>
+            <span class="ada-opp-card__window">Ventana: 21 días</span>
+          </div>
+          <button type="button" class="ada-opp-card__cta ada-opp-card__cta--ghost" (click)="verAnalisis('difusor'); $event.stopPropagation()">Ver análisis</button>
+          <button type="button" class="ada-opp-card__cta" (click)="goToLanzar('difusor'); $event.stopPropagation()">Lanzar →</button>
+        </div>
+
+        <div class="ada-opp-card" (click)="verAnalisis('reloj')" role="button" tabindex="0">
+          <div class="ada-opp-card__score ada-opp-card__score--low">61</div>
+          <div class="ada-opp-card__content">
+            <strong>Reloj Smartwatch Pro X7</strong>
+            <span class="ada-opp-card__stock">Stock: 156 un · TechDropper</span>
+            <div class="ada-opp-card__metrics">
+              <span class="ada-opp-card__metric">Tendencia ↑ Medellín, Cali</span>
+              <span class="ada-opp-card__margin">Margen real ~$31.000/u</span>
+            </div>
+            <span class="ada-opp-card__window">Ventana: 28 días</span>
+          </div>
+          <button type="button" class="ada-opp-card__cta ada-opp-card__cta--ghost" (click)="verAnalisis('reloj'); $event.stopPropagation()">Ver análisis</button>
+          <button type="button" class="ada-opp-card__cta" (click)="goToLanzar('rodillo-jade'); $event.stopPropagation()">Lanzar →</button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ── BUSCADOR SEMÁNTICO ADA SPY ── -->
+  <div class="catalog-semantic-search">
+    <div class="catalog-semantic-search__header">
+      <span class="catalog-semantic-search__dot"></span>
+      <strong>Buscar con ADA Spy</strong>
+      <span class="catalog-semantic-search__hint">Describe lo que quieres vender — ADA analiza precio, competencia y tendencias</span>
+    </div>
+    <div class="catalog-semantic-search__bar">
+      <input
+        type="text"
+        class="catalog-semantic-search__input"
+        placeholder="Ej: colágeno para vender en Bogotá a $50.000, collar para mascotas con GPS..."
+        [ngModel]="semanticQuery()"
+        (ngModelChange)="semanticQuery.set($event)"
+        (keydown.enter)="runSemanticSearch()"
+      />
+      <button type="button" class="catalog-semantic-search__btn"
+        [class.catalog-semantic-search__btn--loading]="semanticSearching()"
+        (click)="runSemanticSearch()" data-proto-skip>
+        @if (semanticSearching()) {
+          <span class="catalog-semantic-search__spinner"></span>
+          Analizando...
+        } @else {
+          ✦ Buscar
+        }
+      </button>
+    </div>
+    <div class="catalog-semantic-search__chips">
+      <button type="button" class="catalog-search-chip" (click)="semanticQuery.set('colágeno para Bogotá a $50k'); runSemanticSearch()" data-proto-skip>colágeno Bogotá $50k</button>
+      <button type="button" class="catalog-search-chip" (click)="semanticQuery.set('collar GPS para mascotas'); runSemanticSearch()" data-proto-skip>collar GPS mascotas</button>
+      <button type="button" class="catalog-search-chip" (click)="semanticQuery.set('difusor aromaterapia premium'); runSemanticSearch()" data-proto-skip>difusor aromaterapia</button>
+      <button type="button" class="catalog-search-chip" (click)="semanticQuery.set('belleza facial tendencia'); runSemanticSearch()" data-proto-skip>belleza facial</button>
+    </div>
+
+    @if (semanticResults(); as results) {
+      <div class="catalog-semantic-results">
+        <div class="catalog-semantic-results__header">
+          <span>ADA encontró {{ results.length }} productos para <em>"{{ semanticQuery() }}"</em></span>
+          <button type="button" class="catalog-semantic-results__clear" (click)="semanticResults.set(null)" data-proto-skip>✕ limpiar</button>
+        </div>
+        <div class="catalog-semantic-results__list">
+          @for (r of results; track r.name) {
+            <div class="catalog-sem-card">
+              <div class="catalog-sem-card__score" [class.catalog-sem-card__score--hot]="r.score >= 80">{{ r.score }}</div>
+              <div class="catalog-sem-card__content">
+                <strong class="catalog-sem-card__name">{{ r.name }}</strong>
+                <div class="catalog-sem-card__metrics">
+                  <span>{{ r.ciudad }}</span>
+                  <span>{{ r.precio }}</span>
+                  <span class="catalog-sem-card__margen">{{ r.margen }} margen</span>
+                </div>
+                <p class="catalog-sem-card__razon">{{ r.razon }}</p>
+              </div>
+              <div class="catalog-sem-card__actions">
+                <button type="button" class="catalog-sem-card__btn" (click)="goToLanzar(r.name)" data-proto-skip>Lanzar →</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
 
   <!-- 1. Breadcrumbs -->
   <nav class="catalog-page__breadcrumbs" aria-label="Breadcrumb">
@@ -242,6 +359,11 @@
             {{ badge }}
           </span>
         </div>
+        <div class="product-card__ada-score" *ngIf="product.adaScore">
+          <span class="ada-score-chip" [class.ada-score-chip--high]="product.adaScore >= 80" [class.ada-score-chip--mid]="product.adaScore >= 60 && product.adaScore < 80">
+            ADA {{ product.adaScore }}
+          </span>
+        </div>
         <span *ngIf="product.isPrivate" class="product-card__lock" aria-label="Producto privado">
           <i class="pi pi-lock"></i>
         </span>
@@ -283,3 +405,9 @@
     </article>
   </section>
 </div>
+
+@if (adaDetailProductId()) {
+  <gali-ada-spy-detail
+    [productId]="adaDetailProductId()!"
+    (closed)="adaDetailProductId.set(null)" />
+}

@@ -174,33 +174,51 @@ $panel-info:     #3b82f6;
     border-bottom: 1px solid $panel-border;
     flex-shrink: 0;
     background: $panel-bg;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
   }
 
   &__tab {
-    flex: 1;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: $size-1;
-    padding: $size-2 $size-3;
+    gap: 4px;
+    padding: 8px 11px;
     border: none;
     background: transparent;
     color: $panel-muted;
     font-family: $font-primary;
-    font-size: $font-xs;
+    font-size: 11px;
     font-weight: $font-medium;
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
     margin-bottom: -1px;
+    white-space: nowrap;
+
+    .pi {
+      font-size: 11px;
+      line-height: 1;
+      opacity: 0.7;
+    }
 
     &:hover {
       color: $panel-text;
+      background: rgba(0,0,0,0.03);
+      .pi { opacity: 1; }
     }
 
     &--active {
       color: $panel-accent;
       border-bottom-color: $panel-accent;
+      font-weight: 700;
+      background: rgba($panel-accent, 0.04);
+
+      .pi { opacity: 1; }
     }
   }
 
@@ -372,6 +390,18 @@ $panel-info:     #3b82f6;
       border-color: rgba($primary-500, 0.5);
       color: $panel-accent;
       background: rgba($primary-500, 0.08);
+    }
+
+    &--featured {
+      background: rgba($primary-500, 0.1);
+      border-color: rgba($primary-500, 0.3);
+      color: $panel-accent;
+      font-weight: $font-medium;
+
+      &:hover {
+        background: rgba($primary-500, 0.2);
+        border-color: $panel-accent;
+      }
     }
   }
 
@@ -1135,5 +1165,600 @@ $panel-info:     #3b82f6;
   &__delta {
     font-size: 10px;
     color: $panel-muted;
+  }
+}
+
+// ── Context bar (agent + current tab description) ────────────────────────────
+.gali-panel__context-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-2;
+  padding: 5px $size-4;
+  background: $panel-surface;
+  border-bottom: 1px solid $panel-border;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.gali-panel__active-agent {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  min-width: 0;
+  animation: fadeInAgent 0.2s ease;
+}
+
+.gali-panel__agent-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: agentPulse 2s infinite;
+}
+
+.gali-panel__agent-label {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-bold;
+  color: $panel-text;
+  flex-shrink: 0;
+}
+
+.gali-panel__agent-sep {
+  color: $panel-border;
+  font-size: 12px;
+}
+
+.gali-panel__agent-desc {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $panel-muted;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gali-panel__tab-hint {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $panel-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+@keyframes fadeInAgent {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Execution cards ──────────────────────────────────────────────────────────
+.exec-card {
+  margin: $size-2 $size-3;
+  border-radius: $radius-md;
+  overflow: hidden;
+  font-family: $font-primary;
+  animation: execCardIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &--running {
+    background: #1a1a22;
+    color: white;
+    padding: $size-3 $size-4;
+
+    .exec-card__header { margin-bottom: $size-2; }
+    .exec-card__skill {
+      font-size: $font-xs;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: $size-2;
+    }
+    .exec-card__hint {
+      font-size: $font-xs;
+      color: rgba(255,255,255,0.4);
+      margin-top: $size-2;
+    }
+  }
+
+  &--done {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #14532d;
+    padding: $size-3 $size-4;
+
+    .exec-card__skill {
+      font-size: $font-xs;
+      color: #166534;
+      margin-bottom: $size-2;
+    }
+    .exec-card__result {
+      font-size: $font-xs;
+      color: #166534;
+      margin-bottom: $size-2;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-1;
+  }
+
+  &__title {
+    font-size: $font-xs;
+    font-weight: $font-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: $primary-500;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  &__check {
+    font-size: 14px;
+    color: #16a34a;
+    font-weight: 700;
+  }
+
+  &__progress {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: $size-2;
+  }
+
+  &__progress-bar {
+    height: 100%;
+    background: $primary-500;
+    border-radius: 2px;
+    animation: progressSweep 1.4s ease-in-out infinite;
+  }
+
+  &__modules {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $size-2;
+    margin-top: $size-2;
+    padding-top: $size-2;
+    border-top: 1px solid #bbf7d0;
+  }
+
+  &__modules-label {
+    font-size: $font-xs;
+    color: #166534;
+    font-weight: $font-medium;
+  }
+
+  &__module-link {
+    font-size: $font-xs;
+    color: #15803d;
+    text-decoration: none;
+    font-weight: $font-semibold;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+@keyframes execCardIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)  scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes progressSweep {
+  0%   { transform: translateX(-100%); width: 60%; }
+  50%  { transform: translateX(0);     width: 80%; }
+  100% { transform: translateX(150%);  width: 60%; }
+}
+
+// ── MEMORY TAB ──────────────────────────────────────────────────
+.gali-panel__memory {
+  padding: $size-3 $size-4;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  overflow-y: auto;
+}
+
+.memory-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $size-2;
+  padding-bottom: $size-3;
+  border-bottom: 1px solid $panel-border;
+
+  &__info {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-2;
+  }
+
+  &__glyph {
+    font-size: 18px;
+    color: $panel-accent;
+    flex-shrink: 0;
+    margin-top: 2px;
+    animation: agentPulse 2.4s ease-in-out infinite;
+  }
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    font-family: $font-primary;
+  }
+
+  &__sub {
+    font-size: $font-xs;
+    color: $panel-muted;
+    margin-top: 1px;
+  }
+
+  &__count {
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $panel-muted;
+    flex-shrink: 0;
+    background: $panel-surface;
+    padding: 2px 8px;
+    border-radius: $radius-sm;
+    border: 1px solid $panel-border;
+  }
+}
+
+.memory-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $size-1;
+
+  &__item {
+    font-size: 10px;
+    font-weight: $font-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: $radius-sm;
+
+    &--pattern   { background: rgba(#3b82f6, 0.1); color: #3b82f6; }
+    &--decision  { background: rgba(#f59e0b, 0.12); color: #b45309; }
+    &--preference { background: rgba(#8b5cf6, 0.1); color: #7c3aed; }
+    &--insight   { background: rgba(#10b981, 0.1); color: #059669; }
+  }
+}
+
+.memory-item {
+  background: $panel-surface;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  padding: $size-3;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+  transition: box-shadow 0.15s;
+
+  &:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  &--pattern   { border-left: 3px solid #3b82f6; }
+  &--decision  { border-left: 3px solid #f59e0b; }
+  &--preference { border-left: 3px solid #8b5cf6; }
+  &--insight   { border-left: 3px solid #10b981; }
+
+  &__top {
+    display: flex;
+    gap: $size-2;
+    align-items: flex-start;
+  }
+
+  &__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $panel-text;
+    font-family: $font-primary;
+    margin-bottom: $size-1;
+  }
+
+  &__desc {
+    font-size: $font-xs;
+    color: $panel-muted;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-wrap: wrap;
+  }
+
+  &__date {
+    font-size: $font-xs;
+    color: $panel-caption;
+    flex-shrink: 0;
+  }
+
+  &__conf {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    flex: 1;
+  }
+
+  &__conf-bar {
+    flex: 1;
+    height: 3px;
+    background: $panel-border;
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 60px;
+  }
+
+  &__conf-fill {
+    display: block;
+    height: 100%;
+    background: $panel-success;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  &__conf-label {
+    font-size: 10px;
+    color: $panel-muted;
+    white-space: nowrap;
+  }
+
+  &__undo {
+    margin-left: auto;
+    font-size: $font-xs;
+    color: $panel-accent;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-weight: $font-medium;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.7; }
+  }
+}
+
+.memory-footer {
+  background: linear-gradient(135deg, rgba($panel-accent, 0.06), rgba($panel-accent, 0.02));
+  border: 1px solid rgba($panel-accent, 0.15);
+  border-radius: $radius-md;
+  padding: $size-3;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__text {
+    font-size: $font-xs;
+    color: $panel-muted;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__btn {
+    background: transparent;
+    border: 1px solid rgba($panel-accent, 0.3);
+    border-radius: $radius-sm;
+    color: $panel-accent;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    padding: $size-1 $size-3;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.15s;
+
+    &:hover { background: rgba($panel-accent, 0.06); }
+  }
+}
+
+// ── FILES TAB ───────────────────────────────────────────────────
+.gali-panel__files {
+  padding: $size-3 $size-4;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+  overflow-y: auto;
+}
+
+.files-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: $size-3;
+  border-bottom: 1px solid $panel-border;
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $panel-text;
+  }
+}
+
+.files-filter {
+  display: flex;
+  gap: $size-1;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    padding: 3px 9px;
+    border-radius: $radius-sm;
+    border: 1px solid $panel-border;
+    background: transparent;
+    color: $panel-muted;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+    &--active {
+      background: $panel-accent;
+      border-color: $panel-accent;
+      color: #fff;
+    }
+
+    &:not(&--active):hover {
+      background: $panel-surface;
+      color: $panel-text;
+    }
+  }
+}
+
+.files-source-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  &--gdrive { background: #4285f4; }
+  &--local  { background: #6b7280; }
+}
+
+.file-row {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-2;
+  padding: $size-2 $size-2;
+  border-radius: $radius-md;
+  transition: background 0.12s;
+
+  &:hover {
+    background: $panel-surface;
+
+    .file-row__use { opacity: 1; }
+  }
+
+  &__icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    display: block;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $panel-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  &__size,
+  &__modified {
+    font-size: 10px;
+    color: $panel-caption;
+  }
+
+  &__sep {
+    font-size: 10px;
+    color: $panel-border;
+  }
+
+  &__used {
+    font-size: 10px;
+    color: $panel-accent;
+    font-weight: $font-medium;
+  }
+
+  &__use {
+    flex-shrink: 0;
+    opacity: 0;
+    background: transparent;
+    border: 1px solid $panel-border;
+    border-radius: $radius-sm;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $panel-muted;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+
+    i { font-size: 11px; }
+
+    &:hover {
+      background: $panel-accent;
+      border-color: $panel-accent;
+      color: #fff;
+    }
+  }
+}
+
+.files-connect {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+  margin-top: $size-2;
+  padding-top: $size-3;
+  border-top: 1px solid $panel-border;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $panel-muted;
+    background: $panel-surface;
+    border: 1px dashed $panel-border;
+    border-radius: $radius-md;
+    padding: $size-2 $size-3;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+    i { font-size: 13px; }
+
+    &:hover {
+      border-color: $panel-accent;
+      color: $panel-accent;
+      background: rgba($panel-accent, 0.04);
+    }
   }
 }

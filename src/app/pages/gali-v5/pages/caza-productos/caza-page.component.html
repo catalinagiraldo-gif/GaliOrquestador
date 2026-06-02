@@ -6,19 +6,26 @@
     [status]="mode() === 'problemas' ? 'running' : 'ok'"
   />
 
-  <div class="gali-agent-bar gali-agent-bar--ada">
-    <div class="gali-agent-bar__left">
-      <span class="gali-agent-bar__dot"></span>
-      <div class="gali-agent-bar__identity">
-        <span class="gali-agent-bar__name">ADA Spy · Caza</span>
-        <span class="gali-agent-bar__status">escaneando tendencias</span>
-      </div>
+  <dropi-gali-bar
+    agent="ADA Spy"
+    status="búsqueda semántica activa"
+    message="3 alta viabilidad · 847 ventas esta semana en Dropi LATAM"
+    ctaLabel="Ver oportunidades en catálogo"
+    (ctaClick)="goToCatalogo()"
+  />
+
+  <div class="caza-semantic">
+    <label class="caza-semantic__label">Búsqueda semántica ADA Spy</label>
+    <div class="caza-semantic__row">
+      <input
+        type="search"
+        class="caza-semantic__input"
+        placeholder='Ej: "algo para vender en Bogotá a madres jóvenes"'
+        [ngModel]="semanticQuery()"
+        (ngModelChange)="semanticQuery.set($event)" />
+      <button type="button" class="caza-semantic__btn" (click)="buscarSemantico()">Buscar con IA</button>
     </div>
-    <div class="gali-agent-bar__ada-stats">
-      <span class="gali-agent-bar__ada-stat"><strong>3</strong> alta viabilidad</span>
-      <span class="gali-agent-bar__ada-sep">·</span>
-      <span class="gali-agent-bar__ada-stat"><strong>847</strong> ventas esta semana en Dropi LATAM</span>
-    </div>
+    <p class="caza-semantic__hint">No busques solo por nombre — describe audiencia, ciudad o problema y ADA rankea categorías + productos.</p>
   </div>
 
   <dropi-titulos title="Caza productos" [breadcrumbs]="breadcrumbs">
@@ -63,8 +70,11 @@
               </div>
               <p class="historial-card__razon">{{ p.razon }}</p>
             </div>
-            <button type="button" class="historial-card__cta" (click)="crearProyecto(p.nombre)">
-              Crear proyecto
+            <button type="button" class="historial-card__cta historial-card__cta--primary" (click)="publicarConAda(p)">
+              Publicar con ADA Spy →
+            </button>
+            <button type="button" class="historial-card__cta historial-card__cta--analysis" (click)="verAnalisis(p)">
+              Ver análisis ADA →
             </button>
           </article>
         }
@@ -172,5 +182,12 @@
   <crear-proyecto-modal
     (closed)="showCrearModal.set(false)"
     (created)="onProyectoCreated($event)"
+  />
+}
+
+@if (showAdaDetail()) {
+  <gali-ada-spy-detail
+    [productId]="adaDetailId()"
+    (closed)="showAdaDetail.set(false)"
   />
 }

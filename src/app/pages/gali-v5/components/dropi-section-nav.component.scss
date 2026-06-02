@@ -167,11 +167,8 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
     }
 
     &--child-active {
-      color: $primary-600;
-      font-weight: $font-semibold;
-      background: rgba($primary-500, 0.08);
-      box-shadow: inset 3px 0 0 $primary-500;
-      padding-left: calc($size-2 - 3px);
+      color: $primary-500;
+      font-weight: $font-medium;
 
       .section-nav__icon {
         @include nav-icon-active-primary;
@@ -180,12 +177,8 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
 
     &--active {
       background: $white;
-      color: $primary-600;
-      font-weight: $font-semibold;
-      box-shadow:
-        inset 3px 0 0 $primary-500,
-        0 1px 3px rgba(0, 0, 0, 0.06);
-      padding-left: calc($size-2 - 3px);
+      color: $primary-500;
+      font-weight: $font-medium;
 
       .section-nav__icon {
         @include nav-icon-active-primary;
@@ -256,10 +249,9 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
     }
 
     &--active .section-nav__tree-label {
-      color: $primary-600;
-      font-weight: $font-semibold;
+      color: $primary-500;
+      font-weight: $font-medium;
       background: $white;
-      box-shadow: inset 2px 0 0 $primary-500;
     }
   }
 

@@ -1,10 +1,17 @@
 @import 'styles/gali-v5-tokens';
 
-/** Evita pantallas vacías cuando el outlet no hereda altura del grid shell */
+/**
+ * Host de cada página dentro del shell de Gali v5.
+ * flex:1 + min-height:0 hace que el host llene el espacio disponible del flex column del shell.
+ * overflow-y:auto activa el scroll interno del componente (los estilos del shell no atraviesan view encapsulation).
+ */
 @mixin dropi-page-host {
   display: block;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 

@@ -1,6 +1,46 @@
 <div class="sold-products-page">
   <dropi-titulos title="Productos vendidos" [breadcrumbs]="breadcrumbs" />
 
+  <!-- Gali Financial Agent summary -->
+  <div class="sold-gali-summary">
+    <div class="sold-gali-summary__header">
+      <span class="sold-gali-summary__icon">✦</span>
+      <div>
+        <strong>Agente Financiero Gali</strong>
+        <span>Semana 22 · Análisis automático basado en pedidos entregados + pauta + logística</span>
+      </div>
+      <button type="button" class="sold-gali-summary__full-btn" routerLink="/gali-v5/reportes/dashboard-financiero">
+        Ver P&L completo →
+      </button>
+    </div>
+    <div class="sold-gali-summary__metrics">
+      <div class="sold-gali-metric">
+        <span class="sold-gali-metric__label">Ventas semana</span>
+        <strong class="sold-gali-metric__val">47</strong>
+      </div>
+      <div class="sold-gali-metric sold-gali-metric--highlight">
+        <span class="sold-gali-metric__label">Ganancia neta</span>
+        <strong class="sold-gali-metric__val">$411k</strong>
+      </div>
+      <div class="sold-gali-metric">
+        <span class="sold-gali-metric__label">ROAS real</span>
+        <strong class="sold-gali-metric__val sold-gali-metric__val--warn">1.93x</strong>
+      </div>
+      <div class="sold-gali-metric">
+        <span class="sold-gali-metric__label">ROAS Meta declarado</span>
+        <strong class="sold-gali-metric__val">2.9x</strong>
+      </div>
+      <div class="sold-gali-metric">
+        <span class="sold-gali-metric__label">Diferencia</span>
+        <strong class="sold-gali-metric__val sold-gali-metric__val--warn">-0.97x</strong>
+      </div>
+      <div class="sold-gali-metric">
+        <span class="sold-gali-metric__label">Causa principal</span>
+        <strong class="sold-gali-metric__val sold-gali-metric__val--info">Novedades Cali 12%</strong>
+      </div>
+    </div>
+  </div>
+
   <div class="sold-products-page__filters">
     <div class="sold-products-page__filter-row">
       <div class="sold-products-page__field">

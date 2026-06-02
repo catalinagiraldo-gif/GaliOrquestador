@@ -33,7 +33,11 @@ export class ProvidersPageComponent {
 
   goToLanzar(): void {
     this.ws.setMode('lanzar');
-    this.router.navigate(['/gali-v5']);
+    this.router.navigate(['/gali-v5/proyectos/nuevo'], { queryParams: { producto: 'collar-gps' } });
+  }
+
+  verAnalisisCompleto(): void {
+    this.router.navigate(['/gali-v5/productos/catalogo'], { queryParams: { ada: 'collar-gps' } });
   }
 
   readonly breadcrumbs = ['Productos', 'Catálogo', 'Proveedores'];

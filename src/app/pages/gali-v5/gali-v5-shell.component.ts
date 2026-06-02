@@ -61,7 +61,7 @@ export class GaliV5ShellComponent {
   }
 
   sectionPanel = signal<SectionPanel>(GALI_MISSION_PANEL);
-  sectionNavCollapsed = signal(false);
+  sectionNavCollapsed = signal(localStorage.getItem('dropi-section-collapsed') === 'true');
   hasSectionPanel = signal(true);
   isCompactNav = signal(false);
   sectionWidth = signal(parseInt(localStorage.getItem('dropi-section-width') ?? '200', 10));
@@ -106,11 +106,14 @@ export class GaliV5ShellComponent {
   }
 
   toggleSectionNav(): void {
-    this.sectionNavCollapsed.update(v => !v);
+    const next = !this.sectionNavCollapsed();
+    this.sectionNavCollapsed.set(next);
+    localStorage.setItem('dropi-section-collapsed', String(next));
   }
 
   collapseSectionNav(): void {
     this.sectionNavCollapsed.set(true);
+    localStorage.setItem('dropi-section-collapsed', 'true');
   }
 
   /** True when the active route is the Gali OS workspace (home, no section panel) */
@@ -121,11 +124,10 @@ export class GaliV5ShellComponent {
     if (panel) {
       this.sectionPanel.set(panel);
       this.hasSectionPanel.set(true);
-      this.sectionNavCollapsed.set(false);
+      // Preserve user-set collapsed state — only restore from localStorage
       this.isOsWorkspace.set(false);
     } else {
       this.hasSectionPanel.set(false);
-      this.sectionNavCollapsed.set(false);
       this.isOsWorkspace.set(false);
     }
     this.currentContextKey.set(this.resolveContextKey(url));

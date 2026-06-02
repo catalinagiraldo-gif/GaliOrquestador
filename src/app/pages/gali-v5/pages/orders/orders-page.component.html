@@ -26,6 +26,7 @@
             <th class="orders-table__th orders-table__th--check"><span class="orders-table__checkbox"></span></th>
             <th class="orders-table__th">ID</th>
             <th class="orders-table__th">Producto</th>
+            <th class="orders-table__th">Huella Vigilante</th>
             <th class="orders-table__th">Cliente / Dirección</th>
             <th class="orders-table__th">Transportadora</th>
             <th class="orders-table__th">Recaudo</th>
@@ -42,6 +43,13 @@
               </span>
             </td>
             <td class="orders-table__td">{{ o.product }}</td>
+            <td class="orders-table__td">
+              @if (getRiskLevel(o); as risk) {
+                <span class="orders-risk" [class]="'orders-risk--' + risk.level" [title]="risk.hint">
+                  {{ risk.label }}
+                </span>
+              }
+            </td>
             <td class="orders-table__td orders-table__td--client">
               <p class="orders-table__client-name">{{ o.clientName }}</p>
               <div class="orders-table__address-row">
@@ -51,11 +59,13 @@
               <p class="orders-table__phone">{{ o.phone }}</p>
             </td>
             <td class="orders-table__td">
-              <span class="orders-table__tag orders-table__tag--carrier">{{ o.carrier }}</span>
+              <span class="orders-table__tag orders-table__tag--carrier"
+                [galiInsight]="getCarrierInsight(o.carrier)">{{ o.carrier }}</span>
               <span class="orders-table__guide">{{ o.guide }}</span>
             </td>
             <td class="orders-table__td orders-table__td--recaudo">
-              <span class="orders-table__recaudo-label">{{ o.recaudo }}</span>
+              <span class="orders-table__recaudo-label"
+                [galiInsight]="'Tasa de cobro efectivo: 89.3%. Vigilante detectó patrón de devolución en zona rural — anticipo recomendado en pedidos >$150k. CPA real incluye ~8% de novedades.'">{{ o.recaudo }}</span>
               <span class="orders-table__tag orders-table__tag--status" *ngFor="let t of o.statusTags">{{ t }}</span>
             </td>
           </tr>

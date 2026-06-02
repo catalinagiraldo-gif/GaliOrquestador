@@ -47,7 +47,7 @@
       <div class="proyecto__gali-actions">
         <button type="button" class="btn-alert btn-alert--primary" (click)="goToSignals()">Ver señales en Gali</button>
         <button type="button" class="btn-alert btn-alert--ghost" (click)="goToSkillEditor()">Crear skill automática</button>
-        <button type="button" class="btn-alert btn-alert--ghost" (click)="goToMedir()">Ver P&L</button>
+        <button type="button" class="btn-alert btn-alert--ghost" (click)="goToMedir()" title="P&amp;L: Pérdidas y Ganancias — tu rentabilidad real después de todos los costos">Ver P&amp;L</button>
       </div>
     </div>
   </header>
@@ -220,7 +220,7 @@
       </div>
     </div>
 
-    <!-- ── TAB: P&L REAL ── -->
+    <!-- ── TAB: P&L REAL (Pérdidas y Ganancias — rentabilidad real del proyecto) ── -->
     <div *ngIf="activeTab() === 'pl'" class="tab-panel">
       <div class="pl-container">
         <div class="pl-insight">

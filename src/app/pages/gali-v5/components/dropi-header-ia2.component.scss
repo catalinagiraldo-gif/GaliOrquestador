@@ -1,6 +1,6 @@
 @import 'styles/gali-v5-tokens';
 
-// Figma Header IA 2 — 53px height (discrepancia vs DS header 70px)
+// Gali Command Bar — Mission Control header
 .header-ia2 {
   display: flex;
   align-items: center;
@@ -10,6 +10,9 @@
   background: $white;
   border-bottom: 1px solid $gray-100;
   flex-shrink: 0;
+  gap: $size-3;
+  position: relative;
+  z-index: 20;
 
   &__brand {
     display: flex;
@@ -116,73 +119,208 @@
     }
   }
 
-  // ── Indicador de objetivo activo ───────────────────────────
-  &__goal {
+  // ── Zona contextual transversal ───────────────────────────────
+  &__context {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  // Business Health Score widget
+  &__health {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1.5px solid var(--health-color, #{$primary-500});
+    border-radius: $radius-md;
+    background: color-mix(in srgb, var(--health-color, #{$primary-500}) 8%, white);
+    cursor: pointer;
+    font-family: $font-primary;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+
+    &:hover {
+      background: color-mix(in srgb, var(--health-color, #{$primary-500}) 14%, white);
+    }
+  }
+
+  &__health-num {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  &__health-bar {
+    width: 36px;
+    height: 4px;
+    background: $gray-200;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__health-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  &__health-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $gray-400;
+  }
+
+  &__health-breakdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: $radius-lg;
+    padding: 14px 16px;
+    min-width: 240px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    strong {
+      font-size: 13px;
+      font-weight: 700;
+      color: $gray-800;
+      margin-bottom: 2px;
+    }
+  }
+
+  .hb-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: $gray-600;
+    font-family: $font-primary;
+
+    span:last-child {
+      font-weight: 700;
+    }
+  }
+
+  .hb-footer {
+    font-size: 10px;
+    color: $gray-400;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  // Agente activo — clickeable, abre el panel derecho
+  &__agent-ctx {
     display: flex;
     align-items: center;
     gap: $size-2;
     padding: 5px $size-3;
-    border: 1px solid $gray-100;
+    border: 1px solid $gray-200;
     border-radius: $radius-md;
-    background: #fafaf8;
-    text-decoration: none;
+    background: $gray-50;
+    cursor: pointer;
+    font-family: $font-primary;
     transition: border-color 0.15s ease, background 0.15s ease;
-    flex-shrink: 0;
+    min-width: 0;
+    max-width: 360px;
 
     &:hover {
-      border-color: $primary-500;
-      background: $gray-50;
+      border-color: rgba(0, 0, 0, 0.18);
+      background: $white;
     }
   }
 
-  &__goal-icon { font-size: 13px; line-height: 1; }
-
-  &__goal-info { display: flex; flex-direction: column; gap: 3px; }
-
-  &__goal-label {
-    font-family: $font-primary;
-    font-size: 11px;
-    font-weight: $font-medium;
-    color: $gray-600;
-    white-space: nowrap;
-    line-height: 1;
+  &__ctx-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    animation: ctx-pulse 2.5s ease-in-out infinite;
   }
 
-  &__goal-bar {
-    width: 80px;
-    height: 3px;
-    border-radius: 2px;
-    background: $gray-200;
-    overflow: hidden;
-  }
-
-  &__goal-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: $primary-500;
-    transition: width 0.4s ease;
-  }
-
-  &__goal-count {
-    font-family: $font-primary;
+  &__ctx-name {
     font-size: $font-sm;
     font-weight: $font-bold;
     color: $gray-800;
+    white-space: nowrap;
+    flex-shrink: 0;
     line-height: 1;
   }
 
-  &__goal-total { font-weight: $font-regular; color: $gray-400; }
+  &__ctx-sep {
+    color: $gray-300;
+    font-size: $font-sm;
+    flex-shrink: 0;
+  }
+
+  &__ctx-status {
+    font-size: $font-xs;
+    color: $gray-500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+  }
+
+  // Señales pendientes — claro y directo
+  &__signals-pill {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    padding: 4px $size-3;
+    border: 1px solid rgba($primary-500, 0.25);
+    border-radius: $radius-full;
+    background: rgba($primary-500, 0.06);
+    text-decoration: none;
+    color: $primary-600;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      border-color: $primary-500;
+      background: rgba($primary-500, 0.1);
+    }
+  }
+
+  &__signals-num {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $primary-600;
+    line-height: 1;
+  }
+
+  &__signals-label {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $primary-500;
+    line-height: 1;
+  }
 
   &__auto-badge {
-    padding: 2px $size-2;
+    padding: 3px $size-3;
     border-radius: $radius-full;
     background: $primary-500;
     color: $white;
     font-family: $font-primary;
-    font-size: 9px;
+    font-size: $font-xs;
     font-weight: $font-bold;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
     line-height: 1;
+    flex-shrink: 0;
   }
   // ─────────────────────────────────────────────────────────────
 
@@ -250,9 +388,9 @@
 
 @media (max-width: 900px) {
   .header-ia2 {
-    &__wallet-amount {
-      font-size: $font-xs;
-    }
+    &__wallet-amount { font-size: $font-xs; }
+    &__ctx-status { display: none; }
+    &__ctx-sep { display: none; }
   }
 }
 
@@ -260,33 +398,23 @@
   .header-ia2 {
     padding: $size-2;
 
-    &__gallery span {
-      display: none;
-    }
-
-    &__gallery {
-      padding: 6px $size-2;
-    }
-
-    &__logo {
-      width: 88px;
-      height: 30px;
-    }
-
-    &__actions {
-      gap: $size-2;
-    }
-
-    &__beta-label {
-      display: none;
-    }
-
-    &__wallet {
-      padding: $size-1 $size-2;
-    }
-
-    &__wallet-amount {
-      font-size: $font-xs;
-    }
+    &__gallery span { display: none; }
+    &__gallery { padding: 6px $size-2; }
+    &__logo { width: 88px; height: 30px; }
+    &__actions { gap: $size-2; }
+    &__signals-pill { display: none; }
+    &__wallet { padding: $size-1 $size-2; }
+    &__wallet-amount { font-size: $font-xs; }
+    &__ctx-name { font-size: $font-xs; }
   }
+}
+
+@keyframes ctx-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.85); }
+}
+
+@keyframes menu-appear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
