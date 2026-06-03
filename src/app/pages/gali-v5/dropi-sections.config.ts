@@ -735,7 +735,14 @@ export const DROPI_SCREENS: DropiScreen[] = [
 ];
 
 const HOME_EXACT = new Set(['/gali-v5', '/gali-v5/']);
-const GALI_HUB_PREFIXES: string[] = [];
+const GALI_HUB_PREFIXES: string[] = [
+  '/gali-v5/proyectos', '/gali-v5/proyecto',
+  '/gali-v5/agentes',
+  '/gali-v5/skills',
+  '/gali-v5/reglas',
+  '/gali-v5/marketplace',
+  '/gali-v5/conexiones',
+];
 
 /** Rutas de orquestación IA sin panel lateral de módulo */
 const ORCHESTRATION_RAIL_KEYS = new Set(['home', 'proyectos', 'agentes', 'skills', 'reglas', 'marketplace', 'conexiones']);
@@ -783,16 +790,7 @@ export const GALI_MISSION_PANEL: SectionPanel = {
   title: 'Gali',
   items: [
     { id: 'gali-hub', label: 'Gali Hub', route: '/gali-v5', icon: 'assets/icons/sidebar/home.svg' },
-    { id: 'hdr-proyectos', label: 'Proyectos', type: 'header' as const },
-    { id: 'proyecto-collar', label: '● Collar GPS v2', route: '/gali-v5/proyecto/collar-gps' },
-    { id: 'proyecto-skincare', label: '● Skincare Pack', route: '/gali-v5/proyecto/skincare' },
-    { id: 'proyecto-fitness', label: '○ Fitness (pausado)', route: '/gali-v5/proyecto/fitness' },
-    {
-      id: 'nuevo-proyecto',
-      label: '+ Nuevo proyecto',
-      route: '/gali-v5/proyectos?nuevo=true',
-      badge: 'nuevo' as SectionBadge,
-    },
+    { id: 'nav-proyectos', label: 'Proyectos', route: '/gali-v5/proyectos', icon: `${G5}/boxes.svg` },
     { id: 'hdr-orq', label: 'Orquestación', type: 'header' as const },
     { id: 'ver-agentes', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
     { id: 'mis-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },

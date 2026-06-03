@@ -7,7 +7,7 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
 
 :host {
   display: block;
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   width: var(--dropi-section-width, 200px);
   height: 100%;
@@ -71,6 +71,12 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
     }
   }
 
+  // ── AI Context Band ──────────────────────────────────────────────────
+  &--ai {
+    background: #fff8f2;
+    border-right-color: rgba($primary-500, 0.18);
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -79,9 +85,27 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
     margin-bottom: $size-5;
     padding: 0 $size-2;
     flex-shrink: 0;
+
+    &--ai {
+      border-left: 3px solid $primary-500;
+      padding-left: $size-2 - 3px;
+      margin: 0 (-$size-2) $size-5;
+      padding-right: $size-2;
+    }
+  }
+
+  &__ai-spark {
+    font-size: 10px;
+    color: $primary-500;
+    margin-right: 4px;
+    animation: ai-spark-breathe 3s ease-in-out infinite;
+    display: inline-block;
+    line-height: 1;
   }
 
   &__title {
+    display: flex;
+    align-items: center;
     flex: 1;
     margin: 0;
     font-family: $font-primary;
@@ -89,6 +113,10 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
     font-weight: $font-bold;
     color: $gray-700;
     line-height: 1.1;
+
+    .section-nav--ai & {
+      color: $primary-500;
+    }
   }
 
   &__collapse {
@@ -379,6 +407,11 @@ $nav-hover-bg: #e9eef5; // gray-100 Figma
 @keyframes af-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes ai-spark-breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 // ── Agent activity indicators ────────────────────────────────────────────────

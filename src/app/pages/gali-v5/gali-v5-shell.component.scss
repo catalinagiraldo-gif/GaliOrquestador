@@ -21,11 +21,10 @@
   --primary-900: #{$primary-900};
 
   --dropi-header-height: 53px;
-  --dropi-rail-width: 56px;
+  --dropi-rail-width: 72px;
   --dropi-section-width: 200px;
   --dropi-section-col: var(--dropi-section-width);
   --gali-panel-width: 520px;
-  --dropi-ia-rail-width: 48px;
 
   display: flex;
   flex-direction: column;
@@ -42,8 +41,8 @@
 
   &__body {
     display: grid;
-    // Col 1: IA rail (48px) | Col 2: main rail (56px) | Col 3: section-nav | Col 4: splitter 8px | Col 5: content
-    grid-template-columns: var(--dropi-ia-rail-width) var(--dropi-rail-width) var(--dropi-section-col) 8px minmax(0, 1fr);
+    // Col 1: unified rail (72px) | Col 2: section-nav | Col 3: splitter 8px | Col 4: content
+    grid-template-columns: var(--dropi-rail-width) var(--dropi-section-col) 8px minmax(0, 1fr);
     flex: 1;
     min-height: 0;
     overflow: hidden;
@@ -53,7 +52,7 @@
   }
 
   &__content {
-    grid-column: 5;
+    grid-column: 4;
     grid-row: 1;
     display: flex;
     flex-direction: column;
@@ -73,7 +72,7 @@
   // Forzamos para evitar colapso visual cuando cambia el estado.
   &--no-section &__content,
   &--nav-collapsed &__content {
-    grid-column: 5;
+    grid-column: 4;
     min-width: 0;
   }
 
@@ -157,9 +156,8 @@
       display: none;
     }
 
-    // IA rail + main rail + no section = content in col 5 (section+splitter = 0)
     .gali-v5-shell__body {
-      grid-template-columns: var(--dropi-ia-rail-width) var(--dropi-rail-width) 0 0 minmax(0, 1fr);
+      grid-template-columns: var(--dropi-rail-width) 0 0 minmax(0, 1fr);
     }
   }
 
@@ -168,7 +166,7 @@
     --dropi-section-width: 48px;
 
     .gali-v5-shell__body {
-      grid-template-columns: var(--dropi-ia-rail-width) var(--dropi-rail-width) var(--dropi-section-col) 0 minmax(0, 1fr);
+      grid-template-columns: var(--dropi-rail-width) var(--dropi-section-col) 0 minmax(0, 1fr);
     }
   }
 
@@ -176,18 +174,13 @@
     --dropi-section-width: 180px;
   }
 
-  // ── Mobile (≤ 767px): colapsa toda la nav izquierda al icon-rail ──
+  // ── Mobile (≤ 767px): solo rail unificado, sin section nav ──
   @media (max-width: 767px) {
     --dropi-section-width: 160px;
     --gali-panel-width: 100vw;
 
-    // Grid: sin ia-rail (0), solo icon-rail (56px), sin section ni splitter, contenido full
     .gali-v5-shell__body {
-      grid-template-columns: 0px var(--dropi-rail-width) 0px 0px minmax(0, 1fr) !important;
-    }
-
-    dropi-ia-rail {
-      display: none !important;
+      grid-template-columns: var(--dropi-rail-width) 0px 0px minmax(0, 1fr) !important;
     }
 
     dropi-section-nav {
@@ -199,7 +192,7 @@
     }
 
     .gali-v5-shell__content {
-      grid-column: 5 !important;
+      grid-column: 4 !important;
     }
   }
 
@@ -209,7 +202,7 @@
     --dropi-section-col: 48px;
 
     .gali-v5-shell__body {
-      grid-template-columns: var(--dropi-ia-rail-width) var(--dropi-rail-width) 48px 0px minmax(0, 1fr);
+      grid-template-columns: var(--dropi-rail-width) 48px 0px minmax(0, 1fr);
     }
   }
 

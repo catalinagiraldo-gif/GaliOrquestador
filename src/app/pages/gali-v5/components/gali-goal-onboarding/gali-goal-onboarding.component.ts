@@ -53,12 +53,19 @@ export class GaliGoalOnboardingComponent {
 
   readonly closed = output<void>();
 
-  readonly step = signal<1 | 2 | 3 | 4>(1);
+  readonly step = signal<1 | 2 | 3 | 4 | 5>(1);
   readonly selectedGoal = signal<GoalOption | null>(null);
   readonly pedidosPerWeek = signal(20);
   readonly mesesOperando = signal<string>('1-6');
   readonly customGoal = signal('');
   readonly showCustom = signal(false);
+  readonly connectedSources = signal<string[]>([]);
+
+  toggleSource(id: string): void {
+    this.connectedSources.update(s =>
+      s.includes(id) ? s.filter(x => x !== id) : [...s, id]
+    );
+  }
 
   readonly goalOptions = GOAL_OPTIONS;
 
@@ -98,6 +105,10 @@ export class GaliGoalOnboardingComponent {
 
   goToStep4(): void {
     this.step.set(4);
+  }
+
+  goToStep5(): void {
+    this.step.set(5);
   }
 
   get dayOneSteps(): DayOneStep[] {
@@ -141,8 +152,19 @@ export class GaliGoalOnboardingComponent {
     const g = this.selectedGoal();
     if (g) {
       localStorage.setItem('gali_goal_label', g.label);
+      localStorage.setItem('gali_goal_id', g.id);
       localStorage.setItem('gali_goal_pedidos_target', String(this.pedidosPerWeek()));
     }
+    // Zero-state: user has 0 orders/week = needs guided setup
+    if (this.pedidosPerWeek() === 0) {
+      localStorage.setItem('gali_zero_state', '1');
+    } else {
+      localStorage.removeItem('gali_zero_state');
+    }
+    // Complexity level: new users start in novice mode
+    const isNovice = this.mesesOperando() === 'nuevo' || this.pedidosPerWeek() <= 5;
+    localStorage.setItem('gali_complexity', isNovice ? 'novice' : 'expert');
+    localStorage.setItem('gali_connected_sources', JSON.stringify(this.connectedSources()));
     this.closed.emit();
   }
 }

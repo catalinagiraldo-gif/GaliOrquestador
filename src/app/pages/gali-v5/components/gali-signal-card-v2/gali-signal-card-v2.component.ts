@@ -75,6 +75,8 @@ export class GaliSignalCardV2Component {
   readonly expanded = signal(false);
   readonly executing = signal(false);
   readonly localState = signal<SignalState | null>(null);
+  readonly pendingOpcion = signal<SignalOpcion | null>(null);
+  private confirmTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly currentState = computed(
     () => this.localState() ?? this.signal_data.estado,
@@ -94,6 +96,33 @@ export class GaliSignalCardV2Component {
 
   toggleExpand(): void {
     this.expanded.update(v => !v);
+  }
+
+  requestOpcion(opcion: SignalOpcion, event: Event): void {
+    event.stopPropagation();
+    // If already pending this option → confirm
+    if (this.pendingOpcion()?.id === opcion.id) {
+      this.confirmOpcion();
+      return;
+    }
+    // First click: set pending with 4s auto-cancel
+    this.pendingOpcion.set(opcion);
+    if (this.confirmTimer) clearTimeout(this.confirmTimer);
+    this.confirmTimer = setTimeout(() => this.pendingOpcion.set(null), 4000);
+  }
+
+  confirmOpcion(): void {
+    const op = this.pendingOpcion();
+    if (!op) return;
+    if (this.confirmTimer) clearTimeout(this.confirmTimer);
+    this.pendingOpcion.set(null);
+    this.executeOpcion(op);
+  }
+
+  cancelOpcion(event: Event): void {
+    event.stopPropagation();
+    if (this.confirmTimer) clearTimeout(this.confirmTimer);
+    this.pendingOpcion.set(null);
   }
 
   executeOpcion(opcion: SignalOpcion): void {

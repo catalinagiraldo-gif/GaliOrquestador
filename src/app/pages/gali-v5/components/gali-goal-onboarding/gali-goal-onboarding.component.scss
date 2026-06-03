@@ -586,6 +586,84 @@
   }
 }
 
+// ── Step 3: Source connection grid ──
+.source-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: $size-4 0;
+}
+
+.source-card {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: 12px 14px;
+  border: 2px solid $gray-200;
+  border-radius: $radius-lg;
+  background: $white;
+  cursor: pointer;
+  font-size: $font-sm;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  color: $gray-700;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  text-align: left;
+  position: relative;
+
+  &:hover {
+    border-color: $primary-300;
+    background: rgba($primary-500, 0.04);
+  }
+
+  &--connected {
+    border-color: $primary-500;
+    background: rgba($primary-500, 0.06);
+    color: $gray-900;
+  }
+
+  &__icon { font-size: 18px; flex-shrink: 0; }
+  &__label { flex: 1; }
+  &__check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: $primary-500;
+    color: $white;
+    font-size: 10px;
+    font-weight: $font-bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.onboarding-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 16px;
+  border: 2px dashed $gray-200;
+  border-radius: $radius-lg;
+  margin-bottom: $size-3;
+  font-size: $font-sm;
+  color: $gray-500;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: $primary-300;
+    color: $gray-700;
+  }
+
+  &__icon { font-size: 22px; }
+  &__hint { font-size: 11px; color: $gray-400; }
+}
+
 @keyframes backdrop-in {
   from { opacity: 0; }
   to { opacity: 1; }

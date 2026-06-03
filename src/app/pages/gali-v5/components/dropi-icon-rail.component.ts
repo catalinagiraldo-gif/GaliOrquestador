@@ -13,7 +13,14 @@ import {
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <nav class="icon-rail" aria-label="Módulos operativos">
+    <nav class="icon-rail" aria-label="Navegación principal">
+      <!-- ✦ Gali Hub logo -->
+      <a routerLink="/gali-v5" class="icon-rail__logo-btn"
+         [class.icon-rail__logo-btn--active]="activeKey() === 'home'"
+         title="Gali Hub" aria-label="Gali Hub">
+        <span class="icon-rail__spark" aria-hidden="true">✦</span>
+      </a>
+
       <div class="icon-rail__main">
 
         <!-- Módulos operativos -->

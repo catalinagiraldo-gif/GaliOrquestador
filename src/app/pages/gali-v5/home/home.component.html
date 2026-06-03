@@ -4,6 +4,39 @@
 
 <div class="mission">
 
+  <!-- ══ DASHBOARD TABS ══ -->
+  @if (dashboardTabs().length > 1 || addingTab()) {
+    <div class="mission__tabs">
+      @for (tab of dashboardTabs(); track tab.id) {
+        <button type="button"
+          class="mission__tab"
+          [class.mission__tab--active]="activeTabId() === tab.id"
+          (click)="selectTab(tab.id)">
+          <span class="mission__tab-icon">{{ tab.icon }}</span>
+          {{ tab.label }}
+          @if (tab.id !== 'principal') {
+            <span class="mission__tab-close" (click)="$event.stopPropagation(); removeTab(tab.id)" title="Eliminar pestaña">×</span>
+          }
+        </button>
+      }
+      @if (addingTab()) {
+        <div class="mission__tab-input">
+          <input type="text" class="mission__tab-name-input"
+            placeholder="Nombre del dashboard…"
+            [ngModel]="newTabName()"
+            (ngModelChange)="newTabName.set($event)"
+            (keydown.enter)="addTab()"
+            (keydown.escape)="addingTab.set(false)"
+            autofocus />
+          <button type="button" class="mission__tab-add-confirm" (click)="addTab()">✓</button>
+          <button type="button" class="mission__tab-add-cancel" (click)="addingTab.set(false)">×</button>
+        </div>
+      } @else {
+        <button type="button" class="mission__tab mission__tab--add" (click)="addingTab.set(true); newTabName.set('')" title="Nuevo dashboard">+</button>
+      }
+    </div>
+  }
+
   @if (ws.hubEntryContext(); as ctx) {
     <section class="mission__entry-banner">
       <div class="mission__entry-banner-inner">
@@ -15,29 +48,157 @@
     </section>
   }
 
-  <!-- ══ GALI INSIGHT ══ -->
+  <!-- ══ GALI INSIGHT (adaptativo por businessDNA) ══ -->
   <section class="mission__insight">
     <div class="mission__insight-inner">
       <span class="mission__insight-dot" aria-hidden="true"></span>
       <div class="mission__insight-body">
-        <span class="mission__insight-label">GALI</span>
-        <p class="mission__insight-text">
-          Collar GPS lleva 52h con ROAS 2.9x sobre meta.
-          Roax sugiere escalar presupuesto +30% ($66k → $86k/día).
-        </p>
+        <span class="mission__insight-label">GALI · {{ currentInsight().agente }}</span>
+        <p class="mission__insight-text">{{ currentInsight().text }}</p>
       </div>
       <div class="mission__insight-actions">
-        <button type="button" class="mission__insight-cta mission__insight-cta--primary">
-          Aprobar escala
-        </button>
-        <button type="button" class="mission__insight-cta mission__insight-cta--secondary">
-          Ver detalle →
-        </button>
+        @if (currentInsight().ctaRoute === null) {
+          <!-- Acción destructiva → requiere confirmación -->
+          <button type="button" class="mission__insight-cta mission__insight-cta--primary"
+            (click)="openScaleConfirm()">
+            {{ currentInsight().ctaLabel }}
+          </button>
+          <button type="button" class="mission__insight-cta mission__insight-cta--secondary"
+            [routerLink]="'/gali-v5/marketing/roax-informes'">
+            Ver detalle →
+          </button>
+        } @else {
+          <!-- Acción de navegación → directa -->
+          <a class="mission__insight-cta mission__insight-cta--primary"
+            [routerLink]="currentInsight().ctaRoute">
+            {{ currentInsight().ctaLabel }}
+          </a>
+        }
       </div>
     </div>
   </section>
 
+  <!-- ══ CONFIRM: APROBAR ESCALA ══ -->
+  @if (showScaleConfirm()) {
+    <div class="mission__confirm-backdrop" (click)="showScaleConfirm.set(false)">
+      <div class="mission__confirm-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <div class="confirm-dialog__header">
+          <span class="confirm-dialog__agent-dot" style="background:#f97316"></span>
+          <h3 class="confirm-dialog__title">Confirmar escala de presupuesto</h3>
+          <button type="button" class="confirm-dialog__close" (click)="showScaleConfirm.set(false)" aria-label="Cerrar">×</button>
+        </div>
+        <p class="confirm-dialog__desc">Roax recomienda subir el presupuesto basado en ROAS 2.9x durante 52h continuas.</p>
+        <div class="confirm-consequence-grid">
+          <div class="consequence-row">
+            <span class="consequence-label">Presupuesto diario</span>
+            <span class="consequence-before">$66k</span>
+            <span class="consequence-arrow">→</span>
+            <span class="consequence-after">$86k</span>
+          </div>
+          <div class="consequence-row">
+            <span class="consequence-label">Gasto mensual est.</span>
+            <span class="consequence-after">~$2.58M/mes</span>
+          </div>
+          <div class="consequence-row">
+            <span class="consequence-label">Pedidos esperados/sem</span>
+            <span class="consequence-after">~61 (vs 47 actuales)</span>
+          </div>
+          <div class="consequence-row consequence-row--safe">
+            <span class="consequence-label">🛡 Protección activa</span>
+            <span>Skill "Escalado ROAS" pausa automáticamente si ROAS cae bajo 2.5x</span>
+          </div>
+        </div>
+        <div class="confirm-dialog__actions">
+          <button type="button" class="confirm-cancel" (click)="showScaleConfirm.set(false)">Cancelar</button>
+          <button type="button" class="confirm-approve" (click)="confirmScale()">Confirmar escala →</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ══ ZERO STATE: guía para usuario sin datos ══ -->
+  @if (isZeroState()) {
+    <section class="mission__zero-state">
+      <div class="zero-state__inner">
+        <div class="zero-state__icon">✦</div>
+        <h2 class="zero-state__title">Gali está lista para aprender contigo</h2>
+        <p class="zero-state__subtitle">Sigue estos 3 pasos para arrancar tu operación y activar los agentes.</p>
+        <div class="zero-state__steps">
+          <div class="zero-state__step" [routerLink]="'/gali-v5/productos/caza-productos'">
+            <span class="zero-state__step-num">1</span>
+            <div class="zero-state__step-body">
+              <strong>Conecta tu catálogo</strong>
+              <span>ADA Spy buscará tu primer producto ganador →</span>
+            </div>
+          </div>
+          <div class="zero-state__step" [routerLink]="'/gali-v5/proyectos/nuevo'">
+            <span class="zero-state__step-num">2</span>
+            <div class="zero-state__step-body">
+              <strong>Crea tu primer proyecto</strong>
+              <span>Define precio, costo y objetivo de pedidos →</span>
+            </div>
+          </div>
+          <div class="zero-state__step" (click)="resetOnboarding()">
+            <span class="zero-state__step-num">3</span>
+            <div class="zero-state__step-body">
+              <strong>Activa Gali</strong>
+              <span>Configura tu objetivo y activa los agentes →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ══ LAYOUT NOVATO: Panel de nave (Intensamente) ══ -->
+  @if (!isZeroState() && ws.complexityLevel() === 'novice') {
+    <section class="mission__novice">
+      <div class="novice__greeting">
+        <span class="novice__greeting-icon">✦</span>
+        <div>
+          <h2 class="novice__greeting-title">Hola, {{ userName() }}. ¿Qué hacemos hoy?</h2>
+          <span class="novice__greeting-sub">Tus 4 agentes están listos</span>
+        </div>
+      </div>
+      <div class="novice__agent-grid">
+        @for (ag of agentes; track ag.id) {
+          <div class="novice__agent-tile" [style.--agent-color]="ag.color">
+            <div class="novice__agent-tile-header">
+              <span class="novice__agent-dot" [style.background]="ag.color"></span>
+              <span class="novice__agent-name">{{ ag.nombre }}</span>
+              <span class="novice__agent-status"
+                [class.novice__agent-status--active]="ag.estado === 'activo'"
+                [class.novice__agent-status--waiting]="ag.estado === 'esperando'">
+                {{ ag.estado === 'activo' ? 'Activo' : ag.estado === 'esperando' ? 'En espera' : 'Pausa' }}
+              </span>
+            </div>
+            <p class="novice__agent-desc">{{ ag.descripcion }}</p>
+            <span class="novice__agent-last">{{ ag.ultimaAccion }}</span>
+          </div>
+        }
+      </div>
+      <div class="novice__chat-wrap">
+        <div class="mission__chat-input">
+          <input
+            type="text"
+            class="mission__chat-field novice__chat-field"
+            placeholder="¿Qué necesitas hoy? Escríbele a Gali…"
+            [ngModel]="lanzarInput()"
+            (ngModelChange)="lanzarInput.set($event)"
+            (keydown.enter)="sendLanzar()" />
+          <button type="button" class="mission__chat-send" [disabled]="!lanzarInput().trim() || lanzarTyping()" (click)="sendLanzar()">
+            <i class="pi pi-send"></i>
+          </button>
+        </div>
+      </div>
+      <button type="button" class="novice__expert-link" (click)="ws.setComplexityLevel('expert')">
+        Ver hub completo (modo experto) →
+      </button>
+    </section>
+  }
+
   <!-- ══ PROYECTO ACTIVO: ANATOMÍA ══ -->
+  @if (!isZeroState() && ws.complexityLevel() === 'expert') {
   <section class="mission__anatomy">
     <div class="mission__anatomy-header">
       <div class="mission__anatomy-title-group">
@@ -224,12 +385,16 @@
             <button type="button" class="node-detail__chat-btn" (click)="openChatWithNode(activeNode()!)">
               Hablar con {{ detail.agentName }}
             </button>
+            <button type="button" class="node-detail__skill-btn" (click)="openNewSkill(activeNode()!)">
+              + Skill para este módulo
+            </button>
           </div>
         </div>
       }
 
     </div><!-- /mission__anatomy-body -->
   </section>
+  } <!-- /!isZeroState && expert -->
 
   <!-- ══ SEÑALES Y CHAT ══ -->
   <div class="mission__bottom">
@@ -324,6 +489,18 @@
     </div>
   </section>
 
+  <!-- Toggle experto/novato -->
+  @if (ws.complexityLevel() === 'expert') {
+    <div class="mission__complexity-toggle">
+      <button type="button" class="complexity-toggle-btn" (click)="ws.setComplexityLevel('novice')">
+        ← Vista simple
+      </button>
+      <button type="button" class="complexity-toggle-btn complexity-toggle-btn--reset" (click)="resetOnboarding()">
+        ↺ Reconfigurar Gali
+      </button>
+    </div>
+  }
+
 </div>
 
 <!-- ══ DASHBOARD CUSTOMIZER PANEL ══ -->
@@ -361,6 +538,11 @@
         <span>✦</span> También puedes decirle a Gali: <em>"Personaliza mi dashboard"</em>
       </p>
       <div class="mission-customizer__footer">
+        <button type="button" class="mission-customizer__tab-btn"
+          (click)="saveCurrentTabSections(); addingTab.set(true); saveAndCloseCustomizer()"
+          title="Guarda esta configuración como una nueva pestaña">
+          + Guardar como pestaña
+        </button>
         <button type="button" class="mission-customizer__save-btn" (click)="saveAndCloseCustomizer()">
           Guardar cambios
         </button>

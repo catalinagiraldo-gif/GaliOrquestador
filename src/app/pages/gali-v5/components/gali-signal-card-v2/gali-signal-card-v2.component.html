@@ -39,14 +39,27 @@
     @if (!expanded() && currentState() === 'pending_decision' && signal_data.opciones) {
       <div class="signal-v2__quick-ctas">
         @for (op of signal_data.opciones.slice(0, 2); track op.id) {
-          <button type="button" class="signal-v2__cta signal-v2__cta--ghost"
-            data-proto-skip (click)="$event.stopPropagation(); executeOpcion(op)">
-            {{ op.label }}
+          <button type="button"
+            class="signal-v2__cta"
+            [class.signal-v2__cta--ghost]="pendingOpcion()?.id !== op.id"
+            [class.signal-v2__cta--pending]="pendingOpcion()?.id === op.id"
+            (click)="requestOpcion(op, $event)">
+            @if (pendingOpcion()?.id === op.id) {
+              <span class="signal-v2__confirm-pulse"></span>
+              Confirmar →
+            } @else {
+              {{ op.label }}
+            }
           </button>
         }
-        @if (signal_data.opciones && signal_data.opciones.length > 2) {
+        @if (pendingOpcion()) {
+          <button type="button" class="signal-v2__cta signal-v2__cta--cancel"
+            (click)="cancelOpcion($event)">
+            Cancelar
+          </button>
+        } @else if (signal_data.opciones && signal_data.opciones.length > 2) {
           <button type="button" class="signal-v2__cta signal-v2__cta--text"
-            data-proto-skip (click)="$event.stopPropagation(); toggleExpand()">
+            (click)="$event.stopPropagation(); toggleExpand()">
             +{{ signal_data.opciones.length - 2 }} más…
           </button>
         }
@@ -113,12 +126,33 @@
       @if (signal_data.opciones && currentState() === 'pending_decision') {
         <div class="signal-v2__opciones">
           @for (op of signal_data.opciones; track op.id) {
-            <button type="button" class="signal-v2__opcion" data-proto-skip
-              (click)="executeOpcion(op)">
-              <span class="signal-v2__opcion-label">{{ op.label }}</span>
-              @if (op.sublabel) {
-                <span class="signal-v2__opcion-sub">{{ op.sublabel }}</span>
+            <button type="button"
+              class="signal-v2__opcion"
+              [class.signal-v2__opcion--pending]="pendingOpcion()?.id === op.id"
+              (click)="requestOpcion(op, $event)">
+              <div class="signal-v2__opcion-body">
+                <span class="signal-v2__opcion-label">
+                  @if (pendingOpcion()?.id === op.id) {
+                    ✓ Confirmar: {{ op.label }}
+                  } @else {
+                    {{ op.label }}
+                  }
+                </span>
+                @if (op.sublabel && pendingOpcion()?.id !== op.id) {
+                  <span class="signal-v2__opcion-sub">{{ op.sublabel }}</span>
+                }
+              </div>
+              @if (pendingOpcion()?.id === op.id) {
+                <div class="signal-v2__opcion-confirm-bar">
+                  <div class="signal-v2__opcion-confirm-timer"></div>
+                </div>
               }
+            </button>
+          }
+          @if (pendingOpcion()) {
+            <button type="button" class="signal-v2__opcion signal-v2__opcion--cancel"
+              (click)="cancelOpcion($event)">
+              Cancelar
             </button>
           }
         </div>

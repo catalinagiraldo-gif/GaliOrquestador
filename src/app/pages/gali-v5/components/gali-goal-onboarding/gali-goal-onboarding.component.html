@@ -5,7 +5,7 @@
     <div class="onboarding-modal__header">
       <span class="onboarding-modal__logo">✦ Gali</span>
       <div class="onboarding-modal__steps">
-        @for (s of [1, 2, 3, 4]; track s; let last = $last) {
+        @for (s of [1, 2, 3, 4, 5]; track s; let last = $last) {
           <span class="step-dot" [class.step-dot--active]="step() >= s" [class.step-dot--done]="step() > s"></span>
           @if (!last) {
             <span class="step-line"></span>
@@ -67,7 +67,7 @@
     <!-- Step 2: Estado actual -->
     @if (step() === 2) {
       <div class="onboarding-modal__body">
-        <div class="onboarding-modal__eyebrow">Paso 2 de 4</div>
+        <div class="onboarding-modal__eyebrow">Paso 2 de 5</div>
         <h1 class="onboarding-modal__title">Cuéntame sobre tu operación actual</h1>
         <p class="onboarding-modal__subtitle">Esto le permite a Gali darte recomendaciones calibradas a tu nivel.</p>
 
@@ -110,10 +110,57 @@
       </div>
     }
 
-    <!-- Step 3: Arquitectura Agentes / Skills / Reglas -->
+    <!-- Step 3: Conecta tus datos (NUEVO) -->
     @if (step() === 3) {
       <div class="onboarding-modal__body">
-        <div class="onboarding-modal__eyebrow">Paso 3 de 4</div>
+        <div class="onboarding-modal__eyebrow">Paso 3 de 5</div>
+        <h1 class="onboarding-modal__title">Conecta tus datos para que Gali aprenda</h1>
+        <p class="onboarding-modal__subtitle">Cuantas más fuentes conectes, más preciso será Gali desde el día 1.</p>
+
+        <div class="source-grid">
+          <button type="button" class="source-card" [class.source-card--connected]="connectedSources().includes('csv')" (click)="toggleSource('csv')">
+            <span class="source-card__icon">📊</span>
+            <span class="source-card__label">CSV de pedidos / Excel</span>
+            @if (connectedSources().includes('csv')) { <span class="source-card__check">✓</span> }
+          </button>
+          <button type="button" class="source-card" [class.source-card--connected]="connectedSources().includes('gdrive')" (click)="toggleSource('gdrive')">
+            <span class="source-card__icon">📁</span>
+            <span class="source-card__label">Google Drive</span>
+            @if (connectedSources().includes('gdrive')) { <span class="source-card__check">✓</span> }
+          </button>
+          <button type="button" class="source-card" [class.source-card--connected]="connectedSources().includes('wms')" (click)="toggleSource('wms')">
+            <span class="source-card__icon">🏭</span>
+            <span class="source-card__label">WMS / ERP</span>
+            @if (connectedSources().includes('wms')) { <span class="source-card__check">✓</span> }
+          </button>
+          <button type="button" class="source-card" [class.source-card--connected]="connectedSources().includes('meta')" (click)="toggleSource('meta')">
+            <span class="source-card__icon">📣</span>
+            <span class="source-card__label">Meta Ads</span>
+            @if (connectedSources().includes('meta')) { <span class="source-card__check">✓</span> }
+          </button>
+        </div>
+
+        <div class="onboarding-upload-zone">
+          <span class="onboarding-upload-zone__icon">📎</span>
+          <span>Arrastra tu CSV aquí o haz clic para subir</span>
+          <span class="onboarding-upload-zone__hint">CSV, XLSX hasta 10 MB</span>
+        </div>
+
+        <p class="onboarding-modal__footnote">Puedes conectar más fuentes después desde <strong>Conexiones →</strong></p>
+
+        <div class="onboarding-modal__nav">
+          <button type="button" class="onboarding-modal__back" (click)="step.set(2)">← Atrás</button>
+          <button type="button" class="onboarding-modal__cta" (click)="goToStep4()">
+            {{ connectedSources().length > 0 ? 'Continuar con ' + connectedSources().length + ' fuente(s) →' : 'Saltar por ahora →' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 4: Arquitectura Agentes / Skills / Reglas -->
+    @if (step() === 4) {
+      <div class="onboarding-modal__body">
+        <div class="onboarding-modal__eyebrow">Paso 4 de 5</div>
         <h1 class="onboarding-modal__title">Cómo funciona Gali por dentro</h1>
         <p class="onboarding-modal__subtitle">Tres piezas distintas — así no se mezclan en una sola bolsa.</p>
 
@@ -139,16 +186,16 @@
         </p>
 
         <div class="onboarding-modal__nav">
-          <button type="button" class="onboarding-modal__back" (click)="step.set(2)">← Atrás</button>
-          <button type="button" class="onboarding-modal__cta" (click)="goToStep4()">Continuar →</button>
+          <button type="button" class="onboarding-modal__back" (click)="step.set(3)">← Atrás</button>
+          <button type="button" class="onboarding-modal__cta" (click)="goToStep5()">Continuar →</button>
         </div>
       </div>
     }
 
-    <!-- Step 4: Agente recomendado + Día 1 path -->
-    @if (step() === 4) {
+    <!-- Step 5: Agente recomendado + Día 1 path -->
+    @if (step() === 5) {
       <div class="onboarding-modal__body onboarding-modal__body--step4">
-        <div class="onboarding-modal__eyebrow">Paso 4 de 4 · Tu plan para hoy</div>
+        <div class="onboarding-modal__eyebrow">Paso 5 de 5 · Tu plan para hoy</div>
         <h1 class="onboarding-modal__title">Tu Día 1 con Gali</h1>
 
         @if (recommendedAgent; as agent) {

@@ -11,7 +11,6 @@ import { GaliRightPanelComponent } from './components/gali-right-panel/gali-righ
 import { DropiPanelSplitterComponent } from './components/dropi-panel-splitter/dropi-panel-splitter.component';
 import { GaliContextStripComponent, ContextKey } from './components/gali-context-strip/gali-context-strip.component';
 import { GaliIntentBarComponent } from './components/gali-intent-bar/gali-intent-bar.component';
-import { DropiIaRailComponent } from './components/dropi-ia-rail/dropi-ia-rail.component';
 import {
   GALI_MISSION_PANEL,
   resolveActiveRailKey,
@@ -36,7 +35,6 @@ import { GaliWorkspaceService } from './services/gali-workspace.service';
     DropiPanelSplitterComponent,
     GaliContextStripComponent,
     GaliIntentBarComponent,
-    DropiIaRailComponent,
   ],
   templateUrl: './gali-v5-shell.component.html',
   styleUrl: './gali-v5-shell.component.scss',

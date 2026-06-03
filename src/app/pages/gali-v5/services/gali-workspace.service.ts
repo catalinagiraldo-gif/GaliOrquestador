@@ -48,6 +48,33 @@ export interface HubEntryContext {
 export class GaliWorkspaceService implements OnDestroy {
   readonly activeMode = signal<WorkspaceMode>('operar');
   readonly galiPaused = signal(false);
+
+  /** Nivel de complejidad del hub: novice = panel simplificado, expert = hub completo */
+  readonly complexityLevel = signal<'novice' | 'expert'>(
+    (localStorage.getItem('gali_complexity') as 'novice' | 'expert') ?? 'novice'
+  );
+
+  /** Fuentes de datos conectadas durante el onboarding */
+  readonly connectedSources = signal<string[]>(
+    JSON.parse(localStorage.getItem('gali_connected_sources') ?? '[]')
+  );
+
+  setComplexityLevel(level: 'novice' | 'expert'): void {
+    this.complexityLevel.set(level);
+    localStorage.setItem('gali_complexity', level);
+  }
+
+  /** Business DNA — perfil derivado del onboarding y comportamiento del usuario */
+  readonly businessDNA = computed(() => ({
+    goalId:        localStorage.getItem('gali_goal_id') ?? null,
+    goalLabel:     localStorage.getItem('gali_goal_label') ?? null,
+    pedidosTarget: Number(localStorage.getItem('gali_goal_pedidos_target') ?? 0),
+    complexity:    this.complexityLevel(),
+    sources:       this.connectedSources(),
+    sessionCount:  Number(localStorage.getItem('gali_session_count') ?? 0),
+    hasData:       localStorage.getItem('gali_zero_state') !== '1',
+  }));
+
   readonly autopilot = signal(false);
   readonly liveEventsVisible = signal(true);
   readonly toast = signal<GaliToast | null>(null);
@@ -97,6 +124,9 @@ export class GaliWorkspaceService implements OnDestroy {
   private ngZone = inject(NgZone);
 
   constructor() {
+    // Session counter — drives progressive disclosure in businessDNA
+    const count = Number(localStorage.getItem('gali_session_count') ?? 0);
+    localStorage.setItem('gali_session_count', String(count + 1));
     // Simulate live events outside Angular zone to avoid continuous change detection
     this.startLiveSimulation();
   }

@@ -1114,6 +1114,564 @@
   }
 }
 
+// ── Fase 5: Dashboard Tabs ────────────────────────────────────────────────────
+.mission__tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: $size-2 $size-6 0;
+  border-bottom: 1px solid $gray-200;
+  flex-wrap: wrap;
+  background: $white;
+  flex-shrink: 0;
+}
+
+.mission__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: $radius-sm $radius-sm 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  font-size: $font-xs;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  color: $gray-500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  position: relative;
+  bottom: -1px;
+
+  &:hover:not(&--active) {
+    background: $gray-50;
+    color: $gray-700;
+  }
+
+  &--active {
+    background: $white;
+    border-color: $gray-200;
+    border-bottom-color: $white;
+    color: $gray-900;
+    font-weight: $font-semibold;
+  }
+
+  &--add {
+    color: $primary-500;
+    font-size: 16px;
+    font-weight: $font-bold;
+    padding: 4px 10px;
+
+    &:hover {
+      background: rgba($primary-500, 0.08);
+      color: $primary-600;
+    }
+  }
+
+  &-icon { font-size: 11px; }
+
+  &-close {
+    margin-left: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    line-height: 1;
+    color: $gray-400;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover {
+      background: rgba($gray-500, 0.15);
+      color: $gray-700;
+    }
+  }
+}
+
+.mission__tab-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.mission__tab-name-input {
+  border: 1px solid $primary-300;
+  border-radius: $radius-xs;
+  padding: 3px 8px;
+  font-size: $font-xs;
+  font-family: $font-primary;
+  color: $gray-800;
+  outline: none;
+  width: 140px;
+
+  &:focus { border-color: $primary-500; }
+}
+
+.mission__tab-add-confirm, .mission__tab-add-cancel {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: $radius-xs;
+}
+
+.mission__tab-add-confirm {
+  color: $primary-500;
+  &:hover { background: rgba($primary-500, 0.1); }
+}
+
+.mission__tab-add-cancel {
+  color: $gray-400;
+  &:hover { background: $gray-100; }
+}
+
+.mission-customizer__tab-btn {
+  padding: 7px 12px;
+  border-radius: $radius-sm;
+  border: 1px dashed $primary-300;
+  background: rgba($primary-500, 0.04);
+  color: $primary-600;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover { background: rgba($primary-500, 0.1); }
+}
+
+// ── Fase 1: Zero State ────────────────────────────────────────────────────────
+.mission__zero-state {
+  margin: $size-6 $size-6 $size-4;
+  border-radius: 16px;
+  border: 2px dashed $gray-200;
+  background: linear-gradient(135deg, rgba($primary-500, 0.03) 0%, rgba($white, 1) 60%);
+  animation: slideUp 0.4s ease;
+}
+
+.zero-state__inner {
+  padding: $size-8 $size-8;
+  text-align: center;
+}
+
+.zero-state__icon {
+  font-size: 32px;
+  color: $primary-500;
+  margin-bottom: $size-3;
+}
+
+.zero-state__title {
+  font-size: $font-lg;
+  font-weight: $font-bold;
+  color: $gray-900;
+  margin: 0 0 $size-2;
+}
+
+.zero-state__subtitle {
+  font-size: $font-sm;
+  color: $gray-500;
+  margin: 0 0 $size-6;
+}
+
+.zero-state__steps {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  text-align: left;
+}
+
+.zero-state__step {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border-radius: $radius-lg;
+  border: 1px solid $gray-100;
+  background: $white;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.12s ease;
+
+  &:hover {
+    border-color: $primary-300;
+    transform: translateX(4px);
+  }
+
+  &-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: $primary-500;
+    color: $white;
+    font-size: $font-xs;
+    font-weight: $font-bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-800;
+    }
+
+    span {
+      font-size: $font-xs;
+      color: $gray-500;
+    }
+  }
+}
+
+// ── Fase 2: Novice Layout (Panel de Nave) ─────────────────────────────────────
+.mission__novice {
+  padding: $size-6 $size-6 $size-4;
+  animation: slideUp 0.35s ease;
+}
+
+.novice__greeting {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  margin-bottom: $size-5;
+}
+
+.novice__greeting-icon {
+  font-size: 28px;
+  color: $primary-500;
+  flex-shrink: 0;
+}
+
+.novice__greeting-title {
+  font-size: $font-lg;
+  font-weight: $font-bold;
+  color: $gray-900;
+  margin: 0 0 2px;
+}
+
+.novice__greeting-sub {
+  font-size: $font-xs;
+  color: $gray-500;
+}
+
+.novice__agent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-3;
+  margin-bottom: $size-4;
+}
+
+.novice__agent-tile {
+  padding: $size-4;
+  border-radius: $radius-lg;
+  border: 1.5px solid rgba(var(--agent-color-raw, 209, 213, 219), 0.3);
+  border-color: color-mix(in srgb, var(--agent-color, #e0e0e0) 30%, transparent);
+  background: $white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+}
+
+.novice__agent-tile-header {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  margin-bottom: $size-2;
+}
+
+.novice__agent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: gali-pulse 2s ease-in-out infinite;
+}
+
+.novice__agent-name {
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: $gray-800;
+  flex: 1;
+}
+
+.novice__agent-status {
+  font-size: 10px;
+  font-weight: $font-medium;
+  padding: 2px 6px;
+  border-radius: $radius-full;
+  background: $gray-100;
+  color: $gray-500;
+
+  &--active {
+    background: rgba(52, 211, 153, 0.15);
+    color: #047857;
+  }
+
+  &--waiting {
+    background: rgba(251, 191, 36, 0.15);
+    color: #92400e;
+  }
+}
+
+.novice__agent-desc {
+  font-size: $font-xs;
+  color: $gray-600;
+  margin: 0 0 $size-2;
+  line-height: 1.4;
+}
+
+.novice__agent-last {
+  font-size: 10px;
+  color: $gray-400;
+  display: block;
+}
+
+.novice__chat-wrap {
+  margin-bottom: $size-3;
+}
+
+.novice__chat-field {
+  font-size: $font-sm;
+}
+
+.novice__expert-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: $size-2;
+  background: none;
+  border: none;
+  font-size: $font-xs;
+  color: $gray-400;
+  cursor: pointer;
+  font-family: $font-primary;
+  transition: color 0.12s;
+
+  &:hover { color: $primary-500; }
+}
+
+// ── Complexity toggle footer ─────────────────────────────────────────────────
+.mission__complexity-toggle {
+  display: flex;
+  gap: $size-2;
+  justify-content: center;
+  padding: $size-3 $size-6;
+  border-top: 1px solid $gray-100;
+}
+
+.complexity-toggle-btn {
+  padding: 6px 12px;
+  border-radius: $radius-full;
+  border: 1px solid $gray-200;
+  background: $white;
+  color: $gray-500;
+  font-size: $font-xs;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: $gray-50;
+    color: $gray-700;
+  }
+
+  &--reset {
+    color: $primary-600;
+    border-color: rgba($primary-500, 0.3);
+
+    &:hover {
+      background: rgba($primary-500, 0.05);
+    }
+  }
+}
+
+// ── Fase 6: Scale Confirm Dialog ──────────────────────────────────────────────
+.mission__confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+.mission__confirm-dialog {
+  background: $white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease;
+  overflow: hidden;
+}
+
+.confirm-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-4 $size-5;
+  border-bottom: 1px solid $gray-100;
+}
+
+.confirm-dialog__agent-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.confirm-dialog__title {
+  flex: 1;
+  font-size: $font-md;
+  font-weight: $font-bold;
+  color: $gray-900;
+  margin: 0;
+}
+
+.confirm-dialog__close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: $gray-400;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  &:hover { color: $gray-700; }
+}
+
+.confirm-dialog__desc {
+  padding: $size-3 $size-5 0;
+  font-size: $font-sm;
+  color: $gray-500;
+  margin: 0;
+}
+
+.confirm-consequence-grid {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+  padding: $size-4 $size-5;
+}
+
+.consequence-row {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: 8px 12px;
+  border-radius: $radius-sm;
+  background: $gray-50;
+  font-size: $font-sm;
+
+  &--safe {
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+  }
+}
+
+.consequence-label {
+  flex: 1;
+  color: $gray-500;
+  font-size: $font-xs;
+}
+
+.consequence-before {
+  color: $gray-500;
+  text-decoration: line-through;
+  font-size: $font-xs;
+}
+
+.consequence-arrow {
+  color: $gray-400;
+  font-size: $font-xs;
+}
+
+.consequence-after {
+  font-weight: $font-semibold;
+  color: $gray-900;
+  font-size: $font-sm;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: $size-2;
+  padding: $size-4 $size-5;
+  border-top: 1px solid $gray-100;
+  justify-content: flex-end;
+}
+
+.confirm-cancel {
+  padding: 8px 16px;
+  border-radius: $radius-sm;
+  border: 1px solid $gray-200;
+  background: $white;
+  color: $gray-600;
+  font-size: $font-sm;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s;
+  &:hover { background: $gray-50; }
+}
+
+.confirm-approve {
+  padding: 8px 20px;
+  border-radius: $radius-sm;
+  border: none;
+  background: $primary-500;
+  color: $white;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s;
+  &:hover { background: $primary-600; }
+}
+
+// ── Fase 3: Node-detail skill button ─────────────────────────────────────────
+.node-detail__skill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: $radius-sm;
+  border: 1px dashed $primary-300;
+  background: rgba($primary-500, 0.04);
+  color: $primary-600;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  &:hover {
+    background: rgba($primary-500, 0.1);
+    border-color: $primary-500;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }

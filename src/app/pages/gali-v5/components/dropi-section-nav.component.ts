@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { SectionNavItem, SectionPanel } from '../dropi-sections.config';
+import { DROPI_ICON_RAIL, SectionNavItem, SectionPanel } from '../dropi-sections.config';
 import { GaliStateService } from '../services/gali-state.service';
 
 // Mapeo de route patterns → agent data para el prototipo
@@ -27,10 +27,14 @@ const ROUTE_PENDING_MAP: Record<string, number> = {
     <nav
       class="section-nav"
       [class.section-nav--collapsed]="collapsed()"
+      [class.section-nav--ai]="isAiSection()"
       [attr.aria-label]="panel().title">
-      <div class="section-nav__head">
+      <div class="section-nav__head" [class.section-nav__head--ai]="isAiSection()">
         @if (!collapsed()) {
-          <h2 class="section-nav__title">{{ panel().title }}</h2>
+          <h2 class="section-nav__title">
+            <span *ngIf="isAiSection()" class="section-nav__ai-spark" aria-hidden="true">✦</span>
+            {{ panel().title }}
+          </h2>
         }
         <button
           type="button"
@@ -148,6 +152,15 @@ export class DropiSectionNavComponent {
   private router = inject(Router);
   private galiState = inject(GaliStateService);
   currentUrl = signal(this.router.url);
+
+  readonly isAiSection = computed(() => {
+    const url = this.currentUrl();
+    // Exclude 'home' — its prefix /gali-v5 matches all routes in this shell
+    return DROPI_ICON_RAIL.some(i =>
+      i.group === 'ai' && i.key !== 'home' && i.matchPrefixes.some(p => url.startsWith(p))
+    );
+  });
+
   // User-toggled overrides — separate from panel defaults
   private readonly userOverrides = signal<Record<string, boolean>>({});
   // Panel defaults derived reactively via computed (no effect needed)

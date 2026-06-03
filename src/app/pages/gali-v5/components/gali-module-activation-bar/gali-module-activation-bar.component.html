@@ -1,0 +1,23 @@
+@if (!dismissed()) {
+  <div class="mod-bar" [style.--agent-color]="meta.color">
+    <div class="mod-bar__left">
+      <span class="mod-bar__dot"></span>
+      <span class="mod-bar__agent">{{ meta.emoji }} {{ meta.nombre }}</span>
+      <span class="mod-bar__sep">·</span>
+      <span class="mod-bar__status">{{ meta.status }}</span>
+      @if (skillSuggestion) {
+        <span class="mod-bar__sep">·</span>
+        <span class="mod-bar__suggestion">Skill sugerida: <em>{{ skillSuggestion }}</em></span>
+      }
+    </div>
+    <div class="mod-bar__actions">
+      <button type="button" class="mod-bar__btn mod-bar__btn--ghost" (click)="goToSkills()">
+        Ver skills activas →
+      </button>
+      <button type="button" class="mod-bar__btn mod-bar__btn--primary" (click)="createSkill()">
+        + Skill para {{ sectionName }}
+      </button>
+      <button type="button" class="mod-bar__dismiss" (click)="dismiss()" aria-label="Cerrar">×</button>
+    </div>
+  </div>
+}

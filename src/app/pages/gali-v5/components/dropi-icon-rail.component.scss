@@ -7,9 +7,9 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
 
 :host {
   display: block;
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
-  width: var(--dropi-rail-width, 56px);
+  width: var(--dropi-rail-width, 72px);
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -74,12 +74,45 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
     padding: $size-3 0 $size-2;
   }
 
+  // ── Logo ✦ Gali Hub ─────────────────────────────────────────────────
+  &__logo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    flex-shrink: 0;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &--active .icon-rail__spark {
+      color: $primary-500;
+      opacity: 1;
+      animation: logo-breathe 3s ease-in-out infinite;
+    }
+  }
+
+  &__spark {
+    font-size: 16px;
+    color: $gray-400;
+    line-height: 1;
+    transition: color 0.15s ease;
+  }
+
+  // ── Navigation items ──────────────────────────────────────────────────
   &__item {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
+    width: 44px;
     height: 40px;
     border-radius: $radius-lg;
     text-decoration: none;
@@ -137,7 +170,7 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
     width: 40px;
     height: 40px;
     border-radius: $radius-md;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, border-left 0.15s ease;
   }
 
   &__svg {
@@ -151,4 +184,9 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
   &__item--active .icon-rail__svg {
     @include nav-icon-active-white;
   }
+}
+
+@keyframes logo-breathe {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }

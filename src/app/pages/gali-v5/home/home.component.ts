@@ -1,4 +1,4 @@
-import { Component, inject, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, inject, signal, computed, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -109,7 +109,15 @@ export class DropiHomeComponent implements AfterViewChecked {
   readonly gali = inject(GaliStateService);
 
   readonly showOnboarding = signal(shouldShowOnboarding());
+  readonly isZeroState = signal(localStorage.getItem('gali_zero_state') === '1');
   private auth = inject(AuthService);
+
+  resetOnboarding(): void {
+    localStorage.removeItem('gali_goal_configured');
+    localStorage.removeItem('gali_zero_state');
+    this.showOnboarding.set(true);
+    this.isZeroState.set(false);
+  }
 
   @ViewChild('lanzarScroll') lanzarScrollEl?: ElementRef<HTMLElement>;
   private shouldScrollLanzar = false;
@@ -134,7 +142,73 @@ export class DropiHomeComponent implements AfterViewChecked {
   saveAndCloseCustomizer(): void {
     this.gali.showCustomizer.set(false);
     this.customizerSaved.set(true);
+    this.saveTabsToStorage();
     setTimeout(() => this.customizerSaved.set(false), 5000);
+  }
+
+  // ── Dashboard Tabs ────────────────────────────────────────────────────────
+  readonly dashboardTabs = signal<Array<{ id: string; label: string; icon: string; sections: Record<string, boolean> }>>(
+    this.loadTabsFromStorage()
+  );
+  readonly activeTabId = signal(this.loadActiveTabId());
+  readonly addingTab = signal(false);
+  readonly newTabName = signal('');
+
+  private loadTabsFromStorage(): Array<{ id: string; label: string; icon: string; sections: Record<string, boolean> }> {
+    try {
+      const raw = localStorage.getItem('gali_dashboard_tabs');
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [
+      { id: 'principal', label: 'Principal', icon: '✦',
+        sections: { insight: true, anatomy: true, signals: true, chat: true, akademy: true } },
+    ];
+  }
+
+  private loadActiveTabId(): string {
+    return localStorage.getItem('gali_active_tab') ?? 'principal';
+  }
+
+  saveTabsToStorage(): void {
+    localStorage.setItem('gali_dashboard_tabs', JSON.stringify(this.dashboardTabs()));
+    localStorage.setItem('gali_active_tab', this.activeTabId());
+  }
+
+  selectTab(id: string): void {
+    this.activeTabId.set(id);
+    const tab = this.dashboardTabs().find(t => t.id === id);
+    if (tab) {
+      this.dashboardSections.set({ ...this.dashboardSections(), ...tab.sections });
+    }
+    localStorage.setItem('gali_active_tab', id);
+  }
+
+  addTab(): void {
+    const name = this.newTabName().trim() || 'Dashboard';
+    const id = `tab-${Date.now()}`;
+    const currentSections = { ...this.dashboardSections() };
+    this.dashboardTabs.update(tabs => [...tabs, {
+      id, label: name, icon: '📊', sections: currentSections
+    }]);
+    this.activeTabId.set(id);
+    this.addingTab.set(false);
+    this.newTabName.set('');
+    this.saveTabsToStorage();
+  }
+
+  removeTab(id: string): void {
+    if (id === 'principal') return;
+    this.dashboardTabs.update(tabs => tabs.filter(t => t.id !== id));
+    if (this.activeTabId() === id) this.activeTabId.set('principal');
+    this.saveTabsToStorage();
+  }
+
+  saveCurrentTabSections(): void {
+    const id = this.activeTabId();
+    this.dashboardTabs.update(tabs =>
+      tabs.map(t => t.id === id ? { ...t, sections: { ...this.dashboardSections() } } : t)
+    );
+    this.saveTabsToStorage();
   }
 
   // Lanzar mode chat
@@ -574,9 +648,63 @@ export class DropiHomeComponent implements AfterViewChecked {
   }
 
   readonly showNewSkill = signal(false);
+  readonly showScaleConfirm = signal(false);
 
-  openNewSkill(): void {
-    this.router.navigate(['/gali-v5/skills/nueva']);
+  /** Insight bar adaptativo según el perfil del usuario (businessDNA) */
+  readonly currentInsight = computed(() => {
+    const dna = this.ws.businessDNA();
+    // Sesión 0-1: usuario muy nuevo → guía de primer paso
+    if (dna.sessionCount <= 1 && !dna.hasData) {
+      return {
+        text: 'Bienvenido a Gali. Conecta tu catálogo y ADA Spy buscará tu primer producto ganador.',
+        ctaLabel: 'Abrir ADA Spy →',
+        ctaRoute: '/gali-v5/productos/caza-productos',
+        agente: 'ADA Spy',
+      };
+    }
+    // Sin fuentes conectadas → prompt de conexión
+    if (dna.sources.length === 0 && dna.sessionCount <= 3) {
+      return {
+        text: 'Conecta Meta Ads para que Roax optimice tus campañas con datos reales, no solo el ROAS declarado.',
+        ctaLabel: 'Conectar Meta Ads →',
+        ctaRoute: '/gali-v5/conexiones',
+        agente: 'Roax',
+      };
+    }
+    // Objetivo escalar pedidos → insight de logística
+    if (dna.goalId === 'escalar-pedidos' && dna.sessionCount > 2) {
+      return {
+        text: 'Para escalar de ' + dna.pedidosTarget + ' a ' + Math.round(dna.pedidosTarget * 2.5) + ' pedidos/sem, Vigilante recomienda activar Smart Routing antes de subir pauta.',
+        ctaLabel: 'Ver smart routing →',
+        ctaRoute: '/gali-v5/logistica/torre-logistica',
+        agente: 'Vigilante',
+      };
+    }
+    // Estado operacional (usuario activo con datos)
+    return {
+      text: 'Collar GPS lleva 52h con ROAS 2.9x sobre meta. Roax sugiere escalar presupuesto +30% ($66k → $86k/día).',
+      ctaLabel: 'Aprobar escala',
+      ctaRoute: null,
+      agente: 'Roax',
+    };
+  });
+
+  openScaleConfirm(): void {
+    this.showScaleConfirm.set(true);
+  }
+
+  confirmScale(): void {
+    this.showScaleConfirm.set(false);
+    this.ws.addLiveEvent({
+      agente: 'Roax', agente_id: 'roax',
+      mensaje: 'Escala aprobada: presupuesto $66k → $86k/día',
+      tipo: 'action',
+    });
+  }
+
+  openNewSkill(moduleId?: string): void {
+    const extras = moduleId ? { queryParams: { contexto: moduleId } } : {};
+    this.router.navigate(['/gali-v5/skills/nueva'], extras);
   }
 
   goToSkills(): void {
