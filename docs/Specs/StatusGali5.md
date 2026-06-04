@@ -1,11 +1,14 @@
 # Gali v5 — Status del Prototipo
 
-**Última actualización**: Junio 1, 2026 (v11.0 — Onboarding Día 1 + Toasts con Memoria + Alertas unificadas + Diagnóstico campaña + Economía unitaria + Skill Creator + Crear agente)  
-**Arquitectura actual**: OS Architecture v11.0 — Backlog completo resuelto: onboarding conectado, toasts con deep-link a Memoria, alertas unificadas, post-mortem Roax, LTV/CAC en financiero, creator dashboard, flujo de agente personalizado
+**Última actualización**: Junio 4, 2026 (v15.0 — Pipeline SpecsNuevos completo: 7 specs ejecutados · UniDatos→RediNavega→HubNegocio→Señales→ZeroState→Finance→Salud · Build limpio)  
+**Anterior v14.0**: Coherencia + Estado Cero + Flujo Completo: dobles barras eliminadas · Panel Intensamente (3 tarjetas) · Strip propuesta de valor · Señales filtradas a críticas · Micromundo↔Onboarding conectados · Kronos en Dashboard Financiero · Build limpio  
+**Arquitectura actual**: OS Architecture v15.0 — Pipeline SpecsNuevos 7/7 ejecutado · Hub 3 zonas · Vista /senales · Onboarding veterano · Tabs proyecto con datos reales
 
 ---
 
-## Snapshot Actual
+## Snapshot Actual (v11.0 + Jun 3 backlog)
+
+> **Jun 3, 2026 (v12.0)** — Plan `GaliAjustesJun3.md` ejecutado en prototipo. Kronos activo como 5° agente. TikTok Shop MCP + Shopify MCP + Meta Ads MCP en Conexiones con badge Gali Pro. P&L desglosado por canal en Dashboard Financiero (identidad Kronos). Indicador de canal en tabla de Pedidos. Capa Determinista visual en Agentes. Los ítems 🔵 restantes (Micromundo estructurado + Page Pilot MCP real) permanecen en backlog.
 
 | Capa | Estado | Descripción |
 |---|---|---|
@@ -93,6 +96,24 @@
 | **galiInsight en Torre Logística** | ✅ **NUEVO v10.0** | Directiva aplicada a efectividad % de cada transportadora con análisis Vigilante |
 | **Smart Routing Vigilante** | ✅ **NUEVO v10.0** | Panel en Torre Logística: tabla por ciudad con carrier actual vs sugerido, % novedad, pedidos pendientes, botón "Aplicar todas" |
 | **Buscador semántico Catálogo** | ✅ **NUEVO v10.0** | Sección ADA Spy en catálogo: búsqueda en lenguaje natural ("colágeno para Bogotá a $50k"), chips de sugerencia, resultados con score/margen/razón |
+| **Agente Kronos** | ✅ **NUEVO v12.0** | 5° agente Finanzas / P&L / Facturación / Siigo · Color `#60a5fa` · Card en Agentes con 5 capacidades + historial · Visible en Conexiones como agente conectado · Header Kronos en Dashboard Financiero |
+| **TikTok Shop MCP** | ✅ **NUEVO v12.0** | Card en Conexiones (categoría E-commerce) · Badge Gali Pro · Panel detalle con impacto real · Indicador canal en Pedidos |
+| **Shopify MCP** | ✅ **NUEVO v12.0** | Card en Conexiones (categoría E-commerce) · Badge Gali Pro · Descripción sincronización bidireccional · Indicador canal en Pedidos |
+| **Meta Ads MCP** | ✅ **NUEVO v12.0** | Nodo separado explícito en Conexiones (antes fusionado con TikTok Ads) · Métricas ROAS real vs Meta en panel |
+| **Siigo MCP** | ✅ **NUEVO v12.0** | Descripción actualizada con Kronos como responsable · Alerta 28 pedidos sin facturar · Urgente |
+| **P&L desglosado por canal** | ✅ **NUEVO v12.0** | Sección completa en Dashboard Financiero: 5 canales (Meta, TikTok Shop, Shopify, WhatsApp, Directo) con ventas, ROAS real, novedad, utilidad y margen · Bar chart de participación · Insight Kronos |
+| **Indicador canal en Pedidos** | ✅ **NUEVO v12.0** | Columna "Canal" en tabla de pedidos con chips de color por canal (Meta/TikTok Shop/Shopify/WhatsApp/Directo) · Campo `channel` + `channelLabel` en `orders.json` |
+| **Capa Determinista visual** | ✅ **NUEVO v12.0** | Banner en Agentes page: 4 validaciones pre-LLM con dots de estado · Link a Reglas · Principio de confianza progresiva |
+| **Gali Pro tier** | ✅ **NUEVO v12.0** | Badge PRO en nodos TikTok Shop y Shopify en mapa de Conexiones · Banner informativo en panel de detalle · Leyenda actualizada en mapa |
+| **🔵 Micromundo estructurado** | 🔵 **BACKLOG** | Grafo de negocio del usuario como objeto unificado. Upload de contexto externo (CSV, Drive, Shopify URL) para construir el perfil |
+| **🔵 Page Pilot MCP real** | 🔵 **BACKLOG** | Conectar Landing Preview de NuevoProyectoPage con deploy real en lugar de solo preview |
+| **Unificación de datos (Spec 1)** | ✅ **NUEVO v15.0** | `projects.json` + `kpis-global.json` canónicos · ROAS 1.93x corregido en todo el prototipo · dashboard-financiero consume mock maestro · campanas SMS/Email sin pauta Meta |
+| **Rediseño Navegación (Spec 2)** | ✅ **NUEVO v15.0** | Rail reducido a 10 ítems · "Centro de Gali" accordion en panel · Tab "Mi negocio" · `/gali-v5/senales` en matchPrefixes · Fix proyectos/nuevo ruta |
+| **Hub Tres Zonas (Spec 3)** | ✅ **NUEVO v15.0** | Zona 1 borde naranja + Zona 2 ciclo horizontal + Zona 3 colapsable · ROAS 1.93x en tarjeta Marketing · "Gali esta semana" · Modal 2 pasos acción masiva |
+| **Vista Señales (Spec 4)** | ✅ **NUEVO v15.0** | Ruta `/gali-v5/senales` · SenalesPageComponent · 5 señales predictivas + 3 alertas operativas · bloque macromundo Dropi · filtros funcionales |
+| **ZeroState & Progresivo (Spec 5)** | ✅ **NUEVO v15.0** | Step 6 veterano en onboarding · Toggle Básico/Experto en Zona 1 · visibleModules en rail · Tabs proyecto con datos reales de projects.json (47/sem, 15% novedad) |
+| **Finanzas Kronos (Spec 6)** | ✅ **NUEVO v15.0** | Wallet Kronos bar + accordion transacciones · Error card Siigo cuantificado · Period badges Mensual/Semanal · kpis-global.json en dashboard |
+| **Score de Salud (Spec 7)** | ✅ **NUEVO v15.0** | health-panel con ring + benchmark 82/100 · Semáforo tasa éxito agentes · Panel umbrales desde Hub y Agentes · Bloques "Gali ya lo hizo" / "Necesitas decidir" · "Modo básico" en footer |
 
 ---
 
@@ -215,6 +236,45 @@ Responsive (v9.0):
 | 16 | CAS UI confusa | ✅ v8 — grid fix + intro narrativo + panels scroll independiente |
 | 17 | Colapso menú → pantalla en blanco | 🟡 Fix aplicado en código (v4/v9); pendiente verificación visual en browser |
 | 18 | Chat "personalizar dashboard" no conectado | 🔴 Comando escrito en chat no abre el customizer — flujo roto |
+
+---
+
+---
+
+## Nuevas Capacidades — Backlog Jun 3, 2026 (desde GaliAjustesJun3.md)
+
+### ✅ Implementado en v13.0 (Jun 3, 2026) — Visibilidad + Backlog completo
+
+| Item | Estado | Descripción |
+|---|---|---|
+| **Micromundo estructurado** | ✅ | Página dedicada `/gali-v5/micromundo` con 4 tabs: Perfil operativo (6 cards) · Grafo de negocio (capas Proyectos→Campañas→Pedidos→Proveedores→Transportadoras) · Comportamiento (timeline de decisiones/skills/alertas) · Contexto externo (upload CSV/Drive/Shopify/Meta) |
+| **Page Pilot MCP real** | ✅ | En paso "Landing" de NuevoProyecto: flujo simulado completo → Generando → Desplegando → Live con URL real `dropi.co/lp/...`, CVR estimado, pixel instalado automaticamente |
+| **Dashboard Financiero visible** | ✅ | Añadido "P&L · Kronos 💎" al panel lateral de Reportes con badge NUEVO — ahora se ve en la nav |
+| **Kronos en panel Agentes** | ✅ | Entrada "Kronos · Finanzas 💎" en el panel lateral de Agentes con badge NUEVO |
+| **Conexiones categorizado** | ✅ | Panel lateral de Conexiones reorganizado: MCPs Core (Meta Ads, WhatsApp, Siigo ⚠) · Canales Pro (TikTok Shop PRO, Shopify PRO, Page Pilot) · Utilidades (Drive) |
+| **Micromundo en GALI_MISSION_PANEL** | ✅ | "Mi Negocio 🌐" con badge NUEVO en el panel hub de Gali — accesible desde home |
+| **Conexiones visible desde hub** | ✅ | "Conexiones" añadido al GALI_MISSION_PANEL — antes invisible desde el hub |
+
+### ✅ Implementado en v12.0 (Jun 3, 2026)
+
+| Item | Estado | Descripción |
+|---|---|---|
+| **Agente Kronos** | ✅ | 5° agente en Agentes page + Conexiones. Color `#60a5fa`. 5 capacidades, 4 acciones recientes, 3 CTAs. Badge pulsante Kronos en Dashboard Financiero |
+| **TikTok Shop MCP** | ✅ | Card en Conexiones con badge Gali Pro. Descripción webhook → pipeline Dropi. Panel de detalle completo |
+| **Shopify MCP** | ✅ | Card en Conexiones con badge Gali Pro. Descripción sincronización bidireccional. Vigilante como responsable logístico |
+| **Meta Ads MCP** | ✅ | Nodo dedicado en Conexiones (categoría Publicidad). Métricas ROAS Meta vs real. Separado de TikTok Ads |
+| **Siigo MCP** | ✅ | Actualizado: Kronos como responsable. Alerta 28 pedidos sin facturar ($4.2M riesgo fiscal). Urgente |
+| **P&L desglosado por canal** | ✅ | Sección "P&L por Canal" en Dashboard Financiero: 5 canales con ventas/pedidos/ROAS real/novedad/utilidad/margen + bar chart + insight Kronos |
+| **Indicador canal en Pedidos** | ✅ | Columna "Canal" en tabla órdenes con chips por canal · `channel` + `channelLabel` en `orders.json` · 5 canales distribuidos en 20 pedidos |
+| **Capa Determinista** | ✅ | Banner visual en Agentes page: 4 validaciones con dots de estado verde · principio explicado · link a Reglas |
+| **Gali Pro tier** | ✅ | Badge `PRO` naranja en nodos TikTok Shop y Shopify del mapa · Banner en panel detalle · Leyenda actualizada |
+
+### 🔵 Pendiente — Backlog residual
+
+| Item | Descripción | Bloque |
+|---|---|---|
+| **Dashboard estado cero** | Cuando el usuario es nuevo: solo 2-3 módulos según su objetivo (hub vacío) | Bloque 6 |
+| **Dashboard estado experto** | Grafo visual del negocio en home (nodos: proyectos → campañas → pedidos → P&L) | Bloque 6 |
 
 ---
 

@@ -1,8 +1,8 @@
 # Gali v5 — Business Operating System
 
-**Versión**: 4.0 — OS Architecture + Business Intelligence + UX Clarity + Conceptual Clarity  
-**Fecha**: Junio 2026  
-**Estado**: Prototipo activo — v8.0 completado: CAS grid fix, ADA Spy wired, Agentes expandidos, concepto A/S/R visual; pendiente v9.0 (ROAS calculator, escalamiento, onboarding)
+**Versión**: 5.0 — OS Architecture + Business Intelligence + UX Clarity + Dual E-commerce + MCP Ecosystem + Multi-Channel  
+**Fecha**: Junio 2026 (actualizado Jun 4, 2026)  
+**Estado**: Prototipo activo v15.0 — Pipeline 7 specs ejecutado Jun 4: UniDatos · RediNavega · HubNegocio · Señales · ZeroState · Finance · Salud (ver SpecsNuevos/)
 
 ---
 
@@ -387,6 +387,116 @@ Tokens OS: `src/styles/_gali-os-tokens.scss`
 14. **Loop completo de mercado**: ADA Spy no es solo una lista de oportunidades. Cada oportunidad tiene un ciclo completo: Score → Análisis (ciudades, ROI, competencia) → Crear proyecto → Configurar campaña → Monitorear. Ningún CTA es un dead-end.
 15. **Visibilidad del sistema (v7.0)**: El usuario siempre sabe dónde está — mode bar con tab activo de alto contraste, section nav con borde naranja, right panel con hint de tab. Sin chips muertos ni indicadores animados sin etiqueta.
 16. **Follow-through en acciones**: Personalizar dashboard guarda y confirma con feedback de Gali. Campañas masivas incluyen copiloto Roax con decisión pendiente y pasos explicados. No dead-ends post slide-over.
+
+---
+
+---
+
+## Expansión Arquitectónica Jun 3, 2026 (ver GaliAjustesJun3.md)
+
+### Micromundo del Usuario (Bloque 1)
+
+El usuario tiene un **grafo de negocio propio** que Gali debe modelar explícitamente — no como secciones separadas sino como un objeto unificado:
+
+| Dimensión | Datos | Fuente |
+|---|---|---|
+| Perfil operativo | Rol, nivel, volumen/semana, antigüedad | Onboarding + inferencia |
+| Grafo de negocio | Proyectos → campañas → pedidos → proveedores → transportadoras | Dropi Core |
+| Historial comportamiento | Skills activados, alertas ignoradas, decisiones, reglas creadas | GaliWorkspaceService |
+| Documentos propios | CSVs WMS, catálogos, facturas, reportes externos | Upload / Drive MCP |
+| Objetivo declarado | Meta de 30 días como filtro de relevancia | GaliGoalOnboarding |
+
+**Principio**: "Gali no te pregunta lo que Dropi ya sabe." El onboarding parte del historial real — no de cero.
+
+---
+
+### Macromundo de Dropi (Bloque 2)
+
+El diferenciador real de Gali frente a cualquier LLM genérico es la **data real del dropshipping LATAM**:
+
+| Dataset | Qué contiene | Actualización |
+|---|---|---|
+| Catálogo vivo | 20.000+ productos, precios, stock, tasas devolución históricas | Continua |
+| Benchmark transportadoras | Novedad por ciudad / semana / ruta | Diaria |
+| Inteligencia de mercado | Productos escalando esta semana en Colombia / México / Chile | Semanal |
+| Patrones de riesgo | Huella digital del comprador — probabilidad de devolución | Continua |
+| Skills colectiva | Recetas de comunidad con resultados en contexto | Tiempo real |
+
+**La ecuación**: `Data global Dropi × Contexto específico usuario = Insight hiperpersonalizado + Acción ejecutable`
+
+---
+
+### Agente Kronos (Nuevo — Bloque 3)
+
+Formalizar un **5° agente especializado en Finanzas / P&L / Facturación**:
+
+| Agente | Color | Especialidad | Agencia |
+|---|---|---|---|
+| **Kronos** | `#60a5fa` azul | P&L real · Facturación · Siigo · Proyección de flujo de caja | Analítico + alertante — nunca mueve dinero sin aprobación |
+
+Kronos asume las funciones que hoy viven difusas en el Dashboard Financiero. Darle nombre e identidad visual aumenta la confianza del usuario en las acciones financieras.
+
+---
+
+### Nuevos Canales de Venta (Bloque 4)
+
+Cuatro canales de venta que Gali debe orquestar además del flujo directo de Dropi:
+
+**TikTok Shop MCP** — Compras embebidas en video:
+- Webhook de órdenes TikTok Shop → flujo logístico Dropi (mismo pipeline)
+- Roax lee métricas del video (views, CTR, CVR) y las cruza con ROAS real
+- UI: card en Conexiones + indicador de origen en Pedidos
+
+**Page Pilot MCP** — Landings no-code:
+- Conectar el paso 3 de `NuevoProyectoPageComponent` (Landing Preview) con Page Pilot real
+- Gali genera la landing desde el ángulo de venta confirmado + copies que han convertido en LATAM
+- CTA "Publicar" ejecuta el deploy real, no solo un preview
+
+**Shopify MCP** — Backend logístico para tiendas propias:
+- Sincronización bidireccional: catálogo Dropi ↔ inventario Shopify
+- Órdenes Shopify → flujo Dropi (mismo pipeline de Vigilante)
+- Kronos lee métricas de conversión de la tienda y las integra en el P&L
+
+**WhatsApp Commerce** — Formalizar Chatea Pro como canal de venta:
+- Gali detecta intención de compra en el hilo y envía formulario estructurado
+- Valida dirección, anticipo y riesgo en el mismo hilo
+- El pedido entra a Dropi sin que el dropshipper lo llene manual
+
+---
+
+### Modelo Dual de E-commerce (Bloque 5)
+
+Dropi tiene dos capas de valor que se deben monetizar por separado:
+
+**E-commerce Logístico** (negocio core):
+- Red de transportadoras + Smart Routing + gestión de novedades
+- Revenue: flete por pedido + servicio de novedades gestionadas por Gali
+
+**E-commerce Tecnológico** (negocio de plataforma):
+- CRM / WMS / Automatización / Analytics / Tiendas virtuales
+- Revenue: Gali Pro (MCPs externos) + revenue share Page Pilot + Skills premium
+
+**La integración que ningún otro sistema LATAM tiene**:
+> "Tu ROAS de Meta es 2.9x. Tu ROAS real neto (descontando flete, novedad y garantías) es 1.7x. El 40% se va en novedades de Cali. Cambiando a Servientrega en esa ciudad, el ROAS real sube a 2.1x."
+
+---
+
+### MCP Ecosystem — Prioridades (Bloque 7)
+
+**Prioridad 1 — Core (sprint 1-2)**:
+- `Meta Ads MCP` — leer métricas, pausar/escalar desde Gali
+- `Siigo MCP` — facturación automática al estado "entregado"
+- `WhatsApp Business MCP` — formalizar Chatea Pro con flujo completo
+- `Coordinadora / Servientrega API` — Smart Routing real
+
+**Prioridad 2 — Expansión (sprint 3-4)**:
+- `TikTok Ads MCP` + `TikTok Shop MCP`
+- `Shopify MCP` — bidireccional catálogo + órdenes
+- `Page Pilot MCP` — landing deploy desde Gali
+- `Google Sheets MCP` — export de P&L y reportes
+
+**Prioridad 3 — Ecosistema (sprint 5+)**:
+- ADA Spy / Minea MCP · AdCreative.ai MCP · HeyGen MCP · Google Drive MCP
 
 ---
 

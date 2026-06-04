@@ -176,15 +176,15 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'personalizar': {
-    text: 'Abriendo el panel de personalización del dashboard. Puedes activar o desactivar: Insight de Gali, Anatomía del proyecto, Señales activas, Chat y Recomendaciones Akademy.',
+    text: 'Abriendo el panel de personalización del dashboard. Puedes activar o desactivar: Insight de Gali, Anatomía del proyecto, Señales activas, Chat y Recomendaciones Academy.',
     actions: [
       { label: 'Abrir personalización', action: 'abrir-customizer', isPrimary: true },
     ],
   },
   'akademy': {
-    text: 'Basado en tus métricas actuales, te recomiendo en Akademy: "Optimización de P&L real en Meta Ads" (38 min) — porque tu ROAS declarado es 2.9x pero el real es 1.93x. La diferencia está en las novedades de Cali.',
+    text: 'Basado en tus métricas actuales, te recomiendo en Academy: "Optimización de P&L real en Meta Ads" (38 min) — porque tu ROAS declarado es 2.9x pero el real es 1.93x. La diferencia está en las novedades de Cali.',
     actions: [
-      { label: 'Ir a Akademy', action: 'ir-akademy', isPrimary: true },
+      { label: 'Ir a Academy', action: 'ir-akademy', isPrimary: true },
     ],
   },
   'default': {

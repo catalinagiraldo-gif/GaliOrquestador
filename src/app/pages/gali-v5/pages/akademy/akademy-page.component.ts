@@ -151,7 +151,7 @@ export class AkademyPageComponent implements OnInit {
 
   askGali(): void {
     this.gali.togglePanel();
-    setTimeout(() => this.gali.sendMessage('¿Qué debo aprender en Akademy?'), 300);
+    setTimeout(() => this.gali.sendMessage('¿Qué debo aprender en Academy?'), 300);
   }
 
   ngOnInit(): void {

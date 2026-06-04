@@ -835,3 +835,379 @@ abbr[title] {
     &:hover { text-decoration: underline; }
   }
 }
+
+// ── Kronos dot variant ──────────────────────────────────────────────────────
+
+.fin-header__gali-dot--kronos {
+  background: #60a5fa !important;
+  animation: kronos-pulse 2s ease-in-out infinite !important;
+}
+
+@keyframes kronos-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+  50%       { box-shadow: 0 0 0 5px rgba(96, 165, 250, 0); }
+}
+
+// ── Period badges ────────────────────────────────────────────────────────────
+
+.fin-period-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: $radius-pill;
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  letter-spacing: 0.03em;
+
+  &--monthly {
+    background: rgba(#60a5fa, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(#60a5fa, 0.25);
+  }
+
+  &--weekly {
+    background: rgba(#a78bfa, 0.1);
+    color: #7c3aed;
+    border: 1px solid rgba(#a78bfa, 0.25);
+  }
+}
+
+// ── KPI section header ───────────────────────────────────────────────────────
+
+.kpi-section-header {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  margin-bottom: -$size-2;
+
+  &__label {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-700;
+  }
+}
+
+// ── Kronos narrative bar ─────────────────────────────────────────────────────
+
+.kronos-narrative-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3 $size-5;
+  border-left: 3px solid #60a5fa;
+  background: rgba(#60a5fa, 0.05);
+  border-radius: 0 $radius-lg $radius-lg 0;
+  border: 1px solid rgba(#60a5fa, 0.2);
+  border-left-width: 3px;
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #60a5fa;
+    flex-shrink: 0;
+    animation: kronos-pulse 2s ease-in-out infinite;
+  }
+
+  &__name {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: #60a5fa;
+    white-space: nowrap;
+  }
+
+  p {
+    flex: 1;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-600;
+    line-height: 1.6;
+    margin: 0;
+
+    strong { color: $gray-900; font-weight: $font-semibold; }
+  }
+}
+
+// ── Weekly section title group ───────────────────────────────────────────────
+
+.weekly-section__title-group {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+}
+
+// ── Channel title row ────────────────────────────────────────────────────────
+
+.channel-section__title-row {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  flex-wrap: wrap;
+}
+
+// ── Kronos channel intro ─────────────────────────────────────────────────────
+
+.channel-kronos-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  background: rgba(#60a5fa, 0.04);
+  border: 1px solid rgba(#60a5fa, 0.15);
+  border-radius: $radius-lg;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #60a5fa;
+    flex-shrink: 0;
+    margin-top: 4px;
+    animation: kronos-pulse 2s ease-in-out infinite;
+  }
+
+  &__text {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-500;
+    line-height: 1.5;
+
+    strong { color: #3b82f6; }
+  }
+}
+
+// ── Eco section kronos variant ───────────────────────────────────────────────
+
+.eco-section__gali--kronos {
+  border-color: rgba(#60a5fa, 0.2) !important;
+  background: #eff6ff !important;
+}
+
+.eco-section__gali-dot--kronos {
+  background: #60a5fa !important;
+  animation: kronos-pulse 2s ease-in-out infinite;
+}
+
+// ── P&L por Canal ──────────────────────────────────────────────────────────
+
+.channel-section {
+  background: $white;
+  border: 1px solid $gray-100;
+  border-radius: $radius-xl;
+  padding: $size-6;
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $size-4;
+    flex-wrap: wrap;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: $font-semibold;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  &__sub {
+    font-size: $font-sm;
+    color: $gray-500;
+  }
+
+  &__kronos {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: $font-sm;
+    color: $gray-600;
+    padding: $size-1 $size-3;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: $radius-full;
+  }
+
+  &__kronos-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #60a5fa;
+    animation: kronos-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes kronos-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.channel-share-chart {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+}
+
+.channel-share-bar {
+  height: 10px;
+  background: $gray-100;
+  border-radius: $radius-full;
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    border-radius: $radius-full;
+    transition: width 0.4s ease;
+
+    &--met { background: #1877f2; }
+    &--tik { background: #010101; }
+    &--sho { background: #96bf48; }
+    &--wha { background: #25d366; }
+    &--dir { background: $gray-400; }
+  }
+}
+
+.channel-share-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $size-2 $size-4;
+}
+
+.channel-legend-item {
+  font-size: $font-xs;
+  color: $gray-600;
+
+  &--met { color: #1877f2; }
+  &--tik { color: #000; }
+  &--sho { color: #5a8a00; }
+  &--wha { color: #128c7e; }
+  &--dir { color: $gray-500; }
+}
+
+.channel-table-wrap {
+  overflow-x: auto;
+  border-radius: $radius-lg;
+  border: 1px solid $gray-100;
+}
+
+.channel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-sm;
+
+  th {
+    padding: $size-2 $size-3;
+    text-align: left;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-500;
+    background: $gray-50;
+    border-bottom: 1px solid $gray-100;
+    white-space: nowrap;
+  }
+}
+
+.channel-row {
+  border-bottom: 1px solid $gray-100;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $gray-50; }
+
+  &__name {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-3;
+    font-weight: $font-medium;
+    color: $gray-800;
+    white-space: nowrap;
+  }
+
+  &__emoji { font-size: 16px; }
+
+  &__num {
+    padding: $size-3;
+    text-align: right;
+    color: $gray-700;
+    white-space: nowrap;
+
+    &--profit { font-weight: $font-semibold; color: #16a34a; }
+    &--warn { color: #d97706; }
+  }
+
+  &__organic {
+    font-size: $font-xs;
+    color: $gray-400;
+    font-style: italic;
+  }
+}
+
+.channel-margin-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+
+  &--high { background: #dcfce7; color: #15803d; }
+  &--mid  { background: #fef9c3; color: #854d0e; }
+  &--low  { background: #fee2e2; color: #b91c1c; }
+}
+
+.channel-kronos-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-4 $size-5;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #60a5fa;
+  border-radius: $radius-lg;
+  font-size: $font-sm;
+
+  &__dot {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body {
+    flex: 1;
+    color: $gray-700;
+    line-height: 1.5;
+
+    strong { color: #1e40af; }
+  }
+
+  &__cta {
+    flex-shrink: 0;
+    color: #2563eb;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    text-decoration: none;
+    white-space: nowrap;
+    align-self: center;
+
+    &:hover { text-decoration: underline; }
+  }
+}

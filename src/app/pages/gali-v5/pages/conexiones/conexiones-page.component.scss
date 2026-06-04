@@ -612,3 +612,43 @@
   from { opacity: 0; transform: translateX(20px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+// ── Gali Pro Badge ────────────────────────────────────────────────────────────
+
+.map-node__pro {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: $primary-500;
+  color: $white;
+  font-size: 9px;
+  font-weight: $font-bold;
+  padding: 1px 5px;
+  border-radius: $radius-full;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.node-pro-banner {
+  margin: 0 $size-4 $size-3;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  border: 1px solid #fed7aa;
+  border-radius: $radius-md;
+  padding: $size-2 $size-3;
+
+  &__badge {
+    font-size: $font-xs;
+    font-weight: $font-bold;
+    color: $primary-600;
+    white-space: nowrap;
+  }
+
+  &__text {
+    font-size: $font-xs;
+    color: $gray-600;
+    line-height: 1.4;
+  }
+}

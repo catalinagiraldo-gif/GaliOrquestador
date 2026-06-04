@@ -221,12 +221,62 @@
           }
         </div>
 
+        <!-- CTA adicional: ver grafo de negocio en Micromundo -->
+        <div class="micromundo-cta-row">
+          <span class="micromundo-cta-row__icon">🌐</span>
+          <div class="micromundo-cta-row__body">
+            <strong>Gali armó el mapa de tu operación con lo que conectaste.</strong>
+            <span>Ver el grafo de tu negocio →</span>
+          </div>
+          <button type="button" class="micromundo-cta-row__btn" (click)="goToMicromundo()">
+            Ver mi negocio
+          </button>
+        </div>
+
         <div class="onboarding-modal__agent-cta">
           <button type="button" class="onboarding-modal__cta" (click)="activateAgent()">
             Ir al Hub de Gali →
           </button>
           <button type="button" class="onboarding-modal__later" (click)="skip()">
             Configurar después
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Paso 6: Confirmación Veterano (CA-1) -->
+    @if (step() === 6) {
+      <div class="onboarding-modal__body onboarding-modal__body--veterano">
+        <div class="onboarding-modal__eyebrow">✦ Gali ya te conoce</div>
+        <h1 class="onboarding-modal__title">Ya sé quién eres.</h1>
+
+        <div class="veterano-summary">
+          <p class="veterano-line">
+            Llevas <strong>{{ mesesLabel }}</strong> en Dropi
+            con <strong>~{{ pedidosLabel }}</strong>.
+          </p>
+          @if (selectedGoal(); as g) {
+            <p class="veterano-line">
+              Tu objetivo: <strong>{{ g.label }}</strong>
+            </p>
+          }
+        </div>
+
+        <div class="veterano-ready">
+          <p class="veterano-ready__title">Esto ya lo tengo listo para ti:</p>
+          <ul class="veterano-ready__list">
+            <li>✓ Vigilante monitoreando tus pedidos</li>
+            <li>✓ ROAS real vs. declarado en dashboard</li>
+            <li>✓ Señales de escala detectadas esta semana</li>
+          </ul>
+        </div>
+
+        <div class="onboarding-modal__nav">
+          <button type="button" class="onboarding-modal__back" (click)="step.set(2)">
+            Ajustar perfil
+          </button>
+          <button type="button" class="onboarding-modal__cta" (click)="finishVeterano()">
+            Ir al Hub →
           </button>
         </div>
       </div>

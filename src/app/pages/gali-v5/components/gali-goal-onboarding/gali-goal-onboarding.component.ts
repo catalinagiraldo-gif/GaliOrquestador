@@ -53,7 +53,8 @@ export class GaliGoalOnboardingComponent {
 
   readonly closed = output<void>();
 
-  readonly step = signal<1 | 2 | 3 | 4 | 5>(1);
+  readonly step = signal<1 | 2 | 3 | 4 | 5 | 6>(1);
+  readonly onboardingPath = signal<'nuevo' | 'veterano'>('nuevo');
   readonly selectedGoal = signal<GoalOption | null>(null);
   readonly pedidosPerWeek = signal(20);
   readonly mesesOperando = signal<string>('1-6');
@@ -83,6 +84,13 @@ export class GaliGoalOnboardingComponent {
     return '100+ pedidos';
   }
 
+  get mesesLabel(): string {
+    const m = this.mesesOperando();
+    return m === 'nuevo' ? 'menos de 1 mes' :
+           m === '1-6'   ? '1 a 6 meses' :
+           m === '6-12'  ? '6 a 12 meses' : 'más de 1 año';
+  }
+
   selectGoal(g: GoalOption): void {
     this.selectedGoal.set(g);
     this.showCustom.set(false);
@@ -100,7 +108,15 @@ export class GaliGoalOnboardingComponent {
   }
 
   goToStep3(): void {
-    this.step.set(3);
+    const meses = this.mesesOperando();
+    const pedidos = this.pedidosPerWeek();
+    const esVeterano = meses === '6-12' || meses === '1y+' || pedidos > 20;
+    if (esVeterano) {
+      this.onboardingPath.set('veterano');
+      this.step.set(6);
+    } else {
+      this.step.set(3);
+    }
   }
 
   goToStep4(): void {
@@ -141,6 +157,17 @@ export class GaliGoalOnboardingComponent {
 
   activateAgent(): void {
     this.finish();
+  }
+
+  finishVeterano(): void {
+    this.ws.setComplexityLevel('expert');
+    this.ws.showAllModules();
+    this.finish();
+  }
+
+  goToMicromundo(): void {
+    this.finish();
+    this.router.navigate(['/gali-v5/micromundo'], { queryParams: { tab: 'documentos' } });
   }
 
   skip(): void {

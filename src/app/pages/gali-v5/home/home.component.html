@@ -13,7 +13,12 @@
           [class.mission__tab--active]="activeTabId() === tab.id"
           (click)="selectTab(tab.id)">
           <span class="mission__tab-icon">{{ tab.icon }}</span>
-          {{ tab.label }}
+          <span class="mission__tab-content">
+            <span class="mission__tab-name">{{ tab.label }}</span>
+            @if (tab.id !== 'principal') {
+              <span class="mission__tab-subtitle">{{ tab.label | slice:0:20 }}</span>
+            }
+          </span>
           @if (tab.id !== 'principal') {
             <span class="mission__tab-close" (click)="$event.stopPropagation(); removeTab(tab.id)" title="Eliminar pestaña">×</span>
           }
@@ -32,7 +37,11 @@
           <button type="button" class="mission__tab-add-cancel" (click)="addingTab.set(false)">×</button>
         </div>
       } @else {
-        <button type="button" class="mission__tab mission__tab--add" (click)="addingTab.set(true); newTabName.set('')" title="Nuevo dashboard">+</button>
+        <button type="button" class="mission__tab mission__tab--add"
+          (click)="addingTab.set(true); newTabName.set('')"
+          title="Nuevo dashboard de proyecto"
+          pTooltip="Nuevo dashboard de proyecto"
+          tooltipPosition="bottom">+</button>
       }
     </div>
   }
@@ -46,6 +55,16 @@
         <button type="button" class="mission__entry-banner-dismiss" (click)="ws.clearHubEntryContext()" data-proto-skip aria-label="Cerrar">×</button>
       </div>
     </section>
+  }
+
+  <!-- ══ STRIP OBJETIVO + PROPUESTA DE VALOR ══ -->
+  @if (ws.businessDNA().goalId && !isZeroState()) {
+    <div class="hub-goal-strip">
+      <span class="hub-goal-strip__glyph">✦</span>
+      <span class="hub-goal-strip__goal">Objetivo: {{ ws.businessDNA().goalLabel }}</span>
+      <span class="hub-goal-strip__sep">·</span>
+      <span class="hub-goal-strip__tagline">Gali aprende contigo para que puedas escalar como un experto.</span>
+    </div>
   }
 
   <!-- ══ GALI INSIGHT (adaptativo por businessDNA) ══ -->
@@ -116,37 +135,52 @@
     </div>
   }
 
-  <!-- ══ ZERO STATE: guía para usuario sin datos ══ -->
+  <!-- ══ ZERO STATE: panel Intensamente (3 emociones / 3 agentes) ══ -->
   @if (isZeroState()) {
     <section class="mission__zero-state">
-      <div class="zero-state__inner">
-        <div class="zero-state__icon">✦</div>
-        <h2 class="zero-state__title">Gali está lista para aprender contigo</h2>
-        <p class="zero-state__subtitle">Sigue estos 3 pasos para arrancar tu operación y activar los agentes.</p>
-        <div class="zero-state__steps">
-          <div class="zero-state__step" [routerLink]="'/gali-v5/productos/caza-productos'">
-            <span class="zero-state__step-num">1</span>
-            <div class="zero-state__step-body">
-              <strong>Conecta tu catálogo</strong>
-              <span>ADA Spy buscará tu primer producto ganador →</span>
-            </div>
-          </div>
-          <div class="zero-state__step" [routerLink]="'/gali-v5/proyectos/nuevo'">
-            <span class="zero-state__step-num">2</span>
-            <div class="zero-state__step-body">
-              <strong>Crea tu primer proyecto</strong>
-              <span>Define precio, costo y objetivo de pedidos →</span>
-            </div>
-          </div>
-          <div class="zero-state__step" (click)="resetOnboarding()">
-            <span class="zero-state__step-num">3</span>
-            <div class="zero-state__step-body">
-              <strong>Activa Gali</strong>
-              <span>Configura tu objetivo y activa los agentes →</span>
-            </div>
-          </div>
-        </div>
+      <div class="zero-state__header">
+        <h2 class="zero-state__title">¿Por dónde empezamos?</h2>
+        <p class="zero-state__sub">Elige tu primer módulo. Gali activará el agente correcto y te guiará desde ahí.</p>
       </div>
+      <div class="zero-state__cards">
+
+        <!-- Tarjeta 1: ADA Spy -->
+        <a class="zero-card zero-card--ada" routerLink="/gali-v5/productos/caza-productos">
+          <div class="zero-card__agent-dot" style="background:#818cf8"></div>
+          <span class="zero-card__step">Paso 1 de 3</span>
+          <div class="zero-card__emoji">🔍</div>
+          <h3 class="zero-card__title">Busca tu primer producto ganador</h3>
+          <p class="zero-card__desc">ADA Spy analiza tendencias LATAM y te sugiere el producto con más margen y menos competencia hoy.</p>
+          <div class="zero-card__agent">ADA Spy · Research</div>
+          <span class="zero-card__cta">Ir a Catálogo →</span>
+        </a>
+
+        <!-- Tarjeta 2: Roax -->
+        <a class="zero-card zero-card--roax" routerLink="/gali-v5/proyectos/nuevo">
+          <div class="zero-card__agent-dot" style="background:#f97316"></div>
+          <span class="zero-card__step">Paso 2 de 3</span>
+          <div class="zero-card__emoji">🚀</div>
+          <h3 class="zero-card__title">Lanza tu primera campaña</h3>
+          <p class="zero-card__desc">Roax te ayuda a elegir el ángulo, configurar el presupuesto y publicar la landing. Todo en un flujo guiado.</p>
+          <div class="zero-card__agent">Roax · Media Buyer</div>
+          <span class="zero-card__cta">Nuevo Proyecto →</span>
+        </a>
+
+        <!-- Tarjeta 3: Vigilante -->
+        <a class="zero-card zero-card--vigilante" routerLink="/gali-v5/logistica/torre-logistica">
+          <div class="zero-card__agent-dot" style="background:#fbbf24"></div>
+          <span class="zero-card__step">Paso 3 de 3</span>
+          <div class="zero-card__emoji">🛡</div>
+          <h3 class="zero-card__title">Activa tu logística</h3>
+          <p class="zero-card__desc">Vigilante monitorea tus pedidos 24/7. Configura el smart routing y define qué novedades gestiona solo.</p>
+          <div class="zero-card__agent">Vigilante · Logística</div>
+          <span class="zero-card__cta">Ver Torre Logística →</span>
+        </a>
+
+      </div>
+      <button type="button" class="zero-state__skip" (click)="ws.setComplexityLevel('expert')">
+        Tengo experiencia — ver hub completo →
+      </button>
     </section>
   }
 
@@ -197,19 +231,26 @@
     </section>
   }
 
-  <!-- ══ PROYECTO ACTIVO: ANATOMÍA ══ -->
-  @if (!isZeroState() && ws.complexityLevel() === 'expert') {
-  <section class="mission__anatomy">
-    <div class="mission__anatomy-header">
-      <div class="mission__anatomy-title-group">
-        <h2 class="mission__anatomy-title">Collar GPS v2</h2>
-        <span class="mission__anatomy-badge mission__anatomy-badge--escala">↑ en escala</span>
-        <span class="mission__anatomy-meta">Sem 22 · Meta: 100 ventas/semana</span>
-        <span class="mission__anatomy-cycle-label" title="Ciclo completo: Producto → Marketing genera Pedidos → Logística entrega → Finanzas captura ingresos → Reportes miden el resultado">↻ Ciclo de negocio</span>
+  <!-- ══ ZONA 2 — Ciclo de Negocio (CA-1, CA-5) — solo vista experto (CA-4) ══ -->
+  @if (!isZeroState() && ws.complexityLevel() === 'expert' && !isSimpleView()) {
+  <section class="mission__anatomy hub-zone hub-zone--2">
+    <!-- Título de sección visible (CA-5) -->
+    <div class="hub-cycle-header">
+      <div class="hub-cycle-header__left">
+        <h2 class="hub-cycle-header__title">Ciclo de negocio</h2>
+        <span class="hub-cycle-header__subtitle">Flujo de tu operación esta semana</span>
       </div>
       <button type="button" class="mission__customize-btn" (click)="showCustomizer.set(!showCustomizer())" data-proto-skip>
         <i class="pi pi-sliders-h"></i> Personalizar
       </button>
+    </div>
+
+    <div class="mission__anatomy-header">
+      <div class="mission__anatomy-title-group">
+        <h3 class="mission__anatomy-title">Collar GPS v2</h3>
+        <span class="mission__anatomy-badge mission__anatomy-badge--escala">↑ en escala</span>
+        <span class="mission__anatomy-meta">Sem 22 · Meta: 100 ventas/semana</span>
+      </div>
       <div class="mission__anatomy-nav">
         @for (p of proyectos; track p.id) {
           <button
@@ -241,8 +282,8 @@
             <span class="anatomy-node__agent-name">ADA Spy</span>
           </div>
           <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">847 unidades</span>
-            <span class="anatomy-node__sub">PetStore Colombia</span>
+            <span class="anatomy-node__main">47/sem</span>
+            <span class="anatomy-node__sub">Estado: en escala</span>
           </div>
         </div>
 
@@ -261,7 +302,11 @@
             <span class="anatomy-node__agent-name">Roax</span>
           </div>
           <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">ROAS 2.9x</span>
+            <div class="anatomy-node__roas-wrap">
+              <span class="anatomy-node__main">1.93x</span>
+              <span class="anatomy-node__roas-label">ROAS real</span>
+              <span class="anatomy-node__roas-sub">Meta: 2.9x</span>
+            </div>
             <span class="anatomy-node__sub">$66k/día · escalando</span>
           </div>
         </div>
@@ -288,12 +333,10 @@
           </div>
         </div>
 
-        <!-- Conectores verticales -->
-        <div class="anatomy-v-connector"></div>
-        <div class="anatomy-v-center"></div>
-        <div class="anatomy-v-connector"></div>
+        <!-- Continuación horizontal -->
+        <div class="anatomy-arrow">→</div>
 
-        <!-- Fila inferior: Logística ← Finanzas ← Reportes -->
+        <!-- Logística · Finanzas · Reportes (misma fila) -->
         <div class="anatomy-node"
              [class.anatomy-node--selected]="activeNode() === 'logistica'"
              (click)="toggleNode('logistica')"
@@ -307,8 +350,8 @@
             <span class="anatomy-node__agent-name">Vigilante</span>
           </div>
           <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">Smart routing</span>
-            <span class="anatomy-node__sub">12 pedidos redirigidos</span>
+            <span class="anatomy-node__main">15%</span>
+            <span class="anatomy-node__sub">Coordinadora Bogotá ⚠</span>
           </div>
         </div>
 
@@ -328,8 +371,8 @@
             <span class="anatomy-node__agent-name">Siigo ○</span>
           </div>
           <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">$450k pend.</span>
-            <span class="anatomy-node__sub">Sin facturar — conectar Siigo</span>
+            <span class="anatomy-node__main">$411k/sem</span>
+            <span class="anatomy-node__sub">Margen 22%</span>
           </div>
         </div>
 
@@ -348,8 +391,8 @@
             <span class="anatomy-node__agent-name">Roax</span>
           </div>
           <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">CPA $21.4k</span>
-            <span class="anatomy-node__sub">ROAS real 1.93x vs 2.9x Meta</span>
+            <span class="anatomy-node__main">$1.82M/sem</span>
+            <span class="anatomy-node__sub">+$89k vs sem anterior</span>
           </div>
         </div>
 
@@ -396,104 +439,137 @@
   </section>
   } <!-- /!isZeroState && expert -->
 
-  <!-- ══ SEÑALES Y CHAT ══ -->
-  <div class="mission__bottom">
-
-    <!-- Señales recientes -->
-    <section class="mission__section mission__section--signals">
-      <div class="mission__section-head">
-        <h2 class="mission__section-title">
-          Señales
-          @if (pendingSignals > 0) {
-            <span class="mission__badge mission__badge--crit">{{ pendingSignals }}</span>
-          }
-        </h2>
-      </div>
-      <div class="mission__signals-list">
-        @for (sig of signals; track sig.id) {
-          <gali-signal-card-v2 [signal_data]="sig" />
+  <!-- ══ ZONA 1 — Decisiones + Señales (CA-1) ══ -->
+  <div class="hub-zone hub-zone--1">
+    <div class="hub-zone__header">
+      <div class="hub-zone__title-row">
+        <h2 class="hub-zone__title">Decisiones pendientes</h2>
+        @if (pendingApprovalSignals.length > 0) {
+          <span class="hub-zone__badge hub-zone__badge--crit">{{ pendingApprovalSignals.length }}</span>
         }
       </div>
-    </section>
-
-    <!-- Chat con Gali -->
-    <section class="mission__section mission__section--chat">
-      <div class="mission__section-head">
-        <h2 class="mission__section-title">✦ Hablar con Gali</h2>
-        <span class="mission__section-meta">Lanzar · Explorar · Decidir</span>
+      <!-- Toggle Vista simple / Experto (CA-3) -->
+      <div class="ui-toggle">
+        <button type="button"
+          class="ui-toggle__opt"
+          [class.ui-toggle__opt--active]="isSimpleView()"
+          (click)="ws.setComplexityLevel('novice')"
+          title="Muestra solo lo esencial">
+          Básico
+        </button>
+        <button type="button"
+          class="ui-toggle__opt"
+          [class.ui-toggle__opt--active]="!isSimpleView()"
+          (click)="ws.setComplexityLevel('expert')"
+          title="Vista completa con todas las métricas">
+          Experto
+        </button>
       </div>
-      <div class="mission__chat">
-        <div class="mission__chat-messages" #lanzarScroll>
-          @for (msg of lanzarMessages(); track $index) {
-            <div class="chat-msg"
-              [class.chat-msg--gali]="msg.from === 'gali'"
-              [class.chat-msg--user]="msg.from === 'user'">
-              @if (msg.from === 'gali') {
-                <span class="chat-msg__avatar">✦</span>
-              }
-              <div class="chat-msg__bubble">{{ msg.text }}</div>
-            </div>
-          }
-          @if (lanzarTyping()) {
-            <div class="chat-msg chat-msg--gali">
-              <span class="chat-msg__avatar">✦</span>
-              <div class="chat-msg__bubble chat-typing">
-                <span></span><span></span><span></span>
-              </div>
-            </div>
-          }
-          @if (lanzarMessages().length === 1 && !lanzarTyping()) {
-            <div class="chat-suggestions">
-              <button type="button" class="chat-suggestion" (click)="sendLanzar('Tengo un producto en mente')">
-                Tengo un producto en mente →
-              </button>
-              <button type="button" class="chat-suggestion" (click)="sendLanzar('Muéstrame sugerencias de ADA Spy')">
-                Sugerencias de ADA Spy →
-              </button>
-              <button type="button" class="chat-suggestion" (click)="sendLanzar('Empezar desde un objetivo de venta')">
-                Empezar desde un objetivo →
-              </button>
-            </div>
+      <div class="hub-zone__header-actions">
+        <button type="button" class="mission__agency-btn"
+          (click)="showAgencyPanel.set(true)"
+          title="Configura cuánta autonomía tiene cada agente">
+          <i class="pi pi-sliders-h"></i> Umbrales
+        </button>
+        <button type="button" class="mission__section-see-all"
+          (click)="navigateToSenales()">
+          Ver todas →
+        </button>
+      </div>
+    </div>
+
+    <!-- Bloque 1: Gali ya lo hizo por ti (Spec 7 — CA-9) -->
+    @if (completedSignals.length > 0) {
+      <div class="mission__signals-block mission__signals-block--done">
+        <div class="mission__signals-block-header">
+          <span class="mission__signals-block-dot mission__signals-block-dot--done"></span>
+          <span class="mission__signals-block-title">Gali ya lo hizo por ti</span>
+          <span class="mission__signals-block-count">{{ completedSignals.length }}</span>
+        </div>
+        <div class="mission__signals-list mission__signals-list--done">
+          @for (sig of completedSignals; track sig.id) {
+            <gali-signal-card-v2 [signal_data]="sig" />
           }
         </div>
-        <div class="mission__chat-input">
-          <input
-            type="text"
-            class="mission__chat-field"
-            placeholder="Escríbele a Gali…"
-            [ngModel]="lanzarInput()"
-            (ngModelChange)="lanzarInput.set($event)"
-            (keydown.enter)="sendLanzar()" />
-          <button
-            type="button"
-            class="mission__chat-send"
-            [disabled]="!lanzarInput().trim() || lanzarTyping()"
-            (click)="sendLanzar()">
-            <i class="pi pi-send" aria-hidden="true"></i>
-          </button>
+      </div>
+    }
+
+    <!-- Bloque 2: Necesitas decidir (Spec 7 — CA-9) -->
+    <div class="mission__signals-block mission__signals-block--pending">
+      <div class="mission__signals-block-header">
+        <span class="mission__signals-block-dot mission__signals-block-dot--pending"></span>
+        <span class="mission__signals-block-title">Necesitas decidir</span>
+        @if (pendingApprovalSignals.length > 0) {
+          <span class="mission__badge mission__badge--crit">{{ pendingApprovalSignals.length }}</span>
+        }
+      </div>
+      <div class="mission__signals-list">
+        @for (sig of pendingApprovalSignals | slice:0:3; track sig.id) {
+          <gali-signal-card-v2 [signal_data]="sig" />
+        }
+        @if (pendingApprovalSignals.length === 0) {
+          <div class="mission__signals-empty">
+            <span>✦</span>
+            <span>Sin decisiones pendientes — Gali gestionó todo automáticamente.</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bloque "Gali esta semana" — solo en vista experto (CA-4) -->
+    @if (!isSimpleView()) {
+    <div class="hub-gali-week">
+      <div class="hub-gali-week__header">
+        <span class="hub-gali-week__glyph">✦</span>
+        <strong class="hub-gali-week__title">Gali esta semana</strong>
+        <button type="button" class="hub-gali-week__history" data-proto-skip title="próximamente">Ver historial →</button>
+      </div>
+      <div class="hub-gali-week__rows">
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">⚡</span>
+          <span><strong>23</strong> acciones ejecutadas automáticamente</span>
+        </div>
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">💰</span>
+          <span><strong>$85k</strong> ahorrados en novedades evitadas</span>
+        </div>
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">🔭</span>
+          <span><strong>2</strong> oportunidades de escala detectadas</span>
         </div>
       </div>
-    </section>
-
+    </div>
+    } <!-- /isSimpleView -->
   </div>
 
-  <!-- ══ AKADEMY CONNECTOR ══ -->
-  <section class="mission__akademy-strip">
-    <div class="mission__akademy-inner">
-      <span class="mission__akademy-icon">🎓</span>
-      <div class="mission__akademy-body">
-        <strong>Gali recomienda para ti en Akademy</strong>
-        <span>Basado en tu ROAS real vs declarado: <em>Optimización de P&amp;L real en Meta Ads</em> — 38 min · Avanzado</span>
-      </div>
-      <a routerLink="/gali-v5/academy" class="mission__akademy-cta">Ir a Akademy →</a>
-    </div>
-  </section>
+  <!-- ══ ZONA 3 — Academy colapsada (CA-8) ══ -->
+  <div class="hub-zone hub-zone--3" [class.hub-zone--3-collapsed]="zone3Collapsed()">
+    <button type="button" class="hub-zone3-handle" (click)="zone3Collapsed.set(!zone3Collapsed())">
+      <span class="hub-zone3-handle__chevron">{{ zone3Collapsed() ? '▸' : '▾' }}</span>
+      <span class="hub-zone3-handle__label">Academy · Personalizado para ti</span>
+      <span class="hub-zone3-handle__badge">1 curso nuevo</span>
+    </button>
+    @if (!zone3Collapsed()) {
+      <section class="mission__akademy-strip">
+        <div class="mission__akademy-inner">
+          <span class="mission__akademy-icon">🎓</span>
+          <div class="mission__akademy-body">
+            <strong>Gali recomienda para ti en Academy</strong>
+            <span>Basado en tu ROAS real vs declarado: <em>Optimización de P&amp;L real en Meta Ads</em> — 38 min · Avanzado</span>
+          </div>
+          <a routerLink="/gali-v5/academy" class="mission__akademy-cta">Ir a Academy →</a>
+        </div>
+      </section>
+    }
+  </div>
 
   <!-- Toggle experto/novato -->
   @if (ws.complexityLevel() === 'expert') {
     <div class="mission__complexity-toggle">
-      <button type="button" class="complexity-toggle-btn" (click)="ws.setComplexityLevel('novice')">
-        ← Vista simple
+      <button type="button" class="complexity-toggle-btn"
+        (click)="ws.setComplexityLevel('novice')"
+        title="Oculta los agentes y muestra solo métricas principales">
+        ← Modo básico
       </button>
       <button type="button" class="complexity-toggle-btn complexity-toggle-btn--reset" (click)="resetOnboarding()">
         ↺ Reconfigurar Gali
@@ -501,7 +577,71 @@
     </div>
   }
 
+  <!-- Modal 2 pasos — Acción masiva transportadora (CA-3) -->
+  @if (showBulkModal()) {
+    <div class="mission__confirm-backdrop" (click)="showBulkModal.set(false)">
+      <div class="mission__confirm-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        @if (bulkModalStep() === 1) {
+          <div class="confirm-dialog__header">
+            <span class="confirm-dialog__agent-dot" style="background:#fbbf24"></span>
+            <h3 class="confirm-dialog__title">Cambiar transportadora en pedidos activos</h3>
+            <button type="button" class="confirm-dialog__close" (click)="showBulkModal.set(false)" aria-label="Cerrar">×</button>
+          </div>
+          <p class="confirm-dialog__desc">Vigilante detectó: Coordinadora Bogotá 15% novedad esta semana.</p>
+          <div class="confirm-consequence-grid">
+            <div class="consequence-row">
+              <span class="consequence-label">Pedidos afectados</span>
+              <span class="consequence-after">12 pedidos activos · Bogotá</span>
+            </div>
+            <div class="consequence-row">
+              <span class="consequence-label">Transportadora destino</span>
+              <span class="consequence-before">Coordinadora</span>
+              <span class="consequence-arrow">→</span>
+              <span class="consequence-after">Servientrega</span>
+            </div>
+            <div class="consequence-row">
+              <span class="consequence-label">Impacto estimado</span>
+              <span class="consequence-after">Evitar ~3 novedades ($51k)</span>
+            </div>
+            <div class="consequence-row consequence-row--safe">
+              <span class="consequence-label">⏱ Gestión adicional</span>
+              <span>~2 horas de ajuste logístico</span>
+            </div>
+          </div>
+          <div class="confirm-dialog__actions">
+            <button type="button" class="confirm-cancel" (click)="showBulkModal.set(false)">Cancelar</button>
+            <button type="button" class="confirm-approve" (click)="bulkModalNext()">Revisar y confirmar →</button>
+          </div>
+        } @else {
+          <div class="confirm-dialog__header">
+            <span class="confirm-dialog__agent-dot" style="background:#fbbf24"></span>
+            <h3 class="confirm-dialog__title">Confirmar cambio</h3>
+            <button type="button" class="confirm-dialog__close" (click)="showBulkModal.set(false)" aria-label="Cerrar">×</button>
+          </div>
+          <div class="confirm-consequence-grid">
+            <div class="consequence-row">
+              <span class="consequence-after">✓ 12 pedidos · Bogotá · → Servientrega</span>
+            </div>
+            <div class="consequence-row consequence-row--safe">
+              <span class="consequence-label">⚠ Esta acción no se puede deshacer.</span>
+              <span>Vigilante notificará cuando esté completo.</span>
+            </div>
+          </div>
+          <div class="confirm-dialog__actions">
+            <button type="button" class="confirm-cancel" (click)="bulkModalBack()">← Volver</button>
+            <button type="button" class="confirm-approve" (click)="confirmBulkAction()">Confirmar cambio ahora</button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
 </div>
+
+<!-- Panel de umbrales de agencia — desde el Hub -->
+@if (showAgencyPanel()) {
+  <gali-agency-thresholds-panel (closed)="showAgencyPanel.set(false)" />
+}
 
 <!-- ══ DASHBOARD CUSTOMIZER PANEL ══ -->
 @if (showCustomizer()) {
@@ -530,7 +670,7 @@
           <input type="checkbox" [checked]="dashboardSections().chat" (change)="toggleSection('chat')" />
         </label>
         <label class="customizer-toggle-row">
-          <span>Recomendaciones Akademy</span>
+          <span>Recomendaciones Academy</span>
           <input type="checkbox" [checked]="dashboardSections().akademy" (change)="toggleSection('akademy')" />
         </label>
       </div>

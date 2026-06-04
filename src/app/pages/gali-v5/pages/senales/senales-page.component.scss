@@ -1,0 +1,421 @@
+@use '../../../../../styles/variables' as *;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.senales-page {
+  height: 100%;
+  overflow-y: auto;
+  padding: $size-6 $size-8;
+}
+
+// Header
+.senales-header {
+  margin-bottom: $size-5;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    margin-bottom: $size-2;
+    flex-wrap: wrap;
+  }
+}
+
+.senales-title {
+  font-family: $font-primary;
+  font-weight: $font-bold;
+  font-size: 24px;
+  color: $gray-900;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+}
+
+.gali-spark { color: $primary-500; font-size: 20px; }
+
+.senales-subtitle {
+  font-family: $font-primary;
+  font-size: 14px;
+  color: $gray-500;
+  margin: 0;
+}
+
+.senales-pills { display: flex; gap: $size-2; }
+
+.pill {
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: $font-medium;
+  padding: 2px 10px;
+  border-radius: $radius-full;
+
+  &--senales { background: #e0e7ff; color: #3730a3; }
+  &--alertas { background: #fee2e2; color: #991b1b; }
+}
+
+// Filtros
+.senales-filters {
+  display: flex;
+  gap: $size-2;
+  margin-bottom: $size-5;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 6px 16px;
+  border-radius: $radius-full;
+  font-size: 13px;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  border: 1px solid $gray-200;
+  background: $white;
+  color: $gray-600;
+  cursor: pointer;
+  transition: all 120ms ease;
+
+  &:hover { background: $gray-50; }
+
+  &--active {
+    background: $primary-500;
+    color: $white;
+    border-color: $primary-500;
+  }
+}
+
+// Paneles — desktop: 2 col; mobile: alertas arriba (CA-6)
+.senales-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-5;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    // Alertas panel tiene order: -1 en mobile (arriba)
+    .panel--alertas { order: -1; }
+    .panel--senales { order: 1; }
+  }
+}
+
+.panel {
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-3;
+    padding: $size-4;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+
+  &__icon { font-size: 18px; }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: 13px;
+    font-weight: $font-semibold;
+    color: $gray-700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 2px;
+  }
+
+  &__subtitle {
+    font-family: $font-primary;
+    font-size: 12px;
+    color: $gray-500;
+    margin: 0;
+  }
+
+  &--senales {
+    background: $gray-50;
+    border: 1px solid $gray-100;
+    border-top: 3px solid $primary-300;
+  }
+
+  &--alertas {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-top: 3px solid #f87171;
+  }
+}
+
+// Cards
+.signal-list,
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  padding: $size-4;
+}
+
+.signal-card {
+  background: $white;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  padding: $size-4;
+  transition: box-shadow 150ms ease;
+
+  &:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-3;
+    flex-wrap: wrap;
+  }
+
+  &--scale       { border-left: 3px solid $primary-500; }
+  &--trend       { border-left: 3px solid #8b5cf6; }
+  &--opportunity { border-left: 3px solid #6366f1; }
+  &--risk        { border-left: 3px solid #f59e0b; }
+  &--completed   { border-left: 3px solid #22c55e; opacity: 0.7; }
+}
+
+.signal-badge {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+
+  &--scale       { background: #fff7ed; color: #c2410c; }
+  &--trend       { background: #ede9fe; color: #5b21b6; }
+  &--opportunity { background: #e0e7ff; color: #3730a3; }
+  &--risk        { background: #fffbeb; color: #92400e; }
+  &--completed   { background: #dcfce7; color: #15803d; }
+}
+
+.signal-agent {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-500;
+}
+
+.signal-window {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  white-space: nowrap;
+
+  i { font-size: 10px; }
+}
+
+.signal-title {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: $font-semibold;
+  color: $gray-900;
+  margin: 0 0 $size-3;
+}
+
+.signal-macromundo {
+  background: #fffbf7;
+  border: 1px solid rgba($primary-500, 0.12);
+  border-radius: $radius-sm;
+  padding: $size-3;
+  margin-bottom: $size-3;
+}
+
+.macromundo-tag {
+  display: block;
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: $font-bold;
+  color: $primary-500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.macromundo-text {
+  font-family: $font-primary;
+  font-size: 12px;
+  color: $gray-600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.signal-recomendacion {
+  font-family: $font-primary;
+  font-size: 13px;
+  color: $gray-700;
+  line-height: 1.5;
+  margin: 0 0 $size-3;
+}
+
+.signal-metrica {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  color: $gray-500;
+  background: $gray-100;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+  display: inline-block;
+  margin-bottom: $size-3;
+}
+
+.signal-actions,
+.alert-actions {
+  display: flex;
+  gap: $size-2;
+  flex-wrap: wrap;
+}
+
+// Cards alertas
+.alert-card {
+  background: $white;
+  border: 1px solid #fecaca;
+  border-radius: $radius-md;
+  padding: $size-4;
+  transition: box-shadow 150ms ease;
+
+  &:hover { box-shadow: 0 2px 8px rgba(220,38,38,0.1); }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-3;
+  }
+
+  &--critical { border-left: 3px solid #ef4444; }
+  &--warning  { border-left: 3px solid #f59e0b; background: #fffbeb; border-color: #fde68a; }
+  &--info     { border-left: 3px solid #60a5fa; }
+}
+
+.alert-badge {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  padding: 2px 8px;
+  border-radius: $radius-full;
+
+  &--critical { background: #fee2e2; color: #991b1b; }
+  &--warning  { background: #fef3c7; color: #92400e; }
+  &--info     { background: #dbeafe; color: #1e40af; }
+}
+
+.alert-agent {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-500;
+  margin-left: auto;
+}
+
+.alert-title {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: $font-semibold;
+  color: $gray-900;
+  margin: 0 0 $size-2;
+}
+
+.alert-description {
+  font-family: $font-primary;
+  font-size: 13px;
+  color: $gray-700;
+  line-height: 1.5;
+  margin: 0 0 $size-3;
+}
+
+.alert-impacto {
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: $font-medium;
+  color: #991b1b;
+  background: #fee2e2;
+  padding: $size-2 $size-3;
+  border-radius: $radius-sm;
+  margin-bottom: $size-3;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+
+  i { font-size: 12px; }
+}
+
+.alert-pedidos {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-500;
+  margin-bottom: $size-3;
+}
+
+// Botones
+.btn-primary {
+  background: $primary-500;
+  color: $white;
+  border: none;
+  border-radius: $radius-sm;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: background 120ms ease;
+
+  &:hover { background: $primary-600; }
+
+  &--urgent {
+    background: #dc2626;
+    &:hover { background: #b91c1c; }
+  }
+}
+
+.btn-ghost {
+  background: transparent;
+  color: $gray-600;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all 120ms ease;
+
+  &:hover { background: $gray-50; }
+}
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+// Estado vacío
+.senales-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px $size-8;
+}
+
+.empty-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: $size-4;
+  opacity: 0.4;
+  color: $primary-500;
+}
+
+.empty-title {
+  font-family: $font-primary;
+  font-size: 16px;
+  font-weight: $font-semibold;
+  color: $gray-700;
+  margin: 0 0 $size-2;
+}
+
+.empty-subtitle {
+  font-family: $font-primary;
+  font-size: 14px;
+  color: $gray-500;
+  margin: 0;
+}

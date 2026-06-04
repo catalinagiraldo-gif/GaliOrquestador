@@ -265,40 +265,142 @@
       </div>
     </div>
 
-    <!-- ── TABS con placeholder (Producto, Estrategia, Campañas, Pedidos) ── -->
-    <div *ngIf="activeTab() === 'producto' || activeTab() === 'estrategia' || activeTab() === 'campanas' || activeTab() === 'pedidos'"
-      class="tab-panel tab-panel--placeholder">
-      <div class="placeholder-state">
-        <span class="placeholder-state__icon">
-          {{ activeTab() === 'producto' ? '📦' : activeTab() === 'estrategia' ? '🎯' : activeTab() === 'campanas' ? '⚡' : '🚛' }}
-        </span>
-        <h3 class="placeholder-state__title">
-          {{ activeTab() === 'producto' ? 'Detalles del producto' :
-             activeTab() === 'estrategia' ? 'Estrategia y avatar' :
-             activeTab() === 'campanas' ? 'Campañas de Meta / TikTok' :
-             'Pedidos y novedades del proyecto' }}
-        </h3>
-        <p class="placeholder-state__desc">
-          Esta sección conecta con
-          <a [routerLink]="activeTab() === 'campanas' ? ['/gali-v5/marketing/roax-informes'] :
-                          activeTab() === 'pedidos' ? ['/gali-v5/mis-pedidos/mis-pedidos'] :
-                          ['/gali-v5/productos/catalogo']"
-            class="placeholder-state__link">
-            {{ activeTab() === 'campanas' ? 'Roax' :
-               activeTab() === 'pedidos' ? 'Mis Pedidos' :
-               'Catálogo' }}
-          </a>
-          con vista filtrada para este proyecto.
-        </p>
-        <a
-          [routerLink]="activeTab() === 'campanas' ? ['/gali-v5/marketing/roax-informes'] :
-                        activeTab() === 'pedidos' ? ['/gali-v5/mis-pedidos/mis-pedidos'] :
-                        ['/gali-v5/productos/catalogo']"
-          class="btn-hero btn-hero--primary">
-          Ir al módulo →
-        </a>
+    <!-- ── Tab Producto — datos reales de projects.json (CA-5) ── -->
+    @if (activeTab() === 'producto') {
+      <div class="tab-panel tab-panel--producto">
+        @if (proyectoData(); as p) {
+          <div class="prod-summary">
+            <div class="prod-state-pill" [class.prod-state-pill--escala]="p['estado'] === 'en_escala'">
+              {{ p['estado'] === 'en_escala' ? '↑ En escala' : p['estado'] === 'activo' ? 'Activo' : 'Pausado' }}
+            </div>
+            <h3 class="prod-nombre">{{ p['nombre'] }}</h3>
+            <div class="prod-metrics-row">
+              <div class="prod-metric">
+                <span class="prod-metric__val">{{ p['pedidos_sem_label'] }}</span>
+                <span class="prod-metric__lbl">Pedidos / sem</span>
+              </div>
+              <div class="prod-metric">
+                <span class="prod-metric__val">{{ p['tasa_novedad_label'] }}</span>
+                <span class="prod-metric__lbl">Tasa novedad</span>
+              </div>
+              <div class="prod-metric">
+                <span class="prod-metric__val">{{ p['margen_neto_pct_label'] }}</span>
+                <span class="prod-metric__lbl">Margen neto</span>
+              </div>
+            </div>
+            <div class="gali-nota" *ngIf="p['gali_nota']">
+              <span class="gali-nota__spark">✦</span>
+              <p>{{ p['gali_nota'] }}</p>
+            </div>
+            <a [routerLink]="['/gali-v5/productos/catalogo']" class="btn-hero btn-hero--secondary">Ver en catálogo →</a>
+          </div>
+        }
       </div>
-    </div>
+    }
+
+    <!-- ── Tab Estrategia — datos reales (CA-5) ── -->
+    @if (activeTab() === 'estrategia') {
+      <div class="tab-panel tab-panel--estrategia">
+        @if (proyectoData(); as p) {
+          <div class="estrategia-content">
+            <div class="roas-comparison">
+              <div class="roas-block roas-block--real">
+                <span class="roas-val">{{ p['roas_real_label'] }}</span>
+                <span class="roas-lbl">ROAS real</span>
+              </div>
+              <div class="roas-separator">vs.</div>
+              <div class="roas-block">
+                <span class="roas-val roas-val--secondary">{{ p['roas_meta_label'] }}</span>
+                <span class="roas-lbl">Meta declarada</span>
+              </div>
+            </div>
+            <p class="margen-row">Margen actual: <strong>{{ p['margen_neto_pct_label'] }}</strong></p>
+            <div class="gali-nota" *ngIf="p['gali_nota']">
+              <span class="gali-nota__spark">✦</span>
+              <p>{{ p['gali_nota'] }}</p>
+            </div>
+            <a [routerLink]="['/gali-v5/reportes/dashboard-financiero']" class="btn-hero btn-hero--secondary">Ver P&amp;L completo →</a>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── Tab Campañas — datos reales (CA-5) ── -->
+    @if (activeTab() === 'campanas') {
+      <div class="tab-panel tab-panel--campanas">
+        @if (proyectoData(); as p) {
+          <div class="campanas-content">
+            <div class="campana-pauta-row">
+              <div class="pauta-item">
+                <span class="pauta-val">{{ p['pauta_diaria_label'] }}</span>
+                <span class="pauta-lbl">Pauta activa/día</span>
+              </div>
+              <div class="pauta-item">
+                <span class="pauta-val pauta-val--propuesta">{{ p['pauta_escala_propuesta_label'] }}</span>
+                <span class="pauta-lbl">Escala propuesta Roax</span>
+              </div>
+              <div class="pauta-item">
+                <span class="pauta-val">{{ p['ctr_activo_label'] }}</span>
+                <span class="pauta-lbl">CTR activo</span>
+              </div>
+            </div>
+            <a [routerLink]="['/gali-v5/marketing/roax-informes']" class="btn-hero btn-hero--secondary">Ver campañas en Roax →</a>
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <span class="tab-empty__icon">⚡</span>
+            <p class="tab-empty__title">Sin campañas activas</p>
+            <p class="tab-empty__desc">Crea tu primera campaña con Roax para que Gali pueda optimizarla automáticamente.</p>
+            <a [routerLink]="['/gali-v5/marketing/roax-lanzador']" class="btn-hero btn-hero--primary">Crear campaña con Roax →</a>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── Tab Pedidos — datos reales (CA-5, CA-6) ── -->
+    @if (activeTab() === 'pedidos') {
+      <div class="tab-panel tab-panel--pedidos">
+        @if (proyectoData(); as p) {
+          <div class="pedidos-content">
+            <div class="pedidos-metrics-row">
+              <div class="pedido-metric">
+                <span class="pedido-metric__val">{{ p['pedidos_sem_label'] }}</span>
+                <span class="pedido-metric__lbl">Esta semana</span>
+              </div>
+              <div class="pedido-metric">
+                <span class="pedido-metric__val">{{ p['tasa_novedad_label'] }}</span>
+                <span class="pedido-metric__lbl">Tasa novedad</span>
+              </div>
+              @if (p['tasa_novedad_ciudad']) {
+                <div class="pedido-metric">
+                  <span class="pedido-metric__val">{{ p['tasa_novedad_ciudad'] }}</span>
+                  <span class="pedido-metric__lbl">Zona más afectada</span>
+                </div>
+              }
+            </div>
+            @if (p['alerta_activa']) {
+              <div class="pedidos-alerta">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ p['alerta_mensaje'] }}
+              </div>
+            }
+            <p class="pedidos-delta"
+               [class.pedidos-delta--ok]="p['semana_delta_ok']"
+               [class.pedidos-delta--down]="!p['semana_delta_ok']">
+              {{ p['semana_delta'] }}
+            </p>
+            <a [routerLink]="['/gali-v5/mis-pedidos/mis-pedidos']" class="btn-hero btn-hero--secondary">Ver pedidos filtrados →</a>
+          </div>
+        } @else {
+          <div class="tab-empty">
+            <span class="tab-empty__icon">🚛</span>
+            <p class="tab-empty__title">Sin pedidos en este proyecto</p>
+            <p class="tab-empty__desc">Los pedidos aparecen aquí automáticamente cuando tienes campañas activas.</p>
+            <a [routerLink]="['/gali-v5/mis-pedidos/mis-pedidos']" class="btn-hero btn-hero--secondary">Ver todos los pedidos →</a>
+          </div>
+        }
+      </div>
+    }
 
   </div>
 

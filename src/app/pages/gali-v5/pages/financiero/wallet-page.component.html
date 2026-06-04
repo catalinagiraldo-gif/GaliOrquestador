@@ -1,11 +1,41 @@
 <div class="wallet-page">
 
-  <dropi-gali-bar
-    agent="Agente Financiero"
-    status="activo"
-    message="📅 Fecha óptima de retiro: jueves · 47 entregas confirmadas · P&amp;L esta semana: $411k neto · Novedades: 40% del costo operativo"
-    ctaLabel="Ver análisis completo"
-  />
+  <!-- Kronos agent bar — identidad azul #60a5fa -->
+  <div class="kronos-bar">
+    <div class="kronos-bar__left">
+      <span class="kronos-bar__dot"></span>
+      <div class="kronos-bar__identity">
+        <span class="kronos-bar__name">Kronos</span>
+        <span class="kronos-bar__role">Agente Financiero · activo</span>
+      </div>
+    </div>
+    <div class="kronos-bar__narrative">
+      Esta semana generaste <strong>$2.74M</strong> en ventas.
+      Después de costos reales, te quedaron <strong>$625k netos (22.8%)</strong>.
+      Hay <strong>2 fugas activas</strong> que Kronos detectó — revísalas abajo.
+    </div>
+    <button type="button" class="kronos-bar__cta" routerLink="/gali-v5/reportes/dashboard-financiero">
+      Ver P&L completo →
+    </button>
+  </div>
+
+  <!-- Error card Siigo — estructura fija -->
+  <div class="siigo-error-card">
+    <div class="siigo-error-card__icon">
+      <i class="pi pi-exclamation-triangle"></i>
+    </div>
+    <div class="siigo-error-card__body">
+      <span class="siigo-error-card__title">Facturación sin sincronizar</span>
+      <span class="siigo-error-card__detail">
+        {{ siigo.sin_facturar_label }} sin facturar
+        · {{ siigo.facturas_pendientes }} facturas pendientes
+        · {{ siigo.dias_sin_sincronizar }} días sin sincronizar
+      </span>
+    </div>
+    <button type="button" class="siigo-error-card__cta" routerLink="/gali-v5/conexiones">
+      Conectar Siigo ahora →
+    </button>
+  </div>
 
   <dropi-titulos title="Historial de wallet" [breadcrumbs]="breadcrumbs">
     <dropi-button-new titulosActions label="Transferir entre wallets" icon="pi-arrows-h" hierarchy="outline" [width]="220" />
@@ -13,6 +43,69 @@
     <dropi-button-new titulosActions label="Recargar" icon="pi-wallet" hierarchy="primary" [width]="130" />
   </dropi-titulos>
 
+  <!-- Resumen financiero narrado por Kronos -->
+  <div class="fin-summary">
+    <div class="fin-summary__period">
+      <span class="fin-summary__period-label">{{ summary.label_periodo }}</span>
+      <span class="fin-summary__period-badge">Semanal</span>
+    </div>
+
+    <div class="fin-summary__cards">
+      <div class="fin-summary__card fin-summary__card--ingresos">
+        <span class="fin-summary__card-label">Ingresos brutos</span>
+        <span class="fin-summary__card-value">{{ summary.ingresos_brutos.label }}</span>
+        <span class="fin-summary__card-sub">Ventas brutas totales</span>
+      </div>
+
+      <div class="fin-summary__separator">
+        <span class="fin-summary__arrow">→</span>
+        <span class="fin-summary__cost-detail">{{ summary.costos_operativos.detalle }}</span>
+      </div>
+
+      <div class="fin-summary__card fin-summary__card--costos">
+        <span class="fin-summary__card-label">Costos operativos reales</span>
+        <span class="fin-summary__card-value fin-summary__card-value--neg">−{{ summary.costos_operativos.label }}</span>
+        <span class="fin-summary__card-sub">COGS + flete + pauta + novedades + comisiones</span>
+      </div>
+
+      <div class="fin-summary__separator">
+        <span class="fin-summary__arrow">=</span>
+      </div>
+
+      <div class="fin-summary__card fin-summary__card--neto">
+        <span class="fin-summary__card-label">Margen neto real</span>
+        <span class="fin-summary__card-value fin-summary__card-value--pos">{{ summary.margen_neto.label }}</span>
+        <span class="fin-summary__card-sub">{{ summary.margen_neto.pct }}% de margen real</span>
+      </div>
+    </div>
+
+    <!-- Kronos: 2 fugas detectadas -->
+    <div class="fugas-block">
+      <div class="fugas-block__header">
+        <span class="fugas-block__kronos-dot"></span>
+        <span class="fugas-block__title">Kronos detectó 2 fugas de dinero esta semana</span>
+      </div>
+      <div class="fugas-block__list">
+        @for (fuga of fugas; track fuga.id) {
+          <div class="fuga-card" [class.fuga-card--alta]="fuga.severidad === 'alta'" [class.fuga-card--media]="fuga.severidad === 'media'">
+            <div class="fuga-card__severity">
+              <i class="pi" [class.pi-exclamation-triangle]="fuga.severidad === 'alta'" [class.pi-info-circle]="fuga.severidad === 'media'"></i>
+            </div>
+            <div class="fuga-card__body">
+              <span class="fuga-card__titulo">{{ fuga.titulo }}</span>
+              <span class="fuga-card__impacto">{{ fuga.impacto }}</span>
+              <span class="fuga-card__canal">{{ fuga.canal }}</span>
+            </div>
+            <a class="fuga-card__accion" [routerLink]="fuga.accion_ruta">
+              {{ fuga.accion }} →
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Nota operativa -->
   <div class="wallet-page__alert">
     <i class="pi pi-info-circle"></i>
     <span>{{ alertMessage }}</span>
@@ -36,7 +129,7 @@
       <select><option>Filtrar por código</option></select>
     </div>
     <dropi-button-new icon="pi-arrow-right" [iconOnly]="true" hierarchy="primary" />
-    <dropi-search-oficial placeholder="Buscar por ID de transacción" [(ngModel)]="searchQuery" />
+    <dropi-search-oficial placeholder="Buscar por ID, producto o pedido" [(ngModel)]="searchQuery" />
     <dropi-button-new label="Exportar" icon="pi-file" hierarchy="outline" [width]="120" />
   </div>
 
@@ -50,35 +143,58 @@
   </div>
 
   @if (activeTab() === 'transacciones') {
-    <div class="wallet-table-wrap">
-      <table class="wallet-table">
-        <thead>
-          <tr>
-            <th style="width:80px">#</th>
-            <th style="width:200px">Fecha</th>
-            <th style="width:120px">Tipo</th>
-            <th style="width:140px">Monto</th>
-            <th style="width:180px">Monto previo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (tx of filteredTransactions(); track tx.num) {
-            <tr>
-              <td>{{ tx.num }}</td>
-              <td>{{ tx.fecha }}</td>
-              <td>{{ tx.tipo }}</td>
-              <td [class.positive]="tx.tipo === 'ENTRADA'" [class.negative]="tx.tipo === 'SALIDA'">{{ tx.monto }}</td>
-              <td>{{ tx.montoPrevio }}</td>
-              <td class="wallet-table__desc">{{ tx.descripcion }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+
+    <!-- Acordeón: tabla colapsable -->
+    <div class="tx-accordion">
+      <button type="button" class="tx-accordion__toggle" (click)="transaccionesOpen.set(!transaccionesOpen())">
+        <div class="tx-accordion__toggle-left">
+          <i class="pi pi-list"></i>
+          <span>Ver transacciones detalladas</span>
+          <span class="tx-accordion__count">{{ filteredTransactions().length }} movimientos</span>
+        </div>
+        <i class="pi tx-accordion__chevron"
+          [class.pi-chevron-down]="!transaccionesOpen()"
+          [class.pi-chevron-up]="transaccionesOpen()">
+        </i>
+      </button>
+
+      @if (transaccionesOpen()) {
+        <div class="wallet-table-wrap">
+          <table class="wallet-table">
+            <thead>
+              <tr>
+                <th style="width:80px">#</th>
+                <th style="width:200px">Fecha</th>
+                <th style="width:120px">Tipo</th>
+                <th style="width:140px">Monto</th>
+                <th style="width:180px">Saldo previo</th>
+                <th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (tx of filteredTransactions(); track tx.num) {
+                <tr>
+                  <td>{{ tx.num }}</td>
+                  <td>{{ tx.fecha }}</td>
+                  <td>
+                    <span class="tx-tipo" [class.tx-tipo--entrada]="tx.tipo === 'ENTRADA'" [class.tx-tipo--salida]="tx.tipo === 'SALIDA'">
+                      {{ tx.tipo === 'ENTRADA' ? '↑' : '↓' }} {{ tx.tipo === 'ENTRADA' ? 'Entrada' : 'Salida' }}
+                    </span>
+                  </td>
+                  <td [class.positive]="tx.tipo === 'ENTRADA'" [class.negative]="tx.tipo === 'SALIDA'">{{ tx.monto }}</td>
+                  <td>{{ tx.montoPrevio }}</td>
+                  <td class="wallet-table__desc">{{ getDescripcion(tx) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <dropi-paginator />
+      }
     </div>
+
   } @else {
     <div class="wallet-page__empty">No hay depósitos manuales en el periodo seleccionado.</div>
   }
 
-  <dropi-paginator />
 </div>

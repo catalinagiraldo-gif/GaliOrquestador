@@ -236,13 +236,13 @@
     align-items: flex-start;
   }
 
-  // 2x3 grid of nodes
+  // Ciclo horizontal (reemplaza grid 2x3)
   &__net {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    grid-template-rows: auto auto auto;
-    gap: $size-3;
-    align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     flex: 1;
     min-width: 0;
     transition: flex 0.25s ease;
@@ -315,6 +315,112 @@
     color: $gray-400;
   }
 
+  &__section-head-actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__agency-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px $size-2;
+    border: 1px solid rgba($primary-500, 0.3);
+    border-radius: $radius-md;
+    background: rgba($primary-500, 0.05);
+    color: $primary-600;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    .pi { font-size: 11px; }
+    &:hover { background: rgba($primary-500, 0.1); border-color: $primary-500; }
+  }
+
+  &__section-see-all {
+    background: none;
+    border: none;
+    font-size: $font-xs;
+    color: $primary-600;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    font-family: $font-primary;
+    padding: 0;
+    &:hover { text-decoration: underline; }
+  }
+
+  // ── Signal blocks (done vs pending) ──────────────────────────────
+  &__signals-block {
+    border-radius: $radius-md;
+    overflow: hidden;
+
+    &--done {
+      margin: $size-2 $size-3 0;
+      border: 1px solid rgba(#22c55e, 0.2);
+      background: rgba(#22c55e, 0.02);
+    }
+
+    &--pending {
+      margin: $size-2 $size-3 $size-3;
+      border: 1px solid rgba(#dc2626, 0.15);
+      background: rgba(#dc2626, 0.01);
+    }
+  }
+
+  &__signals-block-header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-2 $size-4;
+    border-bottom: 1px solid rgba($gray-200, 0.6);
+  }
+
+  &__signals-block-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--done    { background: #22c55e; }
+    &--pending { background: #dc2626; }
+  }
+
+  &__signals-block-title {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-600;
+    flex: 1;
+  }
+
+  &__signals-block-count {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: $font-semibold;
+    color: $gray-400;
+    background: $gray-100;
+    padding: 1px 6px;
+    border-radius: $radius-pill;
+  }
+
+  &__signals-list--done {
+    opacity: 0.75;
+
+    &:hover { opacity: 1; }
+  }
+
+  &__signals-empty {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-4 $size-5;
+    font-size: $font-sm;
+    color: $gray-400;
+  }
+
   &__badge {
     display: inline-flex;
     align-items: center;
@@ -354,8 +460,9 @@
   }
 
   &__section--signals {
-    max-height: 380px;
+    max-height: 520px;
     min-height: 0;
+    overflow-y: auto;
   }
 
   &__chat-messages {
@@ -1247,91 +1354,156 @@
 }
 
 // ── Fase 1: Zero State ────────────────────────────────────────────────────────
+// ── Zero State: Panel Intensamente (3 emociones / 3 agentes) ─────────────────
+
 .mission__zero-state {
   margin: $size-6 $size-6 $size-4;
-  border-radius: 16px;
-  border: 2px dashed $gray-200;
-  background: linear-gradient(135deg, rgba($primary-500, 0.03) 0%, rgba($white, 1) 60%);
   animation: slideUp 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
 }
 
-.zero-state__inner {
-  padding: $size-8 $size-8;
+.zero-state__header {
   text-align: center;
-}
-
-.zero-state__icon {
-  font-size: 32px;
-  color: $primary-500;
-  margin-bottom: $size-3;
+  padding: $size-4 0 0;
 }
 
 .zero-state__title {
-  font-size: $font-lg;
+  font-size: $font-xl;
   font-weight: $font-bold;
   color: $gray-900;
-  margin: 0 0 $size-2;
+  margin: 0 0 $size-1;
 }
 
-.zero-state__subtitle {
+.zero-state__sub {
   font-size: $font-sm;
   color: $gray-500;
-  margin: 0 0 $size-6;
+  margin: 0;
 }
 
-.zero-state__steps {
+.zero-state__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $size-4;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zero-card {
   display: flex;
   flex-direction: column;
-  gap: $size-3;
-  text-align: left;
-}
-
-.zero-state__step {
-  display: flex;
-  align-items: center;
-  gap: $size-3;
-  padding: $size-3 $size-4;
-  border-radius: $radius-lg;
-  border: 1px solid $gray-100;
+  gap: $size-2;
+  padding: $size-5;
+  border-radius: $radius-xl;
+  border: 1.5px solid $gray-200;
   background: $white;
+  text-decoration: none;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.12s ease;
+  position: relative;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
 
   &:hover {
-    border-color: $primary-300;
-    transform: translateX(4px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
   }
 
-  &-num {
-    width: 28px;
-    height: 28px;
+  &--ada:hover  { border-color: #818cf8; }
+  &--roax:hover { border-color: #f97316; }
+  &--vigilante:hover { border-color: #fbbf24; }
+
+  &__agent-dot {
+    position: absolute;
+    top: $size-4;
+    right: $size-4;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background: $primary-500;
-    color: $white;
-    font-size: $font-xs;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  &__step {
+    font-size: 10px;
+    font-weight: $font-semibold;
+    color: $gray-400;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__emoji {
+    font-size: 28px;
+    margin: $size-1 0;
+  }
+
+  &__title {
+    font-size: $font-base;
     font-weight: $font-bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    color: $gray-900;
+    margin: 0;
+    line-height: 1.3;
   }
 
-  &-body {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    strong {
-      font-size: $font-sm;
-      font-weight: $font-semibold;
-      color: $gray-800;
-    }
-
-    span {
-      font-size: $font-xs;
-      color: $gray-500;
-    }
+  &__desc {
+    font-size: $font-sm;
+    color: $gray-500;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
   }
+
+  &__agent {
+    font-size: $font-xs;
+    color: $gray-400;
+    font-weight: $font-medium;
+    margin-top: $size-2;
+  }
+
+  &__cta {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $primary-600;
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.zero-state__skip {
+  align-self: center;
+  background: none;
+  border: none;
+  font-size: $font-xs;
+  color: $gray-400;
+  cursor: pointer;
+  font-family: $font-primary;
+  padding: $size-1 $size-3;
+  border-radius: $radius-full;
+  transition: color 0.12s;
+
+  &:hover { color: $gray-700; }
+}
+
+// ── Hub Goal Strip ─────────────────────────────────────────────────────────────
+
+.hub-goal-strip {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-2 $size-6;
+  background: #fff7ed;
+  border-left: 3px solid $primary-500;
+  font-size: $font-xs;
+  color: $gray-600;
+  flex-wrap: wrap;
+
+  &__glyph { color: $primary-500; font-size: 12px; }
+  &__goal { font-weight: $font-semibold; color: $gray-800; }
+  &__sep { color: $gray-300; }
+  &__tagline { font-style: italic; }
 }
 
 // ── Fase 2: Novice Layout (Panel de Nave) ─────────────────────────────────────
@@ -1702,5 +1874,293 @@
     height: 16px;
     accent-color: $primary-500;
     cursor: pointer;
+  }
+}
+
+// ── Tres Zonas Hub (Spec 3 — CA-1) ───────────────────────────────────────────
+
+.hub-zone {
+  border-radius: $radius-lg;
+  margin: 0 $size-4 $size-4;
+
+  &--1 {
+    border-left: 2px solid $primary-500;
+    background: $gray-50;
+    padding: $size-4 $size-5;
+  }
+
+  &--2 {
+    background: $white;
+    padding: $size-4 $size-5;
+    border: 1px solid $gray-100;
+  }
+
+  &--3 {
+    background: $gray-100;
+    padding: 0;
+    overflow: hidden;
+    transition: max-height 200ms ease-out;
+
+    &-collapsed { max-height: 48px; }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $size-4;
+    flex-wrap: wrap;
+    gap: $size-2;
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: 15px;
+    font-weight: $font-semibold;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 $size-2;
+    border-radius: $radius-full;
+    font-size: 11px;
+    font-weight: $font-bold;
+    font-family: $font-primary;
+
+    &--crit { background: #fee2e2; color: #dc2626; }
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__subtitle {
+    font-family: $font-primary;
+    font-size: 12px;
+    color: $gray-500;
+    margin-top: 2px;
+  }
+}
+
+// ── Hub Cycle Header (CA-5) ──────────────────────────────────────────────────
+
+.hub-cycle-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $size-4;
+  flex-wrap: wrap;
+  gap: $size-2;
+
+  &__title {
+    font-family: $font-primary;
+    font-size: 16px;
+    font-weight: $font-semibold;
+    color: $gray-900;
+    margin: 0 0 2px;
+  }
+
+  &__subtitle {
+    font-family: $font-primary;
+    font-size: 12px;
+    color: $gray-500;
+  }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// ── Ciclo horizontal (CA-5) ──────────────────────────────────────────────────
+
+.mission__net {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: $size-2;
+
+  .anatomy-node {
+    flex-shrink: 0;
+    min-width: 130px;
+    max-width: 160px;
+    scroll-snap-align: start;
+  }
+
+  .anatomy-arrow {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 $size-2;
+    color: $gray-300;
+    font-size: 16px;
+  }
+}
+
+// ROAS wrap en tarjeta Marketing (CA-6)
+.anatomy-node__roas-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.anatomy-node__roas-label {
+  font-size: 9px;
+  font-weight: $font-semibold;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.anatomy-node__roas-sub {
+  font-size: 10px;
+  color: $gray-400;
+}
+
+// ── Gali Esta Semana (CA-4) ──────────────────────────────────────────────────
+
+.hub-gali-week {
+  background: #fff8f0;
+  border: 1px solid rgba($primary-500, 0.15);
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+  margin-top: $size-4;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-3;
+  }
+
+  &__glyph {
+    color: $primary-500;
+    font-size: 14px;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: 13px;
+    font-weight: $font-semibold;
+    color: $gray-800;
+    flex: 1;
+  }
+
+  &__history {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $gray-400;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover { color: $primary-500; }
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    font-family: $font-primary;
+    font-size: 13px;
+    color: $gray-700;
+
+    strong {
+      font-weight: $font-semibold;
+      color: $gray-900;
+    }
+  }
+
+  &__icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+}
+
+// ── Toggle Vista simple / Experto (Spec 5 CA-3) ─────────────────────────────
+
+.ui-toggle {
+  display: flex;
+  background: $gray-100;
+  border-radius: $radius-full;
+  padding: 2px;
+  gap: 2px;
+
+  &__opt {
+    padding: 4px 12px;
+    border-radius: $radius-full;
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: $font-medium;
+    color: $gray-500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 120ms ease;
+    white-space: nowrap;
+
+    &:hover { color: $gray-700; }
+
+    &--active {
+      background: $white;
+      color: $gray-900;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  }
+}
+
+// ── Zone 3 handle (CA-8) ────────────────────────────────────────────────────
+
+.hub-zone3-handle {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  width: 100%;
+  padding: $size-3 $size-5;
+  background: none;
+  border: none;
+  border-bottom: 1px solid $gray-200;
+  cursor: pointer;
+  text-align: left;
+  font-family: $font-primary;
+  font-size: 13px;
+  color: $gray-600;
+  transition: background 0.12s ease;
+
+  &:hover { background: rgba(0,0,0,0.02); }
+
+  &__chevron { color: $gray-400; font-size: 11px; }
+  &__label { flex: 1; font-weight: $font-medium; }
+  &__badge {
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 11px;
+    font-weight: $font-semibold;
+    padding: 2px 8px;
+    border-radius: $radius-pill;
   }
 }

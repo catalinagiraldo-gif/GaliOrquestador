@@ -1135,3 +1135,191 @@ $agent-color: var(--agent-color, #{$primary-500});
   from { opacity: 0; transform: scale(0.94) translateY(16px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+// ── Capa Determinista ─────────────────────────────────────────────────────────
+
+.determinista-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-4;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #60a5fa;
+  border-radius: $radius-lg;
+  padding: $size-5 $size-6;
+
+  &__icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+  }
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: #1e40af;
+  }
+
+  &__sub {
+    font-size: $font-xs;
+    color: $gray-600;
+    line-height: 1.5;
+  }
+
+  &__cta {
+    font-size: $font-xs;
+    color: #2563eb;
+    font-weight: $font-semibold;
+    text-decoration: none;
+    white-space: nowrap;
+    align-self: center;
+    flex-shrink: 0;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.determinista-checks {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+}
+
+.determinista-check {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  font-size: $font-xs;
+  color: $gray-700;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--ok { background: #22c55e; }
+    &--warn { background: #f59e0b; }
+    &--off { background: $gray-300; }
+  }
+
+  &__link {
+    margin-left: auto;
+    font-size: $font-xs;
+    color: #2563eb;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── Botón umbrales de agencia ────────────────────────────────────
+.agentes-page__btn-agency {
+  display: inline-flex;
+  align-items: center;
+  gap: $size-1;
+  height: 36px;
+  padding: 0 $size-4;
+  border: 1px solid rgba($primary-500, 0.35);
+  border-radius: $radius-md;
+  background: rgba($primary-500, 0.05);
+  color: $primary-600;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: rgba($primary-500, 0.1);
+    border-color: $primary-500;
+  }
+}
+
+// ── Success rate semaphore ───────────────────────────────────────
+.success-rate-semaphore {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--ok     { background: #22c55e; box-shadow: 0 0 4px rgba(#22c55e, 0.5); }
+    &--warn   { background: #f59e0b; box-shadow: 0 0 4px rgba(#f59e0b, 0.5); }
+    &--danger { background: #ef4444; box-shadow: 0 0 4px rgba(#ef4444, 0.5); }
+
+    &--lg {
+      width: 10px;
+      height: 10px;
+    }
+  }
+}
+
+// ── Benchmark hint in card ────────────────────────────────────────
+.agent-card__benchmark-hint {
+  display: block;
+  font-size: 10px;
+  color: $gray-400;
+  margin-top: 1px;
+}
+
+.agent-card__metric--rate {
+  cursor: help;
+}
+
+// ── Agent stat benchmark bar (detail panel) ──────────────────────
+.agent-stat__rate-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.agent-stat__benchmark-bar {
+  margin-top: $size-1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.agent-stat__benchmark-track {
+  position: relative;
+  height: 6px;
+  background: $gray-100;
+  border-radius: 3px;
+  overflow: visible;
+  width: 100%;
+}
+
+.agent-stat__benchmark-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.agent-stat__benchmark-marker {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: $gray-400;
+  border-radius: 1px;
+  transform: translateX(-50%);
+}
+
+.agent-stat__benchmark-label {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $gray-400;
+}

@@ -237,6 +237,11 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
       import('./pages/agentes/agentes-page.component').then(m => m.AgentesPageComponent),
   },
   {
+    path: 'micromundo',
+    loadComponent: () =>
+      import('./pages/micromundo/micromundo-page.component').then(m => m.MicromundoPageComponent),
+  },
+  {
     path: 'skills/nueva',
     loadComponent: () =>
       import('./pages/skills/skill-editor-page.component').then(m => m.SkillEditorPageComponent),
@@ -265,6 +270,13 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
     path: 'conexiones',
     loadComponent: () =>
       import('./pages/conexiones/conexiones-page.component').then(m => m.ConexionesPageComponent),
+  },
+
+  // ── Señales (Spec 4) ──
+  {
+    path: 'senales',
+    loadComponent: () =>
+      import('./pages/senales/senales-page.component').then(m => m.SenalesPageComponent),
   },
 
   {

@@ -1,18 +1,39 @@
 <div class="fin-dashboard">
 
+  <gali-module-activation-bar
+    agentId="kronos"
+    sectionName="Dashboard Financiero"
+    skillSuggestion="Alerta umbral P&L semanal"
+  />
+
   <!-- Header -->
   <div class="fin-header">
     <div class="fin-header__left">
       <h1 class="fin-header__title">Dashboard Financiero</h1>
       <span class="fin-header__sub">
         <abbr title="P&L = Pérdidas y Ganancias. Muestra cuánto dinero real te quedó después de restar todos los costos: producto, pauta, logística, novedades y garantías.">P&amp;L real</abbr>
-        · Mayo 2026 · calculado por Gali
+        · <strong class="fin-period-badge fin-period-badge--monthly">Mensual — Mayo 2026</strong>
+        · calculado por Gali
       </span>
     </div>
-    <div class="fin-header__gali">
-      <span class="fin-header__gali-dot"></span>
-      <span class="fin-header__gali-label">Agente Financiero · Gali</span>
+    <div class="fin-header__gali fin-header__gali--kronos">
+      <span class="fin-header__gali-dot fin-header__gali-dot--kronos"></span>
+      <span class="fin-header__gali-label"><strong style="color:#60a5fa">Kronos</strong> · Agente Financiero · activo</span>
     </div>
+  </div>
+
+  <!-- Kronos narrative bar -->
+  <div class="kronos-narrative-bar">
+    <div class="kronos-narrative-bar__identity">
+      <span class="kronos-narrative-bar__dot"></span>
+      <span class="kronos-narrative-bar__name">Kronos narra:</span>
+    </div>
+    <p class="kronos-narrative-bar__text">
+      Mayo 2026: facturaste <strong>$14.82M</strong> en ingresos brutos.
+      Después de COGS, flete, pauta ($3.1M), novedades (14%) y comisiones, te quedaron
+      <strong>$3.808M netos — 25.7% de margen real</strong>.
+      Tu mayor oportunidad de mejora: reducir la tasa de novedad de 14% a 10% sube el margen a ~28%.
+    </p>
   </div>
 
   <!-- Glosario para novatos — desplegable -->
@@ -65,7 +86,11 @@
     </div>
   </details>
 
-  <!-- KPI cards — galiInsight on hover -->
+  <!-- KPI cards — galiInsight on hover — MENSUAL Mayo 2026 -->
+  <div class="kpi-section-header">
+    <span class="kpi-section-header__label">Métricas clave</span>
+    <span class="fin-period-badge fin-period-badge--monthly">Mensual · Mayo 2026</span>
+  </div>
   <div class="kpi-grid">
     @for (kpi of kpis; track kpi.label) {
       <div class="kpi-card" [class.kpi-card--warn]="kpi.tone === 'warn'">
@@ -119,11 +144,14 @@
     </div>
   </div>
 
-  <!-- Weekly breakdown -->
+  <!-- Weekly breakdown — SEMANAL -->
   <div class="weekly-section">
     <div class="weekly-section__header">
-      <h2 class="weekly-section__title">Desglose semanal</h2>
-      <div class="week-filter">
+      <div class="weekly-section__title-group">
+        <h2 class="weekly-section__title">Desglose semanal</h2>
+        <span class="fin-period-badge fin-period-badge--weekly">Semanal · por semana</span>
+      </div>
+      <div class="week-filter" style="margin-top: 0">
         <button type="button" class="week-filter__btn"
           [class.week-filter__btn--active]="activeWeekFilter() === '4s'"
           (click)="activeWeekFilter.set('4s')">Últimas 4 sem.</button>
@@ -133,7 +161,7 @@
       </div>
     </div>
 
-    <div class="weekly-table-wrap">
+    <div class="weekly-table-wrap" style="margin-top: 0">
       <table class="weekly-table">
         <thead>
           <tr>
@@ -258,9 +286,9 @@
         <h2 class="eco-section__title">Economía unitaria por producto</h2>
         <span class="eco-section__sub">LTV, CAC y margen de contribución por cada peso invertido</span>
       </div>
-      <div class="eco-section__gali">
-        <span class="eco-section__gali-dot"></span>
-        <span>Agente Financiero · Gali</span>
+      <div class="eco-section__gali eco-section__gali--kronos">
+        <span class="eco-section__gali-dot eco-section__gali-dot--kronos"></span>
+        <span><strong style="color:#60a5fa">Kronos</strong> · Economía unitaria</span>
       </div>
     </div>
 
@@ -311,6 +339,118 @@
         Bandas de Fitness necesita 14 semanas para recuperar inversión — demasiado para el ciclo de vida del producto.
       </div>
       <a routerLink="/gali-v5/reglas" class="eco-insight__cta">Ver reglas de Roax →</a>
+    </div>
+  </div>
+
+  <!-- ── P&L DESGLOSADO POR CANAL (Kronos) — MENSUAL ── -->
+  <div class="channel-section">
+    <div class="channel-section__header">
+      <div class="channel-section__title-group">
+        <div class="channel-section__title-row">
+          <h2 class="channel-section__title">P&amp;L por Canal de Venta</h2>
+          <span class="fin-period-badge fin-period-badge--monthly">Mensual · Mayo 2026</span>
+        </div>
+        <span class="channel-section__sub">
+          ¿Cuánto ganó cada canal después de todos los costos reales?
+          Meta / TikTok Shop / Shopify / WhatsApp / Directo — cifras de Mayo 2026 completo.
+        </span>
+      </div>
+      <div class="channel-section__kronos">
+        <span class="channel-section__kronos-dot"></span>
+        <span><strong style="color:#60a5fa">Kronos</strong> · Agente Financiero · activo</span>
+      </div>
+    </div>
+
+    <!-- Kronos narración del canal -->
+    <div class="channel-kronos-intro">
+      <span class="channel-kronos-intro__dot"></span>
+      <span class="channel-kronos-intro__text">
+        <strong>Kronos calculó</strong> estos datos cruzando ventas reales (no atribuidas por Meta) con
+        costos operativos reales por canal. El ROAS Real es lo que te quedó a ti — no lo que reporta la plataforma.
+      </span>
+    </div>
+
+    <!-- Bar chart de participación -->
+    <div class="channel-share-chart">
+      @for (row of channelRows; track row.channel) {
+        <div class="channel-share-bar" [title]="row.channel + ': ' + channelSharePct(row.ventas) + '% de ventas'">
+          <div class="channel-share-bar__fill channel-share-bar__fill--{{row.channel | lowercase | slice:0:3}}"
+            [style.width.%]="channelSharePct(row.ventas)">
+          </div>
+        </div>
+      }
+      <div class="channel-share-legend">
+        @for (row of channelRows; track row.channel) {
+          <span class="channel-legend-item channel-legend-item--{{row.channel | lowercase | slice:0:3}}">
+            {{ row.emoji }} {{ row.channel }} {{ channelSharePct(row.ventas) }}%
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Tabla de canales -->
+    <div class="channel-table-wrap">
+      <table class="channel-table">
+        <thead>
+          <tr>
+            <th>Canal</th>
+            <th>Ventas</th>
+            <th>Pedidos</th>
+            <th>ROAS Meta</th>
+            <th>ROAS Real</th>
+            <th>Novedad</th>
+            <th>Utilidad</th>
+            <th>Margen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of channelRows; track row.channel) {
+            <tr class="channel-row">
+              <td class="channel-row__name">
+                <span class="channel-row__emoji">{{ row.emoji }}</span>
+                <span>{{ row.channel }}</span>
+              </td>
+              <td class="channel-row__num">{{ formatCOP(row.ventas) }}</td>
+              <td class="channel-row__num">{{ row.pedidos }}</td>
+              <td class="channel-row__num">
+                @if (row.roas > 0) {
+                  <span [class]="row.roas >= 4 ? 'roas-badge roas-badge--ok' : 'roas-badge roas-badge--warn'">{{ row.roas }}×</span>
+                } @else {
+                  <span class="channel-row__organic">Orgánico</span>
+                }
+              </td>
+              <td class="channel-row__num">
+                @if (row.roasReal > 0) {
+                  <span [class]="row.roasReal >= row.roas ? 'roas-badge roas-badge--ok' : 'roas-badge roas-badge--warn'"
+                    [galiInsight]="row.kronosInsight">{{ row.roasReal }}×</span>
+                } @else {
+                  <span class="channel-row__organic" [galiInsight]="row.kronosInsight">—</span>
+                }
+              </td>
+              <td class="channel-row__num" [class.channel-row__num--warn]="row.novedad > 12">{{ row.novedad }}%</td>
+              <td class="channel-row__num channel-row__num--profit">{{ formatCOP(row.utilidad) }}</td>
+              <td class="channel-row__num">
+                <span class="channel-margin-badge"
+                  [class.channel-margin-badge--high]="row.margen >= 35"
+                  [class.channel-margin-badge--mid]="row.margen >= 25 && row.margen < 35"
+                  [class.channel-margin-badge--low]="row.margen < 25">
+                  {{ row.margen }}%
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="channel-kronos-insight">
+      <span class="channel-kronos-insight__dot">💎</span>
+      <div class="channel-kronos-insight__body">
+        <strong>Kronos recomienda:</strong> Tu ROAS real más alto es WhatsApp (42.6% margen) y Shopify (38.3%) — canales sin costo de pauta.
+        TikTok Shop tiene mejor ROAS real que Meta (3.8× vs 2.9×). Considera redistribuir 20% del presupuesto Meta hacia TikTok Shop.
+        El canal Directo tiene 12% de novedad — conectar Page Pilot MCP reduciría ese ratio con landings más precisas.
+      </div>
+      <a routerLink="/gali-v5/conexiones" class="channel-kronos-insight__cta">Conectar canales →</a>
     </div>
   </div>
 

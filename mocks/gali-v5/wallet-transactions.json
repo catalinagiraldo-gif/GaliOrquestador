@@ -1,4 +1,52 @@
 {
+  "financialSummary": {
+    "periodo": "semanal",
+    "semana": "2026-W23",
+    "label_periodo": "Semana 23 · Jun 2026",
+    "ingresos_brutos": {
+      "valor": 2740000,
+      "label": "$2.74M"
+    },
+    "costos_operativos": {
+      "valor": 2115000,
+      "label": "$2.11M",
+      "detalle": "COGS $1.11M · Flete $370k · Pauta $686k · Novedades $185k · Comisiones $148k"
+    },
+    "margen_neto": {
+      "valor": 625000,
+      "label": "$625k",
+      "pct": 22.8
+    },
+    "fugas": [
+      {
+        "id": "novedades",
+        "titulo": "Novedades logísticas (14%)",
+        "impacto": "$185k/sem perdido en devoluciones",
+        "impacto_valor": 185000,
+        "canal": "Coordinadora Bogotá en alerta activa",
+        "severidad": "alta",
+        "accion": "Ver smart routing",
+        "accion_ruta": "/gali-v5/logistica/torre-logistica"
+      },
+      {
+        "id": "roas-gap",
+        "titulo": "Gap ROAS Meta vs real",
+        "impacto": "$68k/sem en pauta ineficiente",
+        "impacto_valor": 68000,
+        "canal": "Meta declara 2.9× · Gali mide 1.91×",
+        "severidad": "media",
+        "accion": "Ver análisis Roax",
+        "accion_ruta": "/gali-v5/marketing/roax-informes"
+      }
+    ],
+    "siigo": {
+      "sin_facturar_valor": 450000,
+      "sin_facturar_label": "$450k",
+      "facturas_pendientes": 28,
+      "dias_sin_sincronizar": 6,
+      "estado": "urgente"
+    }
+  },
   "transactions": [
     {
       "num": "50028",
@@ -6,7 +54,10 @@
       "tipo": "ENTRADA",
       "monto": "$ 49.000",
       "montoPrevio": "$ 59.175.505",
-      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885851* GUIA: *014144658336*"
+      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885851* GUIA: *014144658336*",
+      "descripcionHumana": "Ganancia por pedido #33885851 — Collar GPS para mascotas",
+      "producto": "Collar GPS para mascotas",
+      "guia": "014144658336"
     },
     {
       "num": "50027",
@@ -14,7 +65,9 @@
       "tipo": "SALIDA",
       "monto": "$ 12.500",
       "montoPrevio": "$ 59.126.505",
-      "descripcion": "SALIDA POR COMISIÓN DE LOGÍSTICA EN ORDEN: 33885840* GUIA: *014144658320*"
+      "descripcion": "SALIDA POR COMISIÓN DE LOGÍSTICA EN ORDEN: 33885840* GUIA: *014144658320*",
+      "descripcionHumana": "Comisión logística · Pedido #33885840",
+      "guia": "014144658320"
     },
     {
       "num": "50026",
@@ -22,7 +75,9 @@
       "tipo": "ENTRADA",
       "monto": "$ 85.000",
       "montoPrevio": "$ 59.139.005",
-      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885822* GUIA: *014144658301*"
+      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885822* GUIA: *014144658301*",
+      "descripcionHumana": "Pago recibido · Pedido #33885822 entregado ✓",
+      "guia": "014144658301"
     },
     {
       "num": "50025",
@@ -30,7 +85,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 120.000",
       "montoPrevio": "$ 59.054.005",
-      "descripcion": "ENTRADA POR RECARGA SPEI DE CARTERA USUARIO"
+      "descripcion": "ENTRADA POR RECARGA SPEI DE CARTERA USUARIO",
+      "descripcionHumana": "Recarga SPEI a tu wallet"
     },
     {
       "num": "50024",
@@ -38,7 +94,8 @@
       "tipo": "SALIDA",
       "monto": "$ 50.000",
       "montoPrevio": "$ 58.934.005",
-      "descripcion": "SALIDA POR RETIRO DE SALDO A CUENTA BANCARIA ****4521"
+      "descripcion": "SALIDA POR RETIRO DE SALDO A CUENTA BANCARIA ****4521",
+      "descripcionHumana": "Retiro a cuenta bancaria ****4521"
     },
     {
       "num": "50023",
@@ -46,7 +103,10 @@
       "tipo": "ENTRADA",
       "monto": "$ 67.200",
       "montoPrevio": "$ 58.984.005",
-      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885790* GUIA: *014144658280*"
+      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885790* GUIA: *014144658280*",
+      "descripcionHumana": "Ganancia por pedido #33885790 — Skincare K-Beauty Pack",
+      "producto": "Skincare K-Beauty Pack",
+      "guia": "014144658280"
     },
     {
       "num": "50022",
@@ -54,7 +114,8 @@
       "tipo": "SALIDA",
       "monto": "$ 8.500",
       "montoPrevio": "$ 58.916.805",
-      "descripcion": "SALIDA POR FLETE DE TRANSPORTADORA EN ORDEN: 33885775*"
+      "descripcion": "SALIDA POR FLETE DE TRANSPORTADORA EN ORDEN: 33885775*",
+      "descripcionHumana": "Flete Servientrega · Pedido #33885775"
     },
     {
       "num": "50021",
@@ -62,7 +123,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 200.000",
       "montoPrevio": "$ 58.925.305",
-      "descripcion": "ENTRADA POR RECARGA PSE DE CARTERA USUARIO"
+      "descripcion": "ENTRADA POR RECARGA PSE DE CARTERA USUARIO",
+      "descripcionHumana": "Recarga PSE a tu wallet"
     },
     {
       "num": "50020",
@@ -70,7 +132,10 @@
       "tipo": "ENTRADA",
       "monto": "$ 45.900",
       "montoPrevio": "$ 58.725.305",
-      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885750* GUIA: *014144658250*"
+      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885750* GUIA: *014144658250*",
+      "descripcionHumana": "Ganancia por pedido #33885750 — Collar GPS para mascotas",
+      "producto": "Collar GPS para mascotas",
+      "guia": "014144658250"
     },
     {
       "num": "50019",
@@ -78,7 +143,8 @@
       "tipo": "SALIDA",
       "monto": "$ 15.750",
       "montoPrevio": "$ 58.679.405",
-      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160612"
+      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160612",
+      "descripcionHumana": "Comisión Dropi · Pedido #160612"
     },
     {
       "num": "50018",
@@ -86,7 +152,10 @@
       "tipo": "ENTRADA",
       "monto": "$ 92.000",
       "montoPrevio": "$ 58.695.155",
-      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885720* GUIA: *014144658220*"
+      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885720* GUIA: *014144658220*",
+      "descripcionHumana": "Ganancia por pedido #33885720 — Collar GPS para mascotas",
+      "producto": "Collar GPS para mascotas",
+      "guia": "014144658220"
     },
     {
       "num": "50017",
@@ -94,7 +163,8 @@
       "tipo": "SALIDA",
       "monto": "$ 100.000",
       "montoPrevio": "$ 58.603.155",
-      "descripcion": "SALIDA POR RETIRO DE SALDO A NEQUI ****8832"
+      "descripcion": "SALIDA POR RETIRO DE SALDO A NEQUI ****8832",
+      "descripcionHumana": "Retiro a Nequi ****8832"
     },
     {
       "num": "50016",
@@ -102,7 +172,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 150.000",
       "montoPrevio": "$ 58.703.155",
-      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885690*"
+      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885690*",
+      "descripcionHumana": "Pago recibido · Pedido #33885690 entregado ✓"
     },
     {
       "num": "50015",
@@ -110,7 +181,9 @@
       "tipo": "ENTRADA",
       "monto": "$ 28.990",
       "montoPrevio": "$ 58.553.155",
-      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885660*"
+      "descripcion": "ENTRADA POR GANANCIA EN LA ORDEN COMO DROPSHIPPER: 33885660*",
+      "descripcionHumana": "Ganancia por pedido #33885660 — Skincare K-Beauty Pack",
+      "producto": "Skincare K-Beauty Pack"
     },
     {
       "num": "50014",
@@ -118,7 +191,8 @@
       "tipo": "SALIDA",
       "monto": "$ 72.800",
       "montoPrevio": "$ 58.524.165",
-      "descripcion": "SALIDA POR PAGO A PROVEEDOR EN ORDEN #160611"
+      "descripcion": "SALIDA POR PAGO A PROVEEDOR EN ORDEN #160611",
+      "descripcionHumana": "Pago al proveedor · Pedido #160611"
     },
     {
       "num": "50013",
@@ -126,7 +200,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 500.000",
       "montoPrevio": "$ 58.596.965",
-      "descripcion": "ENTRADA POR RECARGA SPEI DE CARTERA USUARIO"
+      "descripcion": "ENTRADA POR RECARGA SPEI DE CARTERA USUARIO",
+      "descripcionHumana": "Recarga SPEI a tu wallet"
     },
     {
       "num": "50012",
@@ -134,7 +209,8 @@
       "tipo": "SALIDA",
       "monto": "$ 11.000",
       "montoPrevio": "$ 58.096.965",
-      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160604"
+      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160604",
+      "descripcionHumana": "Comisión Dropi · Pedido #160604"
     },
     {
       "num": "50011",
@@ -142,7 +218,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 89.000",
       "montoPrevio": "$ 58.107.965",
-      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885620*"
+      "descripcion": "ENTRADA POR RECAUDO DE ORDEN ENTREGADA: 33885620*",
+      "descripcionHumana": "Pago recibido · Pedido #33885620 entregado ✓"
     },
     {
       "num": "50010",
@@ -150,7 +227,8 @@
       "tipo": "ENTRADA",
       "monto": "$ 250.000",
       "montoPrevio": "$ 58.018.965",
-      "descripcion": "ENTRADA POR RECARGA PSE DE CARTERA USUARIO"
+      "descripcion": "ENTRADA POR RECARGA PSE DE CARTERA USUARIO",
+      "descripcionHumana": "Recarga PSE a tu wallet"
     },
     {
       "num": "50009",
@@ -158,7 +236,8 @@
       "tipo": "SALIDA",
       "monto": "$ 22.500",
       "montoPrevio": "$ 57.768.965",
-      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160623"
+      "descripcion": "SALIDA POR COMISIÓN DE PEDIDO #160623",
+      "descripcionHumana": "Comisión Dropi · Pedido #160623"
     }
   ],
   "alertMessage": "Los pedidos Sin Recaudo no generan movimiento de entrada en tu wallet hasta que sean entregados y confirmados por la transportadora."

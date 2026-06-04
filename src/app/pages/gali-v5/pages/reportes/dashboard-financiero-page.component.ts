@@ -2,6 +2,8 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
+import { GaliModuleActivationBarComponent } from '../../components/gali-module-activation-bar/gali-module-activation-bar.component';
+import KPIS_GLOBAL from '../../../../../../mocks/gali-v5/kpis-global.json';
 
 interface WaterfallBar {
   label: string;
@@ -30,10 +32,24 @@ interface GaliProjection {
   acciones: string[];
 }
 
+interface ChannelRow {
+  channel: string;
+  emoji: string;
+  ventas: number;
+  pedidos: number;
+  roas: number;
+  roasReal: number;
+  novedad: number;
+  pauta: number;
+  utilidad: number;
+  margen: number;
+  kronosInsight: string;
+}
+
 @Component({
   selector: 'app-dashboard-financiero-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliInsightDirective],
+  imports: [CommonModule, RouterModule, GaliInsightDirective, GaliModuleActivationBarComponent],
   templateUrl: './dashboard-financiero-page.component.html',
   styleUrl: './dashboard-financiero-page.component.scss',
 })
@@ -42,18 +58,18 @@ export class DashboardFinancieroPageComponent {
   readonly activeWeekFilter = signal<'4s' | '8s' | '12s'>('4s');
   readonly activeProjection = signal<'conservador' | 'base' | 'optimista'>('base');
 
-  // ── P&L Waterfall data ───────────────────────────────────────
+  // ── P&L Waterfall data — valores de kpis-global.json ────────
   readonly waterfallBars: WaterfallBar[] = [
-    { label: 'Ingresos brutos', value: 14_820_000, type: 'revenue', tooltip: '2.470 pedidos × $6.000 precio promedio' },
+    { label: 'Ingresos brutos', value: KPIS_GLOBAL.ingresos_brutos_mensual.valor, type: 'revenue', tooltip: '2.470 pedidos × $6.000 precio promedio' },
     { label: 'Costo del producto (COGS)', value: -4_446_000, type: 'cost', tooltip: '30% de los ingresos brutos' },
     { label: 'Flete pagado', value: -1_482_000, type: 'cost', tooltip: '$600/pedido promedio Servientrega + Coordinadora' },
     { label: 'Subtotal post-flete/COGS', value: 8_892_000, type: 'subtotal', tooltip: 'Margen bruto después de producto y flete' },
-    { label: 'Pauta Meta (Roax)', value: -3_100_000, type: 'cost', tooltip: '21% de los ingresos · ROAS 4.78x en ventas directas' },
+    { label: 'Pauta Meta (Roax)', value: -3_100_000, type: 'cost', tooltip: '21% de los ingresos · ROAS 2.9x declarado por Meta' },
     { label: 'Novedades / devoluciones', value: -740_000, type: 'cost', tooltip: '14% tasa novedad · $300 pérdida promedio por novedad' },
     { label: 'Comisión Dropi', value: -594_000, type: 'cost', tooltip: '4% de ingresos brutos' },
     { label: 'Subtotal post-marketing', value: 4_458_000, type: 'subtotal', tooltip: 'Margen después de todos los costos variables' },
     { label: 'Gastos fijos operativos', value: -650_000, type: 'cost', tooltip: 'Herramientas, plataformas, suscripciones' },
-    { label: 'Utilidad neta del mes', value: 3_808_000, type: 'net', tooltip: 'P&L real de Mayo 2026 — Gali calculado' },
+    { label: 'Utilidad neta del mes', value: KPIS_GLOBAL.utilidad_neta_mensual.valor, type: 'net', tooltip: 'P&L real de Mayo 2026 — Gali calculado' },
   ];
 
   get maxAbsValue(): number {
@@ -153,11 +169,11 @@ export class DashboardFinancieroPageComponent {
     return this.projections.find(p => p.scenario === this.activeProjection())!;
   }
 
-  // ── KPI summary ─────────────────────────────────────────────
+  // ── KPI summary — etiquetas desde kpis-global.json ──────────
   readonly kpis = [
-    { label: 'Ingresos brutos', value: '$14.8M', delta: '+12%', tone: 'ok',
+    { label: 'Ingresos brutos', value: KPIS_GLOBAL.ingresos_brutos_mensual.label, delta: '+12%', tone: 'ok',
       insight: 'Crecimiento sostenido 3 meses seguidos. Proyección Gali: $16.5M próximo mes si escalas Difusor.' },
-    { label: 'Utilidad neta', value: '$3.8M', delta: '+8%', tone: 'ok',
+    { label: 'Utilidad neta', value: KPIS_GLOBAL.utilidad_neta_mensual.label, delta: '+8%', tone: 'ok',
       insight: 'Por encima del promedio histórico tuyo ($3.1M). El 60% viene del proyecto Skincare Pack.' },
     { label: 'Margen real', value: '25.7%', delta: '+1.4pp', tone: 'ok',
       insight: 'Margen saludable para dropshipping. La reducción de novedad de 16% a 14% aportó 0.9pp.' },
@@ -206,5 +222,82 @@ export class DashboardFinancieroPageComponent {
     if (v >= 1_000_000) return `$${(v/1_000_000).toFixed(1)}M`;
     if (v >= 1_000) return `$${(v/1_000).toFixed(0)}k`;
     return `$${v}`;
+  }
+
+  // ── P&L por canal (Kronos) ───────────────────────────────────
+  readonly channelRows: ChannelRow[] = [
+    {
+      channel: 'Meta Ads',
+      emoji: '📘',
+      ventas: 9_340_000,
+      pedidos: 1_557,
+      roas: 3.1,
+      roasReal: 2.9,
+      novedad: 15,
+      pauta: 3_100_000,
+      utilidad: 2_530_000,
+      margen: 27.1,
+      kronosInsight: 'Mayor canal. ROAS real 0.2× por debajo de Meta por novedades en Cali. Oportunidad: reducir novedad en ese foco.',
+    },
+    {
+      channel: 'TikTok Shop',
+      emoji: '🎵',
+      ventas: 2_960_000,
+      pedidos: 493,
+      roas: 4.2,
+      roasReal: 3.8,
+      novedad: 11,
+      pauta: 720_000,
+      utilidad: 890_000,
+      margen: 30.1,
+      kronosInsight: 'Mejor ROAS real del portafolio. Videos cortos <47s tienen 3× más CVR. Canal en expansión — considera aumentar presupuesto.',
+    },
+    {
+      channel: 'Shopify',
+      emoji: '🛍',
+      ventas: 1_540_000,
+      pedidos: 257,
+      roas: 0,
+      roasReal: 0,
+      novedad: 9,
+      pauta: 0,
+      utilidad: 590_000,
+      margen: 38.3,
+      kronosInsight: 'Canal orgánico — sin pauta. Mayor margen del portafolio (38%). Priorizar retención y upsell aquí.',
+    },
+    {
+      channel: 'WhatsApp',
+      emoji: '💚',
+      ventas: 680_000,
+      pedidos: 113,
+      roas: 0,
+      roasReal: 0,
+      novedad: 8,
+      pauta: 0,
+      utilidad: 290_000,
+      margen: 42.6,
+      kronosInsight: 'Mejor margen neto (42.6%). Canal de alta conversión. Chatea Pro gestiona el 89% sin intervención manual.',
+    },
+    {
+      channel: 'Directo',
+      emoji: '🔗',
+      ventas: 300_000,
+      pedidos: 50,
+      roas: 0,
+      roasReal: 0,
+      novedad: 12,
+      pauta: 0,
+      utilidad: 98_000,
+      margen: 32.7,
+      kronosInsight: 'Canal directo con tráfico orgánico. Novedad 12% — ligeramente sobre el ideal. Activar landing Page Pilot reduciría este ratio.',
+    },
+  ];
+
+  get channelTotalVentas(): number {
+    return this.channelRows.reduce((s, r) => s + r.ventas, 0);
+  }
+
+  channelSharePct(ventas: number): number {
+    return Math.round((ventas / this.channelTotalVentas) * 100);
   }
 }

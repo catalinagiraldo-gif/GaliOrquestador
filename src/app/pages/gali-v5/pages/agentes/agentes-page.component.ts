@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { GaliAgencyThresholdsPanelComponent } from '../../components/gali-agency-thresholds-panel/gali-agency-thresholds-panel.component';
 
 interface AgentSkill {
   name: string;
@@ -175,6 +176,40 @@ const AGENTS: Agent[] = [
       { label: 'Ir a Caza Productos', icon: 'pi-bolt', variant: 'secondary' },
     ],
   },
+  {
+    id: 'kronos',
+    name: 'Kronos',
+    role: 'Finanzas & P&L',
+    color: '#60a5fa',
+    status: 'activo',
+    lastAction: 'Detectó 28 pedidos entregados sin facturar en Siigo',
+    lastActionTime: 'hace 1h',
+    successRate: 96,
+    actionsThisWeek: 22,
+    description: 'Gestiona tu P&L en tiempo real. Facturación automática en Siigo al estado "Entregado", análisis de márgenes por canal y alertas de riesgo fiscal.',
+    capabilities: [
+      'Calcular P&L real descontando flete, COGS, novedades y garantías',
+      'Facturar automáticamente en Siigo cuando el pedido llega a "Entregado"',
+      'Desglosar ROAS real por canal: Meta, TikTok Shop, Shopify, WhatsApp',
+      'Alertar sobre deuda fiscal acumulada sin facturar',
+      'Proyectar utilidad neta de las próximas 4 semanas según el escenario actual',
+    ],
+    skills: [
+      { name: 'Facturación automática Siigo', status: 'paused', runs: 0 },
+      { name: 'Alerta umbral P&L semanal', status: 'active', runs: 8 },
+    ],
+    recentHistory: [
+      { text: 'Detectó 28 pedidos entregados sin facturar — riesgo fiscal', time: 'hace 1h', result: 'warn', impact: '$4.2M sin declarar' },
+      { text: 'Calculó P&L real Mayo: $3.8M utilidad neta (25.7% margen)', time: 'hace 3h', result: 'ok', impact: 'ROAS Meta vs real: 3.1× → 2.9×' },
+      { text: 'Alertó: ROAS TikTok Shop supera Meta en formato video corto', time: 'ayer', result: 'info', impact: 'Oportunidad de redistribución presupuesto' },
+      { text: 'Conectó pipeline Siigo — pendiente activación de regla por ti', time: 'hace 2 días', result: 'warn' },
+    ],
+    ctas: [
+      { label: 'Conectar Siigo', icon: 'pi-link', variant: 'primary' },
+      { label: 'Ver P&L por canal', icon: 'pi-chart-bar', variant: 'secondary' },
+      { label: 'Ver Dashboard Financiero', icon: 'pi-wallet', variant: 'secondary' },
+    ],
+  },
 ];
 
 interface CustomAgentDraft {
@@ -188,7 +223,7 @@ interface CustomAgentDraft {
 @Component({
   selector: 'app-agentes-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, GaliAgencyThresholdsPanelComponent],
   templateUrl: './agentes-page.component.html',
   styleUrl: './agentes-page.component.scss',
 })
@@ -196,6 +231,22 @@ export class AgentesPageComponent {
   readonly agents = AGENTS;
   selectedAgent = signal<Agent>(AGENTS[0]);
   readonly showCreateAgent = signal(false);
+  readonly showAgencyPanel = signal(false);
+
+  readonly DROPI_BENCHMARK = 89;
+  readonly successRateTooltip = 'Tasa de éxito = acciones ejecutadas sin requerir intervención manual. Promedio Dropi: 89%.';
+
+  successRateColor(rate: number): string {
+    if (rate >= 80) return '#22c55e';
+    if (rate >= 70) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  successRateLabel(rate: number): 'ok' | 'warn' | 'danger' {
+    if (rate >= 80) return 'ok';
+    if (rate >= 70) return 'warn';
+    return 'danger';
+  }
   readonly createAgentDraft = signal<CustomAgentDraft>({ nombre: '', rol: '', descripcion: '', skills: [], step: 1 });
   readonly createAgentDone = signal(false);
 

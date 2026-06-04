@@ -64,6 +64,26 @@ export class GaliWorkspaceService implements OnDestroy {
     localStorage.setItem('gali_complexity', level);
   }
 
+  /** Módulos visibles en el rail — null = todos visibles (sin restricción) */
+  readonly visibleModules = signal<string[] | null>(
+    JSON.parse(localStorage.getItem('gali_visible_modules') ?? 'null')
+  );
+
+  setVisibleModules(modules: string[]): void {
+    this.visibleModules.set(modules);
+    localStorage.setItem('gali_visible_modules', JSON.stringify(modules));
+  }
+
+  showAllModules(): void {
+    this.visibleModules.set(null);
+    localStorage.removeItem('gali_visible_modules');
+  }
+
+  isModuleVisible(key: string): boolean {
+    const visible = this.visibleModules();
+    return visible === null || visible.includes(key);
+  }
+
   /** Business DNA — perfil derivado del onboarding y comportamiento del usuario */
   readonly businessDNA = computed(() => ({
     goalId:        localStorage.getItem('gali_goal_id') ?? null,

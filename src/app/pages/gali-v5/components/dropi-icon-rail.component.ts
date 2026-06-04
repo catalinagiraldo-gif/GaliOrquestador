@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -7,6 +7,7 @@ import {
   IconRailItem,
   resolveActiveRailKey,
 } from '../dropi-sections.config';
+import { GaliWorkspaceService } from '../services/gali-workspace.service';
 
 @Component({
   selector: 'dropi-icon-rail',
@@ -25,7 +26,7 @@ import {
 
         <!-- Módulos operativos -->
         <div class="icon-rail__group">
-          @for (item of mainItems; track item.key) {
+          @for (item of mainItems(); track item.key) {
             <a
               [routerLink]="item.route"
               class="icon-rail__item"
@@ -47,7 +48,7 @@ import {
 
         <!-- Utilidades -->
         <div class="icon-rail__group">
-          @for (item of utilityItems; track item.key) {
+          @for (item of utilityItems(); track item.key) {
             <a
               [routerLink]="item.route"
               class="icon-rail__item"
@@ -80,10 +81,21 @@ import {
 })
 export class DropiIconRailComponent {
   private router = inject(Router);
+  private ws = inject(GaliWorkspaceService);
 
   activeKey = signal(resolveActiveRailKey(inject(Router).url));
-  mainItems: IconRailItem[] = DROPI_ICON_RAIL.filter(i => i.group === 'main');
-  utilityItems: IconRailItem[] = DROPI_ICON_RAIL.filter(i => i.group === 'utility');
+
+  readonly mainItems = computed(() => {
+    const visible = this.ws.visibleModules();
+    const all = DROPI_ICON_RAIL.filter(i => i.group === 'main');
+    return visible === null ? all : all.filter(i => visible.includes(i.key));
+  });
+
+  readonly utilityItems = computed(() => {
+    const visible = this.ws.visibleModules();
+    const all = DROPI_ICON_RAIL.filter(i => i.group === 'utility');
+    return visible === null ? all : all.filter(i => visible.includes(i.key));
+  });
 
   constructor() {
     this.router.events

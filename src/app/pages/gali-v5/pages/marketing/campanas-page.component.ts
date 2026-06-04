@@ -13,7 +13,6 @@ import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
-import { GaliModuleActivationBarComponent } from '../../components/gali-module-activation-bar/gali-module-activation-bar.component';
 
 interface CampanaRow {
   id: string;
@@ -36,7 +35,6 @@ interface CampanaRow {
     DropiGaliBarComponent,
     GaliNewSkillOverlayComponent,
     GaliInsightDirective,
-    GaliModuleActivationBarComponent,
   ],
   templateUrl: './campanas-page.component.html',
   styleUrl: './campanas-page.component.scss',
@@ -50,9 +48,9 @@ export class CampanasPageComponent {
   readonly breadcrumbs = ['Marketing', 'SMS y Correo', 'Campañas masivas'];
 
   readonly galiStats: GaliBarStat[] = [
-    { value: 2, label: 'campañas escalando', variant: 'ok' },
+    { value: 2, label: 'campañas activas SMS', variant: 'ok' },
     { value: 1, label: 'pausada por CTR bajo', variant: 'warn' },
-    { value: '$66k/día', label: 'pauta total' },
+    { value: '87%', label: 'tasa apertura SMS' },
   ];
   readonly campaigns: CampanaRow[] = campanasData.campaigns;
 

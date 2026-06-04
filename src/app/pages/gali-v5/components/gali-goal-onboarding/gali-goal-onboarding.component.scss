@@ -678,3 +678,103 @@
   0%, 100% { opacity: 0.7; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.3); }
 }
+
+// ── Micromundo CTA row ────────────────────────────────────────────────────────
+
+.micromundo-cta-row {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+  border: 1px solid #bfdbfe;
+  border-radius: $radius-lg;
+  margin-bottom: $size-3;
+
+  &__icon { font-size: 20px; flex-shrink: 0; }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong { font-size: $font-sm; color: $gray-900; }
+    span { font-size: $font-xs; color: $gray-500; }
+  }
+
+  &__btn {
+    padding: $size-1 $size-3;
+    border: 1.5px solid #60a5fa;
+    border-radius: $radius-full;
+    background: none;
+    color: #2563eb;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    font-family: $font-primary;
+    white-space: nowrap;
+    transition: background 0.12s;
+
+    &:hover { background: #eff6ff; }
+  }
+}
+
+// Step 6 — Veterano confirmation (Spec 5 CA-1)
+.onboarding-modal__body--veterano {
+  text-align: left;
+}
+
+.veterano-summary {
+  background: #fffbf7;
+  border: 1px solid rgba(244, 154, 61, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.veterano-line {
+  font-size: 14px;
+  color: #333b4d;
+  margin: 0 0 8px;
+  line-height: 1.5;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.veterano-ready {
+  margin: 16px 0;
+
+  &__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475066;
+    margin: 0 0 8px;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    li {
+      font-size: 13px;
+      color: #333b4d;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.onboarding-modal__eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f49a3d;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}

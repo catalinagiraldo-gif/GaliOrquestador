@@ -2,7 +2,7 @@ import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
-export type ModuleAgentId = 'roax' | 'vigilante' | 'chatea' | 'ada';
+export type ModuleAgentId = 'roax' | 'vigilante' | 'chatea' | 'ada' | 'kronos';
 
 @Component({
   selector: 'gali-module-activation-bar',
@@ -24,6 +24,7 @@ export class GaliModuleActivationBarComponent implements OnInit {
     vigilante: { nombre: 'Vigilante',  color: '#fbbf24', emoji: '🚛', status: 'Monitoreando' },
     chatea:    { nombre: 'Chatea Pro', color: '#34d399', emoji: '💬', status: 'Activo — 43/47 resueltos' },
     ada:       { nombre: 'ADA Spy',    color: '#818cf8', emoji: '🔍', status: 'En espera' },
+    kronos:    { nombre: 'Kronos',     color: '#60a5fa', emoji: '💎', status: 'P&L actualizado' },
   };
 
   get meta() { return this.agentMeta[this.agentId]; }

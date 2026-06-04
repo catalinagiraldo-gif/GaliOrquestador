@@ -1,0 +1,95 @@
+<div class="agency-backdrop" (click)="close()">
+  <div class="agency-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="agency-panel-title">
+
+    <div class="agency-panel__header">
+      <div class="agency-panel__title-group">
+        <span class="agency-panel__glyph">⚙</span>
+        <div>
+          <h2 class="agency-panel__title" id="agency-panel-title">Umbrales de agencia</h2>
+          <p class="agency-panel__subtitle">¿Cuánta autonomía le das a cada agente?</p>
+        </div>
+      </div>
+      <button type="button" class="agency-panel__close" (click)="close()" aria-label="Cerrar panel">×</button>
+    </div>
+
+    <!-- Explicación de niveles -->
+    <div class="agency-levels-legend">
+      @for (level of levels; track level) {
+        <div class="agency-levels-legend__item">
+          <span class="agency-levels-legend__badge agency-levels-legend__badge--{{ level }}">
+            {{ LEVEL_LABELS[level] }}
+          </span>
+          <span class="agency-levels-legend__desc">{{ LEVEL_DESCRIPTIONS[level] }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Agentes -->
+    <div class="agency-agents-list">
+      @for (agent of agents(); track agent.id) {
+        <div class="agency-agent" [class.agency-agent--locked]="agent.locked">
+
+          <div class="agency-agent__identity">
+            <span class="agency-agent__dot" [style.background]="agent.color"
+              [class.agency-agent__dot--pulse]="!agent.locked"></span>
+            <div class="agency-agent__info">
+              <strong class="agency-agent__name" [style.color]="agent.color">{{ agent.name }}</strong>
+              <span class="agency-agent__role">{{ agent.role }}</span>
+            </div>
+          </div>
+
+          <p class="agency-agent__desc">{{ agent.autonomyDescription }}</p>
+
+          @if (agent.locked) {
+            <div class="agency-agent__locked-state">
+              <span class="agency-agent__lock-icon">🔒</span>
+              <span class="agency-agent__lock-msg">{{ agent.lockedReason }}</span>
+            </div>
+          } @else {
+            <div class="agency-agent__controls">
+              @for (level of levels; track level) {
+                <button
+                  type="button"
+                  class="agency-level-btn"
+                  [class]="getLevelClass(agent, level)"
+                  (click)="setLevel(agent.id, level)"
+                  [attr.aria-pressed]="agent.autonomyLevel === level">
+                  <span class="agency-level-btn__dot agency-level-btn__dot--{{ level }}"></span>
+                  {{ LEVEL_LABELS[level] }}
+                </button>
+              }
+            </div>
+
+            @if (agent.autonomyLevel === 'total') {
+              <div class="agency-agent__active-note agency-agent__active-note--total">
+                <span>✓ Actúa sin pedirte permiso dentro de tus límites en Reglas</span>
+              </div>
+            }
+            @if (agent.autonomyLevel === 'suggest') {
+              <div class="agency-agent__active-note agency-agent__active-note--suggest">
+                <span>⟳ Verás sus propuestas en "Necesitas decidir" del Hub</span>
+              </div>
+            }
+            @if (agent.autonomyLevel === 'alerts') {
+              <div class="agency-agent__active-note agency-agent__active-note--alerts">
+                <span>🔔 Solo recibirás alertas — ninguna acción automática</span>
+              </div>
+            }
+          }
+
+        </div>
+      }
+    </div>
+
+    <div class="agency-panel__footer">
+      <p class="agency-panel__footer-note">
+        Los límites exactos (presupuesto máximo, ROAS mínimo, zonas permitidas)
+        se configuran en <a href="#" class="agency-panel__footer-link">Reglas →</a>
+      </p>
+      <button type="button" class="agency-panel__save-btn" (click)="close()">
+        Guardar cambios
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -17,8 +17,8 @@ export interface SectionNavItem {
   badge?: SectionBadge;
   children?: SectionNavChild[];
   defaultExpanded?: boolean;
-  /** Etiqueta de grupo en panel (p.ej. "SMS y correo") */
-  type?: 'link' | 'header';
+  /** Etiqueta de grupo en panel (p.ej. "SMS y correo"), o accordion colapsable */
+  type?: 'link' | 'header' | 'accordion';
 }
 
 export interface SectionPanel {
@@ -113,7 +113,7 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     group: 'main',
     matchPrefixes: ['/gali-v5/marketing'],
   },
-  // ── Orquestación IA ─────────────────────────────────────────────────
+  // ── Orquestación IA — único ítem de primer nivel ────────────────────
   {
     key: 'home',
     label: 'Gali Hub',
@@ -121,61 +121,18 @@ export const DROPI_ICON_RAIL: IconRailItem[] = [
     piIcon: 'pi-home',
     route: '/gali-v5',
     group: 'ai',
-    matchPrefixes: ['/gali-v5'],
-  },
-  {
-    key: 'proyectos',
-    label: 'Proyectos',
-    icon: `${G5}/boxes.svg`,
-    piIcon: 'pi-folder',
-    route: '/gali-v5/proyectos',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/proyectos', '/gali-v5/proyecto'],
-  },
-  {
-    key: 'agentes',
-    label: 'Agentes',
-    icon: `${G5}/id-badge.svg`,
-    piIcon: 'pi-android',
-    route: '/gali-v5/agentes',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/agentes'],
-  },
-  {
-    key: 'skills',
-    label: 'Skills',
-    icon: `${G5}/apps-add.svg`,
-    piIcon: 'pi-sparkles',
-    route: '/gali-v5/skills',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/skills'],
-  },
-  {
-    key: 'reglas',
-    label: 'Reglas',
-    icon: `${G5}/page-check.svg`,
-    piIcon: 'pi-sliders-h',
-    route: '/gali-v5/reglas',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/reglas'],
-  },
-  {
-    key: 'marketplace',
-    label: 'Marketplace',
-    icon: `${G5}/handshake.svg`,
-    piIcon: 'pi-shop',
-    route: '/gali-v5/marketplace',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/marketplace'],
-  },
-  {
-    key: 'conexiones',
-    label: 'Conexiones',
-    icon: `${G5}/page-check.svg`,
-    piIcon: 'pi-link',
-    route: '/gali-v5/conexiones',
-    group: 'ai',
-    matchPrefixes: ['/gali-v5/conexiones'],
+    matchPrefixes: [
+      '/gali-v5',
+      '/gali-v5/proyectos',
+      '/gali-v5/proyecto',
+      '/gali-v5/agentes',
+      '/gali-v5/skills',
+      '/gali-v5/reglas',
+      '/gali-v5/marketplace',
+      '/gali-v5/conexiones',
+      '/gali-v5/micromundo',
+      '/gali-v5/senales',
+    ],
   },
   // ── Utilidades ──────────────────────────────────────────────────────
   {
@@ -321,6 +278,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         icon: 'assets/icons/sidebar/chat-arrow-grow.svg',
       },
       {
+        id: 'dashboard-financiero',
+        label: 'P&L · Kronos 💎',
+        route: '/gali-v5/reportes/dashboard-financiero',
+        icon: `${G5}/money-coin.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+      {
         id: 'vendidos',
         label: 'Productos vendidos',
         route: '/gali-v5/reportes/productos-vendidos',
@@ -345,6 +309,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         icon: `${G5}/download.svg`,
       },
     ],
+    agentFooter: {
+      agentId: 'gali',
+      label: 'Kronos',
+      color: '#60a5fa',
+      statusLabel: 'P&L real · Mayo 2026',
+      contextKey: 'reportes',
+    },
   },
   financiero: {
     railKey: 'financiero',
@@ -516,7 +487,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       {
         id: 'nuevo-proyecto',
         label: 'Nuevo proyecto',
-        route: '/gali-v5/proyectos?nuevo=true',
+        route: '/gali-v5/proyectos/nuevo',
         icon: `${G5}/handshake.svg`,
         badge: 'nuevo' as SectionBadge,
       },
@@ -551,6 +522,13 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
         route: '/gali-v5/agentes',
         icon: 'assets/icons/sidebar/search.svg',
       },
+      {
+        id: 'kronos-agent',
+        label: 'Kronos · Finanzas 💎',
+        route: '/gali-v5/agentes',
+        icon: `${G5}/money-coin.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
       { id: 'hdr-config-agentes', label: 'Configuración', type: 'header' as const },
       { id: 'nav-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
       { id: 'nav-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
@@ -560,7 +538,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       agentId: 'gali',
       label: 'Gali',
       color: '#ff6102',
-      statusLabel: '4 agentes orquestados',
+      statusLabel: '5 agentes orquestados',
       contextKey: 'agentes',
     },
   },
@@ -666,43 +644,60 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
     railKey: 'conexiones',
     title: 'Conexiones',
     items: [
+      { id: 'hdr-mcp-core', label: 'MCPs Core', type: 'header' as const },
       {
         id: 'mcp-publicidad',
-        label: 'Publicidad',
+        label: 'Meta Ads ✓',
         route: '/gali-v5/conexiones',
         icon: 'assets/icons/sidebar/megaphone.svg',
         type: 'link' as const,
       },
       {
-        id: 'mcp-contabilidad',
-        label: 'Contabilidad',
-        route: '/gali-v5/conexiones',
-        icon: `${G5}/page-check.svg`,
-      },
-      {
-        id: 'mcp-comunicacion',
-        label: 'Comunicación',
+        id: 'mcp-whatsapp',
+        label: 'WhatsApp ✓',
         route: '/gali-v5/conexiones',
         icon: 'assets/icons/sidebar/comments-dots.svg',
       },
       {
-        id: 'mcp-research',
-        label: 'Research',
+        id: 'mcp-siigo',
+        label: 'Siigo ⚠ urgente',
         route: '/gali-v5/conexiones',
-        icon: 'assets/icons/sidebar/search.svg',
+        icon: `${G5}/page-check.svg`,
+      },
+      { id: 'hdr-mcp-pro', label: 'Canales Pro', type: 'header' as const },
+      {
+        id: 'mcp-tiktok-shop',
+        label: 'TikTok Shop PRO',
+        route: '/gali-v5/conexiones',
+        icon: `${G5}/megaphone.svg`,
+        badge: 'nuevo' as SectionBadge,
       },
       {
-        id: 'mcp-datos',
-        label: 'Datos cruzados',
+        id: 'mcp-shopify',
+        label: 'Shopify PRO',
         route: '/gali-v5/conexiones',
-        icon: `${G5}/money-coin.svg`,
+        icon: `${G5}/boxes.svg`,
+        badge: 'nuevo' as SectionBadge,
+      },
+      {
+        id: 'mcp-page-pilot',
+        label: 'Page Pilot',
+        route: '/gali-v5/conexiones',
+        icon: 'assets/icons/sidebar/page.svg',
+      },
+      { id: 'hdr-mcp-util', label: 'Utilidades', type: 'header' as const },
+      {
+        id: 'mcp-drive',
+        label: 'Google Drive',
+        route: '/gali-v5/conexiones',
+        icon: `${G5}/download.svg`,
       },
     ],
     agentFooter: {
       agentId: 'gali',
       label: 'Gali',
       color: '#ff6102',
-      statusLabel: 'orquestador MCP activo',
+      statusLabel: '4 conectados · 2 Pro',
       contextKey: 'conexiones',
     },
   },
@@ -742,10 +737,12 @@ const GALI_HUB_PREFIXES: string[] = [
   '/gali-v5/reglas',
   '/gali-v5/marketplace',
   '/gali-v5/conexiones',
+  '/gali-v5/micromundo',
+  '/gali-v5/senales',
 ];
 
-/** Rutas de orquestación IA sin panel lateral de módulo */
-const ORCHESTRATION_RAIL_KEYS = new Set(['home', 'proyectos', 'agentes', 'skills', 'reglas', 'marketplace', 'conexiones']);
+/** Rutas de orquestación IA — solo 'home' en el rail (los demás ítems pasaron al panel) */
+const ORCHESTRATION_RAIL_KEYS = new Set(['home']);
 
 /** Resuelve rail activo desde URL */
 export function resolveActiveRailKey(url: string): string {
@@ -784,18 +781,34 @@ export const HOME_OVERVIEW_PANEL: SectionPanel = {
   ],
 };
 
-/** Panel del home — Mission Control: proyectos, skills, señales, agentes */
+/** Panel del home — Hub-y-radios: proyectos, Mi Negocio, Centro de Gali (accordion) */
 export const GALI_MISSION_PANEL: SectionPanel = {
   railKey: 'home',
   title: 'Gali',
   items: [
     { id: 'gali-hub', label: 'Gali Hub', route: '/gali-v5', icon: 'assets/icons/sidebar/home.svg' },
     { id: 'nav-proyectos', label: 'Proyectos', route: '/gali-v5/proyectos', icon: `${G5}/boxes.svg` },
-    { id: 'hdr-orq', label: 'Orquestación', type: 'header' as const },
-    { id: 'ver-agentes', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
-    { id: 'mis-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
-    { id: 'mis-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
-      { id: 'marketplace', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+    {
+      id: 'nav-micromundo',
+      label: 'Mi Negocio',
+      route: '/gali-v5/micromundo',
+      icon: `${G5}/user-circle.svg`,
+      badge: 'nuevo' as SectionBadge,
+    },
+    {
+      id: 'centro-gali',
+      label: 'Centro de Gali',
+      type: 'accordion' as const,
+      icon: `${G5}/apps-add.svg`,
+      defaultExpanded: false,
+      children: [
+        { label: 'Agentes',     route: '/gali-v5/agentes' },
+        { label: 'Skills',      route: '/gali-v5/skills' },
+        { label: 'Reglas',      route: '/gali-v5/reglas' },
+        { label: 'Marketplace', route: '/gali-v5/skills/comunidad' },
+        { label: 'Conexiones',  route: '/gali-v5/conexiones' },
+      ],
+    },
   ],
   agentFooter: {
     agentId: 'gali',

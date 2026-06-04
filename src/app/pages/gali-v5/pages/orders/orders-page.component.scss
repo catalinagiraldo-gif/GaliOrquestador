@@ -307,3 +307,22 @@
   &--managing { background: #fff7ed; color: #9a3412; }
   &--decision { background: #fee2e2; color: #991b1b; }
 }
+
+// ── Canal de origen ─────────────────────────────────────────────────────────
+
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: $radius-pill;
+  font-size: 10px;
+  font-weight: $font-semibold;
+  white-space: nowrap;
+
+  &--meta         { background: #eff6ff; color: #1d4ed8; }
+  &--tiktok_shop  { background: #fdf2f8; color: #86198f; }
+  &--shopify      { background: #f0fdf4; color: #15803d; }
+  &--whatsapp     { background: #dcfce7; color: #166534; }
+  &--directo      { background: $gray-100; color: $gray-600; }
+}

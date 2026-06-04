@@ -1,0 +1,346 @@
+<div class="micromundo-page">
+
+  <!-- Header -->
+  <div class="micromundo-header">
+    <div class="micromundo-header__left">
+      <h1 class="micromundo-header__title">Mi Negocio</h1>
+      <p class="micromundo-header__sub">El micromundo que Gali construye sobre ti — tu operación, tus datos, tus patrones.</p>
+    </div>
+    <div class="micromundo-header__right">
+      <div class="micromundo-completeness">
+        <span class="micromundo-completeness__label">Perfil completado</span>
+        <div class="micromundo-completeness__bar">
+          <div class="micromundo-completeness__fill" [style.width.%]="65"></div>
+        </div>
+        <span class="micromundo-completeness__pct">65%</span>
+      </div>
+      <div class="micromundo-sources-badge">
+        <span class="micromundo-sources-badge__dot"></span>
+        <span>{{ connectedSources }} fuentes conectadas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="micromundo-tabs">
+    <button type="button" class="micromundo-tab" [class.micromundo-tab--active]="activeTab() === 'perfil'" (click)="activeTab.set('perfil')">
+      👤 Perfil operativo
+    </button>
+    <button type="button" class="micromundo-tab" [class.micromundo-tab--active]="activeTab() === 'grafo'" (click)="activeTab.set('grafo')">
+      🕸 Grafo de negocio
+    </button>
+    <button type="button" class="micromundo-tab" [class.micromundo-tab--active]="activeTab() === 'comportamiento'" (click)="activeTab.set('comportamiento')">
+      🧠 Comportamiento
+    </button>
+    <button type="button" class="micromundo-tab" [class.micromundo-tab--active]="activeTab() === 'documentos'" (click)="activeTab.set('documentos')">
+      📂 Contexto externo
+    </button>
+  </div>
+
+  <!-- ── TAB: PERFIL OPERATIVO ── -->
+  @if (activeTab() === 'perfil') {
+    <div class="micromundo-content">
+
+      <div class="perfil-grid">
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">🏪</span>
+          <span class="perfil-card__label">Rol</span>
+          <strong class="perfil-card__value">Dropshipper avanzado</strong>
+          <span class="perfil-card__sub">Inferido por Gali</span>
+        </div>
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">📦</span>
+          <span class="perfil-card__label">Volumen promedio</span>
+          <strong class="perfil-card__value">47 pedidos/semana</strong>
+          <span class="perfil-card__sub">Últimas 4 semanas</span>
+        </div>
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">🗓</span>
+          <span class="perfil-card__label">Antigüedad</span>
+          <strong class="perfil-card__value">6 meses en Dropi</strong>
+          <span class="perfil-card__sub">Desde Dic 2025</span>
+        </div>
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">🎯</span>
+          <span class="perfil-card__label">Objetivo declarado</span>
+          <strong class="perfil-card__value">$5M de utilidad/mes</strong>
+          <span class="perfil-card__sub">Meta de 30 días activa</span>
+        </div>
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">📣</span>
+          <span class="perfil-card__label">Canal principal</span>
+          <strong class="perfil-card__value">Meta Ads</strong>
+          <span class="perfil-card__sub">63% de tus ventas</span>
+        </div>
+        <div class="perfil-card">
+          <span class="perfil-card__emoji">⚡</span>
+          <span class="perfil-card__label">Nivel de agencia Gali</span>
+          <strong class="perfil-card__value">Nivel 3 · Autónomo</strong>
+          <span class="perfil-card__sub">Basado en 47 días de uso</span>
+        </div>
+      </div>
+
+      <!-- Gali no pregunta lo que Dropi ya sabe -->
+      <div class="micromundo-principle">
+        <span class="micromundo-principle__glyph">✦</span>
+        <div class="micromundo-principle__body">
+          <strong>Gali no te pregunta lo que Dropi ya sabe.</strong>
+          Con 6 meses de historial y 47 pedidos/semana, tu perfil de base ya está construido.
+          El onboarding de Gali solo te pregunta las 3 cosas que <em>no puede inferir</em>: tu objetivo de 30 días, tu mayor fricción actual y qué canal quieres escalar primero.
+        </div>
+      </div>
+
+      <!-- Mayor fricción detectada -->
+      <div class="friccion-section">
+        <h2 class="friccion-section__title">Mayor fricción detectada</h2>
+        <p class="friccion-section__sub">Gali identifica qué está bloqueando tu escalamiento</p>
+        <div class="friccion-items">
+          <div class="friccion-item friccion-item--high">
+            <span class="friccion-item__rank">1</span>
+            <div class="friccion-item__body">
+              <strong>Tasa de novedad 14%</strong>
+              <span>Coordinadora Bogotá el mayor culpable — Vigilante ya tiene Smart Routing activo</span>
+            </div>
+            <a routerLink="/gali-v5/logistica/torre-logistica" class="friccion-item__cta">Ver logística →</a>
+          </div>
+          <div class="friccion-item friccion-item--mid">
+            <span class="friccion-item__rank">2</span>
+            <div class="friccion-item__body">
+              <strong>ROAS real vs Meta: -0.2×</strong>
+              <span>La diferencia son novedades no atribuidas. Kronos tiene el desglose completo.</span>
+            </div>
+            <a routerLink="/gali-v5/reportes/dashboard-financiero" class="friccion-item__cta">Ver P&L →</a>
+          </div>
+          <div class="friccion-item friccion-item--low">
+            <span class="friccion-item__rank">3</span>
+            <div class="friccion-item__body">
+              <strong>28 pedidos sin facturar en Siigo</strong>
+              <span>Riesgo fiscal. Kronos puede automatizar la facturación al conectar Siigo.</span>
+            </div>
+            <a routerLink="/gali-v5/conexiones" class="friccion-item__cta">Conectar Siigo →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ── TAB: GRAFO DE NEGOCIO ── -->
+  @if (activeTab() === 'grafo') {
+    <div class="micromundo-content">
+      <div class="grafo-legend">
+        <span class="grafo-legend-item grafo-legend-item--proyecto">● Proyectos</span>
+        <span class="grafo-legend-item grafo-legend-item--campana">● Campañas</span>
+        <span class="grafo-legend-item grafo-legend-item--pedidos">● Pedidos</span>
+        <span class="grafo-legend-item grafo-legend-item--proveedor">● Proveedores</span>
+        <span class="grafo-legend-item grafo-legend-item--transportadora">● Transportadoras</span>
+      </div>
+
+      <div class="grafo-layers">
+
+        <!-- Proyectos -->
+        <div class="grafo-layer">
+          <span class="grafo-layer__label">Proyectos activos</span>
+          <div class="grafo-nodes">
+            @for (n of businessNodes; track n.id) {
+              @if (n.type === 'proyecto') {
+                <div class="grafo-node grafo-node--proyecto" [style.--node-col]="n.color">
+                  <span class="grafo-node__label">{{ n.label }}</span>
+                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
+                  <div class="grafo-node__kpi">
+                    <strong>{{ n.kpi }}</strong>
+                    <span class="grafo-node__trend grafo-node__trend--{{n.trend}}">{{ trendIcon(n.trend) }}</span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+          <div class="grafo-connector" aria-hidden="true"></div>
+        </div>
+
+        <!-- Campañas -->
+        <div class="grafo-layer">
+          <span class="grafo-layer__label">Campañas activas</span>
+          <div class="grafo-nodes">
+            @for (n of businessNodes; track n.id) {
+              @if (n.type === 'campana') {
+                <div class="grafo-node grafo-node--campana" [style.--node-col]="n.color">
+                  <span class="grafo-node__label">{{ n.label }}</span>
+                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
+                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
+                </div>
+              }
+            }
+          </div>
+          <div class="grafo-connector" aria-hidden="true"></div>
+        </div>
+
+        <!-- Pedidos + Proveedores -->
+        <div class="grafo-layer">
+          <span class="grafo-layer__label">Pedidos · Proveedores</span>
+          <div class="grafo-nodes">
+            @for (n of businessNodes; track n.id) {
+              @if (n.type === 'pedidos' || n.type === 'proveedor') {
+                <div class="grafo-node" [class]="'grafo-node--' + n.type" [style.--node-col]="n.color">
+                  <span class="grafo-node__label">{{ n.label }}</span>
+                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
+                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
+                </div>
+              }
+            }
+          </div>
+          <div class="grafo-connector" aria-hidden="true"></div>
+        </div>
+
+        <!-- Transportadoras -->
+        <div class="grafo-layer">
+          <span class="grafo-layer__label">Transportadoras</span>
+          <div class="grafo-nodes">
+            @for (n of businessNodes; track n.id) {
+              @if (n.type === 'transportadora') {
+                <div class="grafo-node grafo-node--transportadora" [style.--node-col]="n.color">
+                  <span class="grafo-node__label">{{ n.label }}</span>
+                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
+                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="grafo-gali-note">
+        <span>✦</span>
+        <span>Este grafo se construye automáticamente desde tus datos en Dropi. Conecta fuentes externas (Shopify, Drive, CSV) para enriquecerlo con datos que Dropi no tiene.</span>
+        <button type="button" class="grafo-gali-note__cta" (click)="activeTab.set('documentos')">Conectar fuentes →</button>
+      </div>
+    </div>
+  }
+
+  <!-- ── TAB: COMPORTAMIENTO ── -->
+  @if (activeTab() === 'comportamiento') {
+    <div class="micromundo-content">
+      <div class="comportamiento-header">
+        <h2 class="comportamiento-header__title">Historial de comportamiento</h2>
+        <p class="comportamiento-header__sub">Gali aprende qué alertas atiendes, cuáles ignoras y cómo tomas decisiones. Después de 7 días de uso, tu perfil de confianza tiene señal suficiente para calibrar el nivel de agencia.</p>
+      </div>
+
+      <div class="comportamiento-metrics">
+        <div class="comp-metric">
+          <span class="comp-metric__emoji">⚡</span>
+          <strong class="comp-metric__val">3</strong>
+          <span class="comp-metric__label">Skills activadas</span>
+        </div>
+        <div class="comp-metric">
+          <span class="comp-metric__emoji">✅</span>
+          <strong class="comp-metric__val">12</strong>
+          <span class="comp-metric__label">Decisiones aprobadas</span>
+        </div>
+        <div class="comp-metric">
+          <span class="comp-metric__emoji">🔕</span>
+          <strong class="comp-metric__val">4</strong>
+          <span class="comp-metric__label">Alertas ignoradas</span>
+        </div>
+        <div class="comp-metric">
+          <span class="comp-metric__emoji">🛡</span>
+          <strong class="comp-metric__val">2</strong>
+          <span class="comp-metric__label">Reglas creadas</span>
+        </div>
+      </div>
+
+      <div class="comportamiento-timeline">
+        @for (item of behaviorItems; track item.time) {
+          <div class="beh-item" [class]="'beh-item--' + item.type">
+            <span class="beh-item__icon">{{ item.icon }}</span>
+            <div class="beh-item__body">
+              <span class="beh-item__type-badge">{{ behaviorTypeLabel(item.type) }}</span>
+              <p class="beh-item__text">{{ item.text }}</p>
+            </div>
+            <span class="beh-item__time">{{ item.time }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="comportamiento-insight">
+        <span>✦</span>
+        <span><strong>Patrón detectado:</strong> Ignoras alertas de novedades los lunes entre 8am–12pm. Gali ajustó el timing de sus alertas para no interrumpirte en ese horario — las consolida y las muestra a las 12:30pm.</span>
+      </div>
+    </div>
+  }
+
+  <!-- ── TAB: CONTEXTO EXTERNO ── -->
+  @if (activeTab() === 'documentos') {
+    <div class="micromundo-content">
+      <div class="docs-header">
+        <h2 class="docs-header__title">Contexto externo</h2>
+        <p class="docs-header__sub">Sube datos que Dropi no tiene. Gali extrae metadata estructurada y enriquece tu grafo de negocio automáticamente.</p>
+      </div>
+
+      <div class="upload-cards">
+        @for (card of uploadCards; track card.id) {
+          <div class="upload-card" [class.upload-card--connected]="isConnected(card.id)">
+            <div class="upload-card__top">
+              <span class="upload-card__emoji">{{ card.emoji }}</span>
+              <div>
+                <strong class="upload-card__label">{{ card.label }}</strong>
+                <p class="upload-card__sub">{{ card.sub }}</p>
+              </div>
+              @if (isConnected(card.id)) {
+                <span class="upload-card__status upload-card__status--ok">● Conectado</span>
+              } @else {
+                <span class="upload-card__status upload-card__status--off">○ Sin conectar</span>
+              }
+            </div>
+            <button
+              type="button"
+              class="upload-card__btn"
+              [class.upload-card__btn--connected]="isConnected(card.id)"
+              (click)="openUpload(card.id)"
+              data-proto-skip>
+              {{ isConnected(card.id) ? '✓ Reconectar' : 'Conectar →' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="docs-gali-note">
+        <span>✦ Gali no comparte tus datos con otros usuarios.</span>
+        <span>Toda la información que conectes se usa exclusivamente para personalizar tu experiencia y construir tu grafo de negocio.</span>
+      </div>
+    </div>
+  }
+
+  <!-- ── UPLOAD MODAL ── -->
+  @if (showUploadModal(); as src) {
+    <div class="upload-modal-backdrop" (click)="showUploadModal.set(null)">
+      <div class="upload-modal" (click)="$event.stopPropagation()" role="dialog">
+        <div class="upload-modal__header">
+          <strong>Conectar fuente externa</strong>
+          <button type="button" class="upload-modal__close" (click)="showUploadModal.set(null)" aria-label="Cerrar">✕</button>
+        </div>
+        <div class="upload-modal__body">
+          <div class="upload-drop-zone">
+            <span class="upload-drop-zone__icon">📤</span>
+            <p class="upload-drop-zone__label">Arrastra tu archivo o ingresa un link</p>
+            <input
+              type="text"
+              class="upload-modal__input"
+              [placeholder]="'Pega una URL o ruta del archivo...'"
+              [ngModel]="uploadInput()"
+              (ngModelChange)="uploadInput.set($event)"
+            />
+          </div>
+          <p class="upload-modal__hint">Gali extraerá: SKUs, volúmenes, zonas, márgenes — sin necesidad de mapeo manual.</p>
+        </div>
+        <div class="upload-modal__footer">
+          <button type="button" class="upload-modal__btn-secondary" (click)="showUploadModal.set(null)">Cancelar</button>
+          <button type="button" class="upload-modal__btn-primary" (click)="confirmUpload()">
+            Conectar y procesar ✦
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -254,35 +254,65 @@
           <div class="np-lp-badge">Estructura generada por Gali</div>
         </div>
 
-        <div class="np-landing-options">
-          <button type="button" class="np-landing-opt np-landing-opt--selected" data-proto-skip>
-            <span class="np-landing-opt__icon">✓</span>
-            <div>
-              <strong>Usar esta estructura</strong>
-              <span>Gali activa esta landing al lanzar la campaña</span>
+        <!-- Page Pilot MCP — Deploy real -->
+        <div class="np-page-pilot">
+          <div class="np-page-pilot__header">
+            <span class="np-page-pilot__badge">Page Pilot MCP</span>
+            <span class="np-page-pilot__sub">Publica esta landing en vivo en segundos — sin salir de Dropi</span>
+          </div>
+
+          @if (pagePilotState() === 'idle') {
+            <button type="button" class="np-page-pilot__deploy-btn" (click)="publishLanding()">
+              🚀 Publicar landing en vivo →
+            </button>
+          }
+
+          @if (pagePilotState() === 'generating') {
+            <div class="np-page-pilot__progress">
+              <div class="np-page-pilot__spinner"></div>
+              <span>Gali está generando HTML/CSS desde el ángulo seleccionado…</span>
             </div>
-          </button>
-          <button type="button" class="np-landing-opt" data-proto-skip>
-            <span class="np-landing-opt__icon">🌐</span>
-            <div>
-              <strong>Ver en Page Pilot</strong>
-              <span>Abre el editor completo de landing pages</span>
+          }
+
+          @if (pagePilotState() === 'deploying') {
+            <div class="np-page-pilot__progress">
+              <div class="np-page-pilot__spinner np-page-pilot__spinner--deploy"></div>
+              <span>Desplegando en servidor Dropi… asignando dominio…</span>
             </div>
-          </button>
-          <button type="button" class="np-landing-opt" data-proto-skip>
-            <span class="np-landing-opt__icon">📁</span>
-            <div>
-              <strong>Subir mis propias imágenes</strong>
-              <span>Personaliza con creativos desde Google Drive</span>
+          }
+
+          @if (pagePilotState() === 'live') {
+            <div class="np-page-pilot__live">
+              <div class="np-page-pilot__live-header">
+                <span class="np-page-pilot__live-dot"></span>
+                <strong>Landing en vivo</strong>
+                <span class="np-page-pilot__live-cvr">CVR estimado: {{ landingCvr() }}%</span>
+              </div>
+              <div class="np-page-pilot__live-url">
+                <span class="np-page-pilot__url-icon">🌐</span>
+                <span class="np-page-pilot__url-text">{{ pagePilotUrl() }}</span>
+                <button type="button" class="np-page-pilot__copy-btn" data-proto-skip>Copiar link</button>
+              </div>
+              <p class="np-page-pilot__live-note">Roax usará este URL en la campaña de Meta Ads. El pixel de Dropi ya está instalado — cada conversión quedará atribuida automáticamente.</p>
             </div>
-          </button>
+          }
+
+          <div class="np-landing-options">
+            <button type="button" class="np-landing-opt" data-proto-skip>
+              <span class="np-landing-opt__icon">📁</span>
+              <div>
+                <strong>Subir mis propias imágenes</strong>
+                <span>Personaliza con creativos desde Google Drive</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="np-section-footer">
         <button type="button" class="np-btn np-btn--secondary" (click)="step.set('estrategia')" data-proto-skip>← Atrás</button>
         <button type="button" class="np-btn np-btn--primary" (click)="goToCampana()">
-          Continuar con esta landing →
+          Continuar a campaña →
         </button>
       </div>
     </div>

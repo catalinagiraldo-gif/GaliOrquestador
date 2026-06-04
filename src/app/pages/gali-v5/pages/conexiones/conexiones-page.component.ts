@@ -20,6 +20,7 @@ interface GraphNode {
   ctaLabel: string;
   ctaRoute?: string;
   urgente?: boolean;
+  isProFeature?: boolean;
 }
 
 @Component({
@@ -105,6 +106,25 @@ export class ConexionesPageComponent {
       ctaLabel: 'Ver oportunidades →',
       ctaRoute: '/gali-v5/productos/caza-productos',
     },
+    {
+      id: 'kronos',
+      label: 'Kronos',
+      emoji: '💎',
+      status: 'connected',
+      agenteColor: '#60a5fa',
+      categoria: 'Agente',
+      desc: 'Agente financiero. Gestiona P&L en tiempo real, facturación Siigo y alertas de riesgo fiscal.',
+      metricas: [
+        { label: 'Utilidad neta Mayo', val: '$3.8M' },
+        { label: 'Pedidos sin facturar', val: '28' },
+        { label: 'Margen real', val: '25.7%' },
+      ],
+      permisos: ['leer P&L', 'calcular proyecciones', 'enviar a Siigo', 'alertas fiscales'],
+      impacto: '28 pedidos entregados sin facturar — riesgo fiscal de $4.2M sin declarar.',
+      ctaLabel: 'Ver Dashboard Financiero →',
+      ctaRoute: '/gali-v5/reportes/dashboard-financiero',
+      urgente: true,
+    },
   ];
 
   readonly platformNodes: GraphNode[] = [
@@ -186,11 +206,60 @@ export class ConexionesPageComponent {
       emoji: '🧾',
       status: 'disconnected',
       categoria: 'Contabilidad',
-      desc: 'Gali te guía paso a paso: conecta Siigo, define reglas (solo Entregado) y automatiza facturación masiva.',
+      desc: 'Kronos automatiza la facturación: conecta Siigo, define regla "solo Entregado" y activa facturación masiva sin salir de Dropi.',
       impacto: '28 pedidos entregados esta semana sin facturar. Riesgo de incumplimiento fiscal.',
       ctaLabel: 'Conectar Siigo paso a paso →',
       ctaRoute: '/gali-v5/financiero/datos-facturacion',
       urgente: true,
+    },
+    {
+      id: 'tiktok-shop',
+      label: 'TikTok Shop',
+      emoji: '🎵',
+      status: 'disconnected',
+      agente: 'roax',
+      agenteColor: '#f97316',
+      categoria: 'E-commerce',
+      desc: 'Conecta TikTok Shop para que los pedidos lleguen directamente al pipeline logístico de Dropi. Roax cruza métricas del video con ROAS real.',
+      impacto: 'Órdenes TikTok Shop entran al flujo Dropi automáticamente — mismo pipeline, cero doble ingreso.',
+      ctaLabel: 'Conectar TikTok Shop',
+      isProFeature: true,
+    },
+    {
+      id: 'shopify',
+      label: 'Shopify',
+      emoji: '🛍',
+      status: 'disconnected',
+      agente: 'vigilante',
+      agenteColor: '#fbbf24',
+      categoria: 'E-commerce',
+      desc: 'Sincronización bidireccional: catálogo Dropi ↔ inventario Shopify. Órdenes Shopify → Vigilante. Dropi como backend logístico de tu tienda.',
+      metricas: [
+        { label: 'Tiendas activas', val: '0 / 5 disponibles' },
+        { label: 'Sincronización', val: 'No configurada' },
+      ],
+      impacto: 'Dropi se convierte en el backend logístico de tu tienda Shopify — tracking automático al cliente final.',
+      ctaLabel: 'Conectar Shopify',
+      isProFeature: true,
+    },
+    {
+      id: 'meta-ads-mcp',
+      label: 'Meta Ads MCP',
+      emoji: '📘',
+      status: 'connected',
+      agente: 'roax',
+      agenteColor: '#f97316',
+      categoria: 'Publicidad',
+      desc: 'Roax lanza, pausa y optimiza campañas directamente en Meta Ads sin que salgas de Dropi. ROAS real vs. ROAS Meta en tiempo real.',
+      metricas: [
+        { label: 'ROAS Meta', val: '3.1x' },
+        { label: 'ROAS Gali real', val: '2.9x' },
+        { label: 'Discrepancia', val: '-0.2x' },
+      ],
+      permisos: ['leer campañas', 'crear campañas', 'modificar presupuesto', 'pausar anuncios'],
+      impacto: 'El 40% de la diferencia ROAS se explica por novedades en Cali los lunes.',
+      ctaLabel: 'Ver análisis de discrepancia →',
+      ctaRoute: '/gali-v5/marketing/roax-informes',
     },
   ];
 

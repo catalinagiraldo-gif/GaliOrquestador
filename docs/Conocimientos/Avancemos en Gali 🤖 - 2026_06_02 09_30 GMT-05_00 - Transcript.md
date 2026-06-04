@@ -1739,3 +1739,6 @@ Tu no te adaptas a Dropi, sino que Dropi se adapta a tu modelo de negocio/operac
 Te damos acceso a nuestra data y ecosistema, para que tu lo adaptes a tus necesidades
 “Gali aprende contigo para que puedas escalar como un experto”
 
+Si pensamos en el día a día de Dropi (plataforma, usuarios o logística)... ¿Cuál crees que es el mayor problema, fricción o proceso lento que hoy nos urge resolver? 🔍
+
+Las solicitudes de mejora de las áreas internas, toman mucho tiempo si entran por producto. Algunas solicitudes pueden tomar menos tiempo si se optimizan por medio de otras herramientas

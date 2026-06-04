@@ -1,10 +1,12 @@
 import { Component, inject, signal, computed, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../../../services/auth.service';
 import { GaliWorkspaceService } from '../services/gali-workspace.service';
 import { GaliStateService } from '../services/gali-state.service';
+import PROJECTS_DATA from '../../../../../mocks/gali-v5/projects.json';
 import {
   GaliSignalCardV2Component,
   GaliSignalData,
@@ -17,8 +19,19 @@ import {
   GaliGoalOnboardingComponent,
   shouldShowOnboarding,
 } from '../components/gali-goal-onboarding/gali-goal-onboarding.component';
+import { GaliAgencyThresholdsPanelComponent } from '../components/gali-agency-thresholds-panel/gali-agency-thresholds-panel.component';
 
 type AgentStatus = 'activo' | 'esperando' | 'pausa';
+
+interface NodeDetail {
+  agentName: string;
+  color: string;
+  description: string;
+  lastAction: string;
+  impacts: Array<{ label: string; route: string }>;
+  ctaLabel: string;
+  ctaRoute: string;
+}
 
 interface AgentLive {
   id: string;
@@ -94,11 +107,14 @@ function matchLanzar(text: string): string {
   standalone: true,
   imports: [
     CommonModule,
+    SlicePipe,
     FormsModule,
     RouterModule,
+    TooltipModule,
     GaliSignalCardV2Component,
     GaliProjectPanelComponent,
     GaliGoalOnboardingComponent,
+    GaliAgencyThresholdsPanelComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -110,6 +126,11 @@ export class DropiHomeComponent implements AfterViewChecked {
 
   readonly showOnboarding = signal(shouldShowOnboarding());
   readonly isZeroState = signal(localStorage.getItem('gali_zero_state') === '1');
+  readonly isSimpleView = computed(() => this.ws.complexityLevel() === 'novice');
+  readonly showAgencyPanel = signal(false);
+  readonly zone3Collapsed = signal(true);
+  readonly showBulkModal = signal(false);
+  readonly bulkModalStep = signal<1 | 2>(1);
   private auth = inject(AuthService);
 
   resetOnboarding(): void {
@@ -160,7 +181,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       if (raw) return JSON.parse(raw);
     } catch {}
     return [
-      { id: 'principal', label: 'Principal', icon: '✦',
+      { id: 'principal', label: 'Mi negocio', icon: '✦',
         sections: { insight: true, anatomy: true, signals: true, chat: true, akademy: true } },
     ];
   }
@@ -280,7 +301,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       timestamp: 'hace 2h',
       urgencia: 'baja',
       resultado_antes: 'CTR: 1.2% · ROAS: 2.6x',
-      resultado_despues: 'CTR: 1.8% · ROAS: 2.9x',
+      resultado_despues: 'CTR: 1.8% · ROAS: 1.93x',
       cta_followup: '¿Crear skill para esto?',
       cta_followup_label: 'Crear skill',
     },
@@ -327,7 +348,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       id: 'collar-gps-2026',
       nombre: 'Collar GPS para mascotas',
       estado: 'en_escala',
-      roas: '2.9x',
+      roas: '1.93x',
       pedidos: '47/sem',
       ganancia: '$411k',
       alertaActiva: true,
@@ -348,7 +369,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       id: 'skincare-kbeauty',
       nombre: 'Skincare K-Beauty',
       estado: 'activo',
-      roas: '2.1x',
+      roas: '1.8x',
       pedidos: '23/sem',
       ganancia: '$187k',
       alertaActiva: false,
@@ -379,7 +400,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       nombre: 'Roax',
       icono: '⚡',
       estado: 'activo',
-      descripcion: 'ROAS 2.9x · Pauta $66k/día · Video B ganando',
+      descripcion: 'ROAS 1.93x · Pauta $66k/día · Video B ganando',
       ultimaAccion: 'Escaló presupuesto +15% · hace 2h',
       color: '#f97316',
     },
@@ -428,11 +449,11 @@ export class DropiHomeComponent implements AfterViewChecked {
       garantias: '-$18k', garantias_pct: 1,
       ganancia_neta: '$411k',
       margen: 22,
-      roas_meta: '5.0x',
-      roas_dropi: '2.9x',
+      roas_meta: '2.9x',
+      roas_dropi: '1.93x',
       semana_delta: '+$89k vs sem anterior',
       semana_delta_ok: true,
-      gali_nota: 'ROAS real 2.9x estable. Skill de escalado subió pauta +15% hace 4h. Margen por encima del objetivo (20%).',
+      gali_nota: 'ROAS real 1.93x (vs 2.9x declarado por Meta). Skill de escalado propone pauta $66k → $86k/día. Margen por encima del objetivo (20%).',
       trend: 'up',
     },
     {
@@ -448,8 +469,8 @@ export class DropiHomeComponent implements AfterViewChecked {
       garantias: '-$9k',  garantias_pct: 1,
       ganancia_neta: '$221k',
       margen: 24,
-      roas_meta: '3.8x',
-      roas_dropi: '2.1x',
+      roas_meta: '2.5x',
+      roas_dropi: '1.8x',
       semana_delta: '-$12k vs sem anterior',
       semana_delta_ok: false,
       gali_nota: 'Tendencia levemente negativa — CTR bajó a 1.1%. Roax evaluando cambio de creativo. Margen aún por encima del umbral.',
@@ -554,78 +575,87 @@ export class DropiHomeComponent implements AfterViewChecked {
     this.activeNode.update(cur => cur === id ? null : id);
   }
 
-  readonly nodeDetailMap: Record<string, { agentName: string; color: string; description: string; lastAction: string; impacts: Array<{ label: string; route: string }>; ctaLabel: string; ctaRoute: string }> = {
-    'producto': {
-      agentName: 'ADA Spy', color: '#818cf8',
-      description: '3 oportunidades · stock 847u (18 días)',
-      lastAction: 'Difusor aromaterapia score 87/100 · hace 1h',
-      impacts: [
-        { label: 'Proyectos', route: '/gali-v5/proyectos' },
-        { label: 'Marketing', route: '/gali-v5/marketing/roax-lanzador' },
-      ],
-      ctaLabel: 'Ver catálogo', ctaRoute: '/gali-v5/productos/catalogo',
-    },
-    'marketing': {
-      agentName: 'Roax', color: '#f97316',
-      description: 'ROAS 2.9x · $66k/día · Video B ganando',
-      lastAction: 'Escaló presupuesto +15% por CTR 1.8% · hace 2h',
-      impacts: [
-        { label: 'Pedidos (+47)', route: '/gali-v5/mis-pedidos/mis-pedidos' },
-        { label: 'Finanzas (34% margen)', route: '/gali-v5/financiero/historial-de-cartera' },
-      ],
-      ctaLabel: 'Ver campañas', ctaRoute: '/gali-v5/marketing/roax-informes',
-    },
-    'pedidos': {
-      agentName: 'Vigilante', color: '#fbbf24',
-      description: '47 activas · 3 pendientes tu decisión',
-      lastAction: 'Detectó novedad 15% Coordinadora · hace 18 min',
-      impacts: [
-        { label: 'Logística (smart routing)', route: '/gali-v5/logistica/transportadoras' },
-        { label: 'Finanzas (28 sin facturar)', route: '/gali-v5/financiero/historial-de-cartera' },
-      ],
-      ctaLabel: 'Ver órdenes', ctaRoute: '/gali-v5/mis-pedidos/mis-pedidos',
-    },
-    'logistica': {
-      agentName: 'Vigilante', color: '#fbbf24',
-      description: 'Smart routing activo · 12 pedidos redirigidos',
-      lastAction: 'Redirigió pedidos a Servientrega · hace 18 min',
-      impacts: [
-        { label: 'Pedidos (riesgo)', route: '/gali-v5/mis-pedidos/novedades' },
-        { label: 'Finanzas (margen +3pts)', route: '/gali-v5/financiero/historial-de-cartera' },
-      ],
-      ctaLabel: 'Ver transportadoras', ctaRoute: '/gali-v5/logistica/transportadoras',
-    },
-    'finanzas': {
-      agentName: 'Gali', color: '#ff6102',
-      description: '$450k pendiente · Siigo sin conectar',
-      lastAction: 'Detectó discrepancia ROAS Meta vs real · hace 3h',
-      impacts: [
-        { label: 'Conexiones (Siigo)', route: '/gali-v5/conexiones' },
-        { label: 'Reportes (P&L)', route: '/gali-v5/reportes/dashboard' },
-      ],
-      ctaLabel: 'Conectar Siigo', ctaRoute: '/gali-v5/conexiones',
-    },
-    'rendimiento': {
-      agentName: 'Roax', color: '#f97316',
-      description: 'CPA $21.4k · Margen neto 34%',
-      lastAction: 'Actualizó ROAS real 2.9x vs Meta 3.1x · hace 2h',
-      impacts: [
-        { label: 'Marketing (ROAS)', route: '/gali-v5/marketing/roax-informes' },
-        { label: 'Finanzas (P&L)', route: '/gali-v5/financiero/historial-de-cartera' },
-      ],
-      ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
-    },
-    'reportes': {
-      agentName: 'Roax', color: '#f97316',
-      description: 'ROAS real 1.93x vs Meta 2.9x · CPA $21.4k · Margen neto 34%',
-      lastAction: 'Detectó discrepancia ROAS: 40% del margen absorbido por novedades en Cali · hace 2h',
-      impacts: [
-        { label: 'Marketing (optimizar ROAS)', route: '/gali-v5/marketing/roax-informes' },
-        { label: 'Finanzas (P&L completo)', route: '/gali-v5/financiero/historial-de-cartera' },
-      ],
-      ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
-    },
-  };
+  private readonly projects = PROJECTS_DATA;
+
+  private get collarGpsProject() {
+    return this.projects.find(p => p.id === 'collar-gps-2026')!;
+  }
+
+  get nodeDetailMap(): Record<string, NodeDetail> {
+    const p = this.collarGpsProject;
+    return {
+      'producto': {
+        agentName: 'ADA Spy', color: '#818cf8',
+        description: '3 oportunidades · stock 847u (18 días)',
+        lastAction: 'Difusor aromaterapia score 87/100 · hace 1h',
+        impacts: [
+          { label: 'Proyectos', route: '/gali-v5/proyectos' },
+          { label: 'Marketing', route: '/gali-v5/marketing/roax-lanzador' },
+        ],
+        ctaLabel: 'Ver catálogo', ctaRoute: '/gali-v5/productos/catalogo',
+      },
+      'marketing': {
+        agentName: 'Roax', color: '#f97316',
+        description: `ROAS ${p.roas_real_label} · ${p.pauta_diaria_label} · Video B ganando`,
+        lastAction: 'Escaló presupuesto +15% por CTR 1.8% · hace 2h',
+        impacts: [
+          { label: `Pedidos (+${p.pedidos_sem})`, route: '/gali-v5/mis-pedidos/mis-pedidos' },
+          { label: `Finanzas (${p.margen_neto_pct}% margen)`, route: '/gali-v5/financiero/historial-de-cartera' },
+        ],
+        ctaLabel: 'Ver campañas', ctaRoute: '/gali-v5/marketing/roax-informes',
+      },
+      'pedidos': {
+        agentName: 'Vigilante', color: '#fbbf24',
+        description: `${p.pedidos_sem} activas · 3 pendientes tu decisión`,
+        lastAction: 'Detectó novedad 15% Coordinadora · hace 18 min',
+        impacts: [
+          { label: 'Logística (smart routing)', route: '/gali-v5/logistica/transportadoras' },
+          { label: 'Finanzas (28 sin facturar)', route: '/gali-v5/financiero/historial-de-cartera' },
+        ],
+        ctaLabel: 'Ver órdenes', ctaRoute: '/gali-v5/mis-pedidos/mis-pedidos',
+      },
+      'logistica': {
+        agentName: 'Vigilante', color: '#fbbf24',
+        description: 'Smart routing activo · 12 pedidos redirigidos',
+        lastAction: 'Redirigió pedidos a Servientrega · hace 18 min',
+        impacts: [
+          { label: 'Pedidos (riesgo)', route: '/gali-v5/mis-pedidos/novedades' },
+          { label: 'Finanzas (margen +3pts)', route: '/gali-v5/financiero/historial-de-cartera' },
+        ],
+        ctaLabel: 'Ver transportadoras', ctaRoute: '/gali-v5/logistica/transportadoras',
+      },
+      'finanzas': {
+        agentName: 'Gali', color: '#ff6102',
+        description: '$450k pendiente · Siigo sin conectar',
+        lastAction: `Detectó discrepancia ROAS Meta ${p.roas_meta_label} vs real ${p.roas_real_label} · hace 3h`,
+        impacts: [
+          { label: 'Conexiones (Siigo)', route: '/gali-v5/conexiones' },
+          { label: 'Reportes (P&L)', route: '/gali-v5/reportes/dashboard' },
+        ],
+        ctaLabel: 'Conectar Siigo', ctaRoute: '/gali-v5/conexiones',
+      },
+      'rendimiento': {
+        agentName: 'Roax', color: '#f97316',
+        description: `CPA ${p.cpa_label} · Margen neto ${p.margen_neto_pct}%`,
+        lastAction: `Actualizó ROAS real ${p.roas_real_label} vs Meta ${p.roas_meta_label} · hace 2h`,
+        impacts: [
+          { label: 'Marketing (ROAS)', route: '/gali-v5/marketing/roax-informes' },
+          { label: 'Finanzas (P&L)', route: '/gali-v5/financiero/historial-de-cartera' },
+        ],
+        ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
+      },
+      'reportes': {
+        agentName: 'Roax', color: '#f97316',
+        description: `ROAS real ${p.roas_real_label} vs Meta ${p.roas_meta_label} · CPA ${p.cpa_label} · Margen neto ${p.margen_neto_pct}%`,
+        lastAction: 'Detectó discrepancia ROAS: 40% del margen absorbido por novedades en Cali · hace 2h',
+        impacts: [
+          { label: 'Marketing (optimizar ROAS)', route: '/gali-v5/marketing/roax-informes' },
+          { label: 'Finanzas (P&L completo)', route: '/gali-v5/financiero/historial-de-cartera' },
+        ],
+        ctaLabel: 'Ver reportes', ctaRoute: '/gali-v5/reportes/dashboard',
+      },
+    };
+  }
 
   activeNodeDetail() {
     const key = this.activeNode();
@@ -643,8 +673,20 @@ export class DropiHomeComponent implements AfterViewChecked {
     return this.signals.filter(s => s.estado === 'pending_decision').length;
   }
 
+  get completedSignals(): GaliSignalData[] {
+    return this.signals.filter(s => s.estado === 'completed');
+  }
+
+  get pendingApprovalSignals(): GaliSignalData[] {
+    return this.signals.filter(s => s.estado === 'pending_decision');
+  }
+
   goToProject(id: string): void {
     this.router.navigate(['/gali-v5/proyecto', id]);
+  }
+
+  navigateToSenales(): void {
+    this.router.navigate(['/gali-v5/senales']);
   }
 
   readonly showNewSkill = signal(false);
@@ -682,7 +724,7 @@ export class DropiHomeComponent implements AfterViewChecked {
     }
     // Estado operacional (usuario activo con datos)
     return {
-      text: 'Collar GPS lleva 52h con ROAS 2.9x sobre meta. Roax sugiere escalar presupuesto +30% ($66k → $86k/día).',
+      text: 'Collar GPS lleva 52h con ROAS real 1.93x. Roax sugiere escalar presupuesto +30% ($66k → $86k/día).',
       ctaLabel: 'Aprobar escala',
       ctaRoute: null,
       agente: 'Roax',
@@ -701,6 +743,27 @@ export class DropiHomeComponent implements AfterViewChecked {
       tipo: 'action',
     });
   }
+
+  openBulkModal(): void {
+    this.bulkModalStep.set(1);
+    this.showBulkModal.set(true);
+  }
+
+  bulkModalNext(): void { this.bulkModalStep.set(2); }
+
+  bulkModalBack(): void { this.bulkModalStep.set(1); }
+
+  confirmBulkAction(): void {
+    this.showBulkModal.set(false);
+    this.ws.addLiveEvent({
+      agente: 'Vigilante', agente_id: 'vigilante',
+      mensaje: '12 pedidos redirigidos a Servientrega (Bogotá)',
+      tipo: 'action',
+    });
+  }
+
+  /** Proyecto activo derivado del mock — collar-gps-2026 */
+  readonly activeProject = PROJECTS_DATA.find((p: { id: string }) => p.id === 'collar-gps-2026')!
 
   openNewSkill(moduleId?: string): void {
     const extras = moduleId ? { queryParams: { contexto: moduleId } } : {};

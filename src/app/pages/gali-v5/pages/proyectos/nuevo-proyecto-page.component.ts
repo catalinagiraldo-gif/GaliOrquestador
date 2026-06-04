@@ -67,6 +67,11 @@ export class NuevoProyectoPageComponent {
   readonly isSearching = signal(false);
   readonly products = signal<ProductSuggestion[]>(PRODUCT_SUGGESTIONS);
 
+  // Page Pilot MCP
+  readonly pagePilotState = signal<'idle' | 'generating' | 'deploying' | 'live'>('idle');
+  readonly pagePilotUrl = signal('');
+  readonly landingCvr = signal(0);
+
   readonly trendingCategories = TRENDING_CATEGORIES;
 
   roasTarget = signal('');
@@ -181,6 +186,20 @@ export class NuevoProyectoPageComponent {
       this.selectedAngulo.set(this.angulos[0]);
     }
     this.step.set('landing');
+  }
+
+  publishLanding(): void {
+    if (this.pagePilotState() !== 'idle') return;
+    this.pagePilotState.set('generating');
+    setTimeout(() => {
+      this.pagePilotState.set('deploying');
+      setTimeout(() => {
+        const slug = this.selectedProduct()?.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') ?? 'producto';
+        this.pagePilotUrl.set(`https://dropi.co/lp/${slug}`);
+        this.landingCvr.set(Math.floor(Math.random() * 3) + 2); // 2–4%
+        this.pagePilotState.set('live');
+      }, 1400);
+    }, 1200);
   }
 
   goToCampana(): void {

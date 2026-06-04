@@ -1,6 +1,11 @@
 @import '../shared/dropi-page-shell';
 @import '../shared/dropi-page-host';
 
+// Kronos brand color — GaliAjustesJun3: #60a5fa
+$kronos: #60a5fa;
+$kronos-bg: rgba(96, 165, 250, 0.06);
+$kronos-border: rgba(96, 165, 250, 0.25);
+
 :host {
   @include dropi-page-host;
 }
@@ -14,19 +19,16 @@
     display: flex;
     align-items: center;
     gap: $size-3;
-    min-height: 48px;
-    padding: $size-3 $size-4;
-    border-radius: $radius-lg;
-    background: rgba($info, 0.08);
-    border: 1px solid rgba($info, 0.2);
+    min-height: 44px;
+    padding: $size-2 $size-4;
+    border-radius: $radius-md;
+    background: rgba($info, 0.06);
+    border: 1px solid rgba($info, 0.15);
     font-family: $font-primary;
-    font-size: $font-sm;
-    color: $secondary-600;
+    font-size: $font-xs;
+    color: $gray-500;
 
-    .pi {
-      font-size: $font-lg;
-      flex-shrink: 0;
-    }
+    .pi { font-size: $font-sm; flex-shrink: 0; color: $info; }
   }
 
   &__filters {
@@ -47,8 +49,7 @@
       color: $gray-500;
     }
 
-    input,
-    select {
+    input, select {
       height: 40px;
       padding: 0 $size-3;
       border: 1px solid $gray-200;
@@ -59,18 +60,14 @@
     }
   }
 
-  &__date input {
-    width: 126px;
-  }
-
-  &__select select {
-    width: 180px;
-  }
+  &__date input { width: 126px; }
+  &__select select { width: 180px; }
 
   &__tabs {
     display: flex;
     gap: 0;
     border-bottom: 1px solid $gray-200;
+    margin-bottom: $size-4;
 
     button {
       height: 52px;
@@ -83,6 +80,7 @@
       color: $gray-500;
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
 
       &.active {
         color: $primary-600;
@@ -103,12 +101,442 @@
   }
 }
 
-.wallet-table-wrap {
-  overflow-x: auto;
+// ── Kronos agent bar ────────────────────────────────────────
+.kronos-bar {
+  display: flex;
+  align-items: center;
+  gap: $size-4;
+  padding: $size-3 $size-5;
+  border-radius: $radius-lg;
+  border-left: 3px solid $kronos;
+  background: $kronos-bg;
+  border: 1px solid $kronos-border;
+  border-left-width: 3px;
+  margin-bottom: $size-4;
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $kronos;
+    animation: kronos-pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__name {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $kronos;
+  }
+
+  &__role {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: rgba($kronos, 0.7);
+  }
+
+  &__narrative {
+    flex: 1;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-600;
+    line-height: 1.5;
+
+    strong { color: $gray-800; font-weight: $font-semibold; }
+  }
+
+  &__cta {
+    padding: 6px $size-3;
+    border: 1px solid $kronos;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $kronos;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover { background: rgba($kronos, 0.08); }
+  }
+}
+
+@keyframes kronos-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($kronos, 0.4); }
+  50%       { box-shadow: 0 0 0 5px rgba($kronos, 0); }
+}
+
+// ── Siigo error card — estructura fija ───────────────────────
+.siigo-error-card {
+  display: flex;
+  align-items: center;
+  gap: $size-4;
+  padding: $size-3 $size-5;
+  border-radius: $radius-lg;
+  background: rgba($error, 0.05);
+  border: 1px solid rgba($error, 0.2);
+  margin-bottom: $size-4;
+
+  &__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    background: rgba($error, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .pi {
+      font-size: $font-base;
+      color: $error;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-800;
+  }
+
+  &__detail {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $error;
+    font-weight: $font-medium;
+  }
+
+  &__cta {
+    padding: 7px $size-4;
+    border: 1px solid $error;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $error;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s;
+
+    &:hover { background: rgba($error, 0.06); }
+  }
+}
+
+// ── Resumen financiero ────────────────────────────────────────
+.fin-summary {
+  border: 1px solid $gray-100;
+  border-radius: $radius-xl;
+  background: $white;
+  box-shadow: $shadow-small;
+  padding: $size-5;
+  margin-bottom: $size-4;
+
+  &__period {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-4;
+  }
+
+  &__period-label {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-700;
+  }
+
+  &__period-badge {
+    padding: 2px $size-2;
+    border-radius: $radius-pill;
+    background: rgba($kronos, 0.1);
+    color: $kronos;
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: $font-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__cards {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex-wrap: wrap;
+    margin-bottom: $size-5;
+  }
+
+  &__card {
+    flex: 1;
+    min-width: 160px;
+    padding: $size-4;
+    border-radius: $radius-lg;
+    border: 1px solid $gray-100;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &--ingresos { background: rgba($success, 0.04); border-color: rgba($success, 0.15); }
+    &--costos   { background: rgba($error, 0.03); border-color: rgba($error, 0.12); }
+    &--neto     {
+      background: rgba($kronos, 0.05);
+      border-color: rgba($kronos, 0.2);
+      border-left: 3px solid $kronos;
+    }
+  }
+
+  &__card-label {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+
+  &__card-value {
+    font-family: $font-primary;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    color: $gray-800;
+    line-height: 1.2;
+
+    &--pos { color: #16a34a; }
+    &--neg { color: $error; }
+  }
+
+  &__card-sub {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $gray-400;
+  }
+
+  &__separator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $size-1;
+    flex-shrink: 0;
+  }
+
+  &__arrow {
+    font-size: $font-lg;
+    color: $gray-300;
+    font-weight: $font-bold;
+  }
+
+  &__cost-detail {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-400;
+    text-align: center;
+    max-width: 140px;
+    line-height: 1.4;
+  }
+}
+
+// ── Fugas de dinero ──────────────────────────────────────────
+.fugas-block {
+  border-top: 1px solid $gray-100;
+  padding-top: $size-4;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-3;
+  }
+
+  &__kronos-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $kronos;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-700;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+}
+
+.fuga-card {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border-radius: $radius-md;
+  border: 1px solid transparent;
+
+  &--alta {
+    background: rgba($error, 0.04);
+    border-color: rgba($error, 0.15);
+
+    .fuga-card__severity .pi { color: $error; }
+    .fuga-card__impacto { color: $error; }
+    .fuga-card__accion { color: $error; border-color: rgba($error, 0.3); }
+    .fuga-card__accion:hover { background: rgba($error, 0.06); }
+  }
+
+  &--media {
+    background: rgba($warning, 0.04);
+    border-color: rgba($warning, 0.2);
+
+    .fuga-card__severity .pi { color: $warning; }
+    .fuga-card__impacto { color: darken($warning, 10%); }
+    .fuga-card__accion { color: darken($warning, 10%); border-color: rgba($warning, 0.4); }
+    .fuga-card__accion:hover { background: rgba($warning, 0.06); }
+  }
+
+  &__severity {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .pi { font-size: $font-base; }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__titulo {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-800;
+  }
+
+  &__impacto {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+  }
+
+  &__canal {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $gray-400;
+  }
+
+  &__accion {
+    padding: 5px $size-3;
+    border: 1px solid;
+    border-radius: $radius-md;
+    background: transparent;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.15s;
+  }
+}
+
+// ── Accordion de transacciones ───────────────────────────────
+.tx-accordion {
   border: 1px solid $gray-100;
   border-radius: $radius-lg;
+  overflow: hidden;
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: $size-4 $size-5;
+    background: $gray-50;
+    border: none;
+    cursor: pointer;
+    font-family: $font-primary;
+    transition: background 0.15s;
+
+    &:hover { background: $gray-100; }
+  }
+
+  &__toggle-left {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+
+    .pi-list { color: $gray-400; font-size: $font-base; }
+
+    span {
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-700;
+    }
+  }
+
+  &__count {
+    font-size: $font-xs !important;
+    font-weight: $font-regular !important;
+    color: $gray-400 !important;
+    background: $gray-200;
+    padding: 2px $size-2;
+    border-radius: $radius-pill;
+  }
+
+  &__chevron {
+    font-size: $font-sm;
+    color: $gray-400;
+    transition: transform 0.2s;
+  }
+}
+
+// ── Tabla de transacciones ───────────────────────────────────
+.wallet-table-wrap {
+  overflow-x: auto;
   background: $white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  border-top: 1px solid $gray-100;
 }
 
 .wallet-table {
@@ -118,18 +546,20 @@
   font-family: $font-primary;
 
   th {
-    height: 55px;
+    height: 44px;
     padding: 0 $size-3;
-    font-size: $font-sm;
+    font-size: $font-xs;
     font-weight: $font-semibold;
-    color: $gray-600;
-    background: $gray-50;
+    color: $gray-500;
+    background: $white;
     border-bottom: 1px solid $gray-100;
     text-align: left;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
 
   td {
-    height: 80px;
+    height: 64px;
     padding: $size-3;
     font-size: $font-sm;
     color: $gray-700;
@@ -138,7 +568,7 @@
     white-space: nowrap;
 
     &.positive {
-      color: $success;
+      color: #16a34a;
       font-weight: $font-semibold;
     }
 
@@ -149,115 +579,31 @@
   }
 
   &__desc {
-    white-space: normal;
-    min-width: 280px;
+    white-space: normal !important;
+    min-width: 260px;
     line-height: 1.5;
+    color: $gray-600 !important;
+    font-size: $font-xs !important;
   }
 }
 
-
-// ── Gali Agent Working Bar ──────────────────────────────
-.gali-agent-bar {
-  display: flex;
+// ── tipo badge en la tabla ────────────────────────────────────
+.tx-tipo {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: $radius-pill;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
 
-  &--ada {
-    border-left: 3px solid #3b82f6;
-    background: rgba(59, 130, 246, 0.05);
-
-    .gali-agent-bar__dot { background: #3b82f6; animation: agbar-pulse-blue 2s infinite; }
-    .gali-agent-bar__status { color: #3b82f6; }
-    .gali-agent-bar__cta { border-color: #3b82f6; color: #3b82f6; }
-    .gali-agent-bar__cta:hover { background: rgba(59,130,246,0.08); }
+  &--entrada {
+    background: rgba($success, 0.1);
+    color: #16a34a;
   }
 
-  &--financiero {
-    border-left: 3px solid #8b5cf6;
-    background: rgba(139, 92, 246, 0.05);
-    align-items: flex-start;
-
-    .gali-agent-bar__dot { background: #8b5cf6; animation: agbar-pulse-violet 2s infinite; }
-    .gali-agent-bar__status { color: #8b5cf6; }
-    .gali-agent-bar__cta { border-color: #8b5cf6; color: #8b5cf6; }
-    .gali-agent-bar__cta:hover { background: rgba(139,92,246,0.08); }
+  &--salida {
+    background: rgba($error, 0.08);
+    color: $error;
   }
-
-  &__left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  &__identity { display: flex; flex-direction: column; gap: 2px; }
-
-  &__name { font-size: 12px; font-weight: 600; color: #1c1c1e; }
-
-  &__status { font-size: 11px; }
-
-  &__action { flex: 1; font-size: 12px; color: #6b7280; }
-
-  &__finance-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  &__action-secondary { font-size: 11px; color: #9ca3af; }
-
-  &__ada-stats {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  &__ada-stat { font-size: 12px; color: #6b7280; strong { font-weight: 700; color: #1c1c1e; } }
-
-  &__ada-sep { color: #d1d5db; }
-
-  &__actions { display: flex; gap: 8px; flex-shrink: 0; }
-
-  &__cta {
-    padding: 5px 12px;
-    border: 1px solid currentColor;
-    border-radius: 6px;
-    background: transparent;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.15s ease;
-  }
-
-  &__secondary {
-    padding: 5px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    background: transparent;
-    color: #6b7280;
-    font-size: 12px;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-    &:hover { border-color: #9ca3af; }
-  }
-}
-
-@keyframes agbar-pulse-blue {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
-  50%       { box-shadow: 0 0 0 4px rgba(59,130,246,0); }
-}
-
-@keyframes agbar-pulse-violet {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
-  50%       { box-shadow: 0 0 0 4px rgba(139,92,246,0); }
 }

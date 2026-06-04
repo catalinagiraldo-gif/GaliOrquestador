@@ -1,5 +1,10 @@
 <div class="agentes-page">
 
+  <!-- Panel de umbrales de agencia -->
+  @if (showAgencyPanel()) {
+    <gali-agency-thresholds-panel (closed)="showAgencyPanel.set(false)" />
+  }
+
   <!-- Header de página -->
   <div class="agentes-page__header">
     <div>
@@ -7,6 +12,10 @@
       <p class="agentes-page__subtitle">Cada agente se especializa en un área de tu negocio. Usan skills para ejecutar acciones automáticas.</p>
     </div>
     <div class="agentes-page__header-actions">
+      <button type="button" class="agentes-page__btn-agency" (click)="showAgencyPanel.set(true)"
+        title="Configura cuánta autonomía le das a cada agente">
+        <i class="pi pi-sliders-h"></i> Umbrales de agencia
+      </button>
       <a routerLink="/gali-v5/reglas" class="agentes-page__btn-outline">
         <i class="pi pi-list-check"></i> Reglas
       </a>
@@ -31,7 +40,7 @@
       <div class="agentes-concept__content">
         <span class="agentes-concept__badge agentes-concept__badge--agent">Agente</span>
         <span class="agentes-concept__desc">Entidad que <strong>ejecuta</strong> acciones de forma autónoma. Tú lo configuras una vez; él actúa 24/7.</span>
-        <span class="agentes-concept__example">Roax · Vigilante · Chatea Pro · ADA Spy</span>
+        <span class="agentes-concept__example">Roax · Vigilante · Chatea Pro · ADA Spy · Kronos</span>
       </div>
     </div>
     <div class="agentes-concept__connector">
@@ -101,9 +110,21 @@
               <span class="agent-card__metric-val">{{ agent.actionsThisWeek }}</span>
               <span class="agent-card__metric-label">acciones/sem</span>
             </div>
-            <div class="agent-card__metric">
-              <span class="agent-card__metric-val">{{ agent.successRate }}%</span>
-              <span class="agent-card__metric-label">tasa de éxito</span>
+            <div class="agent-card__metric agent-card__metric--rate"
+              [title]="successRateTooltip">
+              <div class="success-rate-semaphore">
+                <span class="success-rate-semaphore__dot"
+                  [class]="'success-rate-semaphore__dot--' + successRateLabel(agent.successRate)">
+                </span>
+                <span class="agent-card__metric-val"
+                  [style.color]="successRateColor(agent.successRate)">
+                  {{ agent.successRate }}%
+                </span>
+              </div>
+              <span class="agent-card__metric-label">
+                tasa de éxito
+                <span class="agent-card__benchmark-hint">vs 89% Dropi</span>
+              </span>
             </div>
           </div>
         </button>
@@ -160,9 +181,31 @@
             <strong class="agent-stat__val">{{ selectedAgent().actionsThisWeek }}</strong>
             <span class="agent-stat__label">Acciones</span>
           </div>
-          <div class="agent-stat">
-            <strong class="agent-stat__val">{{ selectedAgent().successRate }}%</strong>
-            <span class="agent-stat__label">Éxito</span>
+          <div class="agent-stat" [title]="successRateTooltip">
+            <div class="agent-stat__rate-row">
+              <span class="success-rate-semaphore__dot success-rate-semaphore__dot--lg"
+                [class]="'success-rate-semaphore__dot--' + successRateLabel(selectedAgent().successRate)">
+              </span>
+              <strong class="agent-stat__val"
+                [style.color]="successRateColor(selectedAgent().successRate)">
+                {{ selectedAgent().successRate }}%
+              </strong>
+            </div>
+            <span class="agent-stat__label">Tasa de éxito</span>
+            <!-- benchmark bar -->
+            <div class="agent-stat__benchmark-bar">
+              <div class="agent-stat__benchmark-track">
+                <div class="agent-stat__benchmark-fill"
+                  [style.width.%]="selectedAgent().successRate"
+                  [style.background]="successRateColor(selectedAgent().successRate)">
+                </div>
+                <div class="agent-stat__benchmark-marker"
+                  [style.left.%]="DROPI_BENCHMARK"
+                  title="Promedio Dropi: 89%">
+                </div>
+              </div>
+              <span class="agent-stat__benchmark-label">Prom. Dropi: {{ DROPI_BENCHMARK }}%</span>
+            </div>
           </div>
           <div class="agent-stat">
             <strong class="agent-stat__val">{{ selectedAgent().skills.length }}</strong>
@@ -225,6 +268,35 @@
 
     </div>
 
+  </div>
+
+  <!-- ── CAPA DETERMINISTA ── -->
+  <div class="determinista-banner">
+    <div class="determinista-banner__icon">🛡</div>
+    <div class="determinista-banner__body">
+      <span class="determinista-banner__title">Capa Determinista — lo que hace a Gali confiable</span>
+      <span class="determinista-banner__sub">Antes de que cualquier agente actúe, una capa simbólica valida 4 condiciones. Si alguna falla, el agente no actúa — escala a ti con contexto completo.</span>
+      <div class="determinista-checks">
+        <div class="determinista-check">
+          <span class="determinista-check__dot determinista-check__dot--ok"></span>
+          <span>¿Esta acción viola alguna regla tuya?</span>
+          <a routerLink="/gali-v5/reglas" class="determinista-check__link">Ver reglas →</a>
+        </div>
+        <div class="determinista-check">
+          <span class="determinista-check__dot determinista-check__dot--ok"></span>
+          <span>¿El monto está dentro del umbral autorizado?</span>
+        </div>
+        <div class="determinista-check">
+          <span class="determinista-check__dot determinista-check__dot--ok"></span>
+          <span>¿La zona de entrega está en lista negra?</span>
+        </div>
+        <div class="determinista-check">
+          <span class="determinista-check__dot determinista-check__dot--ok"></span>
+          <span>¿El proveedor tiene stock suficiente para el pedido?</span>
+        </div>
+      </div>
+    </div>
+    <a routerLink="/gali-v5/reglas" class="determinista-banner__cta">Configurar límites →</a>
   </div>
 
   <!-- ── CREAR AGENTE PERSONALIZADO ── -->

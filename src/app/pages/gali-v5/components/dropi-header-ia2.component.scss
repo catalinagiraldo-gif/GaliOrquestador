@@ -418,3 +418,364 @@
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+// ── Health Score Side Panel ──────────────────────────────────────
+
+.health-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(21, 25, 33, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  animation: hp-fade 0.18s ease;
+}
+
+@keyframes hp-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.health-panel {
+  width: 400px;
+  max-width: 100vw;
+  height: 100vh;
+  background: $white;
+  border-left: 1px solid $gray-100;
+  box-shadow: -4px 0 28px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: hp-slide 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-4;
+    padding: $size-5 $size-5 $size-4;
+    border-bottom: 1px solid $gray-100;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  &__score-wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  &__score-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  &__score-num {
+    font-family: $font-primary;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    line-height: 1.1;
+  }
+
+  &__score-denom {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-400;
+    line-height: 1;
+  }
+
+  &__headline {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $size-1;
+    padding-top: $size-1;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-base;
+    font-weight: $font-bold;
+    color: $gray-800;
+    margin: 0;
+  }
+
+  &__status {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+  }
+
+  &__benchmark {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-500;
+    flex-wrap: wrap;
+  }
+
+  &__benchmark-val {
+    color: $gray-700;
+  }
+
+  &__delta {
+    font-weight: $font-medium;
+
+    &--below { color: #f59e0b; }
+    &--above { color: #22c55e; }
+  }
+
+  &__close {
+    position: absolute;
+    top: $size-4;
+    right: $size-4;
+    width: 28px;
+    height: 28px;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $gray-500;
+    font-size: $font-base;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+
+    &:hover { background: $gray-50; color: $gray-800; }
+  }
+
+  &__section {
+    padding: $size-4 $size-5;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__section-title {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 $size-3;
+  }
+
+  &__components {
+    display: flex;
+    flex-direction: column;
+    gap: $size-4;
+  }
+
+  &__recs {
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+  }
+
+  &__footer {
+    padding: $size-3 $size-5 $size-5;
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-300;
+    line-height: 1.5;
+  }
+}
+
+@keyframes hp-slide {
+  from { transform: translateX(100%); opacity: 0.5; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+// ── SVG ring ─────────────────────────────────────────────────────
+.health-ring {
+  display: block;
+
+  &__track {
+    fill: none;
+    stroke: $gray-100;
+    stroke-width: 6;
+  }
+
+  &__fill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dasharray 0.5s ease;
+  }
+}
+
+// ── Health score components ───────────────────────────────────────
+.health-comp {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $size-2;
+  }
+
+  &__label {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $gray-700;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__score {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+  }
+
+  &__weight {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-400;
+  }
+
+  &__status {
+    font-size: 11px;
+  }
+
+  &__bar-track {
+    position: relative;
+    height: 6px;
+    background: $gray-100;
+    border-radius: 3px;
+    overflow: visible;
+  }
+
+  &__bar-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    max-width: 100%;
+  }
+
+  &__bar-marker {
+    position: absolute;
+    top: -3px;
+    left: 82%;
+    width: 2px;
+    height: 12px;
+    background: $gray-400;
+    border-radius: 1px;
+    transform: translateX(-50%);
+
+    &::after {
+      content: 'Dropi';
+      position: absolute;
+      top: 13px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: $gray-400;
+      white-space: nowrap;
+      font-family: $font-primary;
+    }
+  }
+
+  &__detail {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $gray-400;
+    line-height: 1.4;
+  }
+}
+
+// ── Health recommendations ───────────────────────────────────────
+.health-rec {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  background: $gray-50;
+  transition: background 0.12s;
+
+  &:hover { background: $white; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+
+  &__impact {
+    min-width: 48px;
+    height: 40px;
+    border-radius: $radius-md;
+    background: rgba(#22c55e, 0.1);
+    color: #16a34a;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(#22c55e, 0.2);
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__accion {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-800;
+  }
+
+  &__porque {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-500;
+    line-height: 1.4;
+  }
+
+  &__cta {
+    padding: 5px $size-3;
+    border: 1px solid $primary-500;
+    border-radius: $radius-md;
+    background: transparent;
+    color: $primary-600;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    transition: background 0.12s;
+
+    &:hover { background: rgba($primary-500, 0.08); }
+  }
+}

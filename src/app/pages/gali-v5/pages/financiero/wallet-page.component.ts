@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import {
   DropiTitulosComponent,
   DropiButtonNewComponent,
@@ -17,6 +18,20 @@ interface WalletTransaction {
   monto: string;
   montoPrevio: string;
   descripcion: string;
+  descripcionHumana?: string;
+  producto?: string;
+  guia?: string;
+}
+
+interface Fuga {
+  id: string;
+  titulo: string;
+  impacto: string;
+  impacto_valor: number;
+  canal: string;
+  severidad: 'alta' | 'media';
+  accion: string;
+  accion_ruta: string;
 }
 
 @Component({
@@ -25,6 +40,7 @@ interface WalletTransaction {
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     DropiTitulosComponent,
     DropiButtonNewComponent,
     DropiSearchOficialComponent,
@@ -37,15 +53,26 @@ interface WalletTransaction {
 export class WalletPageComponent {
   searchQuery = '';
   activeTab = signal<'transacciones' | 'depositos'>('transacciones');
+  transaccionesOpen = signal(false);
+
   readonly breadcrumbs = ['Financiero', 'Wallet', 'Historial de wallet'];
   readonly alertMessage = walletData.alertMessage;
   readonly transactions: WalletTransaction[] = walletData.transactions;
+
+  readonly summary = walletData.financialSummary;
+  readonly fugas: Fuga[] = walletData.financialSummary.fugas as Fuga[];
+  readonly siigo = walletData.financialSummary.siigo;
 
   filteredTransactions(): WalletTransaction[] {
     if (!this.searchQuery) return this.transactions;
     const q = this.searchQuery.toLowerCase();
     return this.transactions.filter(t =>
-      t.num.includes(q) || t.descripcion.toLowerCase().includes(q),
+      t.num.includes(q) ||
+      (t.descripcionHumana ?? t.descripcion).toLowerCase().includes(q),
     );
+  }
+
+  getDescripcion(t: WalletTransaction): string {
+    return t.descripcionHumana ?? t.descripcion;
   }
 }

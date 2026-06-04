@@ -1,9 +1,10 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DiagnosticoModalComponent } from '../../components/diagnostico-modal/diagnostico-modal.component';
 import { SkillsEditorModalComponent } from '../../components/skills-editor-modal/skills-editor-modal.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import PROJECTS_DATA from '../../../../../../mocks/gali-v5/projects.json';
 
 export type TabId = 'resumen' | 'producto' | 'estrategia' | 'creativos' | 'campanas' | 'pedidos' | 'pl';
 export type AgentStatus = 'activo' | 'esperando' | 'pausa';
@@ -69,7 +70,13 @@ interface PlLine {
 })
 export class ProyectoDetallePageComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private ws = inject(GaliWorkspaceService);
+
+  readonly proyectoId = signal<string>('collar-gps-2026');
+  readonly proyectoData = computed(() =>
+    PROJECTS_DATA.find((p: { id: string }) => p.id === this.proyectoId()) ?? PROJECTS_DATA[0]
+  );
 
   activeTab = signal<TabId>('resumen');
   showDiagnostic = signal(false);
@@ -243,7 +250,11 @@ export class ProyectoDetallePageComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.route.params.subscribe(p => {
+      if (p['id']) this.proyectoId.set(p['id']);
+    });
+  }
 
   setTab(id: TabId): void {
     this.activeTab.set(id);

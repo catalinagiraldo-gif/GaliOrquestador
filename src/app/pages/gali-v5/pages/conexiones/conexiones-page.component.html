@@ -82,6 +82,9 @@
               @if (platform.urgente && platform.status !== 'connected') {
                 <span class="map-node__urgente" aria-label="Requiere atención">!</span>
               }
+              @if (platform.isProFeature) {
+                <span class="map-node__pro" aria-label="Gali Pro">PRO</span>
+              }
             </button>
           }
         </div>
@@ -92,6 +95,7 @@
         <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> Conectado</span>
         <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Pendiente</span>
         <span class="legend-item"><span class="legend-dot" style="background:#9ca3af"></span> Desconectado</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f97316"></span> Gali Pro</span>
       </div>
 
     </div><!-- /map-container -->
@@ -149,6 +153,13 @@
           </div>
 
         </div>
+
+        @if (node.isProFeature) {
+          <div class="node-pro-banner">
+            <span class="node-pro-banner__badge">✦ Gali Pro</span>
+            <span class="node-pro-banner__text">Este canal requiere Gali Pro — incluido en el tier de plataforma tecnológica.</span>
+          </div>
+        }
 
         <div class="node-detail-panel__footer">
           @if (node.ctaRoute) {

@@ -155,19 +155,21 @@ export class DropiSectionNavComponent {
 
   readonly isAiSection = computed(() => {
     const url = this.currentUrl();
-    // Exclude 'home' — its prefix /gali-v5 matches all routes in this shell
-    return DROPI_ICON_RAIL.some(i =>
-      i.group === 'ai' && i.key !== 'home' && i.matchPrefixes.some(p => url.startsWith(p))
+    const path = url.split('?')[0];
+    const homeItem = DROPI_ICON_RAIL.find(i => i.key === 'home');
+    if (!homeItem) return false;
+    return homeItem.matchPrefixes.some(p =>
+      p === '/gali-v5' ? (path === '/gali-v5' || path === '/gali-v5/') : path.startsWith(p)
     );
   });
 
   // User-toggled overrides — separate from panel defaults
   private readonly userOverrides = signal<Record<string, boolean>>({});
-  // Panel defaults derived reactively via computed (no effect needed)
+  // Panel defaults derived reactively — stores explicit true/false when set
   private readonly panelDefaults = computed<Record<string, boolean>>(() => {
     const defaults: Record<string, boolean> = {};
     this.panel().items.forEach((item: SectionNavItem) => {
-      if (item.defaultExpanded) defaults[item.id] = true;
+      if (item.defaultExpanded !== undefined) defaults[item.id] = item.defaultExpanded;
     });
     return defaults;
   });
@@ -181,6 +183,9 @@ export class DropiSectionNavComponent {
   isExpanded(id: string): boolean {
     const override = this.userOverrides()[id];
     if (override !== undefined) return override;
+    // Auto-expand accordion when a child route is active
+    const item = this.panel().items.find(i => i.id === id);
+    if (item?.type === 'accordion' && this.isChildRouteActive(item)) return true;
     return this.panelDefaults()[id] ?? true;
   }
 

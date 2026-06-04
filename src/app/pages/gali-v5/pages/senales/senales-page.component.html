@@ -1,0 +1,141 @@
+<div class="senales-page">
+
+  <!-- HEADER -->
+  <div class="senales-header">
+    <div class="senales-header__top">
+      <h1 class="senales-title">
+        <span class="gali-spark">✦</span> Señales
+      </h1>
+      <div class="senales-pills">
+        <span class="pill pill--senales">{{ senalesVisibles().length }} señales</span>
+        <span class="pill pill--alertas">{{ alertasVisibles().length }} alertas</span>
+      </div>
+    </div>
+    <p class="senales-subtitle">Lo que Gali detectó antes de que lo vieras tú</p>
+  </div>
+
+  <!-- FILTROS (CA-5) -->
+  <div class="senales-filters">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter() === f"
+        (click)="setFilter(f)">
+        {{ filterLabel(f) }}
+      </button>
+    }
+  </div>
+
+  <!-- PANELES — mobile: alertas arriba, señales abajo (CA-6) (CA-2) -->
+  <div class="senales-panels">
+
+    <!-- PANEL ALERTAS (arriba en mobile) -->
+    @if (alertasVisibles().length > 0) {
+      <div class="panel panel--alertas">
+        <div class="panel__header">
+          <span class="panel__icon">⚠️</span>
+          <div>
+            <p class="panel__title">Alertas operativas</p>
+            <p class="panel__subtitle">Requieren acción hoy</p>
+          </div>
+        </div>
+
+        <div class="alert-list">
+          @for (a of alertasVisibles(); track a.id) {
+            <div class="alert-card alert-card--{{ a.tipo }}">
+              <div class="alert-card__header">
+                <span class="alert-badge alert-badge--{{ a.tipo }}">
+                  {{ a.tipo === 'critical' ? '🔴 Crítico' : a.tipo === 'warning' ? '🟡 Advertencia' : 'ℹ️ Info' }}
+                </span>
+                <span class="alert-agent">{{ agenteLabel(a.agente) }}</span>
+              </div>
+
+              <h3 class="alert-title">{{ a.titulo }}</h3>
+              <p class="alert-description">{{ a.descripcion }}</p>
+
+              <div class="alert-impacto">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ a.impacto }}
+              </div>
+
+              @if (a.pedidosAfectados && a.pedidosAfectados > 0) {
+                <div class="alert-pedidos">{{ a.pedidosAfectados }} pedidos afectados</div>
+              }
+
+              <div class="alert-actions">
+                <button
+                  type="button"
+                  class="btn-primary btn-sm btn-primary--urgent"
+                  (click)="handleAlertaCta(a)">
+                  {{ a.ctaPrincipal }}
+                </button>
+                <button type="button" class="btn-ghost btn-sm">{{ a.ctaSecundario }}</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- PANEL SEÑALES (abajo en mobile) -->
+    @if (senalesVisibles().length > 0) {
+      <div class="panel panel--senales">
+        <div class="panel__header">
+          <span class="panel__icon">🔭</span>
+          <div>
+            <p class="panel__title">Señales predictivas</p>
+            <p class="panel__subtitle">Oportunidades con ventana de acción activa</p>
+          </div>
+        </div>
+
+        <div class="signal-list">
+          @for (s of senalesVisibles(); track s.id) {
+            <div class="signal-card signal-card--{{ s.tipo }}">
+              <div class="signal-card__header">
+                <span class="signal-badge signal-badge--{{ s.tipo }}">
+                  {{ getBadgeLabel(s.tipo) }}
+                </span>
+                <span class="signal-agent">{{ agenteLabel(s.agente) }}</span>
+                <span class="signal-window">
+                  <i class="pi pi-clock"></i> {{ s.ventanaDias }} días
+                </span>
+              </div>
+
+              <h3 class="signal-title">{{ s.titulo }}</h3>
+
+              <!-- Contexto macromundo (CA-4) -->
+              <div class="signal-macromundo">
+                <span class="macromundo-tag">Según datos de la red Dropi</span>
+                <p class="macromundo-text">{{ s.contextoMacromundo }}</p>
+              </div>
+
+              <p class="signal-recomendacion">{{ s.recomendacion }}</p>
+
+              @if (s.metrica) {
+                <div class="signal-metrica">{{ s.metrica }}</div>
+              }
+
+              <div class="signal-actions">
+                <button type="button" class="btn-primary btn-sm" (click)="handleSenalCta(s)">
+                  {{ s.ctaPrincipal }}
+                </button>
+                <button type="button" class="btn-ghost btn-sm">{{ s.ctaSecundario }}</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ESTADO VACÍO -->
+    @if (senalesVisibles().length === 0 && alertasVisibles().length === 0) {
+      <div class="senales-empty">
+        <span class="empty-icon">✦</span>
+        <p class="empty-title">Todo tranquilo por ahora</p>
+        <p class="empty-subtitle">Gali monitorea tu negocio 24/7 y te avisará aquí cuando detecte algo.</p>
+      </div>
+    }
+
+  </div>
+</div>

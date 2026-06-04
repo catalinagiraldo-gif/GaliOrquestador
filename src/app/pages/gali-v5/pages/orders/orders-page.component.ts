@@ -6,7 +6,7 @@ import ordersData from '../../../../../../mocks/gali-v5/orders.json';
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
-import { GaliModuleActivationBarComponent } from '../../components/gali-module-activation-bar/gali-module-activation-bar.component';
+
 
 interface OrderRow {
   id: string;
@@ -21,6 +21,8 @@ interface OrderRow {
   statusTags: string[];
   riskLevel?: 'verde' | 'amarillo' | 'rojo';
   riskLabel?: string;
+  channel?: string;
+  channelLabel?: string;
 }
 
 type GaliTriageStatus = 'ok' | 'managing' | 'decision' | 'auto';
@@ -28,7 +30,7 @@ type GaliTriageStatus = 'ok' | 'managing' | 'decision' | 'auto';
 @Component({
   selector: 'app-orders-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiGaliBarComponent, GaliInsightDirective, GaliModuleActivationBarComponent],
+  imports: [CommonModule, FormsModule, DropiGaliBarComponent, GaliInsightDirective],
   templateUrl: './orders-page.component.html',
   styleUrl: './orders-page.component.scss',
 })
@@ -99,6 +101,21 @@ export class OrdersPageComponent {
 
   getRiskLevel(o: OrderRow): { level: 'verde' | 'amarillo' | 'rojo'; label: string; hint: string } | null {
     return this.riskByOrder[o.id] ?? { level: 'verde', label: 'Sin alerta', hint: 'Vigilante no detectó riesgo' };
+  }
+
+  getChannelEmoji(channel: string | undefined): string {
+    const map: Record<string, string> = {
+      meta: '📘',
+      tiktok_shop: '🎵',
+      shopify: '🛍',
+      whatsapp: '💚',
+      directo: '🔗',
+    };
+    return map[channel ?? ''] ?? '—';
+  }
+
+  getChannelClass(channel: string | undefined): string {
+    return `channel-chip channel-chip--${channel ?? 'directo'}`;
   }
 
   getCarrierInsight(carrier: string): string {
