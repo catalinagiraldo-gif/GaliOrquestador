@@ -59,6 +59,9 @@
               <span class="akademy-duration">{{ course.duration }}</span>
             </div>
             <strong class="akademy-card__title">{{ course.title }}</strong>
+            @if (course.justificacion) {
+              <p class="course-justification">{{ course.justificacion }}</p>
+            }
             <p class="akademy-card__desc">{{ course.desc }}</p>
             <div class="akademy-card__footer">
               <span class="akademy-instructor">{{ course.instructor }}</span>

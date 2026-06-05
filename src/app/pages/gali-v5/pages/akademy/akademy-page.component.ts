@@ -16,6 +16,7 @@ interface Course {
   progress?: number;
   category: string;
   instructor: string;
+  justificacion?: string;
 }
 
 const AKADEMY_PROGRESS_KEY = 'gali_akademy_progress';
@@ -66,6 +67,7 @@ export class AkademyPageComponent implements OnInit {
       agentRec: true,
       category: 'Logística',
       instructor: 'Carlos Vega',
+      justificacion: '↑ Tu tasa de novedad está en 15% — 5pts sobre la media Dropi',
     },
     {
       id: 'whatsapp-confirmacion',
@@ -77,6 +79,7 @@ export class AkademyPageComponent implements OnInit {
       agentRec: true,
       category: 'Ventas',
       instructor: 'Camila Torres',
+      justificacion: 'Para bajar novedades con mejor confirmación antes del envío',
     },
     {
       id: 'escalar-meta',
@@ -88,6 +91,7 @@ export class AkademyPageComponent implements OnInit {
       agentRec: true,
       category: 'Marketing',
       instructor: 'Andrés Ospina',
+      justificacion: 'Por tu gap ROAS real 1.93x vs 2.9x declarado — hay margen de escala',
     },
     {
       id: 'producto-ganador',

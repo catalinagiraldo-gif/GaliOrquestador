@@ -69,12 +69,46 @@ import { GaliWorkspaceService } from '../services/gali-workspace.service';
       </div>
 
       <div class="icon-rail__footer">
+        <button type="button" class="icon-rail__item icon-rail__item--help"
+          title="Ayuda y documentación"
+          aria-label="Ayuda y documentación"
+          (click)="showHelpDrawer.set(true)">
+          <span class="icon-rail__item-inner">
+            <span class="icon-rail__help-glyph" aria-hidden="true">?</span>
+          </span>
+        </button>
         <button type="button" class="icon-rail__item icon-rail__item--heart" title="Creado con Dropi">
           <span class="icon-rail__item-inner">
             <i class="pi pi-heart-fill" aria-hidden="true"></i>
           </span>
         </button>
       </div>
+
+      <!-- Drawer de ayuda -->
+      @if (showHelpDrawer()) {
+        <div class="help-drawer-backdrop" (click)="showHelpDrawer.set(false)">
+          <aside class="help-drawer" (click)="$event.stopPropagation()" role="dialog" aria-label="Ayuda y documentación">
+            <div class="help-drawer__header">
+              <span class="help-drawer__title">Centro de ayuda</span>
+              <button type="button" class="help-drawer__close" (click)="showHelpDrawer.set(false)" aria-label="Cerrar">×</button>
+            </div>
+            <nav class="help-drawer__sections">
+              <div class="help-section">
+                <h4 class="help-section__title">Sobre este módulo</h4>
+                <p class="help-section__text">Explora las secciones del menú lateral para gestionar tu operación de dropshipping con Gali.</p>
+              </div>
+              <div class="help-section">
+                <h4 class="help-section__title">Tutorial del agente activo</h4>
+                <p class="help-section__text">Gali orquesta tu negocio con 5 agentes especializados: Roax (marketing), Vigilante (logística), ADA Spy (productos), Chatea Pro (ventas) y Kronos (finanzas).</p>
+              </div>
+              <div class="help-section help-section--support">
+                <h4 class="help-section__title">¿Necesitas ayuda?</h4>
+                <a href="mailto:soporte@dropi.co" class="help-section__cta">Escribir a soporte →</a>
+              </div>
+            </nav>
+          </aside>
+        </div>
+      }
     </nav>
   `,
   styleUrl: './dropi-icon-rail.component.scss',
@@ -84,6 +118,7 @@ export class DropiIconRailComponent {
   private ws = inject(GaliWorkspaceService);
 
   activeKey = signal(resolveActiveRailKey(inject(Router).url));
+  readonly showHelpDrawer = signal(false);
 
   readonly mainItems = computed(() => {
     const visible = this.ws.visibleModules();

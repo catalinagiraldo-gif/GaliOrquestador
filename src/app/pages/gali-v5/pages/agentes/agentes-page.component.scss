@@ -284,6 +284,8 @@ $agent-color: var(--agent-color, #{$primary-500});
     border-style: dashed;
     border-color: $gray-200;
     padding: $size-5;
+    opacity: 0.55;
+    pointer-events: none;
   }
 
   &__top {
@@ -404,10 +406,16 @@ $agent-color: var(--agent-color, #{$primary-500});
     color: $gray-500;
   }
 
-  &__create-desc {
+  &__create-badge {
     font-family: $font-primary;
-    font-size: $font-xs;
+    font-size: 10px;
+    font-weight: $font-semibold;
+    letter-spacing: 0.08em;
     color: $gray-400;
+    background: $gray-100;
+    border-radius: $radius-sm;
+    padding: 2px 6px;
+    text-transform: uppercase;
   }
 }
 

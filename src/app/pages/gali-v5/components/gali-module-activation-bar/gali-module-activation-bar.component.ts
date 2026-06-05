@@ -20,7 +20,7 @@ export class GaliModuleActivationBarComponent implements OnInit {
   readonly dismissed = signal(false);
 
   readonly agentMeta: Record<ModuleAgentId, { nombre: string; color: string; emoji: string; status: string }> = {
-    roax:      { nombre: 'Roax',       color: '#f97316', emoji: '⚡', status: 'Activo — ROAS 2.9x' },
+    roax:      { nombre: 'Roax',       color: '#f97316', emoji: '⚡', status: 'Activo — ROAS real 1.93x' },
     vigilante: { nombre: 'Vigilante',  color: '#fbbf24', emoji: '🚛', status: 'Monitoreando' },
     chatea:    { nombre: 'Chatea Pro', color: '#34d399', emoji: '💬', status: 'Activo — 43/47 resueltos' },
     ada:       { nombre: 'ADA Spy',    color: '#818cf8', emoji: '🔍', status: 'En espera' },

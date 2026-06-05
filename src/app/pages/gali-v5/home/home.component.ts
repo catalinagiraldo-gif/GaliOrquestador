@@ -131,6 +131,17 @@ export class DropiHomeComponent implements AfterViewChecked {
   readonly zone3Collapsed = signal(true);
   readonly showBulkModal = signal(false);
   readonly bulkModalStep = signal<1 | 2>(1);
+  readonly showReconfigureModal = signal(false);
+  readonly showFabMenu = signal(false);
+  private readonly insightBannerUserExpanded = signal(false);
+
+  get insightBannerCollapsed(): boolean {
+    return this.pendingApprovalSignals.length > 0 && !this.insightBannerUserExpanded();
+  }
+
+  toggleInsightBanner(): void {
+    this.insightBannerUserExpanded.update(v => !v);
+  }
   private auth = inject(AuthService);
 
   resetOnboarding(): void {
@@ -277,6 +288,7 @@ export class DropiHomeComponent implements AfterViewChecked {
       metrica_label: 'Novedad Coordinadora',
       metrica_valor: '15%',
       umbral: '5%',
+      bulkActionOpcionIds: ['a', 'b'],
       opciones: [
         { id: 'a', label: 'Cambiar todos → Servientrega', sublabel: 'Tasa actual: 3.8%' },
         { id: 'b', label: 'Cambiar solo los de hoy', sublabel: 'Esperar datos de mañana' },
@@ -579,6 +591,10 @@ export class DropiHomeComponent implements AfterViewChecked {
 
   private get collarGpsProject() {
     return this.projects.find(p => p.id === 'collar-gps-2026')!;
+  }
+
+  get growthDeltaPedidos(): number {
+    return (this.collarGpsProject as any)['proyeccion_delta_pedidos_sem'] ?? 18;
   }
 
   get nodeDetailMap(): Record<string, NodeDetail> {

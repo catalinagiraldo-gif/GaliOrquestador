@@ -13,38 +13,51 @@ import { GaliStateService } from '../services/gali-state.service';
 
       <!-- Acciones secundarias -->
       <div class="menu-action__secondary">
-        <button
-          type="button"
-          class="menu-action__mini"
-          title="Verificación de huella"
-          (click)="onHuella()">
-          <img src="assets/images/dropi-baseline/fab/icon-huella.svg" alt="" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          class="menu-action__mini"
-          title="Torre logística"
-          (click)="onTorre()">
-          <img src="assets/images/dropi-baseline/fab/icon-torre.svg" alt="" aria-hidden="true" />
-        </button>
+        <div class="menu-action__mini-wrap">
+          <button
+            type="button"
+            class="menu-action__mini"
+            title="Verificación de huella"
+            aria-label="Verificación de huella"
+            (click)="onHuella()">
+            <img src="assets/images/dropi-baseline/fab/icon-huella.svg" alt="" aria-hidden="true" />
+          </button>
+          <span class="menu-action__fab-label">Huella</span>
+        </div>
+        <div class="menu-action__mini-wrap">
+          <button
+            type="button"
+            class="menu-action__mini"
+            title="Torre logística"
+            aria-label="Torre logística"
+            (click)="onTorre()">
+            <img src="assets/images/dropi-baseline/fab/icon-torre.svg" alt="" aria-hidden="true" />
+          </button>
+          <span class="menu-action__fab-label">Torre</span>
+        </div>
       </div>
 
       <!-- Botón principal Gali -->
-      <button
-        type="button"
-        class="menu-action__gali"
-        [class.menu-action__gali--open]="gali.galiMode() > 0"
-        [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : 'Abrir panel Gali'"
-        title="Gali"
-        (click)="toggleGali()"
-        data-proto-skip>
-        @if (gali.galiMode() === 0 && gali.criticalCount() > 0) {
-          <span class="menu-action__badge">{{ gali.criticalCount() }}</span>
-        }
-        <span class="menu-action__gali-icon">
-          {{ gali.galiMode() > 0 ? '✕' : '✦' }}
+      <div class="menu-action__gali-wrap">
+        <button
+          type="button"
+          class="menu-action__gali"
+          [class.menu-action__gali--open]="gali.galiMode() > 0"
+          [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : 'Abrir panel Gali'"
+          title="Abrir panel Gali"
+          (click)="toggleGali()"
+          data-proto-skip>
+          @if (gali.galiMode() === 0 && gali.criticalCount() > 0) {
+            <span class="menu-action__badge">{{ gali.criticalCount() }}</span>
+          }
+          <span class="menu-action__gali-icon">
+            {{ gali.galiMode() > 0 ? '✕' : '✦' }}
+          </span>
+        </button>
+        <span class="menu-action__fab-label menu-action__fab-label--gali">
+          {{ gali.galiMode() > 0 ? 'Cerrar Gali' : 'Panel Gali' }}
         </span>
-      </button>
+      </div>
     </div>
   `,
   styleUrl: './dropi-menu-action.component.scss',

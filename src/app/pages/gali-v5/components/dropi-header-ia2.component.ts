@@ -274,7 +274,7 @@ export class DropiHeaderIa2Component implements OnInit {
       score: 87,
       color: '#22c55e',
       statusIcon: '✓',
-      detail: '2.9× real — objetivo 2.5×',
+      detail: '1.93× real · Meta 2.9× — objetivo 2.5×',
     },
     {
       label: 'Tasa de novedades',

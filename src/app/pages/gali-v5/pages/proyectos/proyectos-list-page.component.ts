@@ -50,7 +50,7 @@ export class ProyectosListPageComponent {
       icono: '🐕',
       nombre: 'Collar GPS para mascotas',
       estado: 'en_escala',
-      roas: '2.9x',
+      roas: '1.93x',
       pedidos: 47,
       ganancia: '$411k/sem',
       galiStatus: 'warn',

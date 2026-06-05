@@ -86,14 +86,14 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'roas': {
-    text: 'Roax tiene ROAS 2.9x hoy — por encima del objetivo de 2.5x durante 52h. La skill "Escalado ROAS" se activó hace 4h y subió el presupuesto de $57.5k a $66k/día. ¿Quieres que siga subiendo?',
+    text: 'Roax: ROAS Meta 2.9x · ROAS real Dropi 1.93x. La skill "Escalado ROAS" se activó hace 4h y subió el presupuesto de $57.5k a $66k/día. ¿Quieres que siga subiendo?',
     context: {
       id: 'roas-snapshot',
       title: 'ROAS · Collar GPS',
       subtitle: 'Últimas 48h',
       type: 'metrics',
       metrics: [
-        { label: 'ROAS actual', value: '2.9x', delta: '+0.3x', tone: 'ok' },
+        { label: 'ROAS real Dropi', value: '1.93x', delta: '+0.3x', tone: 'ok' },
         { label: 'Presupuesto/día', value: '$66k', delta: '+15%', tone: 'ok' },
         { label: 'CTR creativo B', value: '1.8%', delta: '+0.6pp', tone: 'ok' },
         { label: 'Objetivo', value: '2.5x', tone: 'warn' },
@@ -105,14 +105,14 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'hoy': {
-    text: 'Resumen de hoy: ROAS 2.9x, 47 pedidos confirmados, 1 pendiente de tu decisión, 1 señal crítica y ganancia estimada $411k.',
+    text: 'Resumen de hoy: ROAS real 1.93x (Meta 2.9x), 47 pedidos confirmados, 1 pendiente de tu decisión, 1 señal crítica y ganancia estimada $411k.',
     context: {
       id: 'resumen-hoy',
       title: 'Resumen del día',
       subtitle: '29 mayo 2026',
       type: 'metrics',
       metrics: [
-        { label: 'ROAS', value: '2.9x', delta: '↑ desde 2.6x', tone: 'ok' },
+        { label: 'ROAS real', value: '1.93x', delta: '↑ desde 1.7x', tone: 'ok' },
         { label: 'Pedidos', value: '47', delta: '1 pendiente', tone: 'warn' },
         { label: 'Señales críticas', value: '1', tone: 'crit' },
         { label: 'Ganancia est.', value: '$411k', tone: 'ok' },
@@ -131,7 +131,7 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'proyecto': {
-    text: 'Collar GPS está en escala con ROAS 2.9x y 47 pedidos/sem. Hay una alerta activa: novedad alta en Cali. Skincare K-Beauty está normal. Bandas de Fitness está pausado — el CTR se recuperó.',
+    text: 'Collar GPS en escala · ROAS real 1.93x (Meta 2.9x) · 47 pedidos/sem. Alerta activa: novedad alta en Cali. Skincare K-Beauty normal. Bandas de Fitness pausado — CTR recuperado.',
     actions: [
       { label: 'Ver proyectos', action: 'ir-operar' },
       { label: 'Lanzar nuevo proyecto', action: 'ir-lanzar' },
@@ -150,7 +150,7 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'medir': {
-    text: 'Cambiando a Modo Medir. Tu mejor proyecto esta semana es Collar GPS con ROAS 2.9x y $411k de ganancia estimada. Skincare K-Beauty está en 1.8x — en el umbral de corte.',
+    text: 'Cambiando a Modo Medir. Tu mejor proyecto esta semana es Collar GPS con ROAS real 1.93x y $411k de ganancia estimada. Skincare K-Beauty está en 1.8x — en el umbral de corte.',
     actions: [
       { label: 'Ver P&L completo', action: 'ir-medir', isPrimary: true },
     ],
@@ -188,7 +188,7 @@ const SMART_RESPONSES: Record<string, { text: string; actions?: ChatAction[]; co
     ],
   },
   'default': {
-    text: 'Entendido. Voy a procesar eso. Mientras tanto, recuerda que tienes 1 señal crítica activa (Coordinadora 15% novedad) y el ROAS está en 2.9x. ¿Quieres que priorice algo específico?',
+    text: 'Entendido. Voy a procesar eso. Mientras tanto, tienes 1 señal crítica activa (Coordinadora 15% novedad) y ROAS real 1.93x (Meta 2.9x). ¿Quieres que priorice algo específico?',
     actions: [
       { label: 'Ver señales', action: 'ir-a-senales' },
       { label: 'Ver todo el resumen', action: 'hoy' },
@@ -259,7 +259,7 @@ export class GaliStateService {
   }
 
   readonly agents = signal<AgentStatus[]>([
-    { id: 'roax', name: 'Roax', color: '#f97316', status: 'activo', action: 'ROAS 2.9x · pauta $66k/día activa', skills: ['Auto-pausa CTR', 'Escalado ROAS'] },
+    { id: 'roax', name: 'Roax', color: '#f97316', status: 'activo', action: 'ROAS real 1.93x · Meta 2.9x · pauta $66k/día', skills: ['Auto-pausa CTR', 'Escalado ROAS'] },
     { id: 'vigilante', name: 'Vigilante', color: '#fbbf24', status: 'activo', action: 'Detectó novedad 15% Coordinadora Bogotá', skills: ['Smart routing novedad'] },
     { id: 'chatea', name: 'Chatea Pro', color: '#34d399', status: 'activo', action: '43 de 47 pedidos confirmados · 1 pendiente', skills: [] },
     { id: 'ada', name: 'ADA Spy', color: '#818cf8', status: 'esperando', action: 'Evaluando 3 productos · ventana 18 días', skills: [] },

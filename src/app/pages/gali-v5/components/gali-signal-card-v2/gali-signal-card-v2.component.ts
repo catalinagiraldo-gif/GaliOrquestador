@@ -58,6 +58,10 @@ export interface GaliSignalData {
   resultado_despues?: string;
   cta_followup?: string;
   cta_followup_label?: string;
+  /** IDs de opciones que deben emitir (onBulkAction) en lugar de ejecutar internamente */
+  bulkActionOpcionIds?: string[];
+  /** ID de opción que debe emitir (onScaleConfirm) en lugar de ejecutar internamente */
+  scaleConfirmOpcionId?: string;
 }
 
 @Component({
@@ -71,6 +75,8 @@ export class GaliSignalCardV2Component {
   private router = inject(Router);
   @Input({ required: true }) signal_data!: GaliSignalData;
   @Output() actionTaken = new EventEmitter<{ signalId: string; opcionId: string }>();
+  @Output() onBulkAction = new EventEmitter<{ signalId: string; opcionId: string }>();
+  @Output() onScaleConfirm = new EventEmitter<string>();
 
   readonly expanded = signal(false);
   readonly executing = signal(false);
@@ -100,6 +106,16 @@ export class GaliSignalCardV2Component {
 
   requestOpcion(opcion: SignalOpcion, event: Event): void {
     event.stopPropagation();
+    // Bulk action opciones → delegate to Hub modal
+    if (this.signal_data.bulkActionOpcionIds?.includes(opcion.id)) {
+      this.onBulkAction.emit({ signalId: this.signal_data.id, opcionId: opcion.id });
+      return;
+    }
+    // Scale confirm opcion → delegate to Hub modal
+    if (this.signal_data.scaleConfirmOpcionId === opcion.id) {
+      this.onScaleConfirm.emit(this.signal_data.id);
+      return;
+    }
     // If already pending this option → confirm
     if (this.pendingOpcion()?.id === opcion.id) {
       this.confirmOpcion();

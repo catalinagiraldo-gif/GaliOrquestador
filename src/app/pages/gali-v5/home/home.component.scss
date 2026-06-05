@@ -1734,8 +1734,18 @@
 .confirm-dialog__desc {
   padding: $size-3 $size-5 0;
   font-size: $font-sm;
-  color: $gray-500;
+  color: $gray-700;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong { color: $primary-600; }
+}
+
+.confirm-dialog__desc-sub {
+  font-size: $font-xs;
+  color: $gray-400;
 }
 
 .confirm-consequence-grid {
@@ -1816,6 +1826,46 @@
   cursor: pointer;
   transition: background 0.12s;
   &:hover { background: $primary-600; }
+}
+
+.confirm-destructive {
+  padding: 8px 20px;
+  border-radius: $radius-sm;
+  border: 1px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  font-family: $font-primary;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  &:hover { background: #ef4444; color: $white; }
+}
+
+.reconfig-reset-list {
+  margin: $size-2 0 $size-3;
+  padding: 0 0 0 $size-3;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+
+  li {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-700;
+  }
+}
+
+.confirm-dialog__note {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $gray-500;
+  margin: 0 0 $size-4;
+  padding: $size-2 $size-3;
+  background: $gray-50;
+  border-radius: $radius-sm;
+  border-left: 3px solid $gray-200;
 }
 
 // ── Fase 3: Node-detail skill button ─────────────────────────────────────────
@@ -2101,6 +2151,102 @@
   }
 }
 
+// ── Insight banner collapse (Spec 3 CA-14) ───────────────────────────────────
+
+.insight-banner {
+  .insight-header {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .insight-banner__chevron {
+    font-size: 10px;
+    color: $gray-400;
+    margin-left: auto;
+  }
+
+  .insight-body {
+    overflow: hidden;
+    max-height: 120px;
+    transition: max-height 200ms ease-out, opacity 200ms ease-out;
+    opacity: 1;
+  }
+
+  &.is-collapsed {
+    .insight-body {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .hub-gali-week__header {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ── Kronos node in Ciclo (Spec 3 CA-12) ──────────────────────────────────────
+
+.cycle-card__agent-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: $font-primary;
+  font-weight: $font-medium;
+  color: var(--agent-color);
+  margin-left: auto;
+
+  .agent-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--agent-color);
+    flex-shrink: 0;
+  }
+
+  .agent-name {
+    white-space: nowrap;
+  }
+}
+
+.anatomy-node__kronos-data {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: $size-1;
+}
+
+.anatomy-node__kronos-row {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-600;
+}
+
+.anatomy-node__fiscal-alert {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-medium;
+  color: #92400e;
+  background: #fffbeb;
+  border-radius: $radius-sm;
+  padding: 2px 6px;
+  align-self: flex-start;
+}
+
+.anatomy-node__kronos-cta {
+  display: block;
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: $font-medium;
+  background: none;
+  border: none;
+  padding: 4px 0 0;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover { text-decoration: underline; }
+}
+
 // ── Toggle Vista simple / Experto (Spec 5 CA-3) ─────────────────────────────
 
 .ui-toggle {
@@ -2162,5 +2308,111 @@
     font-weight: $font-semibold;
     padding: 2px 8px;
     border-radius: $radius-pill;
+  }
+}
+
+// FAB "+" con mini-menú acciones rápidas (C17)
+.hub-fab-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.hub-fab-wrap {
+  position: relative;
+  z-index: 100;
+}
+
+.hub-fab-plus {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $primary-500;
+  color: $white;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, background 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: $primary-600; }
+  &--open { transform: rotate(45deg); background: $gray-700; }
+}
+
+.hub-fab-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-lg;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 164px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fabMenuIn 0.12s ease-out;
+
+  @keyframes fabMenuIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-3 $size-4;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-800;
+    text-align: left;
+    transition: background 0.1s;
+
+    i { font-size: 13px; color: $gray-500; }
+
+    &:hover {
+      background: $gray-50;
+      i { color: $primary-500; }
+    }
+
+    &:not(:last-child) { border-bottom: 1px solid $gray-100; }
+  }
+}
+
+// Widget de proyección de crecimiento (C19)
+.growth-projection-banner {
+  display: flex;
+  align-items: baseline;
+  gap: $size-2;
+  padding: $size-3 $size-4;
+  background: linear-gradient(135deg, rgba($primary-500, 0.06) 0%, rgba($primary-300, 0.04) 100%);
+  border: 1px solid rgba($primary-400, 0.25);
+  border-radius: $radius-lg;
+  flex-wrap: wrap;
+  margin-bottom: $size-3;
+
+  &__glyph { font-size: 14px; flex-shrink: 0; }
+
+  &__text {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-800;
+    strong { color: $primary-600; font-weight: $font-semibold; }
+  }
+
+  &__sub {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-500;
+    margin-left: auto;
   }
 }

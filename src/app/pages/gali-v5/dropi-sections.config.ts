@@ -406,7 +406,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       agentId: 'roax',
       label: 'Roax',
       color: '#f97316',
-      statusLabel: 'ROAS 2.9x · 3 campañas',
+      statusLabel: 'ROAS real 1.93x · 3 campañas',
       contextKey: 'marketing',
     },
   },

@@ -60,6 +60,46 @@
     "label": "22.8%",
     "calculo": "promedio ponderado por revenue: (22% × $1.82M + 24% × $920k) / $2.74M = (400400 + 220800) / 2740000 = 22.67% ≈ 22.8%"
   },
+  "cogs_mensual": {
+    "valor": -4446000,
+    "label": "-$4.45M",
+    "calculo": "30% de ingresos brutos: $14.82M × 0.30"
+  },
+  "flete_mensual": {
+    "valor": -1482000,
+    "label": "-$1.48M",
+    "calculo": "$600/pedido × 2470 pedidos"
+  },
+  "subtotal_post_flete": {
+    "valor": 8892000,
+    "label": "$8.89M",
+    "calculo": "14820000 - 4446000 - 1482000"
+  },
+  "pauta_mensual": {
+    "valor": -3100000,
+    "label": "-$3.10M",
+    "calculo": "suma de pauta_diaria × 30 de proyectos activos: ($66k + $32k) × 30 ≈ $2.94M + margen operativo"
+  },
+  "novedades_mensual": {
+    "valor": -740000,
+    "label": "-$740k",
+    "calculo": "14% novedad × 2470 pedidos × $300 pérdida promedio por novedad"
+  },
+  "comision_mensual": {
+    "valor": -594000,
+    "label": "-$594k",
+    "calculo": "4% de ingresos brutos: $14.82M × 0.04"
+  },
+  "subtotal_post_marketing": {
+    "valor": 4458000,
+    "label": "$4.46M",
+    "calculo": "8892000 - 3100000 - 740000 - 594000"
+  },
+  "gastos_fijos_mensual": {
+    "valor": -650000,
+    "label": "-$650k",
+    "nota": "constante documentada — herramientas, plataformas, suscripciones"
+  },
   "proyectos_activos": 2,
   "proyectos_en_escala": 1,
   "proyectos_pausados": 1,

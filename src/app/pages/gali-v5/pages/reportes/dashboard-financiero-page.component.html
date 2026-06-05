@@ -422,7 +422,12 @@
               <td class="channel-row__num">
                 @if (row.roasReal > 0) {
                   <span [class]="row.roasReal >= row.roas ? 'roas-badge roas-badge--ok' : 'roas-badge roas-badge--warn'"
-                    [galiInsight]="row.kronosInsight">{{ row.roasReal }}×</span>
+                    [galiInsight]="row.channel === 'Meta Ads'
+                      ? 'ROAS declarado por Meta Ads (atribución plataforma). ROAS real global ponderado: ' + roasEfetivoLabel
+                      : row.kronosInsight">{{ row.roasReal }}×</span>
+                  @if (row.channel === 'Meta Ads') {
+                    <span class="declarado-meta-badge">Declarado Meta</span>
+                  }
                 } @else {
                   <span class="channel-row__organic" [galiInsight]="row.kronosInsight">—</span>
                 }

@@ -43,7 +43,7 @@ export class ConexionesPageComponent {
       categoria: 'Agente',
       desc: 'Agente especializado en media buying. Gestiona tus campañas en Meta Ads automáticamente.',
       metricas: [
-        { label: 'ROAS promedio', val: '2.9x' },
+        { label: 'ROAS real Dropi', val: '1.91x' },
         { label: 'Campañas activas', val: '3' },
         { label: 'Acciones esta semana', val: '18' },
       ],
@@ -139,8 +139,8 @@ export class ConexionesPageComponent {
       desc: 'Roax lanza, pausa y optimiza campañas directamente en Meta Ads.',
       metricas: [
         { label: 'ROAS Meta', val: '3.1x' },
-        { label: 'ROAS Gali real', val: '2.9x' },
-        { label: 'Discrepancia', val: '-0.2x' },
+        { label: 'ROAS Gali real', val: '1.93x' },
+        { label: 'Discrepancia', val: '-1.17x' },
       ],
       permisos: ['leer campañas', 'crear campañas', 'modificar presupuesto', 'pausar'],
       impacto: 'El 40% de la diferencia ROAS se explica por novedades en Cali los lunes.',
@@ -253,8 +253,8 @@ export class ConexionesPageComponent {
       desc: 'Roax lanza, pausa y optimiza campañas directamente en Meta Ads sin que salgas de Dropi. ROAS real vs. ROAS Meta en tiempo real.',
       metricas: [
         { label: 'ROAS Meta', val: '3.1x' },
-        { label: 'ROAS Gali real', val: '2.9x' },
-        { label: 'Discrepancia', val: '-0.2x' },
+        { label: 'ROAS Gali real', val: '1.93x' },
+        { label: 'Discrepancia', val: '-1.17x' },
       ],
       permisos: ['leer campañas', 'crear campañas', 'modificar presupuesto', 'pausar anuncios'],
       impacto: 'El 40% de la diferencia ROAS se explica por novedades en Cali los lunes.',

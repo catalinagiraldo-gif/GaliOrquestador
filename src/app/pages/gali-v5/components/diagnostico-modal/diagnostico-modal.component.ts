@@ -42,7 +42,7 @@ export class DiagnosticoModalComponent {
 
   executing = signal(false);
 
-  readonly titulo = '¿Por qué cayó tu ROAS de 2.9x a 1.8x?';
+  readonly titulo = '¿Por qué el ROAS Meta declarado (2.9x) no es tu ganancia real?';
   readonly proyecto = 'Collar GPS para mascotas';
   readonly generadoHace = 'hace 2 min';
 

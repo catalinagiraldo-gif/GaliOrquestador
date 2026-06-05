@@ -102,7 +102,7 @@ export class GaliWorkspaceService implements OnDestroy {
 
   /** Live feed — last N agent events */
   readonly liveEvents = signal<LiveEvent[]>([
-    { id: 'e1', agente: 'Roax', agente_id: 'roax', mensaje: 'ROAS 2.9x estable · Video B ganando', timestamp: 'ahora', tipo: 'ok' },
+    { id: 'e1', agente: 'Roax', agente_id: 'roax', mensaje: 'ROAS real 1.93x · Meta 2.9x · Video B ganando', timestamp: 'ahora', tipo: 'ok' },
     { id: 'e2', agente: 'Vigilante', agente_id: 'vigilante', mensaje: 'Detectó novedad 15% Coordinadora Bogotá', timestamp: 'hace 18 min', tipo: 'warn' },
     { id: 'e3', agente: 'Chatea Pro', agente_id: 'chatea', mensaje: 'Resolvió 8 novedades automáticamente', timestamp: 'hace 1h', tipo: 'action' },
   ]);
@@ -134,7 +134,7 @@ export class GaliWorkspaceService implements OnDestroy {
     { agente: 'Vigilante', agente_id: 'vigilante', mensaje: 'Smart routing: 3 pedidos reasignados a Servientrega', tipo: 'action' },
     { agente: 'Chatea Pro', agente_id: 'chatea', mensaje: 'Patrón PQR detectado — Collar GPS novedad Cali', tipo: 'warn' },
     { agente: 'ADA Spy', agente_id: 'ada', mensaje: 'Score Difusor aromaterapia actualizado: 87/100', tipo: 'ok' },
-    { agente: 'Roax', agente_id: 'roax', mensaje: 'ROAS 2.9x — presupuesto $66k/día estable', tipo: 'ok' },
+    { agente: 'Roax', agente_id: 'roax', mensaje: 'ROAS real 1.93x · Meta 2.9x · $66k/día estable', tipo: 'ok' },
     { agente: 'Vigilante', agente_id: 'vigilante', mensaje: 'Coordinadora Bogotá: novedad bajó a 12%', tipo: 'warn' },
     { agente: 'Chatea Pro', agente_id: 'chatea', mensaje: '2 tickets PQR cerrados automáticamente', tipo: 'action' },
     { agente: 'ADA Spy', agente_id: 'ada', mensaje: 'Nuevo nicho detectado: accesorios gaming 94/100', tipo: 'ok' },

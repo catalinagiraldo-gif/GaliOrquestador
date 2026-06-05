@@ -1,10 +1,31 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import PROJECTS from '../../../../../../mocks/gali-v5/projects.json';
 
 const STORAGE_KEY = 'gali_goal_configured';
+
+// Maps onboarding answers to visible modules — pure function (sprint 11.2)
+function resolveVisibleModules(objetivo: string, friccion: string): string[] {
+  const siempre = ['home', 'configurar', 'academy'];
+
+  if (objetivo === 'primer-producto' && friccion === 'que-vender')
+    return [...siempre, 'productos', 'proyectos', 'cas'];
+
+  if (objetivo === 'escalar-pedidos' && friccion === 'roas')
+    return [...siempre, 'proyectos', 'marketing', 'reportes'];
+
+  if (friccion === 'tiempo')
+    return [...siempre, 'pedidos', 'cas'];
+
+  if (friccion === 'novedades')
+    return [...siempre, 'proyectos', 'logistica', 'pedidos'];
+
+  return ['home', 'productos', 'proyectos', 'pedidos', 'logistica',
+          'marketing', 'reportes', 'financiero', 'cas', 'academy', 'configurar'];
+}
 
 interface GoalOption {
   id: string;
@@ -61,6 +82,24 @@ export class GaliGoalOnboardingComponent {
   readonly customGoal = signal('');
   readonly showCustom = signal(false);
   readonly connectedSources = signal<string[]>([]);
+  // sprint 11.2: fricción derivada del objetivo seleccionado
+  readonly selectedFriccion = computed<string>(() => {
+    const g = this.selectedGoal();
+    if (!g) return '';
+    const map: Record<string, string> = {
+      'primer-producto':  'que-vender',
+      'primer-millon':    'roas',
+      'escalar-pedidos':  'roas',
+      'automatizar':      'tiempo',
+    };
+    return map[g.id] ?? '';
+  });
+
+  // sprint 11.3: proyecto activo — prioridad sobre slider del step 2
+  readonly proyectoActivo = computed(() => {
+    const id = localStorage.getItem('gali_proyecto_activo') ?? 'collar-gps-2026';
+    return (PROJECTS as any[]).find((p: any) => p.id === id) ?? (PROJECTS as any[])[0];
+  });
 
   toggleSource(id: string): void {
     this.connectedSources.update(s =>
@@ -76,12 +115,15 @@ export class GaliGoalOnboardingComponent {
   }
 
   get pedidosLabel(): string {
+    // sprint 11.3: projects.json is authoritative; slider is fallback for first session
+    const fromProject = (this.proyectoActivo() as any)?.pedidos_sem_label as string | undefined;
+    if (fromProject) return fromProject;
     const v = this.pedidosPerWeek();
     if (v <= 5) return '0–5 pedidos';
-    if (v <= 20) return `~${v} pedidos`;
-    if (v <= 50) return `~${v} pedidos`;
-    if (v <= 100) return `~${v} pedidos`;
-    return '100+ pedidos';
+    if (v <= 20) return `~${v}/sem`;
+    if (v <= 50) return `~${v}/sem`;
+    if (v <= 100) return `~${v}/sem`;
+    return '100+/sem';
   }
 
   get mesesLabel(): string {
@@ -162,6 +204,15 @@ export class GaliGoalOnboardingComponent {
   finishVeterano(): void {
     this.ws.setComplexityLevel('expert');
     this.ws.showAllModules();
+    this.finish();
+  }
+
+  // sprint 11.2: nuevo user path — set visible modules based on answers
+  finishNuevo(): void {
+    const objetivo = this.selectedGoal()?.id ?? '';
+    const friccion = this.selectedFriccion();
+    const modules  = resolveVisibleModules(objetivo, friccion);
+    this.ws.setVisibleModules(modules);
     this.finish();
   }
 

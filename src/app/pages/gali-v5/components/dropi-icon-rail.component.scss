@@ -190,3 +190,113 @@ $rail-hover-inner: #f0f4f9; // gray-50 Figma panel
   0%, 100% { opacity: 0.7; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.08); }
 }
+
+.icon-rail__help-glyph {
+  font-family: $font-primary;
+  font-size: 15px;
+  font-weight: $font-bold;
+  color: $gray-400;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.icon-rail__item--help:hover .icon-rail__help-glyph {
+  color: $primary-500;
+}
+
+// Drawer de ayuda contextual
+.help-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 500;
+  display: flex;
+  align-items: stretch;
+}
+
+.help-drawer {
+  width: 280px;
+  background: $white;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $size-4 $size-5;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-900;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: $gray-400;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    &:hover { color: $gray-700; }
+  }
+
+  &__sections {
+    display: flex;
+    flex-direction: column;
+    padding: $size-4 $size-5;
+    gap: $size-5;
+  }
+}
+
+.help-section {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+
+  &__text {
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-600;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &--support {
+    padding-top: $size-4;
+    border-top: 1px solid $gray-100;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border: 1px solid $primary-200;
+    border-radius: $radius-sm;
+    background: $white;
+    color: $primary-600;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    text-decoration: none;
+    transition: background 0.12s, border-color 0.12s;
+    &:hover { background: $primary-50; border-color: $primary-300; }
+  }
+}

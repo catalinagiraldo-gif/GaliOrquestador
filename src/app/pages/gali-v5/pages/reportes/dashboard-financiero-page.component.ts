@@ -57,18 +57,20 @@ export class DashboardFinancieroPageComponent {
   readonly Math = Math;
   readonly activeWeekFilter = signal<'4s' | '8s' | '12s'>('4s');
   readonly activeProjection = signal<'conservador' | 'base' | 'optimista'>('base');
+  // C2: expose for template tooltip
+  readonly roasEfetivoLabel = KPIS_GLOBAL.roas_efectivo_global.label;
 
-  // ── P&L Waterfall data — valores de kpis-global.json ────────
+  // ── P&L Waterfall data — 10 barras desde kpis-global.json (0 literales hardcodeados) ──
   readonly waterfallBars: WaterfallBar[] = [
     { label: 'Ingresos brutos', value: KPIS_GLOBAL.ingresos_brutos_mensual.valor, type: 'revenue', tooltip: '2.470 pedidos × $6.000 precio promedio' },
-    { label: 'Costo del producto (COGS)', value: -4_446_000, type: 'cost', tooltip: '30% de los ingresos brutos' },
-    { label: 'Flete pagado', value: -1_482_000, type: 'cost', tooltip: '$600/pedido promedio Servientrega + Coordinadora' },
-    { label: 'Subtotal post-flete/COGS', value: 8_892_000, type: 'subtotal', tooltip: 'Margen bruto después de producto y flete' },
-    { label: 'Pauta Meta (Roax)', value: -3_100_000, type: 'cost', tooltip: '21% de los ingresos · ROAS 2.9x declarado por Meta' },
-    { label: 'Novedades / devoluciones', value: -740_000, type: 'cost', tooltip: '14% tasa novedad · $300 pérdida promedio por novedad' },
-    { label: 'Comisión Dropi', value: -594_000, type: 'cost', tooltip: '4% de ingresos brutos' },
-    { label: 'Subtotal post-marketing', value: 4_458_000, type: 'subtotal', tooltip: 'Margen después de todos los costos variables' },
-    { label: 'Gastos fijos operativos', value: -650_000, type: 'cost', tooltip: 'Herramientas, plataformas, suscripciones' },
+    { label: 'Costo del producto (COGS)', value: (KPIS_GLOBAL as any).cogs_mensual.valor, type: 'cost', tooltip: '30% de los ingresos brutos' },
+    { label: 'Flete pagado', value: (KPIS_GLOBAL as any).flete_mensual.valor, type: 'cost', tooltip: '$600/pedido promedio Servientrega + Coordinadora' },
+    { label: 'Subtotal post-flete/COGS', value: (KPIS_GLOBAL as any).subtotal_post_flete.valor, type: 'subtotal', tooltip: 'Margen bruto después de producto y flete' },
+    { label: 'Pauta Meta (Roax)', value: (KPIS_GLOBAL as any).pauta_mensual.valor, type: 'cost', tooltip: '21% de los ingresos · ROAS 2.9x declarado por Meta' },
+    { label: 'Novedades / devoluciones', value: (KPIS_GLOBAL as any).novedades_mensual.valor, type: 'cost', tooltip: '14% tasa novedad · $300 pérdida promedio por novedad' },
+    { label: 'Comisión Dropi', value: (KPIS_GLOBAL as any).comision_mensual.valor, type: 'cost', tooltip: '4% de ingresos brutos' },
+    { label: 'Subtotal post-marketing', value: (KPIS_GLOBAL as any).subtotal_post_marketing.valor, type: 'subtotal', tooltip: 'Margen después de todos los costos variables' },
+    { label: 'Gastos fijos operativos', value: (KPIS_GLOBAL as any).gastos_fijos_mensual.valor, type: 'cost', tooltip: 'Herramientas, plataformas, suscripciones' },
     { label: 'Utilidad neta del mes', value: KPIS_GLOBAL.utilidad_neta_mensual.valor, type: 'net', tooltip: 'P&L real de Mayo 2026 — Gali calculado' },
   ];
 
@@ -177,8 +179,8 @@ export class DashboardFinancieroPageComponent {
       insight: 'Por encima del promedio histórico tuyo ($3.1M). El 60% viene del proyecto Skincare Pack.' },
     { label: 'Margen real', value: '25.7%', delta: '+1.4pp', tone: 'ok',
       insight: 'Margen saludable para dropshipping. La reducción de novedad de 16% a 14% aportó 0.9pp.' },
-    { label: 'ROAS efectivo', value: '4.78×', delta: '-0.2×', tone: 'warn',
-      insight: 'Pequeña caída vs semana anterior por Video C (CTR bajo). Roax está evaluando pausa automática.' },
+    { label: 'ROAS efectivo', value: KPIS_GLOBAL.roas_efectivo_global.label, delta: '-0.2×', tone: 'warn',
+      insight: 'ROAS real ponderado por pauta de todos los proyectos activos. Meta declara 2.9× para Collar GPS — diferencia de 0.99× absorbida por novedades.' },
     { label: 'Tasa novedad', value: '14%', delta: '-2pp', tone: 'warn',
       insight: 'Bajó de 16% → 14% pero sigue sobre el umbral ideal (10%). Coordinadora Bogotá es el foco.' },
     { label: 'Costo adquisición', value: '$1.255', delta: '-$120', tone: 'ok',
@@ -232,12 +234,12 @@ export class DashboardFinancieroPageComponent {
       ventas: 9_340_000,
       pedidos: 1_557,
       roas: 3.1,
-      roasReal: 2.9,
+      roasReal: 1.93, // ROAS real calculado por Dropi — Meta declara 3.1× (atribución plataforma)
       novedad: 15,
       pauta: 3_100_000,
       utilidad: 2_530_000,
       margen: 27.1,
-      kronosInsight: 'Mayor canal. ROAS real 0.2× por debajo de Meta por novedades en Cali. Oportunidad: reducir novedad en ese foco.',
+      kronosInsight: 'Mayor canal. ROAS real Dropi 1.93× vs Meta declarado 3.1× — diferencia de 1.17× absorbida por novedades en Cali (40%). Oportunidad: reducir tasa de novedad.',
     },
     {
       channel: 'TikTok Shop',

@@ -60,7 +60,7 @@ export class MarketplacePageComponent {
     {
       id: 'ps2',
       title: 'Escalar pauta 15% si ROAS > 2.5x por 48h',
-      reason: 'Tu ROAS es 2.9x en Collar GPS. Roax podría escalarlo automáticamente.',
+      reason: 'Tu ROAS real es 1.93x en Collar GPS (Meta declara 2.9x). Roax podría escalarlo automáticamente.',
       agent: 'Roax',
       agentColor: '#ff6102',
       cta: 'Activar para Collar GPS',

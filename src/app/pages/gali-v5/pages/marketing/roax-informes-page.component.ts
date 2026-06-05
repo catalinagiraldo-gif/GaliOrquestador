@@ -27,10 +27,10 @@ export class RoaxInformesPageComponent {
   readonly skillImpact = informesData.skillImpact;
 
   readonly galiRoasInsight = {
-    roasDeclarado: '5.0x',
-    roasReal: '2.9x',
-    gap: '-2.1x',
-    causa: '54% del gap = atribución inflada de Meta (ventas orgánicas atribuidas a pauta)',
+    roasDeclarado: '3.1x',  // ROAS reportado por Meta para campaña Video B UGC
+    roasReal: '1.93x',      // ROAS real calculado por Dropi (revenue / gasto total real)
+    gap: '-1.17x',          // 3.1 - 1.93
+    causa: '71% del gap = novedades en Cali (15%) + atribución inflada de Meta',
     presupuesto: '$462k',
     gananciaReal: '$411k',
   };

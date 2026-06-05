@@ -38,7 +38,7 @@ const CONTEXT_MAP: Record<string, ContextConfig> = {
       '⚠ 3 casos requieren tu decisión',
     ],
     crossImpacts: [
-      { section: 'Reportes', icon: '📊', route: '/gali-v5/reportes/dashboard', text: 'Roax recibió 43 conversiones → ROAS actualizado a 2.9x' },
+      { section: 'Reportes', icon: '📊', route: '/gali-v5/reportes/dashboard', text: 'Roax recibió 43 conversiones · ROAS real Dropi 1.93x · Meta 2.9x' },
       { section: 'Finanzas', icon: '💰', route: '/gali-v5/financiero/historial-de-cartera', text: '28 entregas → pendientes de facturar en Siigo' },
       { section: 'Marketing', icon: '📣', route: '/gali-v5/marketing/roax-informes', text: 'CPA actualizado $21.4k por conversión' },
     ],
@@ -50,7 +50,7 @@ const CONTEXT_MAP: Record<string, ContextConfig> = {
     agentId: 'roax',
     agentLabel: 'Roax',
     color: '#f97316',
-    summary: 'ROAS 2.9x · escalando presupuesto',
+    summary: 'ROAS real 1.93x · escalando presupuesto',
     agencyLevel: 'Media buyer autónomo con límites',
     recentActions: [
       '⚡ Video B CTR 1.8% (+50%) — Roax escaló presupuesto +15%',
@@ -60,7 +60,7 @@ const CONTEXT_MAP: Record<string, ContextConfig> = {
     crossImpacts: [
       { section: 'Pedidos', icon: '🛒', route: '/gali-v5/mis-pedidos/mis-pedidos', text: '47 pedidos esta semana generados por campañas activas' },
       { section: 'Finanzas', icon: '💰', route: '/gali-v5/financiero/historial-de-cartera', text: 'Gasto pauta $280k/sem · margen neto 34% del proyecto' },
-      { section: 'Reportes', icon: '📊', route: '/gali-v5/reportes/productos-vendidos', text: 'ROAS real Gali: 2.9x vs ROAS Meta declarado: 3.1x' },
+      { section: 'Reportes', icon: '📊', route: '/gali-v5/reportes/productos-vendidos', text: 'ROAS real Gali: 1.93x vs ROAS Meta declarado: 3.1x (gap 1.17×)' },
     ],
     activeSkill: 'Escalado ROAS automático',
     skillRoute: '/gali-v5/skills',
@@ -94,7 +94,7 @@ const CONTEXT_MAP: Record<string, ContextConfig> = {
     recentActions: [
       '💰 Ganancia neta sem 22: $411k (↓4pts vs sem 21)',
       '⚠ Causa: novedades Cali subieron de 4% a 12%',
-      '📊 ROAS Meta 3.1x vs ROAS Gali real 2.9x (discrepancia -0.2x)',
+      '📊 ROAS Meta 3.1x vs ROAS real Dropi 1.93x (discrepancia -1.17x)',
     ],
     crossImpacts: [
       { section: 'Conexiones', icon: '🔗', route: '/gali-v5/conexiones', text: '28 entregas sin facturar — Siigo no conectado' },
@@ -129,7 +129,7 @@ const CONTEXT_MAP: Record<string, ContextConfig> = {
     summary: 'Dashboard actualizado · sem 22',
     agencyLevel: 'Analítico + alertante',
     recentActions: [
-      '📊 ROAS promedio semana: 2.9x (vs objetivo 2.5x ✓)',
+      '📊 ROAS Meta semana: 2.9x (objetivo 2.5x ✓) · ROAS real Dropi: 1.93x',
       '✓ 47 unidades vendidas Collar GPS — líder de la semana',
       '⚠ Skincare K-Beauty: ROAS 2.1x, cercano al umbral de corte 1.8x',
     ],

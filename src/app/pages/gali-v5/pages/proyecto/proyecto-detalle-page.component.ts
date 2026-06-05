@@ -147,7 +147,7 @@ export class ProyectoDetallePageComponent implements OnInit {
       herramienta: 'Media Buyer',
       icono: '⚡',
       estado: 'activo',
-      observacion: 'ROAS 2.9x, Video B ganando (+50% CTR). Pausa automática activa si CTR < 0.8%.',
+      observacion: 'ROAS Meta 2.9x · real Dropi 1.93x · Video B ganando (+50% CTR). Pausa automática activa si CTR < 0.8%.',
       ultimaAccion: 'Escaló presupuesto +15% ($57.5k → $66k/día) · hace 2h',
       route: '/gali-v5/marketing/roax-informes',
     },
@@ -239,6 +239,9 @@ export class ProyectoDetallePageComponent implements OnInit {
   ];
 
   readonly siguienteAccion = 'Expandir a Medellín — hay demanda sin competencia activa. Estimo +$200k/día con el mismo creative.';
+
+  readonly memoriaCollapsed = signal(false);
+  toggleMemoria(): void { this.memoriaCollapsed.update(v => !v); }
 
   openSkillsEditor(agente: string): void {
     // Navigate to the full skill editor with agent context

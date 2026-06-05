@@ -53,6 +53,44 @@
   </header>
 
   <!-- ══════════════════════════════════════════════
+       SIGUIENTE ACCIÓN STICKY + MEMORIA GALI (CA-9)
+  ══════════════════════════════════════════════ -->
+
+  <!-- Sticky: siguiente acción siempre visible -->
+  <div class="siguiente-accion-sticky">
+    <span class="siguiente-accion-sticky__spark">✦</span>
+    <p class="siguiente-accion-sticky__text">{{ siguienteAccion }}</p>
+    <button type="button" class="btn-sm btn-primary-sm" data-proto-skip>Ejecutar →</button>
+  </div>
+
+  <!-- Memoria colapsable -->
+  <div class="proyecto__memoria-wrapper"
+       [class.proyecto__memoria-wrapper--collapsed]="memoriaCollapsed()">
+    <button type="button" class="memoria-toggle" (click)="toggleMemoria()">
+      <span class="memoria-toggle__label">Memoria Gali</span>
+      <i class="pi"
+         [class.pi-chevron-down]="!memoriaCollapsed()"
+         [class.pi-chevron-up]="memoriaCollapsed()"></i>
+    </button>
+    @if (!memoriaCollapsed()) {
+      <div class="memoria-grid">
+        <div class="memoria-card">
+          <h4 class="memoria-card__title">Decisiones clave</h4>
+          <ul class="memoria-list">
+            <li *ngFor="let d of memoriaDecisiones">{{ d }}</li>
+          </ul>
+        </div>
+        <div class="memoria-card">
+          <h4 class="memoria-card__title">Aprendizajes</h4>
+          <ul class="memoria-list">
+            <li *ngFor="let a of memoriaAprendizajes">{{ a }}</li>
+          </ul>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ══════════════════════════════════════════════
        TABS
   ══════════════════════════════════════════════ -->
   <nav class="proyecto__tabs">
@@ -154,31 +192,7 @@
 
       </div>
 
-      <!-- Memoria de Gali -->
-      <section class="memoria-section">
-        <h3 class="section-title">Memoria Gali — lo que recuerda sobre este proyecto</h3>
-        <div class="memoria-grid">
-          <div class="memoria-card">
-            <h4 class="memoria-card__title">Decisiones clave</h4>
-            <ul class="memoria-list">
-              <li *ngFor="let d of memoriaDecisiones">{{ d }}</li>
-            </ul>
-          </div>
-          <div class="memoria-card">
-            <h4 class="memoria-card__title">Aprendizajes</h4>
-            <ul class="memoria-list">
-              <li *ngFor="let a of memoriaAprendizajes">{{ a }}</li>
-            </ul>
-          </div>
-          <div class="memoria-card memoria-card--accent">
-            <h4 class="memoria-card__title">✦ Siguiente acción recomendada</h4>
-            <p class="memoria-card__body">{{ siguienteAccion }}</p>
-            <button type="button" class="btn-hero btn-hero--primary" style="margin-top: 12px;">
-              Ejecutar recomendación
-            </button>
-          </div>
-        </div>
-      </section>
+      <!-- Memoria Gali movida encima de los tabs (CA-9) -->
 
     </div>
 

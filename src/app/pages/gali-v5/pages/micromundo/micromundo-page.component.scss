@@ -412,6 +412,25 @@
   &__sub { font-size: $font-sm; color: $gray-600; margin: 0; line-height: 1.5; }
 }
 
+.docs-sync-note {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-2;
+  padding: $size-3;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: $radius-md;
+
+  i { color: #3b82f6; font-size: 13px; margin-top: 2px; flex-shrink: 0; }
+
+  span {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: #1e40af;
+    line-height: 1.5;
+  }
+}
+
 .upload-cards {
   display: flex;
   flex-direction: column;

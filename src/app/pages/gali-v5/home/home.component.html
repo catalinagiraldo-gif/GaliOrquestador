@@ -106,7 +106,10 @@
           <h3 class="confirm-dialog__title">Confirmar escala de presupuesto</h3>
           <button type="button" class="confirm-dialog__close" (click)="showScaleConfirm.set(false)" aria-label="Cerrar">×</button>
         </div>
-        <p class="confirm-dialog__desc">Roax recomienda subir el presupuesto basado en ROAS 2.9x durante 52h continuas.</p>
+        <p class="confirm-dialog__desc">
+          <strong>ROAS real 1.93x</strong> en Collar GPS — por encima del umbral de escala (1.8x).
+          <span class="confirm-dialog__desc-sub">Meta declara 2.9x · diferencia absorbida por novedades en Cali</span>
+        </p>
         <div class="confirm-consequence-grid">
           <div class="consequence-row">
             <span class="consequence-label">Presupuesto diario</span>
@@ -231,6 +234,151 @@
     </section>
   }
 
+  <!-- ══ ZONA 1 — Decisiones + Señales (CA-1) ══ -->
+  <div class="hub-zone hub-zone--1">
+    <div class="hub-zone__header">
+      <div class="hub-zone__title-row">
+        <h2 class="hub-zone__title">Decisiones pendientes</h2>
+        @if (pendingApprovalSignals.length > 0) {
+          <span class="hub-zone__badge hub-zone__badge--crit">{{ pendingApprovalSignals.length }}</span>
+        }
+      </div>
+      <!-- Toggle Vista simple / Experto (CA-3) -->
+      <div class="ui-toggle">
+        <button type="button"
+          class="ui-toggle__opt"
+          [class.ui-toggle__opt--active]="isSimpleView()"
+          (click)="ws.setComplexityLevel('novice')"
+          title="Muestra solo lo esencial">
+          Básico
+        </button>
+        <button type="button"
+          class="ui-toggle__opt"
+          [class.ui-toggle__opt--active]="!isSimpleView()"
+          (click)="ws.setComplexityLevel('expert')"
+          title="Vista completa con todas las métricas">
+          Experto
+        </button>
+      </div>
+      <div class="hub-zone__header-actions">
+        <button type="button" class="mission__agency-btn"
+          (click)="showAgencyPanel.set(true)"
+          title="Configura cuánta autonomía tiene cada agente">
+          <i class="pi pi-sliders-h"></i> Umbrales
+        </button>
+        <button type="button" class="mission__section-see-all"
+          (click)="navigateToSenales()">
+          Ver todas →
+        </button>
+        <!-- FAB "+" con mini-menú (C17) -->
+        @if (showFabMenu()) {
+          <div class="hub-fab-backdrop" (click)="showFabMenu.set(false)"></div>
+        }
+        <div class="hub-fab-wrap">
+          <button
+            type="button"
+            class="hub-fab-plus"
+            [class.hub-fab-plus--open]="showFabMenu()"
+            (click)="showFabMenu.set(!showFabMenu())"
+            aria-label="Acciones rápidas"
+            title="Acciones rápidas">
+            {{ showFabMenu() ? '✕' : '+' }}
+          </button>
+          @if (showFabMenu()) {
+            <div class="hub-fab-menu" role="menu">
+              <button type="button" class="hub-fab-menu__item" role="menuitem"
+                (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/proyectos/nuevo')">
+                <i class="pi pi-briefcase"></i>
+                <span>Nuevo proyecto</span>
+              </button>
+              <button type="button" class="hub-fab-menu__item" role="menuitem"
+                (click)="showFabMenu.set(false); showNewSkill.set(true)">
+                <i class="pi pi-bolt"></i>
+                <span>Nueva skill</span>
+              </button>
+              <button type="button" class="hub-fab-menu__item" role="menuitem"
+                (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/reglas')"
+                data-proto-skip>
+                <i class="pi pi-list-check"></i>
+                <span>Nueva regla</span>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Bloque 1: Gali ya lo hizo por ti (Spec 7 — CA-9) -->
+    @if (completedSignals.length > 0) {
+      <div class="mission__signals-block mission__signals-block--done">
+        <div class="mission__signals-block-header">
+          <span class="mission__signals-block-dot mission__signals-block-dot--done"></span>
+          <span class="mission__signals-block-title">Gali ya lo hizo por ti</span>
+          <span class="mission__signals-block-count">{{ completedSignals.length }}</span>
+        </div>
+        <div class="mission__signals-list mission__signals-list--done">
+          @for (sig of completedSignals; track sig.id) {
+            <gali-signal-card-v2 [signal_data]="sig" />
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Bloque 2: Necesitas decidir (Spec 7 — CA-9) -->
+    <div class="mission__signals-block mission__signals-block--pending">
+      <div class="mission__signals-block-header">
+        <span class="mission__signals-block-dot mission__signals-block-dot--pending"></span>
+        <span class="mission__signals-block-title">Necesitas decidir</span>
+        @if (pendingApprovalSignals.length > 0) {
+          <span class="mission__badge mission__badge--crit">{{ pendingApprovalSignals.length }}</span>
+        }
+      </div>
+      <div class="mission__signals-list">
+        @for (sig of pendingApprovalSignals | slice:0:3; track sig.id) {
+          <gali-signal-card-v2
+            [signal_data]="sig"
+            (onBulkAction)="showBulkModal.set(true)"
+            (onScaleConfirm)="openScaleConfirm()" />
+        }
+        @if (pendingApprovalSignals.length === 0) {
+          <div class="mission__signals-empty">
+            <span>✦</span>
+            <span>Sin decisiones pendientes — Gali gestionó todo automáticamente.</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bloque "Gali esta semana" — solo en vista experto (CA-4, CA-14) -->
+    @if (!isSimpleView()) {
+    <div class="hub-gali-week insight-banner" [class.is-collapsed]="insightBannerCollapsed">
+      <div class="hub-gali-week__header insight-header" (click)="toggleInsightBanner()">
+        <span class="hub-gali-week__glyph">✦</span>
+        <strong class="hub-gali-week__title">Gali esta semana</strong>
+        <i class="pi insight-banner__chevron"
+           [class.pi-chevron-down]="insightBannerCollapsed"
+           [class.pi-chevron-up]="!insightBannerCollapsed"></i>
+        <button type="button" class="hub-gali-week__history" data-proto-skip title="próximamente"
+          (click)="$event.stopPropagation()">Ver historial →</button>
+      </div>
+      <div class="hub-gali-week__rows insight-body">
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">⚡</span>
+          <span><strong>23</strong> acciones ejecutadas automáticamente</span>
+        </div>
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">💰</span>
+          <span><strong>$85k</strong> ahorrados en novedades evitadas</span>
+        </div>
+        <div class="hub-gali-week__row">
+          <span class="hub-gali-week__icon">🔭</span>
+          <span><strong>2</strong> oportunidades de escala detectadas</span>
+        </div>
+      </div>
+    </div>
+    } <!-- /isSimpleView -->
+  </div>
+
   <!-- ══ ZONA 2 — Ciclo de Negocio (CA-1, CA-5) — solo vista experto (CA-4) ══ -->
   @if (!isZeroState() && ws.complexityLevel() === 'expert' && !isSimpleView()) {
   <section class="mission__anatomy hub-zone hub-zone--2">
@@ -262,6 +410,16 @@
           </button>
         }
       </div>
+    </div>
+
+    <!-- Widget de proyección de crecimiento (C19) -->
+    <div class="growth-projection-banner">
+      <span class="growth-projection-banner__glyph">🔭</span>
+      <span class="growth-projection-banner__text">
+        Con las recomendaciones actuales →
+        <strong>+{{ growthDeltaPedidos }} pedidos/sem</strong> en 30 días
+      </span>
+      <span class="growth-projection-banner__sub">Si apruebas la escala de pauta ($66k → $86k/día)</span>
     </div>
 
     <!-- Red de nodos + panel de detalle -->
@@ -357,23 +515,28 @@
 
         <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'logistica' || activeNode() === 'finanzas'">→</div>
 
-        <div class="anatomy-node anatomy-node--warn"
+        <div class="anatomy-node anatomy-node--warn anatomy-node--has-agent"
              [class.anatomy-node--selected]="activeNode() === 'finanzas'"
              (click)="toggleNode('finanzas')"
              role="button" tabindex="0" aria-label="Ver detalle de Finanzas">
           <div class="anatomy-node__header">
             <span class="anatomy-node__icon">💰</span>
             <span class="anatomy-node__label">FINANZAS</span>
-            <span class="anatomy-node__badge-warn">!</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot" style="background:#9ca3af"></span>
-            <span class="anatomy-node__agent-name">Siigo ○</span>
+            <div class="cycle-card__agent-pill" style="--agent-color: #60a5fa">
+              <span class="agent-dot"></span>
+              <span class="agent-name">Kronos activo</span>
+            </div>
           </div>
           <div class="anatomy-node__metrics">
             <span class="anatomy-node__main">$411k/sem</span>
             <span class="anatomy-node__sub">Margen 22%</span>
           </div>
+          <div class="anatomy-node__kronos-data">
+            <span class="anatomy-node__kronos-row">28 facturas · $450k · 6 días</span>
+            <span class="anatomy-node__fiscal-alert">⚠ Riesgo fiscal</span>
+          </div>
+          <button type="button" class="anatomy-node__kronos-cta" data-proto-skip
+            style="color:#60a5fa">Conectar Siigo →</button>
         </div>
 
         <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'finanzas' || activeNode() === 'reportes'">→</div>
@@ -439,109 +602,6 @@
   </section>
   } <!-- /!isZeroState && expert -->
 
-  <!-- ══ ZONA 1 — Decisiones + Señales (CA-1) ══ -->
-  <div class="hub-zone hub-zone--1">
-    <div class="hub-zone__header">
-      <div class="hub-zone__title-row">
-        <h2 class="hub-zone__title">Decisiones pendientes</h2>
-        @if (pendingApprovalSignals.length > 0) {
-          <span class="hub-zone__badge hub-zone__badge--crit">{{ pendingApprovalSignals.length }}</span>
-        }
-      </div>
-      <!-- Toggle Vista simple / Experto (CA-3) -->
-      <div class="ui-toggle">
-        <button type="button"
-          class="ui-toggle__opt"
-          [class.ui-toggle__opt--active]="isSimpleView()"
-          (click)="ws.setComplexityLevel('novice')"
-          title="Muestra solo lo esencial">
-          Básico
-        </button>
-        <button type="button"
-          class="ui-toggle__opt"
-          [class.ui-toggle__opt--active]="!isSimpleView()"
-          (click)="ws.setComplexityLevel('expert')"
-          title="Vista completa con todas las métricas">
-          Experto
-        </button>
-      </div>
-      <div class="hub-zone__header-actions">
-        <button type="button" class="mission__agency-btn"
-          (click)="showAgencyPanel.set(true)"
-          title="Configura cuánta autonomía tiene cada agente">
-          <i class="pi pi-sliders-h"></i> Umbrales
-        </button>
-        <button type="button" class="mission__section-see-all"
-          (click)="navigateToSenales()">
-          Ver todas →
-        </button>
-      </div>
-    </div>
-
-    <!-- Bloque 1: Gali ya lo hizo por ti (Spec 7 — CA-9) -->
-    @if (completedSignals.length > 0) {
-      <div class="mission__signals-block mission__signals-block--done">
-        <div class="mission__signals-block-header">
-          <span class="mission__signals-block-dot mission__signals-block-dot--done"></span>
-          <span class="mission__signals-block-title">Gali ya lo hizo por ti</span>
-          <span class="mission__signals-block-count">{{ completedSignals.length }}</span>
-        </div>
-        <div class="mission__signals-list mission__signals-list--done">
-          @for (sig of completedSignals; track sig.id) {
-            <gali-signal-card-v2 [signal_data]="sig" />
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Bloque 2: Necesitas decidir (Spec 7 — CA-9) -->
-    <div class="mission__signals-block mission__signals-block--pending">
-      <div class="mission__signals-block-header">
-        <span class="mission__signals-block-dot mission__signals-block-dot--pending"></span>
-        <span class="mission__signals-block-title">Necesitas decidir</span>
-        @if (pendingApprovalSignals.length > 0) {
-          <span class="mission__badge mission__badge--crit">{{ pendingApprovalSignals.length }}</span>
-        }
-      </div>
-      <div class="mission__signals-list">
-        @for (sig of pendingApprovalSignals | slice:0:3; track sig.id) {
-          <gali-signal-card-v2 [signal_data]="sig" />
-        }
-        @if (pendingApprovalSignals.length === 0) {
-          <div class="mission__signals-empty">
-            <span>✦</span>
-            <span>Sin decisiones pendientes — Gali gestionó todo automáticamente.</span>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Bloque "Gali esta semana" — solo en vista experto (CA-4) -->
-    @if (!isSimpleView()) {
-    <div class="hub-gali-week">
-      <div class="hub-gali-week__header">
-        <span class="hub-gali-week__glyph">✦</span>
-        <strong class="hub-gali-week__title">Gali esta semana</strong>
-        <button type="button" class="hub-gali-week__history" data-proto-skip title="próximamente">Ver historial →</button>
-      </div>
-      <div class="hub-gali-week__rows">
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">⚡</span>
-          <span><strong>23</strong> acciones ejecutadas automáticamente</span>
-        </div>
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">💰</span>
-          <span><strong>$85k</strong> ahorrados en novedades evitadas</span>
-        </div>
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">🔭</span>
-          <span><strong>2</strong> oportunidades de escala detectadas</span>
-        </div>
-      </div>
-    </div>
-    } <!-- /isSimpleView -->
-  </div>
-
   <!-- ══ ZONA 3 — Academy colapsada (CA-8) ══ -->
   <div class="hub-zone hub-zone--3" [class.hub-zone--3-collapsed]="zone3Collapsed()">
     <button type="button" class="hub-zone3-handle" (click)="zone3Collapsed.set(!zone3Collapsed())">
@@ -571,7 +631,7 @@
         title="Oculta los agentes y muestra solo métricas principales">
         ← Modo básico
       </button>
-      <button type="button" class="complexity-toggle-btn complexity-toggle-btn--reset" (click)="resetOnboarding()">
+      <button type="button" class="complexity-toggle-btn complexity-toggle-btn--reset" (click)="showReconfigureModal.set(true)">
         ↺ Reconfigurar Gali
       </button>
     </div>
@@ -637,6 +697,31 @@
   }
 
 </div>
+
+<!-- Modal de advertencia — Reconfigurar Gali (C12) -->
+@if (showReconfigureModal()) {
+  <div class="mission__confirm-backdrop" (click)="showReconfigureModal.set(false)">
+    <div class="mission__confirm-dialog mission__confirm-dialog--warn" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="reconfig-title">
+      <div class="confirm-dialog__header">
+        <span class="confirm-dialog__agent-dot" style="background:#ef4444"></span>
+        <h3 class="confirm-dialog__title" id="reconfig-title">¿Reconfigurar Gali?</h3>
+        <button type="button" class="confirm-dialog__close" (click)="showReconfigureModal.set(false)" aria-label="Cerrar">×</button>
+      </div>
+      <p class="confirm-dialog__desc">Esta acción restablece la configuración inicial. Se va a resetear:</p>
+      <ul class="reconfig-reset-list">
+        <li>✦ Tu objetivo actual (100 ventas/semana)</li>
+        <li>✦ Fuentes conectadas al perfil de Mi Negocio</li>
+        <li>✦ Configuración de agentes y niveles de autonomía</li>
+        <li>✦ Preferencia de complejidad de vista (Experto/Básico)</li>
+      </ul>
+      <p class="confirm-dialog__note">Las skills, reglas y proyectos activos <strong>no se borran</strong>.</p>
+      <div class="confirm-dialog__actions">
+        <button type="button" class="confirm-cancel" (click)="showReconfigureModal.set(false)">Cancelar</button>
+        <button type="button" class="confirm-destructive" (click)="resetOnboarding(); showReconfigureModal.set(false)">Reconfigurar de todos modos</button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Panel de umbrales de agencia — desde el Hub -->
 @if (showAgencyPanel()) {

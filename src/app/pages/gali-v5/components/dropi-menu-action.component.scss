@@ -29,6 +29,37 @@ $panel-accent: $primary-500; // #ff6102
     gap: $size-2;
   }
 
+  &__mini-wrap,
+  &__gali-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__fab-label {
+    position: absolute;
+    right: calc(100% + $size-2);
+    white-space: nowrap;
+    background: rgba(28, 28, 30, 0.85);
+    color: $white;
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-medium;
+    padding: 3px 8px;
+    border-radius: $radius-sm;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+
+    &--gali { font-size: 12px; }
+  }
+
+  &__mini-wrap:hover &__fab-label,
+  &__gali-wrap:hover &__fab-label {
+    opacity: 1;
+  }
+
   &__mini {
     display: flex;
     align-items: center;

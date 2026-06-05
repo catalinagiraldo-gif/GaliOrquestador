@@ -51,7 +51,7 @@ export class SkillsPageComponent {
       ultima_ejecucion: 'hace 4h',
       ejecuciones_total: 3,
       runHistory: [
-        { fecha: '2026-05-29 10:00', resultado: 'ejecutado', detalle: 'ROAS fue 2.9x por 52h — Budget $57.5k → $66k', impacto: '+$8.500/día' },
+        { fecha: '2026-05-29 10:00', resultado: 'ejecutado', detalle: 'ROAS Meta 2.9x por 52h (≥ umbral 2.8x) — Budget $57.5k → $66k', impacto: '+$8.500/día' },
         { fecha: '2026-05-22 09:30', resultado: 'ejecutado', detalle: 'ROAS fue 3.1x por 60h — Budget $50k → $57.5k', impacto: '+$7.500/día' },
         { fecha: '2026-05-15 —', resultado: 'no_activado', detalle: 'ROAS 2.3x, no alcanzó umbral', impacto: '—' },
       ],
