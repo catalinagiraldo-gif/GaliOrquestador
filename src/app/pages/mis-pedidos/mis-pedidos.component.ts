@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 interface PedidoClient {
   name: string;
@@ -32,6 +33,7 @@ interface Pedido {
   selector: 'app-mis-pedidos',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  // RouterModule not needed — uses inject(Router) for navigation
   templateUrl: './mis-pedidos.component.html',
   styleUrls: ['./mis-pedidos.component.scss'],
 })
@@ -39,6 +41,8 @@ export class MisPedidosComponent implements OnInit {
   pedidos: Pedido[] = [];
   searchQuery = '';
   showActionsDropdown = false;
+
+  private router = inject(Router);
 
   constructor(private http: HttpClient) {}
 
@@ -83,5 +87,11 @@ export class MisPedidosComponent implements OnInit {
 
   hasAction(pedido: Pedido, action: string): boolean {
     return pedido.actions.includes(action);
+  }
+
+  verSenalGali(pedido: Pedido): void {
+    this.router.navigate(['/gali-v5/senales'], {
+      queryParams: { signalId: 'alt-001' },
+    });
   }
 }

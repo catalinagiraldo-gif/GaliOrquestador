@@ -1,0 +1,84 @@
+// ============================================
+// Gali V5 — Global Keyframes
+// Motion Language — see docs/SpecsNuevos/Cambios10jun.md §9.0
+// ============================================
+
+@keyframes gali-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gali-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes gali-slide-right {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes gali-slide-left-in {
+  from { transform: translateX(420px); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes gali-pulse-border {
+  0%, 100% { border-color: var(--red-400); opacity: 1; }
+  50%       { border-color: var(--red-200); opacity: 0.7; }
+}
+
+@keyframes gali-pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.4); opacity: 0.6; }
+}
+
+@keyframes gali-count-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gali-bar-grow {
+  from { width: 0%; }
+  to   { width: var(--bar-target-width); }
+}
+
+@keyframes panel-slide-in {
+  from { transform: translateX(-6px); opacity: 0.6; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes gali-panel-slide-in {
+  from { transform: translateX(100%); opacity: 0.85; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes gali-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.008); opacity: 0.96; }
+}
+
+.gali-stagger-in > * {
+  animation: gali-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.gali-stagger-in > *:nth-child(1) { animation-delay: 0ms; }
+.gali-stagger-in > *:nth-child(2) { animation-delay: 55ms; }
+.gali-stagger-in > *:nth-child(3) { animation-delay: 110ms; }
+.gali-stagger-in > *:nth-child(4) { animation-delay: 165ms; }
+.gali-stagger-in > *:nth-child(5) { animation-delay: 220ms; }
+
+.gali-panel-slide-in {
+  animation: gali-panel-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.impact-stat__val {
+  animation: gali-count-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

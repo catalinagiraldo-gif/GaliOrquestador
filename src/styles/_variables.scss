@@ -116,3 +116,15 @@ $header-height: 70px;
   --shadow-small: #{$shadow-small};
   --shadow-medium: #{$shadow-medium};
 }
+
+// --- Motion Tokens — Gali V5 ---
+$motion-instant:  50ms;
+$motion-fast:    120ms;
+$motion-medium:  200ms;
+$motion-slow:    300ms;
+$motion-xslow:   500ms;
+
+$ease-entrance: cubic-bezier(0.0, 0.0, 0.2, 1);
+$ease-exit:     cubic-bezier(0.4, 0.0, 1.0, 1);
+$ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+$ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);

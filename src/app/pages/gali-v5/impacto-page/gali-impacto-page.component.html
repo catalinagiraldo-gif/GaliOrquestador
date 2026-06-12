@@ -1,0 +1,173 @@
+<div class="impacto-page">
+
+  <!-- Header -->
+  <div class="impacto-header">
+    <div class="impacto-header__left">
+      <span class="gali-star">✦</span>
+      <div>
+        <h1 class="impacto-header__title">Impacto de Gali</h1>
+        <p class="impacto-header__subtitle">Todo lo que Gali hizo mientras tú operabas tu negocio</p>
+      </div>
+    </div>
+    <a routerLink="/gali-v5" class="btn-back">← Volver al Hub</a>
+  </div>
+
+  <!-- Milestones alcanzados -->
+  @for (m of milestoneAlcanzado(); track m.id) {
+    <div class="milestone-celebration">
+      <span class="milestone-celebration__icon">🏆</span>
+      <div class="milestone-celebration__body">
+        <p class="milestone-celebration__titulo">{{ m.titulo }}</p>
+        <p class="milestone-celebration__desc">{{ m.descripcion }}</p>
+        @if (m.fecha_alcanzado) {
+          <span class="milestone-celebration__fecha">
+            Alcanzado el {{ m.fecha_alcanzado | date:'d MMM yyyy' : '' : 'es-CO' }}
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  <app-gali-impact-widget mode="hub" class="impacto-page__widget gali-stagger-in" />
+
+  <!-- Resumen acumulado -->
+  <div class="impacto-totales">
+    <div class="total-stat" style="animation-delay:0ms">
+      <span class="total-stat__val">{{ acumuladoTotal().acciones }}</span>
+      <span class="total-stat__lbl">acciones totales ejecutadas</span>
+    </div>
+    <div class="total-stat" style="animation-delay:80ms">
+      <span class="total-stat__val">{{ formatPesos(acumuladoTotal().pesos) }}</span>
+      <span class="total-stat__lbl">de valor protegido</span>
+    </div>
+    <div class="total-stat" style="animation-delay:160ms">
+      <span class="total-stat__val">{{ acumuladoTotal().autonomas }}</span>
+      <span class="total-stat__lbl">decisiones autónomas (sin pedirte permiso)</span>
+    </div>
+    <div class="total-stat total-stat--metric" style="animation-delay:240ms">
+      <span class="total-stat__val">
+        {{ acumuladoTotal().acciones > 0
+          ? (acumuladoTotal().autonomas / acumuladoTotal().acciones * 100 | number:'1.0-0')
+          : 0 }}%
+      </span>
+      <span class="total-stat__lbl">de autonomía</span>
+      <span class="total-stat__objetivo">Objetivo: >40%</span>
+    </div>
+  </div>
+
+  <!-- Próximo milestone -->
+  @if (proximoMilestone(); as m) {
+    <div class="milestone-bar">
+      <div class="milestone-bar__info">
+        <span class="milestone-bar__icon">🏆</span>
+        <div>
+          <p class="milestone-bar__name">Próximo logro: <strong>{{ m.titulo }}</strong></p>
+          <p class="milestone-bar__desc">{{ m.descripcion }}</p>
+        </div>
+        <span class="milestone-bar__pct">{{ milestoneProgress() }}%</span>
+      </div>
+      <div class="milestone-bar__track">
+        <div class="milestone-bar__fill" [style.width.%]="milestoneProgress()"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Comparación temporal -->
+  @if (semanaActual() && semanaAnterior()) {
+    <div class="comparacion-band">
+      <span class="comparacion-band__label">Esta semana Gali ahorró</span>
+      <span class="comparacion-band__delta"
+        [class.comparacion-band__delta--up]="deltaPct() > 0"
+        [class.comparacion-band__delta--down]="deltaPct() < 0">
+        {{ deltaPct() > 0 ? '↑' : '↓' }}{{ deltaPct() | abs }}%
+      </span>
+      <span class="comparacion-band__context">más que la semana pasada</span>
+    </div>
+  }
+
+  <!-- Historial semanal -->
+  <section class="impacto-section">
+    <h2 class="impacto-section__title">Historial semanal</h2>
+    <div class="semanas-grid">
+      @for (s of summaries; track s.semana_iso; let i = $index) {
+        <div class="semana-card" [style.animation-delay]="(i * 80) + 'ms'">
+          <div class="semana-card__header">
+            <span class="semana-card__label">Semana {{ s.semana_iso }}</span>
+            <span class="semana-card__mes">Mayo {{ s.anio }}</span>
+          </div>
+          <div class="semana-card__stats">
+            <div class="s-stat">
+              <span class="s-stat__val">{{ s.acciones_totales }}</span>
+              <span class="s-stat__lbl">acciones</span>
+            </div>
+            <div class="s-stat">
+              <span class="s-stat__val">{{ formatPesos(s.pesos_ahorrados) }}</span>
+              <span class="s-stat__lbl">ahorrados</span>
+            </div>
+            <div class="s-stat">
+              <span class="s-stat__val">{{ s.novedades_evitadas }}</span>
+              <span class="s-stat__lbl">novedades</span>
+            </div>
+            <div class="s-stat">
+              <span class="s-stat__val">{{ s.horas_libradas }}h</span>
+              <span class="s-stat__lbl">libradas</span>
+            </div>
+          </div>
+          <div class="semana-card__autonomia">
+            <span>Autonomía: {{ s.acciones_totales > 0 ? (s.acciones_autonomas / s.acciones_totales * 100 | number:'1.0-0') : 0 }}%</span>
+            <div class="autonomia-bar">
+              <div class="autonomia-bar__fill"
+                [style.width]="(s.acciones_totales > 0 ? (s.acciones_autonomas / s.acciones_totales * 100) : 0) + '%'">
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Feed de acciones -->
+  <section class="impacto-section">
+    <div class="impacto-section__header-row">
+      <h2 class="impacto-section__title">Todas las acciones</h2>
+      <div class="agente-filtros">
+        @for (f of agenteFiltros; track f) {
+          <button type="button" class="filtro-pill"
+            [class.filtro-pill--active]="filtroAgente() === f"
+            (click)="setFiltro(f)">
+            {{ f === 'todos' ? 'Todos' : f }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="acciones-feed">
+      @for (a of accionesVisibles(); track a.id; let i = $index) {
+        <div class="accion-item" [style.animation-delay]="(i * 40) + 'ms'">
+          <span class="accion-item__icon">{{ getTipoIcon(a.tipo_accion) }}</span>
+          <div class="accion-item__body">
+            <div class="accion-item__top">
+              <span class="accion-item__agente" [style.color]="getAgenteColor(a.agente)">{{ a.agente }}</span>
+              <span class="accion-item__time">{{ formatTimestamp(a.timestamp) }}</span>
+              <span class="accion-item__autonomia-badge"
+                [class.accion-item__autonomia-badge--autonomo]="!a.requirio_aprobacion">
+                {{ a.requirio_aprobacion ? 'Con tu aprobación' : 'Autónomo' }}
+              </span>
+            </div>
+            <p class="accion-item__desc">{{ a.descripcion }}</p>
+            @if (a.impacto_pesos > 0) {
+              <span class="accion-item__impacto">{{ a.impacto_label }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (accionesVisibles().length === 0) {
+        <div class="acciones-empty">
+          <p>No hay acciones de {{ filtroAgente() }} en este período.</p>
+        </div>
+      }
+    </div>
+  </section>
+
+</div>

@@ -47,6 +47,28 @@ export interface HubEntryContext {
 @Injectable({ providedIn: 'root' })
 export class GaliWorkspaceService implements OnDestroy {
   readonly activeMode = signal<WorkspaceMode>('operar');
+
+  /** Re-sincronizar objetivo tras cerrar onboarding (llamar desde Hub) */
+  ensureGoalFromStorage(): void {
+    this.ensureGoalDefaults();
+  }
+
+  private ensureGoalDefaults(): void {
+    const configured = localStorage.getItem('gali_goal_configured');
+    if (!configured) return;
+
+    const storedLabel = localStorage.getItem('gali_goal_label');
+    const storedId = localStorage.getItem('gali_goal_id');
+
+    if (!storedId) {
+      const label = storedLabel ?? 'Automatizar mi operación para trabajar menos horas';
+      localStorage.setItem('gali_goal_label', label);
+      localStorage.setItem('gali_goal_id', 'automatizar');
+      this._goalLabel.set(label);
+    } else if (!this._goalLabel() && storedLabel) {
+      this._goalLabel.set(storedLabel);
+    }
+  }
   readonly galiPaused = signal(false);
 
   /** Nivel de complejidad del hub: novice = panel simplificado, expert = hub completo */
@@ -59,15 +81,39 @@ export class GaliWorkspaceService implements OnDestroy {
     JSON.parse(localStorage.getItem('gali_connected_sources') ?? '[]')
   );
 
-  setComplexityLevel(level: 'novice' | 'expert'): void {
-    this.complexityLevel.set(level);
-    localStorage.setItem('gali_complexity', level);
+  /** Incrementa cuando el usuario pide editar objetivo desde el mode-bar */
+  readonly editGoalRequest = signal(0);
+  readonly reconfigureRequest = signal(0);
+  /** Incrementa en cada cambio explícito de complejidad (para scroll/feedback en Hub) */
+  readonly complexityChangeTick = signal(0);
+
+  requestEditGoal(): void {
+    this.editGoalRequest.update(n => n + 1);
   }
 
-  /** Módulos visibles en el rail — null = todos visibles (sin restricción) */
-  readonly visibleModules = signal<string[] | null>(
-    JSON.parse(localStorage.getItem('gali_visible_modules') ?? 'null')
-  );
+  requestReconfigure(): void {
+    this.reconfigureRequest.update(n => n + 1);
+  }
+
+  setComplexityLevel(level: 'novice' | 'expert', opts?: { notify?: boolean }): void {
+    const prev = this.complexityLevel();
+    this.complexityLevel.set(level);
+    localStorage.setItem('gali_complexity', level);
+    if (opts?.notify && prev !== level) {
+      this.complexityChangeTick.update(n => n + 1);
+      this.showToast({
+        message: level === 'expert'
+          ? 'Vista experto — ciclo del negocio desbloqueado'
+          : 'Vista básica — decisiones y brief primero',
+        agente: 'Gali',
+        tipo: level === 'expert' ? 'ok' : 'warn',
+        id: `cx-${Date.now()}`,
+      });
+    }
+  }
+
+  /** Módulos visibles en el rail — null = todos visibles (sin restricción). Rail always shows all modules. */
+  readonly visibleModules = signal<string[] | null>(null);
 
   setVisibleModules(modules: string[]): void {
     this.visibleModules.set(modules);
@@ -85,9 +131,11 @@ export class GaliWorkspaceService implements OnDestroy {
   }
 
   /** Business DNA — perfil derivado del onboarding y comportamiento del usuario */
+  private readonly _goalLabel = signal<string | null>(localStorage.getItem('gali_goal_label'));
+
   readonly businessDNA = computed(() => ({
     goalId:        localStorage.getItem('gali_goal_id') ?? null,
-    goalLabel:     localStorage.getItem('gali_goal_label') ?? null,
+    goalLabel:     this._goalLabel(),
     pedidosTarget: Number(localStorage.getItem('gali_goal_pedidos_target') ?? 0),
     complexity:    this.complexityLevel(),
     sources:       this.connectedSources(),
@@ -95,8 +143,18 @@ export class GaliWorkspaceService implements OnDestroy {
     hasData:       localStorage.getItem('gali_zero_state') !== '1',
   }));
 
+  updateGoalLabel(label: string): void {
+    localStorage.setItem('gali_goal_label', label);
+    if (!localStorage.getItem('gali_goal_id')) {
+      localStorage.setItem('gali_goal_id', 'custom');
+    }
+    this._goalLabel.set(label);
+  }
+
   readonly autopilot = signal(false);
   readonly liveEventsVisible = signal(true);
+  /** Cuando hay un banner crítico activo en cualquier página, el intent-bar se suprime */
+  readonly primaryAlertActive = signal(false);
   readonly toast = signal<GaliToast | null>(null);
   readonly hubEntryContext = signal<HubEntryContext | null>(null);
 
@@ -144,6 +202,7 @@ export class GaliWorkspaceService implements OnDestroy {
   private ngZone = inject(NgZone);
 
   constructor() {
+    this.ensureGoalDefaults();
     // Session counter — drives progressive disclosure in businessDNA
     const count = Number(localStorage.getItem('gali_session_count') ?? 0);
     localStorage.setItem('gali_session_count', String(count + 1));

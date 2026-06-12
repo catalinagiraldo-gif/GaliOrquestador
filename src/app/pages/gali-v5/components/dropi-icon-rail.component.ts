@@ -8,6 +8,7 @@ import {
   resolveActiveRailKey,
 } from '../dropi-sections.config';
 import { GaliWorkspaceService } from '../services/gali-workspace.service';
+import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
 
 @Component({
   selector: 'dropi-icon-rail',
@@ -20,6 +21,11 @@ import { GaliWorkspaceService } from '../services/gali-workspace.service';
          [class.icon-rail__logo-btn--active]="activeKey() === 'home'"
          title="Gali Hub" aria-label="Gali Hub">
         <span class="icon-rail__spark" aria-hidden="true">✦</span>
+        @if (tieneCriticas()) {
+          <span class="rail-badge rail-badge--criticas" [attr.aria-label]="alertasCriticasCount() + ' alertas críticas'">{{ alertasCriticasCount() }}</span>
+        } @else if (senalesActivasCount() > 0) {
+          <span class="rail-badge rail-badge--senales" [attr.aria-label]="senalesActivasCount() + ' señales activas'">{{ senalesActivasCount() }}</span>
+        }
       </a>
 
       <div class="icon-rail__main">
@@ -120,17 +126,23 @@ export class DropiIconRailComponent {
   activeKey = signal(resolveActiveRailKey(inject(Router).url));
   readonly showHelpDrawer = signal(false);
 
-  readonly mainItems = computed(() => {
-    const visible = this.ws.visibleModules();
-    const all = DROPI_ICON_RAIL.filter(i => i.group === 'main');
-    return visible === null ? all : all.filter(i => visible.includes(i.key));
-  });
+  readonly mainItems = computed(() =>
+    DROPI_ICON_RAIL.filter(i => i.group === 'main')
+  );
 
-  readonly utilityItems = computed(() => {
-    const visible = this.ws.visibleModules();
-    const all = DROPI_ICON_RAIL.filter(i => i.group === 'utility');
-    return visible === null ? all : all.filter(i => visible.includes(i.key));
-  });
+  readonly utilityItems = computed(() =>
+    DROPI_ICON_RAIL.filter(i => i.group === 'utility')
+  );
+
+  readonly senalesActivasCount = computed(() =>
+    MOCK_SENALES.filter(s => s.tipo !== 'completed').length
+  );
+
+  readonly alertasCriticasCount = computed(() =>
+    MOCK_ALERTAS.filter(a => a.tipo === 'critical').length
+  );
+
+  readonly tieneCriticas = computed(() => this.alertasCriticasCount() > 0);
 
   constructor() {
     this.router.events

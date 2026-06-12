@@ -696,3 +696,110 @@
   &--active  { background: #10b981; }
   &--waiting { background: #f59e0b; }
 }
+
+// ── QUÉ HIZO GALI — J5 ────────────────────────────────────────────────────
+.ri-gali-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+}
+
+.ri-gali-action {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border-radius: $radius-sm;
+  border: 1px solid $gray-200;
+  background: $white;
+
+  &--success { border-left: 3px solid #16a34a; background: rgba(#16a34a, 0.02); }
+  &--pending { border-left: 3px solid $primary-500; background: rgba($primary-500, 0.02); }
+  &--info    { border-left: 3px solid #3b82f6; background: rgba(#3b82f6, 0.02); }
+
+  &__agent {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $white;
+    font-size: 11px;
+    font-weight: $font-bold;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    display: block;
+    font-size: 13px;
+    font-weight: $font-semibold;
+    color: $gray-800;
+    font-family: $font-primary;
+    margin-bottom: 2px;
+  }
+
+  &__when {
+    display: block;
+    font-size: 11px;
+    color: $gray-400;
+    font-family: $font-primary;
+    margin-bottom: $size-2;
+  }
+
+  &__diff {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-1 $size-2;
+    background: $gray-50;
+    border-radius: $radius-sm;
+    width: fit-content;
+  }
+
+  &__badge {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: $radius-sm;
+    font-size: 11px;
+    font-weight: $font-semibold;
+    font-family: $font-primary;
+    align-self: center;
+    white-space: nowrap;
+
+    &--success { background: rgba(#16a34a, 0.1); color: #15803d; }
+    &--cta {
+      background: $primary-500;
+      color: $white;
+      text-decoration: none;
+      cursor: pointer;
+      &:hover { background: $primary-600; }
+    }
+    &--info { background: rgba(#3b82f6, 0.1); color: #1d4ed8; }
+  }
+}
+
+.ri-gali-diff-before {
+  font-size: 11px;
+  color: $gray-500;
+  font-family: $font-primary;
+  font-style: italic;
+}
+
+.ri-gali-diff-arrow {
+  font-size: 11px;
+  color: $gray-300;
+}
+
+.ri-gali-diff-after {
+  font-size: 11px;
+  color: #15803d;
+  font-weight: $font-medium;
+  font-family: $font-primary;
+}

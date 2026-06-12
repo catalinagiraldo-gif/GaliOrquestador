@@ -52,7 +52,8 @@ export interface GaliBarStat {
       }
 
       @if (ctaLabel) {
-        <button type="button" class="gali-bar__cta" (click)="ctaClick.emit()" data-proto-skip>
+        <button type="button" class="gali-bar__cta" (click)="ctaClick.emit()" data-proto-skip
+          [title]="ctaTooltip || ''">
           {{ ctaLabel }} →
         </button>
       }
@@ -72,6 +73,7 @@ export class DropiGaliBarComponent {
   @Input() message = '';
   @Input() stats?: GaliBarStat[];
   @Input() ctaLabel?: string;
+  @Input() ctaTooltip?: string;
   @Input() secondaryCta?: string;
   @Output() ctaClick = new EventEmitter<void>();
   @Output() secondaryClick = new EventEmitter<void>();

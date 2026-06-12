@@ -1,10 +1,11 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { DropiPrototypeFeedbackService } from '../services/dropi-prototype-feedback.service';
 import { GaliStateService } from '../services/gali-state.service';
 import { GALI_V5_DROPI_LOGO } from '../gali-v5.constants';
+import { MOCK_ALERTAS, MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
 
 interface SectionAgent { name: string; color: string; status: string; }
 
@@ -44,6 +45,18 @@ const SECTION_AGENTS: Array<{ patterns: string[]; agent: SectionAgent }> = [
   },
 ];
 
+function resolveGaliStatus(): string {
+  const criticalAlerts = MOCK_ALERTAS.filter(a => a.tipo === 'critical').length;
+  if (criticalAlerts > 0) {
+    return `hay ${criticalAlerts} decisión${criticalAlerts > 1 ? 'es' : ''} que necesitan tu aprobación`;
+  }
+  const totalAlerts = MOCK_ALERTAS.length;
+  if (totalAlerts === 0) {
+    return 'negocio en orden · 0 alertas activas';
+  }
+  return 'tu Director de E-commerce activo';
+}
+
 function resolveAgentForUrl(url: string): SectionAgent {
   const path = url.toLowerCase();
   for (const entry of SECTION_AGENTS) {
@@ -51,7 +64,33 @@ function resolveAgentForUrl(url: string): SectionAgent {
       return entry.agent;
     }
   }
-  return { name: 'Gali', color: '#ff6102', status: 'orquestando tu negocio' };
+  return { name: 'Gali', color: '#ff6102', status: resolveGaliStatus() };
+}
+
+interface BreadcrumbItem { label: string; url: string | null; }
+
+function resolveBreadcrumbs(path: string): BreadcrumbItem[] {
+  if (path === '/gali-v5' || path === '/gali-v5/') return [];
+
+  const crumbMap: Array<{ match: (p: string) => boolean; crumbs: BreadcrumbItem[] }> = [
+    { match: p => p === '/gali-v5/senales',           crumbs: [{ label: 'Señales', url: '/gali-v5/senales' }] },
+    { match: p => p === '/gali-v5/micromundo',         crumbs: [{ label: 'Mi Negocio', url: null }] },
+    { match: p => p === '/gali-v5/proyectos',          crumbs: [{ label: 'Proyectos', url: '/gali-v5/proyectos' }] },
+    { match: p => p === '/gali-v5/proyectos/nuevo',    crumbs: [{ label: 'Proyectos', url: '/gali-v5/proyectos' }, { label: 'Nuevo', url: null }] },
+    { match: p => p.startsWith('/gali-v5/proyecto/'),  crumbs: [{ label: 'Proyectos', url: '/gali-v5/proyectos' }, { label: 'Detalle', url: null }] },
+    { match: p => p === '/gali-v5/agentes',            crumbs: [{ label: 'Centro de Gali', url: null }, { label: 'Agentes', url: null }] },
+    { match: p => p === '/gali-v5/marketplace',       crumbs: [{ label: 'Marketplace', url: '/gali-v5/marketplace' }] },
+    { match: p => p === '/gali-v5/skills/nueva',       crumbs: [{ label: 'Centro de Gali', url: null }, { label: 'Nueva skill', url: null }] },
+    { match: p => p === '/gali-v5/skills',             crumbs: [{ label: 'Centro de Gali', url: null }, { label: 'Skills', url: null }] },
+    { match: p => p === '/gali-v5/reglas',             crumbs: [{ label: 'Centro de Gali', url: null }, { label: 'Reglas', url: null }] },
+    { match: p => p === '/gali-v5/conexiones',         crumbs: [{ label: 'Centro de Gali', url: null }, { label: 'Conexiones', url: null }] },
+    { match: p => p === '/gali-v5/marketplace',        crumbs: [{ label: 'Marketplace', url: '/gali-v5/marketplace' }] },
+  ];
+
+  for (const entry of crumbMap) {
+    if (entry.match(path)) return entry.crumbs;
+  }
+  return [];
 }
 
 @Component({
@@ -70,6 +109,21 @@ function resolveAgentForUrl(url: string): SectionAgent {
           <img [src]="logoSrc" alt="dropi" class="header-ia2__logo" />
         </a>
       </div>
+
+      <!-- Breadcrumb contextual (AJ-2.4) -->
+      @if (breadcrumbs().length > 0) {
+        <nav class="header-ia2__breadcrumb" aria-label="Ruta actual">
+          <a routerLink="/gali-v5" class="header-ia2__bc-root">Gali</a>
+          @for (crumb of breadcrumbs(); track crumb.label) {
+            <span class="header-ia2__bc-sep" aria-hidden="true">›</span>
+            @if (crumb.url) {
+              <a [routerLink]="crumb.url" class="header-ia2__bc-link">{{ crumb.label }}</a>
+            } @else {
+              <span class="header-ia2__bc-current">{{ crumb.label }}</span>
+            }
+          }
+        </nav>
+      }
 
       <!-- ── ZONA CONTEXTUAL TRANSVERSAL ──────────────────────────── -->
       <div class="header-ia2__context">
@@ -101,9 +155,14 @@ function resolveAgentForUrl(url: string): SectionAgent {
           <span class="header-ia2__ctx-status">{{ sectionAgent().status }}</span>
         </button>
 
-        <!-- Señales pendientes -->
-        <a routerLink="/gali-v5" class="header-ia2__signals-pill" title="Ver señales pendientes en Gali Hub">
-          <span class="header-ia2__signals-num">{{ signalCount }}</span>
+        <!-- Señales pendientes — badge dinámico (CA-F2-3/F2-4) -->
+        <a routerLink="/gali-v5/senales" class="header-ia2__signals-pill"
+          [class.header-ia2__signals-pill--critical]="tieneCriticas"
+          title="Ver señales pendientes en Gali Hub">
+          @if (tieneCriticas) {
+            <span class="header-ia2__signals-dot"></span>
+          }
+          <span class="header-ia2__signals-num">{{ totalSenalesActivas }}</span>
           <span class="header-ia2__signals-label">señales</span>
         </a>
 
@@ -244,8 +303,16 @@ export class DropiHeaderIa2Component implements OnInit {
   @Input() galiMode: 0 | 1 | 2 = 0;
   @Input() autopilotOn = false;
 
-  readonly signalCount = 3;
+  readonly totalSenalesActivas = MOCK_SENALES.filter(s => s.tipo !== 'completed').length + MOCK_ALERTAS.length;
+  readonly tieneCriticas = MOCK_ALERTAS.some(a => a.tipo === 'critical');
   readonly showHealthPanel = signal(false);
+
+  // Breadcrumb contextual (AJ-2.4)
+  private readonly currentUrl = signal(this.router.url);
+  readonly breadcrumbs = computed(() => {
+    const path = this.currentUrl().split('?')[0];
+    return resolveBreadcrumbs(path);
+  });
 
   // Business Health Score
   readonly healthScore = 78; // 0–100: ROAS(30%) + novedad(25%) + conversión(20%) + P&L vs goal(25%)
@@ -313,7 +380,7 @@ export class DropiHeaderIa2Component implements OnInit {
     {
       puntos: 3,
       accion: 'Cerrar gap ROAS Meta vs real',
-      porQue: 'Declarado 2.9× vs real 1.91× — gap del 34% afecta el score',
+      porQue: 'Meta declara 2.9× pero Gali calcula 1.91× real — estás pagando por resultados que no se materializan',
       ctaLabel: 'Ver análisis Roax',
       ruta: '/gali-v5/marketing/roax-informes',
     },
@@ -325,7 +392,10 @@ export class DropiHeaderIa2Component implements OnInit {
   ngOnInit(): void {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(e => this.sectionAgent.set(resolveAgentForUrl(e.urlAfterRedirects)));
+      .subscribe(e => {
+        this.sectionAgent.set(resolveAgentForUrl(e.urlAfterRedirects));
+        this.currentUrl.set(e.urlAfterRedirects);
+      });
   }
 
   get formattedBalance(): string {

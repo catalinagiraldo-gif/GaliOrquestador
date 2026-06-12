@@ -184,6 +184,55 @@
     </div>
   </div>
 
+  <!-- ✦ VER SEÑALES GALI — Antes / Después (J5) -->
+  <div class="ri-section">
+    <div class="ri-section__header">
+      <h3 class="ri-section__title">✦ Qué hizo Gali esta semana · Antes / Después</h3>
+      <a routerLink="/gali-v5/senales" class="ri-btn ri-btn--ghost">Ver todas las señales →</a>
+    </div>
+    <div class="ri-gali-actions">
+      <div class="ri-gali-action ri-gali-action--success">
+        <div class="ri-gali-action__agent" style="background:#f97316">R</div>
+        <div class="ri-gali-action__body">
+          <strong class="ri-gali-action__title">Cambió Video A → Video B por CTR bajo</strong>
+          <span class="ri-gali-action__when">Hace 2 días · automático · skill Auto-pausa CTR</span>
+          <div class="ri-gali-action__diff">
+            <span class="ri-gali-diff-before">CTR 0.7% · ROAS 2.6x</span>
+            <span class="ri-gali-diff-arrow">→</span>
+            <span class="ri-gali-diff-after">CTR 1.8% · ROAS 1.93x</span>
+          </div>
+        </div>
+        <span class="ri-gali-action__badge ri-gali-action__badge--success">+$32k</span>
+      </div>
+      <div class="ri-gali-action ri-gali-action--pending">
+        <div class="ri-gali-action__agent" style="background:#f97316">R</div>
+        <div class="ri-gali-action__body">
+          <strong class="ri-gali-action__title">Propone escalar Collar GPS: $66k → $86k/día</strong>
+          <span class="ri-gali-action__when">Hace 3h · esperando tu aprobación · skill Escalado ROAS</span>
+          <div class="ri-gali-action__diff">
+            <span class="ri-gali-diff-before">$66k/día · 47 pedidos/sem</span>
+            <span class="ri-gali-diff-arrow">→</span>
+            <span class="ri-gali-diff-after">$86k/día · ~61 pedidos/sem est.</span>
+          </div>
+        </div>
+        <a routerLink="/gali-v5/senales" [queryParams]="{signalId:'sen-001'}" class="ri-gali-action__badge ri-gali-action__badge--cta">Aprobar →</a>
+      </div>
+      <div class="ri-gali-action ri-gali-action--info">
+        <div class="ri-gali-action__agent" style="background:#f97316">R</div>
+        <div class="ri-gali-action__body">
+          <strong class="ri-gali-action__title">Amplió segmentación a Medellín · K-Beauty</strong>
+          <span class="ri-gali-action__when">Hace 1 día · automático · umbral de confianza 85%</span>
+          <div class="ri-gali-action__diff">
+            <span class="ri-gali-diff-before">Bogotá, Cali, Barranquilla · CTR 1.1%</span>
+            <span class="ri-gali-diff-arrow">→</span>
+            <span class="ri-gali-diff-after">+ Medellín · CTR 1.4% · midiendo…</span>
+          </div>
+        </div>
+        <span class="ri-gali-action__badge ri-gali-action__badge--info">Midiendo</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Impacto de Skills -->
   <div class="ri-section">
     <div class="ri-section__header">

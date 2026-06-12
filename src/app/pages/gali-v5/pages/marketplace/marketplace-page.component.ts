@@ -1,25 +1,29 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { SkillsEditorModalComponent } from '../../components/skills-editor-modal/skills-editor-modal.component';
 
-export type SkillTipo = 'gratuita' | 'experto' | 'premium';
-export type AgenteFiltro = 'todos' | 'Roax' | 'ADA Spy' | 'Chatea Pro' | 'Vigilante' | 'Financiero';
-
-interface Skill {
+interface CommunitySkill {
   id: string;
   nombre: string;
-  agente: string;
-  icono: string;
-  tipo: SkillTipo;
-  rating: number;
-  usos: number;
-  creador: string;
-  verificado: boolean;
   descripcion: string;
-  instalada: boolean;
-  categoria: string;
+  tipo: 'Operación' | 'Lanzamiento' | 'Experto' | 'Premium';
+  secciones: string[];
+  uses: string;
+  rating: number;
+  copias: number;
+  comments: number;
+  autor: string;
+  handle?: string;
+  autorBio?: string;
+  autorAvatar: string;
+  autorColor: string;
+  verificado: boolean;
+  tag?: string;
 }
+
+type MktAgente = { id: string; nombre: string; color: string; instalado: boolean; creador: string; rating: number; usos: string; descripcion: string; habilidades: string[] };
+type MktRegla  = { id: string; titulo: string; agente: string; agentColor: string; descripcion: string; ejemplo: string; usos: string; instalada: boolean };
 
 interface PersonalizedSkill {
   id: string;
@@ -34,18 +38,21 @@ interface PersonalizedSkill {
 @Component({
   selector: 'app-marketplace-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, SkillsEditorModalComponent],
+  imports: [CommonModule, RouterModule, SkillsEditorModalComponent],
   templateUrl: './marketplace-page.component.html',
   styleUrl: './marketplace-page.component.scss',
 })
-
 export class MarketplacePageComponent {
-  agenteTab = signal<AgenteFiltro>('todos');
-  tipoFiltro = signal<SkillTipo | 'todos'>('todos');
-  busqueda = signal('');
-  instalandoId = signal<string | null>(null);
-  instaladosHoy = signal<string[]>([]);
-  showEditor = signal(false);
+  private router = inject(Router);
+
+  readonly mainCategory = signal<'skills' | 'agentes' | 'reglas' | 'plugins'>('skills');
+  readonly activeTab = signal<'populares' | 'por-seccion' | 'expertos' | 'nuevas'>('populares');
+  readonly activeSectionFilter = signal<string | null>(null);
+  readonly searchQuery = signal('');
+  readonly showShareModal = signal(false);
+  readonly shareDone = signal(false);
+  readonly showEditor = signal(false);
+  readonly personalizedInstalled = signal<string[]>([]);
 
   readonly personalizedSkills: PersonalizedSkill[] = [
     {
@@ -77,7 +84,346 @@ export class MarketplacePageComponent {
     },
   ];
 
-  personalizedInstalled = signal<string[]>([]);
+  // ── Publish flow ────────────────────────────────────────────────────────
+  readonly publishOpen   = signal(false);
+  readonly publishStep   = signal<'choose' | 'new' | 'existing' | 'done'>('choose');
+  readonly publishName   = signal('');
+  readonly publishDesc   = signal('');
+  readonly publishAgent  = signal('Roax');
+  readonly publishPickId = signal<string | null>(null);
+
+  readonly publishBtnLabel = computed(() => ({
+    skills:  'Publicar skill',
+    agentes: 'Publicar agente',
+    reglas:  'Publicar regla',
+    plugins: 'Publicar plugin MCP',
+  }[this.mainCategory()]));
+
+  readonly publishModalTitle = computed(() => ({
+    skills:  'Publicar skill en el Marketplace',
+    agentes: 'Publicar agente en el Marketplace',
+    reglas:  'Publicar regla en el Marketplace',
+    plugins: 'Publicar plugin MCP',
+  }[this.mainCategory()]));
+
+  // ── "Existing" items the user can pick per category ──────────────────────
+  readonly myExistingSkills = [
+    { id: 'ms1', nombre: 'Smart Routing de Novedades v2', desc: 'Vigilante · Logística', icon: '⚡' },
+    { id: 'ms2', nombre: 'P&L simplificado para declarar', desc: 'Finanzas · Roax', icon: '📊' },
+    { id: 'ms3', nombre: 'Recuperación carrito 3 mensajes', desc: 'Chatea Pro · WhatsApp', icon: '💬' },
+    { id: 'ms4', nombre: 'Anti-fatiga audiencia Meta', desc: 'Roax · Marketing', icon: '📣' },
+  ];
+  readonly myExistingAgentes = [
+    { id: 'ma1', nombre: 'Mi Agente Drops v2',   desc: 'Personalizado · 4 skills activas', icon: '🤖', color: '#a78bfa' },
+    { id: 'ma2', nombre: 'CAS Express',           desc: 'Fork de Chatea Pro · respuesta rápida', icon: '🤖', color: '#34d399' },
+  ];
+  readonly myExistingReglas = [
+    { id: 'mr1', nombre: 'Anticipo zona rural $25k', desc: 'Chatea Pro · Pedidos · activa', icon: '📋' },
+    { id: 'mr2', nombre: 'Dayparting 11pm–6am',      desc: 'Roax · Meta Ads · activa', icon: '📋' },
+    { id: 'mr3', nombre: 'Auto-confirmación verde',   desc: 'Vigilante · Pedidos · activa', icon: '📋' },
+  ];
+
+  get myExistingForCategory() {
+    return { skills: this.myExistingSkills, agentes: this.myExistingAgentes, reglas: this.myExistingReglas, plugins: [] }[this.mainCategory()];
+  }
+
+  // ── Published items (user's contributions visible per tab) ───────────────
+  readonly myPublishedSkills  = signal([
+    { id: 'ps1', nombre: 'Smart Routing de Novedades v2', desc: 'Logística', usos: '234', rating: 4.8, pendingReview: false },
+    { id: 'ps2', nombre: 'Recuperación carrito 3 mensajes', desc: 'WhatsApp · CAS', usos: '87', rating: 4.6, pendingReview: false },
+    { id: 'ps3', nombre: 'Anti-fatiga audiencia Meta', desc: 'Marketing', usos: '12', rating: 0, pendingReview: true },
+  ]);
+  readonly myPublishedAgentes = signal([
+    { id: 'pa1', nombre: 'CAS Express', desc: 'Fork de Chatea Pro', usos: '41', rating: 4.5, pendingReview: false },
+  ]);
+  readonly myPublishedReglas  = signal([
+    { id: 'pr1', nombre: 'Anticipo zona rural $25k', desc: 'Pedidos · Chatea Pro', usos: '156', rating: 4.7, pendingReview: false },
+  ]);
+
+  get myPublishedForCategory() {
+    return { skills: this.myPublishedSkills, agentes: this.myPublishedAgentes, reglas: this.myPublishedReglas, plugins: this.myPublishedSkills }[this.mainCategory()]();
+  }
+
+  openPublishModal(): void {
+    this.publishStep.set('choose');
+    this.publishName.set('');
+    this.publishDesc.set('');
+    this.publishPickId.set(null);
+    this.publishOpen.set(true);
+  }
+  closePublishModal(): void { this.publishOpen.set(false); }
+
+  goPublishNew():      void { this.publishStep.set('new'); }
+  goPublishExisting(): void { this.publishStep.set('existing'); }
+  goPublishBack():     void { this.publishStep.set('choose'); this.publishPickId.set(null); }
+
+  selectExistingItem(id: string): void { this.publishPickId.set(id); }
+
+  confirmPublish(): void {
+    const cat = this.mainCategory();
+    if (this.publishStep() === 'new') {
+      const name = this.publishName().trim();
+      if (!name) return;
+      const newItem = { id: `p${Date.now()}`, nombre: name, desc: this.publishDesc().trim() || cat, usos: '0', rating: 0, pendingReview: true };
+      if (cat === 'skills')  this.myPublishedSkills.update(l => [newItem, ...l]);
+      if (cat === 'agentes') this.myPublishedAgentes.update(l => [newItem, ...l]);
+      if (cat === 'reglas')  this.myPublishedReglas.update(l => [newItem, ...l]);
+    } else if (this.publishStep() === 'existing') {
+      const pid = this.publishPickId();
+      if (!pid) return;
+      const src = this.myExistingForCategory.find(x => x.id === pid);
+      if (!src) return;
+      const newItem = { id: `p${Date.now()}`, nombre: src.nombre, desc: src.desc, usos: '0', rating: 0, pendingReview: true };
+      if (cat === 'skills')  this.myPublishedSkills.update(l => [newItem, ...l]);
+      if (cat === 'agentes') this.myPublishedAgentes.update(l => [newItem, ...l]);
+      if (cat === 'reglas')  this.myPublishedReglas.update(l => [newItem, ...l]);
+    }
+    this.publishStep.set('done');
+    setTimeout(() => this.publishOpen.set(false), 2000);
+  }
+  // ────────────────────────────────────────────────────────────────────────
+
+  // Preview modals
+  readonly previewAgent = signal<MktAgente | null>(null);
+  readonly previewRegla  = signal<MktRegla  | null>(null);
+  readonly installedAgentIds = signal<string[]>([]);
+  readonly installedReglaIds = signal<string[]>([]);
+
+  // Agent assignment (for rule install / create)
+  readonly assignAgentIds = signal<string[]>([]);
+  readonly allKnownAgents = [
+    { id: 'roax',      nombre: 'Roax',       color: '#f97316', custom: false },
+    { id: 'vigilante', nombre: 'Vigilante',   color: '#fbbf24', custom: false },
+    { id: 'chatea-pro',nombre: 'Chatea Pro',  color: '#34d399', custom: false },
+    { id: 'ada-spy',   nombre: 'ADA Spy',     color: '#818cf8', custom: false },
+    { id: 'kronos',    nombre: 'Kronos',       color: '#60a5fa', custom: false },
+    { id: 'custom-1',  nombre: 'Mi Agente Drops v2', color: '#a78bfa', custom: true },
+  ];
+
+  openAgentPreview(ag: MktAgente): void { this.previewAgent.set(ag); }
+  closeAgentPreview(): void { this.previewAgent.set(null); }
+  confirmInstallAgent(): void {
+    const ag = this.previewAgent();
+    if (!ag) return;
+    this.installedAgentIds.update(ids => ids.includes(ag.id) ? ids : [...ids, ag.id]);
+    this.previewAgent.set(null);
+  }
+  isAgentInstalled(id: string): boolean {
+    const ag = this.mktAgentes.find(a => a.id === id);
+    return (ag?.instalado ?? false) || this.installedAgentIds().includes(id);
+  }
+
+  openReglaPreview(r: MktRegla): void {
+    // Pre-select the native agent
+    const match = this.allKnownAgents.find(a => a.nombre === r.agente);
+    this.assignAgentIds.set(match ? [match.id] : []);
+    this.previewRegla.set(r);
+  }
+  closeReglaPreview(): void { this.previewRegla.set(null); }
+  toggleAssignAgent(id: string): void {
+    this.assignAgentIds.update(ids =>
+      ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]
+    );
+  }
+  confirmInstallRegla(): void {
+    const r = this.previewRegla();
+    if (!r) return;
+    this.installedReglaIds.update(ids => ids.includes(r.id) ? ids : [...ids, r.id]);
+    this.previewRegla.set(null);
+  }
+  isReglaInstalled(id: string): boolean {
+    const r = this.mktReglas.find(x => x.id === id);
+    return (r?.instalada ?? false) || this.installedReglaIds().includes(id);
+  }
+
+  readonly sectionFilters = ['Pedidos', 'Marketing', 'Finanzas', 'Logística', 'Productos', 'CAS'];
+
+  readonly mktAgentes = [
+    { id: 'roax', nombre: 'Roax', color: '#f97316', instalado: true, creador: 'Dropi Team', rating: 4.9, usos: '12.4k',
+      descripcion: 'Agente de marketing autónomo: pausa campañas, escala presupuesto y rota creativos según ROAS real y CTR.',
+      habilidades: ['Auto-pausa CTR', 'Escalado ROAS', 'Anti-fatiga audiencia', 'Dayparting'] },
+    { id: 'vigilante', nombre: 'Vigilante', color: '#fbbf24', instalado: true, creador: 'Dropi Team', rating: 4.8, usos: '9.7k',
+      descripcion: 'Agente logístico: monitorea novedades por ciudad, reasigna transportadoras y confirma pedidos con huella verde.',
+      habilidades: ['Smart routing', 'Monitoreo novedades', 'Auto-confirmación', 'Alerta garantías'] },
+    { id: 'chatea-pro', nombre: 'Chatea Pro', color: '#34d399', instalado: true, creador: 'Dropi Team', rating: 4.7, usos: '6.2k',
+      descripcion: 'Agente de CAS: responde WhatsApp, recupera carritos abandonados y escala casos complejos al dropshipper.',
+      habilidades: ['Respuesta WhatsApp', 'Recuperación carrito', 'Escalamiento inteligente'] },
+    { id: 'ada-spy', nombre: 'ADA Spy', color: '#818cf8', instalado: false, creador: 'Dropi Team', rating: 4.6, usos: '4.1k',
+      descripcion: 'Agente de inteligencia de mercado: detecta productos trending en LATAM y alerta cuando hay ventana de oportunidad.',
+      habilidades: ['Alerta nichos', 'Trending LATAM', 'Score oportunidad', 'Análisis competencia'] },
+    { id: 'kronos', nombre: 'Kronos', color: '#60a5fa', instalado: false, creador: 'Dropi Team', rating: 4.8, usos: '3.9k',
+      descripcion: 'Agente financiero: monitorea P&L real, proyecta flujo de caja y conecta con Siigo para facturación.',
+      habilidades: ['P&L real', 'Proyección flujo caja', 'Siigo sync', 'ROAS break-even'] },
+  ];
+
+  readonly mktReglas = [
+    { id: 'r1', titulo: 'Si ROAS < 2x por 24h → pausar campaña', agente: 'Roax', agentColor: '#f97316',
+      descripcion: 'Pausa automáticamente la campaña activa cuando el ROAS cae bajo el objetivo durante un día completo.',
+      ejemplo: 'IF roas_real < 2.0 AND duracion >= 24h THEN pausar_campaña + notificar', usos: '8.4k', instalada: true },
+    { id: 'r2', titulo: 'Si novedad Bogotá > 10% → reasignar a Servientrega', agente: 'Vigilante', agentColor: '#fbbf24',
+      descripcion: 'Cambia transportadora automáticamente en pedidos de Bogotá cuando la tasa de novedad supera el umbral.',
+      ejemplo: 'IF novedad_ciudad["Bogotá"] > 0.10 THEN reasignar_transportadora("Servientrega")', usos: '3.1k', instalada: true },
+    { id: 'r3', titulo: 'Si frecuencia > 2.5x → rotar creativo', agente: 'Roax', agentColor: '#f97316',
+      descripcion: 'Sustituye el creativo activo por el siguiente en la cola cuando la frecuencia de impacto supera 2.5.',
+      ejemplo: 'IF frecuencia > 2.5 THEN activar_siguiente_creativo + archivar_actual', usos: '2.7k', instalada: false },
+    { id: 'r4', titulo: 'Si pedido huella verde → auto-confirmar', agente: 'Vigilante', agentColor: '#fbbf24',
+      descripcion: 'Confirma pedidos sin intervención del dropshipper cuando todos los indicadores de riesgo están en verde.',
+      ejemplo: 'IF huella === "verde" AND wallet_ok AND direccion_valida THEN confirmar_pedido', usos: '11.2k', instalada: false },
+    { id: 'r5', titulo: 'Si CTR < 0.8% por 48h → diagnóstico Gali', agente: 'Roax', agentColor: '#f97316',
+      descripcion: 'Solicita un diagnóstico cruzado automático cuando el CTR se mantiene bajo dos días seguidos.',
+      ejemplo: 'IF ctr < 0.008 AND duracion >= 48h THEN solicitar_diagnostico_cruzado', usos: '1.9k', instalada: false },
+  ];
+
+  readonly mktPlugins = [
+    { id: 'meta', nombre: 'Meta Ads MCP', icono: '📣', tipo: 'Ads', proveedor: 'Meta Business', gratis: false, instalado: true,
+      descripcion: 'Conecta Roax directamente con Meta Ads Manager. ROAS en tiempo real, escalado automático de presupuesto.' },
+    { id: 'siigo', nombre: 'Siigo MCP', icono: '📊', tipo: 'Contabilidad', proveedor: 'Siigo SAS', gratis: false, instalado: true,
+      descripcion: 'Kronos registra ventas y costos en Siigo automáticamente. Declaración de renta simplificada.' },
+    { id: 'shopify', nombre: 'Shopify MCP', icono: '🛍', tipo: 'E-commerce', proveedor: 'Shopify Inc.', gratis: false, instalado: false,
+      descripcion: 'Sincroniza inventario bidireccional entre Dropi y tu tienda Shopify. Vigilante monitorea stock.' },
+    { id: 'tiktok', nombre: 'TikTok Shop MCP', icono: '🎵', tipo: 'Ads / Shop', proveedor: 'TikTok for Business', gratis: false, instalado: false,
+      descripcion: 'Publica productos y gestiona campañas TikTok desde Gali. Métricas integradas en el Dashboard.' },
+    { id: 'gdrive', nombre: 'Google Drive MCP', icono: '📁', tipo: 'Storage', proveedor: 'Google', gratis: true, instalado: true,
+      descripcion: 'Sube CSVs de pedidos y reportes a Drive automáticamente. Gali lee archivos para enriquecer el contexto.' },
+    { id: 'wms', nombre: 'WMS / ERP MCP', icono: '🏭', tipo: 'Logística', proveedor: 'Multi-proveedor', gratis: false, instalado: false,
+      descripcion: 'Conecta tu WMS o ERP para que Vigilante tenga visibilidad de inventario en tiempo real.' },
+  ];
+
+  readonly allSkills: CommunitySkill[] = [
+    {
+      id: 'pop-1', nombre: 'Auto-pausa CTR bajo', tipo: 'Operación',
+      secciones: ['Marketing'], uses: '3.4k', rating: 4.9, copias: 312, comments: 48,
+      descripcion: 'Pausa la campaña activa cuando el CTR cae por debajo del 0.8% durante 48h y notifica con diagnóstico.',
+      autor: 'Dropi Team', autorAvatar: 'DT', autorColor: '#f49a3d', verificado: true, tag: 'Top usado',
+    },
+    {
+      id: 'pop-2', nombre: 'P&L real vs ROAS declarado', tipo: 'Operación',
+      secciones: ['Finanzas', 'Marketing'], uses: '2.1k', rating: 4.8, copias: 189, comments: 37,
+      descripcion: 'Detecta discrepancias entre el ROAS reportado en Meta y el P&L real descontando flete, novedades y COGS.',
+      autor: 'Dropi Team', autorAvatar: 'DT', autorColor: '#f49a3d', verificado: true,
+    },
+    {
+      id: 'pop-3', nombre: 'Smart routing novedad Cali', tipo: 'Operación',
+      secciones: ['Logística', 'Pedidos'], uses: '1.8k', rating: 4.7, copias: 134, comments: 22,
+      descripcion: 'Reasigna pedidos automáticamente a la transportadora con menor novedad cuando un umbral regional supera el 10%.',
+      autor: 'Dropi Team', autorAvatar: 'DT', autorColor: '#f49a3d', verificado: true,
+    },
+    {
+      id: 'pop-4', nombre: 'Auto-confirmación pedidos verdes', tipo: 'Operación',
+      secciones: ['Pedidos'], uses: '4.5k', rating: 4.9, copias: 401, comments: 67,
+      descripcion: 'Confirma automáticamente pedidos con huella verde sin intervención del dropshipper. Ahorra 30-45 min/día.',
+      autor: 'Dropi Team', autorAvatar: 'DT', autorColor: '#f49a3d', verificado: true, tag: 'Más popular',
+    },
+    {
+      id: 'exp-1', nombre: 'Scaling vertical — 20% cada 48h', tipo: 'Experto',
+      secciones: ['Marketing'], uses: '847', rating: 4.9, copias: 203, comments: 34,
+      descripcion: 'Escala presupuesto +20% cada 48h si el ROAS se mantiene sobre el objetivo. Con límites inteligentes y rollback automático.',
+      autor: 'Alejandro Torres', handle: '@AlejandroTorres',
+      autorBio: 'Dropshipper top · 1.200+ ventas/mes · 3 años en Dropi',
+      autorAvatar: 'AT', autorColor: '#f97316', verificado: true,
+    },
+    {
+      id: 'exp-2', nombre: 'P&L simplificado para declarar', tipo: 'Experto',
+      secciones: ['Finanzas'], uses: '623', rating: 4.7, copias: 118, comments: 19,
+      descripcion: 'Calcula automáticamente tu utilidad real descontando flete, novedad, pauta y COGS. Compatible con declaración de renta.',
+      autor: 'Carlos Pérez CPA', handle: '@ContadorDropi',
+      autorBio: 'Contador certificado · especialista en dropshipping',
+      autorAvatar: 'CP', autorColor: '#3b82f6', verificado: true,
+    },
+    {
+      id: 'exp-3', nombre: 'Bundle mascotas: 5 productos ganadores', tipo: 'Experto',
+      secciones: ['Productos'], uses: '412', rating: 4.6, copias: 76, comments: 12,
+      descripcion: 'Alerta cuando los 5 productos clave del nicho mascotas tienen ventana simultánea. Incluye configuración de scoring.',
+      autor: 'María Gómez', handle: '@PetDropper',
+      autorBio: 'Nicho mascotas · Top seller noviembre 2025',
+      autorAvatar: 'MG', autorColor: '#10b981', verificado: false,
+    },
+    {
+      id: 'exp-4', nombre: 'CAS → Recuperación carrito abandonado', tipo: 'Experto',
+      secciones: ['CAS', 'Marketing'], uses: '389', rating: 4.8, copias: 91, comments: 27,
+      descripcion: 'Secuencia de 3 mensajes WhatsApp: recordatorio suave → urgencia → oferta final. Personalizado con nombre del producto.',
+      autor: 'Luis Vargas', handle: '@ChateaProLuis',
+      autorBio: 'Chatea Pro power user · tasa recuperación 38%',
+      autorAvatar: 'LV', autorColor: '#8b5cf6', verificado: true,
+    },
+    {
+      id: 'new-1', nombre: 'Confirmación inteligente pedidos', tipo: 'Operación',
+      secciones: ['Pedidos'], uses: '312', rating: 4.5, copias: 28, comments: 8,
+      descripcion: 'Confirma pedidos con huella verde automáticamente en el horario que configures.',
+      autor: 'Dropi Team', autorAvatar: 'DT', autorColor: '#f49a3d', verificado: true, tag: 'Nuevo',
+    },
+    {
+      id: 'new-2', nombre: 'Detector de productos trending', tipo: 'Operación',
+      secciones: ['Productos'], uses: '198', rating: 4.4, copias: 14, comments: 5,
+      descripcion: 'Detecta productos con tendencia creciente en Dropi LATAM antes de que saturen el mercado.',
+      autor: 'Equipo ADA Spy', autorAvatar: 'AS', autorColor: '#818cf8', verificado: true, tag: 'Nuevo',
+    },
+    {
+      id: 'new-3', nombre: 'Anti-fatiga de audiencia', tipo: 'Operación',
+      secciones: ['Marketing'], uses: '445', rating: 4.6, copias: 39, comments: 11,
+      descripcion: 'Rota creativos automáticamente cuando la frecuencia supera 2.5x para evitar saturación.',
+      autor: 'Roax Team', autorAvatar: 'RX', autorColor: '#f97316', verificado: true, tag: 'Nuevo',
+    },
+  ];
+
+  readonly filteredSkills = computed(() => {
+    const tab = this.activeTab();
+    const section = this.activeSectionFilter();
+    const q = this.searchQuery().toLowerCase();
+
+    let skills = this.allSkills;
+
+    if (q) {
+      skills = skills.filter(s =>
+        s.nombre.toLowerCase().includes(q) ||
+        s.descripcion.toLowerCase().includes(q) ||
+        s.secciones.some(sec => sec.toLowerCase().includes(q))
+      );
+    }
+
+    if (section) {
+      skills = skills.filter(s => s.secciones.includes(section));
+    }
+
+    if (tab === 'populares') {
+      return skills.filter(s => s.tipo === 'Operación').sort((a, b) => parseInt(b.uses) - parseInt(a.uses));
+    }
+    if (tab === 'expertos') {
+      return skills.filter(s => s.tipo === 'Experto');
+    }
+    if (tab === 'nuevas') {
+      return skills.filter(s => s.tag === 'Nuevo');
+    }
+    // por-seccion: all
+    return skills;
+  });
+
+  setSection(section: string | null): void {
+    this.activeSectionFilter.set(section);
+    this.activeTab.set('por-seccion');
+  }
+
+  activateSkill(id: string): void {
+    this.router.navigate(['/gali-v5/skills/nueva'], { queryParams: { base: id } });
+  }
+
+  forkSkill(id: string): void {
+    this.router.navigate(['/gali-v5/skills/nueva'], { queryParams: { fork: id } });
+  }
+
+  openShareModal(): void {
+    this.showShareModal.set(true);
+  }
+
+  confirmShare(): void {
+    this.showShareModal.set(false);
+    this.shareDone.set(true);
+    setTimeout(() => this.shareDone.set(false), 4000);
+  }
+
+  goToMySkills(): void {
+    this.router.navigate(['/gali-v5/skills']);
+  }
 
   installPersonalized(id: string): void {
     this.personalizedInstalled.update(l => [...l, id]);
@@ -85,83 +431,5 @@ export class MarketplacePageComponent {
 
   isPersonalizedInstalled(id: string): boolean {
     return this.personalizedInstalled().includes(id);
-  }
-
-  readonly agenteTabs: { id: AgenteFiltro; label: string; icono: string }[] = [
-    { id: 'todos', label: 'Destacadas', icono: '⭐' },
-    { id: 'Roax', label: 'Roax', icono: '⚡' },
-    { id: 'ADA Spy', label: 'ADA Spy', icono: '🔍' },
-    { id: 'Chatea Pro', label: 'Chatea Pro', icono: '💬' },
-    { id: 'Vigilante', label: 'Vigilante', icono: '🚛' },
-    { id: 'Financiero', label: 'Financiero', icono: '📊' },
-  ];
-
-  readonly allSkills: Skill[] = [
-    { id:'sk-001', nombre:'Anti-Baneo Meta', agente:'Roax', icono:'🛡️', tipo:'gratuita', rating:4.8, usos:1200, creador:'Dropi Team', verificado:true, descripcion:'Detecta señales de restricción y pausa automáticamente antes de que Meta limite tu cuenta.', instalada:true, categoria:'Protección' },
-    { id:'sk-002', nombre:'Escalador ROAS 20%', agente:'Roax', icono:'🚀', tipo:'experto', rating:4.6, usos:847, creador:'@MarinaDrops', verificado:true, descripcion:'Si el ROAS supera el objetivo por 48h, sube el presupuesto 20% automáticamente.', instalada:false, categoria:'Escalamiento' },
-    { id:'sk-003', nombre:'Prepago Zona Rural', agente:'Vigilante', icono:'🌍', tipo:'gratuita', rating:4.9, usos:2100, creador:'Dropi Team', verificado:true, descripcion:'Si el pedido va a municipio rural, solicita prepago automáticamente.', instalada:true, categoria:'Logística' },
-    { id:'sk-004', nombre:'Cierre Cálido WhatsApp', agente:'Chatea Pro', icono:'💬', tipo:'premium', rating:4.7, usos:634, creador:'@JuanDropper1847', verificado:true, descripcion:'Script de 5 pasos para confirmar pedidos por WhatsApp con tono cercano y manejo de objeciones.', instalada:false, categoria:'Cierre' },
-    { id:'sk-005', nombre:'P&L Semanal Auto', agente:'Financiero', icono:'📊', tipo:'gratuita', rating:4.5, usos:980, creador:'Dropi Team', verificado:true, descripcion:'Cada domingo Gali genera el P&L de la semana con desglose de costos y ganancia neta.', instalada:false, categoria:'Reportes' },
-    { id:'sk-006', nombre:'Pausa Nocturna', agente:'Roax', icono:'🌙', tipo:'gratuita', rating:4.3, usos:1450, creador:'Dropi Team', verificado:true, descripcion:'Pausa campañas entre 11pm y 6am. Ahorra hasta 25% del presupuesto en horas de baja conversión.', instalada:false, categoria:'Ahorro' },
-    { id:'sk-007', nombre:'Alerta Novedad Alta', agente:'Vigilante', icono:'⚠️', tipo:'gratuita', rating:4.7, usos:1876, creador:'Dropi Team', verificado:true, descripcion:'Si la tasa de novedad supera el umbral, reasigna automáticamente a la mejor transportadora.', instalada:true, categoria:'Logística' },
-    { id:'sk-008', nombre:'Bundle Mascotas x5', agente:'ADA Spy', icono:'🐾', tipo:'experto', rating:4.6, usos:412, creador:'@PetDropCO', verificado:false, descripcion:'Los 5 productos de nicho mascotas que mejor se venden juntos en Colombia 2026.', instalada:false, categoria:'Productos' },
-    { id:'sk-009', nombre:'Recuperación Carritos x3', agente:'Chatea Pro', icono:'🛒', tipo:'gratuita', rating:4.4, usos:765, creador:'Dropi Team', verificado:true, descripcion:'Secuencia de 3 mensajes (2h, 6h, 24h) para recuperar compradores indecisos. Tasa promedio: 18%.', instalada:false, categoria:'Retención' },
-    { id:'sk-010', nombre:'Stack Skincare LATAM', agente:'ADA Spy', icono:'✨', tipo:'experto', rating:4.8, usos:523, creador:'@DropiBeauty', verificado:true, descripcion:'Los ángulos de venta de skincare que más convierten en Colombia y México 2026.', instalada:false, categoria:'Productos' },
-    { id:'sk-011', nombre:'Proyección Flujo Caja', agente:'Financiero', icono:'💰', tipo:'premium', rating:4.9, usos:289, creador:'@ContadorDropi', verificado:true, descripcion:'Proyecta el flujo de caja de los próximos 14 días basado en pedidos activos y tasas históricas.', instalada:false, categoria:'Finanzas' },
-    { id:'sk-012', nombre:'Detección Saturación 7d', agente:'ADA Spy', icono:'📉', tipo:'gratuita', rating:4.5, usos:1123, creador:'Dropi Team', verificado:true, descripcion:'Alerta con 7 días de anticipación antes de saturación de cualquier producto favorito.', instalada:false, categoria:'Investigación' },
-    { id:'sk-013', nombre:'Confirmar y Despachar Auto', agente:'Chatea Pro', icono:'⚡', tipo:'experto', rating:4.6, usos:678, creador:'@FastDropCO', verificado:true, descripcion:'Para pedidos con huella verde y monto bajo, confirma y genera etiqueta automáticamente.', instalada:false, categoria:'Automatización' },
-    { id:'sk-014', nombre:'Reporte Transportadoras', agente:'Vigilante', icono:'🚛', tipo:'gratuita', rating:4.2, usos:834, creador:'Dropi Team', verificado:true, descripcion:'Resumen semanal de tasa de entrega por transportadora y ciudad, con recomendación.', instalada:false, categoria:'Logística' },
-    { id:'sk-015', nombre:'Tono Amigable Colombia', agente:'Chatea Pro', icono:'🇨🇴', tipo:'gratuita', rating:4.8, usos:2340, creador:'Dropi Team', verificado:true, descripcion:'Configura el tono de todos los mensajes con expresiones colombianas. Aumenta respuesta 12%.', instalada:false, categoria:'Comunicación' },
-    { id:'sk-016', nombre:'Scaling Vertical Meta', agente:'Roax', icono:'📈', tipo:'experto', rating:4.7, usos:892, creador:'@AlexScalerCO', verificado:true, descripcion:'Estrategia completa: ABO test → CBO scale → +20% cada 72h. 300+ campañas exitosas en COL.', instalada:false, categoria:'Escalamiento' },
-    { id:'sk-017', nombre:'Alerta ROAS Caída Rápida', agente:'Roax', icono:'🔴', tipo:'gratuita', rating:4.6, usos:1567, creador:'Dropi Team', verificado:true, descripcion:'Si el ROAS cae más de 30% en 6h, pausa y notifica con diagnóstico inmediato.', instalada:false, categoria:'Protección' },
-    { id:'sk-018', nombre:'Nicho Fitness 2026', agente:'ADA Spy', icono:'💪', tipo:'experto', rating:4.4, usos:334, creador:'@FitDropLATAM', verificado:false, descripcion:'Los 8 productos fitness con mayor crecimiento en Q2 2026 en Colombia.', instalada:false, categoria:'Productos' },
-    { id:'sk-019', nombre:'Cierre Zona Cali', agente:'Chatea Pro', icono:'🏙️', tipo:'experto', rating:4.8, usos:445, creador:'@CaliDropper', verificado:true, descripcion:'Script para Cali: anticipo si novedad > 8%, tono directo, objeciones locales.', instalada:false, categoria:'Cierre' },
-    { id:'sk-020', nombre:'Facturación Automática Siigo', agente:'Financiero', icono:'🧾', tipo:'premium', rating:4.5, usos:178, creador:'Dropi Team', verificado:true, descripcion:'Genera facturas en Siigo automáticamente al marcar pedido como entregado.', instalada:false, categoria:'Contabilidad' },
-  ];
-
-  filteredSkills = computed(() => {
-    let skills = this.allSkills;
-    const agente = this.agenteTab();
-    const tipo = this.tipoFiltro();
-    const q = this.busqueda().toLowerCase();
-
-    if (agente !== 'todos') skills = skills.filter(s => s.agente === agente);
-    if (tipo !== 'todos') skills = skills.filter(s => s.tipo === tipo);
-    if (q) skills = skills.filter(s => s.nombre.toLowerCase().includes(q) || s.descripcion.toLowerCase().includes(q));
-
-    return skills;
-  });
-
-  instaladosCount = computed(() =>
-    this.allSkills.filter(s => s.instalada).length + this.instaladosHoy().length
-  );
-
-  getTipoBadgeClass(tipo: SkillTipo): string {
-    return { gratuita: 'badge--gratuita', experto: 'badge--experto', premium: 'badge--premium' }[tipo];
-  }
-
-  formatUsos(n: number): string {
-    return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : `${n}`;
-  }
-
-  instalar(skill: Skill): void {
-    if (skill.instalada || this.instaladosHoy().includes(skill.id)) return;
-    this.instalandoId.set(skill.id);
-    setTimeout(() => {
-      this.instaladosHoy.update(ids => [...ids, skill.id]);
-      this.instalandoId.set(null);
-    }, 700);
-  }
-
-  isInstalada(skill: Skill): boolean {
-    return skill.instalada || this.instaladosHoy().includes(skill.id);
-  }
-
-  isInstalando(skill: Skill): boolean {
-    return this.instalandoId() === skill.id;
-  }
-
-  setTipoFiltro(t: string): void {
-    this.tipoFiltro.set(t as SkillTipo | 'todos');
   }
 }

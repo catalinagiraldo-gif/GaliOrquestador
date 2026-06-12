@@ -10,26 +10,85 @@
     </div>
     <div class="reglas-page__header-actions">
       <a routerLink="/gali-v5/marketing/chatea-pro" class="reglas-page__link">Centro Chatea Pro →</a>
-      <button type="button" class="reglas-page__btn" (click)="showNewRule.set(true)" data-proto-skip>+ Nueva regla</button>
+      <button type="button" class="reglas-page__btn" (click)="showNewRule.set(!showNewRule())">
+        {{ showNewRule() ? '✕ Cerrar' : '+ Nueva regla' }}
+      </button>
     </div>
   </header>
 
-  <div class="reglas-concept">
-    <article class="reglas-concept__card reglas-concept__card--agent">
-      <span class="reglas-concept__badge reglas-concept__badge--agent">Agente</span>
-      <p>Ejecuta. Roax, Chatea Pro, Vigilante, ADA Spy.</p>
-      <a routerLink="/gali-v5/agentes">Ver agentes →</a>
-    </article>
-    <article class="reglas-concept__card reglas-concept__card--skill">
-      <span class="reglas-concept__badge reglas-concept__badge--skill">Skill</span>
-      <p>Receta auditable: trigger + condición + acción + historial.</p>
-      <a routerLink="/gali-v5/skills">Mis skills →</a>
-    </article>
-    <article class="reglas-concept__card reglas-concept__card--rule reglas-concept__card--active">
-      <span class="reglas-concept__badge reglas-concept__badge--rule">Regla</span>
-      <p>Si pasa X → haz Y. Ideal para WhatsApp y toggles rápidos.</p>
-    </article>
-  </div>
+  <gali-ontology-strip highlight="rule" />
+
+  <!-- Editor de nueva regla (inline) -->
+  @if (showNewRule()) {
+    <div class="new-rule-editor">
+      <div class="new-rule-editor__header">
+        <span class="new-rule-editor__title">Nueva regla en lenguaje natural</span>
+        <span class="new-rule-editor__hint">Gali la interpreta y la convierte en lógica ejecutable</span>
+      </div>
+
+      <div class="new-rule-editor__agent-row">
+        <span class="new-rule-editor__label">Tipo de regla:</span>
+        @for (opt of agentOptions; track opt.name) {
+          <button type="button"
+            class="new-rule-agent-chip"
+            [class.new-rule-agent-chip--selected]="newRuleAgent() === opt.name"
+            [style.--c]="opt.color"
+            (click)="newRuleAgent.set(opt.name)">
+            <span class="new-rule-agent-chip__dot"></span>
+            {{ opt.name }}
+          </button>
+        }
+      </div>
+
+      <textarea
+        class="new-rule-editor__area"
+        rows="3"
+        placeholder="Describe la regla en lenguaje natural... Ej: Si el CTR cae por debajo del 1% durante 48h → pausar el anuncio y notificarme."
+        [value]="newRuleText()"
+        (input)="newRuleText.set($any($event.target).value)">
+      </textarea>
+
+      <!-- Sección: Agregar a mis agentes -->
+      <div class="new-rule-editor__assign-section">
+        <span class="new-rule-editor__assign-label">
+          Agregar a mis agentes
+          @if (assignedAgentIds().length > 0) {
+            <span class="new-rule-editor__assign-count">{{ assignedAgentIds().length }} seleccionado{{ assignedAgentIds().length !== 1 ? 's' : '' }}</span>
+          }
+        </span>
+        <div class="new-rule-editor__agents-grid">
+          @for (ag of allAgentsForAssign; track ag.id) {
+            <label class="new-rule-assign-row" [class.new-rule-assign-row--checked]="assignedAgentIds().includes(ag.id)">
+              <input type="checkbox"
+                [checked]="assignedAgentIds().includes(ag.id)"
+                (change)="toggleAssignedAgent(ag.id)" />
+              <span class="new-rule-assign-row__dot" [style.background]="ag.color"></span>
+              <span class="new-rule-assign-row__name">{{ ag.nombre }}</span>
+              @if (ag.custom) {
+                <span class="new-rule-assign-row__badge">tuyo</span>
+              }
+              <span class="new-rule-assign-row__check">{{ assignedAgentIds().includes(ag.id) ? '✓' : '' }}</span>
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="new-rule-editor__actions">
+        <button type="button" class="new-rule-editor__btn new-rule-editor__btn--gali" (click)="prefillRuleExample()">
+          ✦ Gali, ayúdame a crear esta regla
+        </button>
+        <button type="button" class="new-rule-editor__btn new-rule-editor__btn--ghost" (click)="showNewRule.set(false); newRuleText.set('')">
+          Cancelar
+        </button>
+        <button type="button" class="new-rule-editor__btn new-rule-editor__btn--primary"
+          [disabled]="!newRuleText().trim()"
+          [class.new-rule-editor__btn--saved]="newRuleSaved()"
+          (click)="addNewRule()">
+          @if (newRuleSaved()) { ✓ Guardada } @else { Guardar regla → }
+        </button>
+      </div>
+    </div>
+  }
 
   <section class="reglas-list-section">
     <h2 class="reglas-list-section__title">Reglas activas en tu cuenta</h2>

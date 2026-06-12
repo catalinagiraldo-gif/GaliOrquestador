@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { GaliWorkspaceModeBarComponent } from '../../components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 
 export type TriggerType = 'tiempo' | 'evento' | 'umbral';
@@ -80,7 +80,7 @@ const ACTIONS: Record<string, { id: string; label: string }[]> = {
 @Component({
   selector: 'app-skill-editor-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, GaliWorkspaceModeBarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, GaliWorkspaceModeBarComponent],
   templateUrl: './skill-editor-page.component.html',
   styleUrl: './skill-editor-page.component.scss',
 })
@@ -104,6 +104,36 @@ export class SkillEditorPageComponent implements OnInit {
   });
 
   readonly saved = signal(false);
+  readonly activeEditorTab = signal<'capacidad' | 'pipeline'>('capacidad');
+
+  readonly capacidadDraft = signal({
+    descripcion: '',
+    resultadoEsperado: '',
+    agentesCompatibles: [] as string[],
+  });
+
+  onCapacidadDescripcionInput(e: Event): void {
+    const v = (e.target as HTMLTextAreaElement).value;
+    this.capacidadDraft.update(d => ({ ...d, descripcion: v }));
+  }
+
+  onCapacidadResultadoInput(e: Event): void {
+    const v = (e.target as HTMLInputElement).value;
+    this.capacidadDraft.update(d => ({ ...d, resultadoEsperado: v }));
+  }
+
+  toggleCapacidadAgente(id: string): void {
+    this.capacidadDraft.update(d => {
+      const agentes = d.agentesCompatibles.includes(id)
+        ? d.agentesCompatibles.filter(a => a !== id)
+        : [...d.agentesCompatibles, id];
+      return { ...d, agentesCompatibles: agentes };
+    });
+  }
+
+  isCapacidadAgenteSelected(id: string): boolean {
+    return this.capacidadDraft().agentesCompatibles.includes(id);
+  }
 
   readonly eventOptions = computed(() => EVENT_TRIGGERS[this.draft().agente] ?? []);
   readonly metrics = computed(() => METRICS[this.draft().agente] ?? []);

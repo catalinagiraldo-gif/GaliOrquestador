@@ -1,0 +1,206 @@
+@import 'styles/gali-v5-tokens';
+
+.spm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $size-5;
+  animation: fadeIn 0.18s ease;
+}
+
+.spm-modal {
+  background: $white;
+  border-radius: $radius-xl;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: scaleIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spm-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $size-4;
+  padding: $size-5 $size-6 $size-4;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.spm-modal__eyebrow {
+  font-family: $font-secondary;
+  font-size: 11px;
+  font-weight: $font-medium;
+  color: $primary-500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.spm-modal__title {
+  font-family: $font-primary;
+  font-size: $font-lg;
+  font-weight: $font-bold;
+  color: #1c1c1e;
+  margin: 0;
+}
+
+.spm-modal__close {
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-md;
+  border: 1px solid #e5e7eb;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  &:hover { background: #f3f4f6; color: #1c1c1e; }
+  .pi { font-size: 13px; }
+}
+
+.spm-modal__search {
+  position: relative;
+  padding: $size-3 $size-6;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.spm-modal__search-icon {
+  position: absolute;
+  left: calc(#{$size-6} + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.spm-modal__search-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: $radius-md;
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: #1c1c1e;
+  background: #f9fafb;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+
+  &:focus { border-color: $primary-500; background: $white; }
+  &::placeholder { color: #9ca3af; }
+}
+
+.spm-modal__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: $size-4 $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+}
+
+.spm-modal__empty {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: #9ca3af;
+  text-align: center;
+  padding: $size-8 0;
+}
+
+.spm-skill-card {
+  width: 100%;
+  text-align: left;
+  background: #f9fafb;
+  border: 1.5px solid #e5e7eb;
+  border-radius: $radius-lg;
+  padding: $size-3 $size-4;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: $primary-500;
+    background: #fff7ed;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($primary-500, 0.1);
+  }
+}
+
+.spm-skill-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $size-1;
+}
+
+.spm-skill-card__name {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: #1c1c1e;
+}
+
+.spm-skill-card__cat {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-medium;
+  color: $primary-500;
+  background: rgba($primary-500, 0.1);
+  border-radius: $radius-full;
+  padding: 2px $size-2;
+}
+
+.spm-skill-card__desc {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: #6b7280;
+  line-height: 1.4;
+  margin: 0 0 $size-2;
+}
+
+.spm-skill-card__agents {
+  display: flex;
+  gap: $size-1;
+  flex-wrap: wrap;
+}
+
+.spm-skill-card__agent-tag {
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: $font-medium;
+  color: #6b7280;
+  background: #f3f4f6;
+  border-radius: $radius-full;
+  padding: 2px 8px;
+}
+
+.spm-modal__footer {
+  padding: $size-3 $size-6;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #f9fafb;
+}
+
+.spm-modal__footer-link {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  color: $primary-500;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

@@ -45,7 +45,217 @@
       "facturas_pendientes": 28,
       "dias_sin_sincronizar": 6,
       "estado": "urgente"
-    }
+    },
+    "galiRoi": {
+      "mes_label": "Mayo 2026",
+      "acciones_ejecutadas": 127,
+      "pesos_ahorrados": 420000,
+      "campanas_escaladas": 2,
+      "productos_en_tendencia": 3,
+      "horas_libradas": 41,
+      "roi_multiplicador": "4.2x"
+    },
+    "galiImpactLedger": [
+      {
+        "id": "act-001",
+        "timestamp": "2026-05-24T14:32:00Z",
+        "agente": "Roax",
+        "tipo_accion": "escalo_campana",
+        "descripcion": "Escaló presupuesto Collar GPS 15% ($57k→$66k/día)",
+        "impacto_pesos": 85000,
+        "impacto_label": "$85.000 en ROAS adicional estimado",
+        "semana_iso": 21,
+        "mes": 5,
+        "proyecto_id": "collar-gps-2026",
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-002",
+        "timestamp": "2026-05-24T09:18:00Z",
+        "agente": "Vigilante",
+        "tipo_accion": "cambio_operadora",
+        "descripcion": "Cambió 12 pedidos de Coordinadora a Servientrega en Bogotá",
+        "impacto_pesos": 48000,
+        "impacto_label": "12 novedades evitadas · $48.000 recuperados",
+        "semana_iso": 21,
+        "mes": 5,
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-003",
+        "timestamp": "2026-05-23T16:45:00Z",
+        "agente": "Vigilante",
+        "tipo_accion": "evito_novedad",
+        "descripcion": "Detectó dirección incorrecta en 8 pedidos antes de despacho",
+        "impacto_pesos": 32000,
+        "impacto_label": "8 devoluciones evitadas · $32.000 recuperados",
+        "semana_iso": 21,
+        "mes": 5,
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-004",
+        "timestamp": "2026-05-23T11:00:00Z",
+        "agente": "Roax",
+        "tipo_accion": "escalo_presupuesto",
+        "descripcion": "Escaló Skincare K-Beauty desde $20k/día a $25k tras ROAS 3.1x sostenido 72h",
+        "impacto_pesos": 62000,
+        "impacto_label": "$62.000 en ingresos adicionales proyectados",
+        "semana_iso": 21,
+        "mes": 5,
+        "proyecto_id": "skincare-kbeauty",
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-005",
+        "timestamp": "2026-05-22T08:30:00Z",
+        "agente": "Gali",
+        "tipo_accion": "detecto_senal_predictiva",
+        "descripcion": "Detectó ventana de mercado en Cali: búsquedas 'collar mascotas' +34% semana",
+        "impacto_pesos": 0,
+        "impacto_label": "Oportunidad identificada — acción pendiente",
+        "semana_iso": 21,
+        "mes": 5,
+        "requirio_aprobacion": true,
+        "anio": 2026
+      },
+      {
+        "id": "act-006",
+        "timestamp": "2026-05-21T17:20:00Z",
+        "agente": "Kronos",
+        "tipo_accion": "genero_diagnostico",
+        "descripcion": "Generó diagnóstico cruzado: Collar GPS y Skincare comparten patrón ROAS > 2.5x en Medellín",
+        "impacto_pesos": 0,
+        "impacto_label": "Insight estratégico — sin impacto directo medible",
+        "semana_iso": 21,
+        "mes": 5,
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-007",
+        "timestamp": "2026-05-21T10:00:00Z",
+        "agente": "Vigilante",
+        "tipo_accion": "alerto_stock",
+        "descripcion": "Alertó stock crítico Collar GPS: 12 unidades restantes, tasa de venta 6/día",
+        "impacto_pesos": 0,
+        "impacto_label": "Alerta preventiva — sin impacto directo",
+        "semana_iso": 21,
+        "mes": 5,
+        "requirio_aprobacion": true,
+        "anio": 2026
+      },
+      {
+        "id": "act-008",
+        "timestamp": "2026-05-20T15:45:00Z",
+        "agente": "Roax",
+        "tipo_accion": "escalo_campana",
+        "descripcion": "Aumentó creatividades activas de 2 a 4 en Meta Ads — detectó fatiga en la principal",
+        "impacto_pesos": 40000,
+        "impacto_label": "CTR recuperado · $40.000 en pauta aprovechada",
+        "semana_iso": 20,
+        "mes": 5,
+        "proyecto_id": "collar-gps-2026",
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-009",
+        "timestamp": "2026-05-19T09:10:00Z",
+        "agente": "Vigilante",
+        "tipo_accion": "optimizo_ruta_logistica",
+        "descripcion": "Reconfiguró 23 pedidos Barranquilla a TCC por alerta regional de Coordinadora",
+        "impacto_pesos": 92000,
+        "impacto_label": "23 novedades evitadas · $92.000 recuperados",
+        "semana_iso": 20,
+        "mes": 5,
+        "requirio_aprobacion": false,
+        "anio": 2026
+      },
+      {
+        "id": "act-010",
+        "timestamp": "2026-05-18T14:00:00Z",
+        "agente": "Brujula",
+        "tipo_accion": "genero_diagnostico",
+        "descripcion": "Calculó precio óptimo para Skincare K-Beauty: $89.900 → margen 31%",
+        "impacto_pesos": 18000,
+        "impacto_label": "Precio optimizado · $18.000 adicionales por unidad proyectados",
+        "semana_iso": 20,
+        "mes": 5,
+        "proyecto_id": "skincare-kbeauty",
+        "requirio_aprobacion": false,
+        "anio": 2026
+      }
+    ],
+    "galiImpactSummaries": [
+      {
+        "semana_iso": 21,
+        "mes": 5,
+        "acciones_totales": 47,
+        "acciones_autonomas": 38,
+        "pesos_ahorrados": 227000,
+        "campanas_escaladas": 2,
+        "novedades_evitadas": 43,
+        "senales_detectadas": 3,
+        "horas_libradas": 15,
+        "anio": 2026
+      },
+      {
+        "semana_iso": 20,
+        "mes": 5,
+        "acciones_totales": 39,
+        "acciones_autonomas": 31,
+        "pesos_ahorrados": 193000,
+        "campanas_escaladas": 1,
+        "novedades_evitadas": 35,
+        "senales_detectadas": 2,
+        "horas_libradas": 13,
+        "anio": 2026
+      },
+      {
+        "semana_iso": 19,
+        "mes": 5,
+        "acciones_totales": 41,
+        "acciones_autonomas": 33,
+        "pesos_ahorrados": 175000,
+        "campanas_escaladas": 2,
+        "novedades_evitadas": 31,
+        "senales_detectadas": 1,
+        "horas_libradas": 13,
+        "anio": 2026
+      }
+    ],
+    "galiImpactMilestones": [
+      {
+        "id": "m-1",
+        "tipo": "pesos",
+        "umbral": 500000,
+        "titulo": "Primer medio millón",
+        "descripcion": "Gali protegió $500.000 de tu operación",
+        "alcanzado": false
+      },
+      {
+        "id": "m-2",
+        "tipo": "acciones",
+        "umbral": 100,
+        "titulo": "100 decisiones",
+        "descripcion": "Gali tomó 100 decisiones autónomas en tu nombre",
+        "alcanzado": true,
+        "fecha_alcanzado": "2026-05-20T00:00:00Z"
+      },
+      {
+        "id": "m-3",
+        "tipo": "pesos",
+        "umbral": 1000000,
+        "titulo": "El primer millón",
+        "descripcion": "Gali ahorró $1.000.000 acumulados en tu operación",
+        "alcanzado": false
+      }
+    ]
   },
   "transactions": [
     {
@@ -240,5 +450,37 @@
       "descripcionHumana": "Comisión Dropi · Pedido #160623"
     }
   ],
-  "alertMessage": "Los pedidos Sin Recaudo no generan movimiento de entrada en tu wallet hasta que sean entregados y confirmados por la transportadora."
+  "alertMessage": "Los pedidos Sin Recaudo no generan movimiento de entrada en tu wallet hasta que sean entregados y confirmados por la transportadora.",
+  "galiRoi": {
+    "periodo": "Mayo 2026",
+    "acciones_ejecutadas": 127,
+    "ahorro_novedades": {
+      "valor": 420000,
+      "label": "$420k"
+    },
+    "campanas_escaladas": 2,
+    "productos_tendencia": 3,
+    "detalle": [
+      {
+        "icono": "⚡",
+        "label": "acciones ejecutadas sin intervención manual",
+        "valor": "127"
+      },
+      {
+        "icono": "💰",
+        "label": "ahorrado en novedades logísticas (smart routing)",
+        "valor": "$420k"
+      },
+      {
+        "icono": "📈",
+        "label": "campañas escaladas en el momento justo",
+        "valor": "2"
+      },
+      {
+        "icono": "🔍",
+        "label": "productos en tendencia detectados antes del pico",
+        "valor": "3"
+      }
+    ]
+  }
 }

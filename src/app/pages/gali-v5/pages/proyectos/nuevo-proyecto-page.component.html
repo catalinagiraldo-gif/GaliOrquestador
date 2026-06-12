@@ -220,7 +220,7 @@
       <div class="np-section-footer">
         <button type="button" class="np-btn np-btn--secondary" (click)="step.set('select')" data-proto-skip>← Atrás</button>
         <button type="button" class="np-btn np-btn--primary" [disabled]="!selectedAngulo()" (click)="goToLanding()">
-          Continuar con este ángulo →
+          {{ selectedAngulo() ? 'Continuar: "' + selectedAngulo()!.titulo + '" →' : 'Selecciona un ángulo →' }}
         </button>
       </div>
     </div>
@@ -331,34 +331,63 @@
       </div>
 
       <div class="np-campana-form">
+        <!-- Calculadora costo → precio sugerido -->
+        <div class="np-precio-calc">
+          <h3 class="np-precio-calc__title">Calculadora de precio de venta</h3>
+          <p class="np-precio-calc__sub">Ingresa costos y Gali calcula el precio mínimo para que sea rentable.</p>
+          <div class="np-precio-calc__grid">
+            <label class="np-breakeven__field">
+              <span>Costo del producto (COGS)</span>
+              <input type="number" [ngModel]="cogs()" (ngModelChange)="cogs.set(+$event)" />
+            </label>
+            <label class="np-breakeven__field">
+              <span>Costo flete promedio</span>
+              <input type="number" [ngModel]="fleteUnit()" (ngModelChange)="fleteUnit.set(+$event)" />
+            </label>
+          </div>
+          <div class="np-precio-calc__result-row">
+            <div class="np-precio-calc__sugerido">
+              <span class="np-precio-calc__label">Precio sugerido</span>
+              <strong class="np-precio-calc__val">${{ precioSugerido.toLocaleString('es-CO') }}</strong>
+              <span class="np-precio-calc__hint">= (costo total) × 2.5</span>
+            </div>
+            <div class="np-precio-calc__divider"></div>
+            <label class="np-breakeven__field">
+              <span>Tu precio de venta</span>
+              <input type="number" [ngModel]="precioVenta()" (ngModelChange)="precioVenta.set(+$event)" />
+            </label>
+            <div class="np-precio-calc__margen" [class.np-precio-calc__margen--ok]="margenProyectado >= 25"
+                                                [class.np-precio-calc__margen--warn]="margenProyectado < 25 && margenProyectado > 0">
+              <span>Margen proyectado</span>
+              <strong>{{ margenProyectado }}%</strong>
+              @if (margenProyectado >= 25) {
+                <span class="np-precio-calc__margen-tip">✓ Buen margen</span>
+              } @else if (margenProyectado > 0) {
+                <span class="np-precio-calc__margen-tip">↑ Sube el precio</span>
+              }
+            </div>
+          </div>
+        </div>
+
         <div class="np-campana-field">
           <label class="np-campana-label">Presupuesto diario inicial</label>
+          <div class="np-gali-rec-badge">
+            <span class="np-gali-rec-badge__dot"></span>
+            <span>Gali recomienda: <strong>{{ galiPresupuestoRec }}</strong></span>
+            <span class="np-gali-rec-badge__sub">para alcanzar {{ pedidosTarget() }} pedidos esta semana</span>
+          </div>
           <div class="np-budget-row">
             <input type="range" min="50000" max="500000" step="25000"
               [ngModel]="budget()" (ngModelChange)="budget.set(+$event)"
               class="np-budget-slider" />
             <span class="np-budget-val">{{ budgetFormatted }}</span>
           </div>
-          <p class="np-campana-hint">Roax sugiere este monto basado en tu objetivo. ROAS estimado: <strong>{{ roasCalculated }}</strong></p>
+          <p class="np-campana-hint">ROAS estimado con este presupuesto: <strong>{{ roasCalculated }}</strong></p>
         </div>
 
         <div class="np-breakeven">
           <h3 class="np-breakeven__title">Brújula: break-even ROAS</h3>
           <p class="np-breakeven__sub">Si tu ROAS en Meta cae por debajo de este número, pierdes plata en cada venta.</p>
-          <div class="np-breakeven__grid">
-            <label class="np-breakeven__field">
-              <span>Precio de venta</span>
-              <input type="number" [ngModel]="precioVenta()" (ngModelChange)="precioVenta.set(+$event)" />
-            </label>
-            <label class="np-breakeven__field">
-              <span>COGS (producto)</span>
-              <input type="number" [ngModel]="cogs()" (ngModelChange)="cogs.set(+$event)" />
-            </label>
-            <label class="np-breakeven__field">
-              <span>Flete promedio</span>
-              <input type="number" [ngModel]="fleteUnit()" (ngModelChange)="fleteUnit.set(+$event)" />
-            </label>
-          </div>
           <p class="np-breakeven__result">
             Tu ROAS mínimo para no perder: <strong>{{ breakEvenRoas }}x</strong>
             <span class="np-breakeven__hint">— Roax pausará si el ROAS real cae bajo {{ breakEvenRoas - 0.2 }}x (margen de seguridad).</span>
@@ -375,39 +404,31 @@
           </div>
         </div>
 
-        <div class="np-campana-skills">
-          <h3 class="np-campana-skills__title">Skills que se activarán automáticamente</h3>
-          <p class="np-campana-skills__sub">Roax configuró estas automatizaciones para proteger tu campaña desde el inicio.</p>
+        <div class="np-campana-agentes">
+          <h3 class="np-campana-agentes__title">Agentes que trabajarán en este proyecto</h3>
+          <p class="np-campana-agentes__sub">Activa los agentes que quieres asignar. Cada uno actúa en su área de forma autónoma.</p>
 
-          <div class="np-skill-card" [class.np-skill-card--active]="campanaSkill1Active()">
-            <div class="np-skill-card__header">
-              <div class="np-skill-card__info">
-                <span class="np-skill-card__dot" [style.background]="campanaSkill1Active() ? '#22c55e' : '#9ca3af'"></span>
-                <strong class="np-skill-card__name">Auto-pausa si CTR cae bajo 0.8%</strong>
-                <span class="np-skill-card__agent">Roax</span>
+          @for (ag of [
+            {key:'roax', nombre:'Roax', color:'#f97316', desc:'Gestiona y optimiza tu campaña Meta Ads en tiempo real'},
+            {key:'vigilante', nombre:'Vigilante', color:'#fbbf24', desc:'Monitorea novedades logísticas y protege cada pedido'},
+            {key:'chatea', nombre:'Chatea Pro', color:'#34d399', desc:'Responde confirmaciones de WhatsApp automáticamente'},
+            {key:'ada', nombre:'ADA Spy', color:'#818cf8', desc:'Alerta si aparece competencia directa en el mercado'},
+            {key:'kronos', nombre:'Kronos', color:'#60a5fa', desc:'Gestiona facturación y cobros del proyecto'}
+          ]; track ag.key) {
+            <div class="np-agente-card" [class.np-agente-card--active]="agentesProyecto()[ag.key]">
+              <div class="np-agente-card__header">
+                <div class="np-agente-card__info">
+                  <span class="np-agente-card__dot" [style.background]="ag.color"></span>
+                  <strong class="np-agente-card__name">{{ ag.nombre }}</strong>
+                </div>
+                <label class="np-toggle">
+                  <input type="checkbox" [ngModel]="agentesProyecto()[ag.key]" (ngModelChange)="toggleAgente(ag.key)" />
+                  <span class="np-toggle__knob"></span>
+                </label>
               </div>
-              <label class="np-toggle">
-                <input type="checkbox" [ngModel]="campanaSkill1Active()" (ngModelChange)="campanaSkill1Active.set($event)" />
-                <span class="np-toggle__knob"></span>
-              </label>
+              <p class="np-agente-card__desc">{{ ag.desc }}</p>
             </div>
-            <p class="np-skill-card__desc">Si el CTR cae durante 48h continuas, Roax pausa y activa el video de respaldo.</p>
-          </div>
-
-          <div class="np-skill-card" [class.np-skill-card--active]="campanaSkill2Active()">
-            <div class="np-skill-card__header">
-              <div class="np-skill-card__info">
-                <span class="np-skill-card__dot" [style.background]="campanaSkill2Active() ? '#22c55e' : '#9ca3af'"></span>
-                <strong class="np-skill-card__name">Escalado ROAS automático +15%</strong>
-                <span class="np-skill-card__agent">Roax</span>
-              </div>
-              <label class="np-toggle">
-                <input type="checkbox" [ngModel]="campanaSkill2Active()" (ngModelChange)="campanaSkill2Active.set($event)" />
-                <span class="np-toggle__knob"></span>
-              </label>
-            </div>
-            <p class="np-skill-card__desc">Si ROAS ≥ 2.8x por 48h, Roax escala el presupuesto automáticamente.</p>
-          </div>
+          }
         </div>
       </div>
 
@@ -507,10 +528,10 @@
         </div>
 
         <div class="np-launch__gali-actions">
-          <button type="button" class="np-launch__btn-primary" (click)="launchProject()">
+          <button type="button" class="np-launch__btn-primary" (click)="showConfirmLaunch.set(true)">
             🚀 Lanzar proyecto
           </button>
-          <button type="button" class="np-launch__btn-secondary" (click)="saveDraft()" data-proto-skip>
+          <button type="button" class="np-launch__btn-secondary" (click)="saveDraft()">
             Guardar como borrador
           </button>
         </div>
@@ -520,3 +541,65 @@
   }
 
 </div>
+
+<!-- Diálogo de confirmación previo (C10) -->
+@if (showConfirmLaunch()) {
+  <div class="np-launch-modal-backdrop" (click)="showConfirmLaunch.set(false)">
+    <div class="np-launch-modal np-launch-modal--confirm" (click)="$event.stopPropagation()">
+      <h2 class="np-launch-modal__title">¿Lanzar este proyecto?</h2>
+      <div class="np-launch-modal__summary">
+        <div class="np-launch-modal__summary-row">
+          <span>Proyecto</span>
+          <strong>{{ projectName() || selectedProduct()?.name || 'Sin nombre' }}</strong>
+        </div>
+        <div class="np-launch-modal__summary-row">
+          <span>Producto</span>
+          <strong>{{ selectedProduct()?.name ?? '—' }}</strong>
+        </div>
+        <div class="np-launch-modal__summary-row">
+          <span>Presupuesto diario</span>
+          <strong>{{ budgetFormatted }}</strong>
+        </div>
+      </div>
+      <div class="np-launch-modal__confirm-actions">
+        <button type="button" class="np-launch-modal__cta" (click)="confirmLaunch()">Confirmar y lanzar →</button>
+        <button type="button" class="np-launch-modal__cancel" (click)="showConfirmLaunch.set(false)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de confirmación de lanzamiento -->
+@if (showLaunchModal()) {
+  <div class="np-launch-modal-backdrop" (click)="launchSuccess() && closeLaunchModal()">
+    <div class="np-launch-modal" (click)="$event.stopPropagation()">
+      @if (!launchSuccess()) {
+        <div class="np-launch-modal__loading">
+          <div class="np-launch-modal__spinner"></div>
+          <p class="np-launch-modal__msg">Gali está configurando tu proyecto...</p>
+          <p class="np-launch-modal__sub">Activando agentes · conectando campañas · preparando tracking</p>
+        </div>
+      } @else {
+        <div class="np-launch-modal__success">
+          <div class="np-launch-modal__icon">🚀</div>
+          <h2 class="np-launch-modal__title">¡Proyecto lanzado!</h2>
+          <p class="np-launch-modal__desc">
+            <strong>{{ selectedProduct()?.name ?? 'Tu proyecto' }}</strong> está activo.
+            Los agentes ya están trabajando — te avisaremos cuando haya novedades.
+          </p>
+          <button type="button" class="np-launch-modal__cta" (click)="closeLaunchModal()">
+            Ver mi proyecto →
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Toast de borrador guardado -->
+@if (showDraftToast()) {
+  <div class="np-draft-toast">
+    <span class="np-draft-toast__icon">✓</span>
+    Proyecto guardado como borrador. Puedes retomarlo desde Proyectos.
+  </div>
+}

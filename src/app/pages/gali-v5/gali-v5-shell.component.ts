@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -11,6 +11,7 @@ import { GaliRightPanelComponent } from './components/gali-right-panel/gali-righ
 import { DropiPanelSplitterComponent } from './components/dropi-panel-splitter/dropi-panel-splitter.component';
 import { GaliContextStripComponent, ContextKey } from './components/gali-context-strip/gali-context-strip.component';
 import { GaliIntentBarComponent } from './components/gali-intent-bar/gali-intent-bar.component';
+import { GaliWorkspaceModeBarComponent } from './components/gali-workspace-mode-bar/gali-workspace-mode-bar.component';
 import {
   GALI_MISSION_PANEL,
   resolveActiveRailKey,
@@ -35,6 +36,7 @@ import { GaliWorkspaceService } from './services/gali-workspace.service';
     DropiPanelSplitterComponent,
     GaliContextStripComponent,
     GaliIntentBarComponent,
+    GaliWorkspaceModeBarComponent,
   ],
   templateUrl: './gali-v5-shell.component.html',
   styleUrl: './gali-v5-shell.component.scss',
@@ -64,6 +66,29 @@ export class GaliV5ShellComponent {
   isCompactNav = signal(false);
   sectionWidth = signal(parseInt(localStorage.getItem('dropi-section-width') ?? '200', 10));
   currentContextKey = signal<ContextKey>(null);
+  readonly isHubHome = signal(false);
+  /** Rutas con barra Gali a nivel página — suprimen context-strip e intent-bar del shell */
+  /** Rutas con chrome agente a nivel página — suprimen context-strip e intent-bar */
+  private readonly pageLevelAgentChromePrefixes = [
+    '/gali-v5/mis-pedidos/mis-pedidos',
+    '/gali-v5/mis-pedidos/garantias',
+    '/gali-v5/marketing/campanas',
+    '/gali-v5/marketing/chatea-pro',
+    '/gali-v5/productos/caza-productos',
+    '/gali-v5/productos/catalogo',
+    '/gali-v5/productos/proveedores',
+    '/gali-v5/cas/bandeja',
+    '/gali-v5/proyectos',
+    '/gali-v5/proyecto/',
+    '/gali-v5/reportes/dashboard',
+    '/gali-v5/reportes/dashboard-financiero',
+    '/gali-v5/financiero/historial-de-cartera',
+    '/gali-v5/logistica/transportadoras',
+    '/gali-v5/logistica/torre-logistica',
+  ];
+  readonly hasPageLevelGaliBar = signal(false);
+  readonly showContextStrip = signal(false);
+  readonly showIntentBar = signal(true);
 
   constructor() {
     this.syncNav(this.router.url);
@@ -129,7 +154,29 @@ export class GaliV5ShellComponent {
       this.isOsWorkspace.set(false);
     }
     this.currentContextKey.set(this.resolveContextKey(url));
+    const hub = url === '/gali-v5' || url === '/gali-v5/';
+    this.isHubHome.set(hub);
+    const pageBar = this.pageLevelAgentChromePrefixes.some(
+      p => p.endsWith('/')
+        ? url.startsWith(p)
+        : url === p || (p === '/gali-v5/proyectos' && url === '/gali-v5/proyectos'),
+    );
+    this.hasPageLevelGaliBar.set(pageBar);
+    this.showContextStrip.set(!hub && !pageBar);
+    this.showIntentBar.set(
+      this.galiState.galiMode() === 0 && !hub && !pageBar && !this.ws.primaryAlertActive(),
+    );
   }
+
+  readonly hubObjetivoLabel = computed(() => this.ws.businessDNA().goalLabel ?? '50 ventas/semana');
+  readonly hubObjetivoActual = computed(() => {
+    const dna = this.ws.businessDNA();
+    return dna.pedidosTarget > 0 ? Math.min(dna.pedidosTarget - 12, dna.pedidosTarget) : 38;
+  });
+  readonly hubObjetivoMeta = computed(() => {
+    const t = this.ws.businessDNA().pedidosTarget;
+    return t > 0 ? t : 50;
+  });
 
   private resolveContextKey(url: string): ContextKey {
     const railKey = resolveActiveRailKey(url);

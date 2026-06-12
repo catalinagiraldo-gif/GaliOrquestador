@@ -2,7 +2,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliAdaSpyDetailComponent } from '../../components/gali-ada-spy-detail/gali-ada-spy-detail.component';
 
@@ -34,7 +33,7 @@ interface CatalogProduct {
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DropiGaliBarComponent, GaliAdaSpyDetailComponent],
+  imports: [CommonModule, FormsModule, RouterLink, GaliAdaSpyDetailComponent],
   templateUrl: './catalog-page.component.html',
   styleUrl: './catalog-page.component.scss',
 })

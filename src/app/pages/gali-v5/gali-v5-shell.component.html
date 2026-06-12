@@ -30,9 +30,20 @@
       (dragEnd)="onSplitterDragEnd()"
     />
 
-    <main class="gali-v5-shell__content" [class.gali-v5-shell__content--os]="isOsWorkspace()">
-      <gali-context-strip [contextKey]="currentContextKey()" />
-      <gali-intent-bar />
+    <main class="gali-v5-shell__content" [class.gali-v5-shell__content--os]="isOsWorkspace() || isHubHome()">
+      @if (isHubHome()) {
+        <gali-workspace-mode-bar
+          [objetivoLabel]="hubObjetivoLabel()"
+          [objetivoActual]="hubObjetivoActual()"
+          [objetivoMeta]="hubObjetivoMeta()"
+          objetivoPeriodo="Sem 3 de 4" />
+      }
+      @if (showContextStrip()) {
+        <gali-context-strip [contextKey]="currentContextKey()" />
+      }
+      @if (showIntentBar()) {
+        <gali-intent-bar />
+      }
       <div class="gali-v5-shell__outlet">
         <router-outlet />
       </div>
@@ -42,7 +53,7 @@
   <!-- Panel derecho de Gali -->
   @if (galiState.galiMode() > 0) {
     <div
-      class="gali-v5-shell__panel-overlay"
+      class="gali-v5-shell__panel-overlay gali-panel-slide-in"
       [style.width.px]="galiState.panelWidth()">
       <dropi-panel-splitter
         class="gali-v5-shell__panel-resize"

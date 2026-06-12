@@ -1,8 +1,8 @@
 # Gali v5 — Business Operating System
 
 **Versión**: 5.0 — OS Architecture + Business Intelligence + UX Clarity + Dual E-commerce + MCP Ecosystem + Multi-Channel  
-**Fecha**: Junio 2026 (actualizado Jun 4, 2026)  
-**Estado**: Prototipo activo v15.0 — Pipeline 7 specs ejecutado Jun 4: UniDatos · RediNavega · HubNegocio · Señales · ZeroState · Finance · Salud (ver SpecsNuevos/)
+**Fecha**: Junio 2026 (actualizado Jun 10, 2026)  
+**Estado**: Prototipo activo v25.0 — Spec 10 WorkspaceChat ejecutado · multi-thread con secciones · rich cards ROAS/pedidos/novedad/acciones · selector de contexto inline · pins localStorage · pre-carga desde proyecto y agente · Specs pipeline 16✅ 15✅ 14✅ 10✅ completados
 
 ---
 
@@ -21,13 +21,13 @@ Es crítico distinguir estos 3 conceptos:
 
 | Concepto | Qué es | Dónde vive | Historial |
 |---|---|---|---|
-| **Agente** | Entidad especializada (Roax, Vigilante, Chatea Pro, ADA Spy) que ejecuta skills | En el workspace y en señales | No — es el ejecutor |
-| **Skill** | Receta automatizable: Trigger + Condición + Acción | En Skills page + Skill Editor | Sí — historial auditable |
-| **Regla** | Condicional simple Si/Entonces solo para Chatea Pro | En Chatea Pro, columna derecha | No — es operacional |
+| **Skill** | Capacidad reutilizable que un agente invoca (plugin/función). **No** tiene trigger/condición/acción | Skills page + detalle skill | Sí — historial de ejecuciones |
+| **Agente** | Entidad autónoma que usa skills + reglas con su propia lógica de cuándo actuar | Agentes page + señales + ficha detalle | No — es el ejecutor |
+| **Regla** | Condicional If-Then que controla cuándo el agente activa una skill | Ficha del agente (tab Configuración) + Reglas page | Parcial — toggles persisten en `localStorage` |
 
-- Los **Agentes** son personas virtuales con rol específico. No son genéricos "IA".
-- Las **Skills** tienen historial, pueden asignarse a cualquier agente, y se gestionan desde el OS workspace.
-- Las **Reglas** son solo para Chatea Pro (WhatsApp). Son If-Then sin contexto de negocio. Para lógica más compleja → convertir a Skill.
+- Los **Agentes** son personas virtuales con rol específico. No son genéricos "IA". El trigger/condición/acción vive en su ficha, no en la skill.
+- Las **Skills** son capacidades asignables a uno o más agentes. Se muestran por nombre, descripción y agentes que las usan — sin pipeline trigger→condición→acción en el listado.
+- Las **Reglas** son If-Then por agente. Chatea Pro las usa en WhatsApp; Roax y Vigilante tienen reglas de escalamiento y logística. Editor libre en `/gali-v5/reglas`.
 
 ---
 
@@ -105,10 +105,20 @@ El cambio de modo es inmediato (transición CSS, no navegación). Estado gestion
 
 Command bar sticky visible en todas las rutas `/gali-v5`. Input de lenguaje natural + 3 shortcuts (⚡ Señales, 🚀 Lanzar, 📊 Medir). Cuando el usuario escribe un intent, detecta el modo correspondiente y hace `ws.setMode()` sin navegar.
 
-### GaliGoalOnboardingComponent (v5.0)
+### GaliGoalOnboardingComponent (v5.0 → v17.0)
 **Path**: `src/app/pages/gali-v5/components/gali-goal-onboarding/`
 
-Modal fullscreen de 3 pasos que aparece en la primera visita a `/gali-v5`. Almacena en `localStorage('gali_goal_configured')`. Pasos: objetivo de 30 días → pedidos/sem actuales + antigüedad → agente recomendado por objetivo. Exporta `shouldShowOnboarding()` helper.
+Modal fullscreen que aparece en la primera visita a `/gali-v5`. Almacena en `localStorage('gali_goal_configured')`. Exporta `shouldShowOnboarding()` helper.
+
+**Flujo actual (v17.0)** — 5–6 pasos según perfil:
+1. Objetivo de 30 días (4 opciones + custom)
+2. **Contexto Dropi pre-cargado** — lee `kpis-global.json`; si hay pedidos, muestra banner KPI en vez de preguntar "¿cuántos pedidos tienes?" (B1/B5 Spec 8)
+3. Agente recomendado por objetivo
+4. Tu plan para hoy (pasos accionables con rutas)
+5. Conexiones opcionales (Meta, Drive, etc.)
+6. Veterano: path alternativo si ya tiene historial
+
+**Separación de flujos (C4)**: "Editar objetivo" en Hub abre mini-modal de 1 paso (`openEditGoal()` en `home.component.ts`). "Reconfigurar Gali" abre el wizard completo — flujos distintos.
 
 ### GaliAdaSpyDetailComponent (v5.0)
 **Path**: `src/app/pages/gali-v5/components/gali-ada-spy-detail/`
@@ -123,7 +133,7 @@ Overlay lateral (440px) que abre el mode-bar ANTES de activar autopilot. Configu
 ### GaliWorkspaceService
 **Path**: `src/app/pages/gali-v5/services/gali-workspace.service.ts`
 
-Servicio singleton que gestiona el modo activo del workspace, el estado de Gali (activo / autopilot / pausado), y expone señales reactivas para todos los componentes.
+Servicio singleton que gestiona el modo activo del workspace, el estado de Gali (activo / autopilot / pausado), complejidad del Hub, DNA de negocio, y coordinación de alertas primarias entre páginas.
 
 ```typescript
 type WorkspaceMode = 'operar' | 'lanzar' | 'medir' | 'construir' | 'comunidad';
@@ -132,8 +142,18 @@ class GaliWorkspaceService {
   readonly activeMode = signal<WorkspaceMode>('operar');
   readonly galiPaused = signal(false);
   readonly autopilot = signal(false);
+  readonly complexityLevel = signal<'novice' | 'expert'>('novice');  // localStorage: gali_complexity
+  readonly connectedSources = signal<string[]>([]);                    // localStorage: gali_connected_sources
+  readonly visibleModules = signal<string[] | null>(null);             // null = todos visibles
+  readonly primaryAlertActive = signal(false);                       // suprime intent-bar globalmente
+  readonly hubEntryContext = signal<HubEntryContext | null>(null);   // banner al llegar desde catálogo/caza
+  readonly businessDNA = computed(() => ({ goalId, goalLabel, pedidosTarget, complexity, sources, sessionCount, hasData }));
+  updateGoalLabel(label: string): void;
+  ensureGoalFromStorage(): void;
 }
 ```
+
+**`primaryAlertActive`**: cada página con banner crítico (Hub, Wallet, Dashboard Financiero, Novedades) setea `true` en `ngOnInit` y `false` en `ngOnDestroy`. El `GaliIntentBarComponent` se oculta mientras esté activo.
 
 ---
 
@@ -141,10 +161,11 @@ class GaliWorkspaceService {
 **Path**: `src/app/pages/gali-v5/components/gali-workspace-mode-bar/`
 
 Barra superior siempre visible. Muestra:
-- Tabs de los 5 modos (activo con fill naranja + sombra — v7.0)
-- Progreso del objetivo activo (barra + fracción)
+- Tabs de los 5 modos (activo con fill naranja + sombra — v7.0) — navegan vía `ws.setMode()` sin URL
+- Progreso del objetivo activo (barra + fracción + periodo)
+- **Toggle Básico/Experto** (v16.0/v17.0) — movido aquí desde la sección Decisiones del Hub
 - Estado de Gali (activo / autopilot / pausado) — clickeable
-- Autopilot abre `GaliAutopilotConfigComponent` antes de activar; scope persiste en `localStorage`
+- **Autopilot** (v16.0): link "Configurar autopilot →" que navega a `/gali-v5/agentes` — lugar canónico; ya no es toggle directo en mode-bar
 
 ---
 
@@ -246,6 +267,65 @@ Con barra de estado (activo/pausado/total ejecuciones) y tabla de historial de r
 
 ---
 
+### Componentes Shared (v17.0)
+
+**Path**: `src/app/pages/gali-v5/components/shared/`
+
+| Componente | Selector | Uso |
+|---|---|---|
+| `GaliTermTooltipComponent` | `gali-term-tooltip` | Tooltip ⓘ reutilizable para glosario (PIL, ROAS, huella, etc.) — exportado en `shared/index.ts` |
+| `ConfirmActionModalComponent` | `confirm-action-modal` | Modal de confirmación con impacto + pedidos afectados — usado en Señales para alertas críticas |
+
+### DropiPrototypeFeedbackService (v17.0)
+**Path**: `src/app/pages/gali-v5/services/dropi-prototype-feedback.service.ts`
+
+Toast global (`Prototipo · {acción}`) para botones sin handler real. El shell (`gali-v5-shell.component.ts`) intercepta clicks en botones sin `data-proto-skip` y sin `routerLink` para evitar sensación de UI rota. Se limpia automáticamente en `NavigationEnd`.
+
+### SkillPickerModalComponent (v17.0)
+**Path**: `src/app/pages/gali-v5/pages/agentes/skill-picker-modal.component.*`
+
+Modal de búsqueda para asignar skills a un agente desde su ficha. Catálogo de 10 skills con categoría y agentes que las usan. Emite `skillAdded` → actualiza `agentsList` en `AgentesPageComponent`.
+
+### AgentesPageComponent — Wizard y ficha (v16.0/v17.0)
+**Path**: `src/app/pages/gali-v5/pages/agentes/agentes-page.component.*`
+**Ruta**: `/gali-v5/agentes`
+
+- **Wizard crear agente**: 6 pasos — Identidad (rol libre textarea) → Skills (multi-select) → Regla inicial If-Then → Autopilot + umbral → Confirmar → Conexiones (Meta, Dropi, Siigo, Chatea, ADA)
+- **`launchAgent()`** persiste el agente en `agentsList` signal; estado inicial "Configurando…" → "Activo" tras 1.5s + toast Gali
+- **Tabs ficha detalle**: Actividad · Skills · **Configuración** (autopilot toggle, umbral slider 0–100%, reglas activas)
+- **Umbrales por agente**: `agentThresholds` signal — cableados en sliders (sin `data-proto-skip`)
+- **Agregar skill**: abre `SkillPickerModal` en vez de navegar a `/skills` genérico
+
+### ReglasPageComponent — Editor libre (v17.0)
+**Path**: `src/app/pages/gali-v5/pages/reglas/reglas-page.component.*`
+
+- Editor "+ Nueva regla" con textarea libre, selector de agente, asignación multi-agente
+- Persistencia toggles en `localStorage('gali_reglas_state')`
+- Sección Escalamiento Roax: 6 reglas estilo Revealbot con tooltips
+- Copy ontología corregido: skill ≠ regla
+
+### MarketplacePageComponent — Sección propia (v17.0)
+**Path**: `src/app/pages/gali-v5/pages/marketplace/marketplace-page.component.*`
+**Ruta**: `/gali-v5/marketplace`
+
+Marketplace **desanidado** de Skills. Tabs: Skills · Agentes · Reglas · Plugins · APIs. Skills page enlaza vía `routerLink="/gali-v5/marketplace"` en lugar de tab embebido.
+
+### DropiHomeComponent — Hub widgets (v17.0)
+**Path**: `src/app/pages/gali-v5/home/home.component.*`
+
+Además del layout 3 zonas (Spec 3):
+- **Goal strip editable** — click en objetivo → mini-modal inline
+- **Ciclo de Negocio ARRIBA** de Decisiones en modo experto (C1)
+- **FAB acciones rápidas** en header modo básico (Nuevo proyecto, Señales, etc.)
+- **Mis metas esta semana** — widget con progreso + link a editar objetivo
+- **Tu plan esta semana** — pasos del onboarding con checkboxes persistentes
+- **Dashboard tabs** — múltiples tabs personalizables (`gali_dashboard_tabs`, `gali_active_tab` en localStorage)
+- **Customizer** funcional sin `data-proto-skip` — guarda secciones por tab
+- Copy "Señales →" en vez de "Ver todas"
+- Tooltips PIL/ROAS inline (pTooltip)
+
+---
+
 ### SkillEditorPageComponent (NUEVO)
 **Path**: `src/app/pages/gali-v5/pages/skills/skill-editor-page.component.*`
 **Ruta**: `/gali-v5/skills/nueva`
@@ -286,8 +366,9 @@ src/app/pages/gali-v5/
 │   ├── home.component.html        ← @switch(mode) → layouts de panel
 │   └── home.component.scss        ← Dark OS styles, mode layouts
 ├── services/
-│   ├── gali-workspace.service.ts  ← Modos, estado de Gali
-│   └── gali-state.service.ts      ← Panel derecho legacy
+│   ├── gali-workspace.service.ts       ← Modos, businessDNA, primaryAlertActive, complexity
+│   ├── gali-state.service.ts           ← Panel derecho + customizer desde chat
+│   └── dropi-prototype-feedback.service.ts ← Toast acciones prototipo (v17.0)
 ├── components/
 │   ├── gali-workspace-mode-bar/   ← Barra de modos
 │   ├── gali-signal-card-v2/       ← Señal con lifecycle
@@ -301,9 +382,13 @@ src/app/pages/gali-v5/
 │   ├── gali-goal-onboarding/      ← [v5.0] Onboarding 3 pasos primera visita
 │   ├── gali-ada-spy-detail/       ← [v5.0] Overlay análisis ADA Spy
 │   ├── gali-chip/                 ← Presencia de agente (legacy)
-│   └── dropi-gali-bar/            ← Bar de agente en secciones (máx 1 por vista)
+│   ├── dropi-gali-bar/            ← Bar de agente en secciones (máx 1 por vista)
+│   └── shared/
+│       ├── gali-term-tooltip.component.ts   ← [v17.0] Glosario ⓘ
+│       └── confirm-action-modal.component.ts ← [v17.0] Confirmación alertas
 ├── pages/
-│   ├── agentes/                   ← [NUEVO v4.0] AgentesPageComponent
+│   ├── agentes/                   ← [v4.0/v17.0] AgentesPageComponent + skill-picker-modal
+│   ├── marketplace/               ← [v17.0] MarketplacePageComponent (sección propia)
 │   ├── proyectos/
 │   │   ├── nuevo-proyecto-page.*  ← [NUEVO v4.0] Pantalla completa de creación
 │   │   └── proyectos-list-page.*
@@ -351,8 +436,12 @@ Tokens OS: `src/styles/_gali-os-tokens.scss`
 | Archivo | Contenido |
 |---|---|
 | `mocks/gali-v5/signals.json` | 5 señales con estados, opciones, tablas |
+| `mocks/gali-v5/senales.mock.ts` | Señales predictivas + alertas operativas con `resolucionResumen`, `beforeState`, `afterState`, `galiFlowDesc` |
+| `mocks/gali-v5/projects.json` | Proyectos canónicos — incluye `recien_lanzado`, `pausado`, `campaña_fallida`, `borrador` (C12) |
+| `mocks/gali-v5/kpis-global.json` | KPIs maestros — ROAS 1.93x, pedidos/sem; consumido por onboarding y dashboard |
 | `mocks/gali-v5/skill-rules.json` | 3 skills con historial de ejecución |
 | `mocks/gali-v5/user-skills.json` | Skills de usuario (legacy) |
+| `mocks/gali-v5/wallet-transactions.json` | Transacciones wallet + alertas Kronos/Siigo |
 | `mocks/gali-v5/pqr-patterns.json` | Patrones PQR del CAS |
 | `mocks/gali-v5/problem-network.json` | Red de problemas |
 
@@ -366,6 +455,8 @@ Tokens OS: `src/styles/_gali-os-tokens.scss`
 | **Vigilante** | `#fbbf24` ámbar | Logística / Novedades | Activo / Alerta |
 | **Chatea Pro** | `#34d399` verde | Cierre & CAS | Activo |
 | **ADA Spy** | `#818cf8` índigo | Research / Oportunidades | Esperando |
+| **Kronos** | `#60a5fa` azul | Finanzas / P&L / Siigo | Activo (v12.0) |
+| **Custom** | `#a855f7` púrpura | Agente personalizado del usuario | Configurando → Activo (v17.0) |
 
 ---
 
@@ -514,9 +605,72 @@ Dropi tiene dos capas de valor que se deben monetizar por separado:
 | Campañas masivas sin guía Gali | ✅ Resuelto | Panel Roax Copilot Guide |
 | Scroll señales/chat Hub | ✅ Resuelto | Altura fija + overflow en `.mission__bottom` |
 | Navegación paneles confusa | ✅ Mejorado | Mode bar, tabs panel, section nav activo |
-| Skills/Agentes/Reglas mezclados | 🔴 Pendiente v8.0 | Existe `/agentes` pero UX aún confusa |
-| CAS UI incomprensible | 🟡 Parcial | Banner v4.0; rediseño completo pendiente |
-| Colapso menú → pantalla blanco | 🔴 Verificar | Fix v4.0 documentado; re-test en browser |
-| Nuevo proyecto paso a paso desde cero | 🟡 Parcial | `/proyectos/nuevo` 6 etapas; falta onboarding cero |
-| Marketplace skills poco visible | 🟡 Parcial | Comunidad v6.0 en Skills; falta pantalla dedicada |
-| Chat "personalizar dashboard" | 🔴 Pendiente | Comando en chat no abre customizer aún |
+| Skills/Agentes/Reglas mezclados | 🟡 Mejorado v17.0 | Ontología en banners + wizard + editor reglas; skill-editor pipeline legacy pendiente |
+| CAS UI incomprensible | 🟡 Parcial | Banner v4.0 + grid fix v8.0; rediseño profundo pendiente |
+| Colapso menú → pantalla blanco | 🟡 Verificar | Fix v4.0/v9.0 en código; pendiente verificación visual |
+| Nuevo proyecto paso a paso desde cero | ✅ v17.0 | 6 etapas + confirmación lanzamiento + toast borrador + agentes en launch |
+| Marketplace skills poco visible | ✅ v17.0 | `/gali-v5/marketplace` sección propia 5 tabs |
+| Chat "personalizar dashboard" | ✅ v10.0 | Comando abre customizer vía `gali-state.service` |
+| Hub sin jerarquía / objetivo no editable | ✅ v17.0 | Ciclo arriba · toggle en mode-bar · mini-modal objetivo · widgets metas |
+| Agentes decorativos / crear no persiste | ✅ v17.0 | Wizard 6 pasos · `launchAgent()` persiste · tab Configuración |
+| Alertas acumuladas | 🟡 Parcial v17.0 | `primaryAlertActive` en 4 páginas; marketing/logística pendiente |
+
+---
+
+## Correcciones Post-Auditoría Jun 8, 2026 (v16.0)
+
+**Fuente**: `docs/Descubrimientos/Correcionescata8jun.md`  
+**Spec**: `docs/SpecsNuevos/8.AuditoriaJun8.md`  
+**14 P0s detectados** — Hub Clarity + Ontología + Agentes funcionales + Explicabilidad
+
+### Cambios al Modelo Conceptual (v16.0)
+
+La definición de **Skill** se clarifica y corrige. La v15.0 tenía la ontología parcialmente rota:
+
+| Concepto | Definición correcta (v16.0) | Analogía |
+|---|---|---|
+| **Skill** | Capacidad reutilizable que un agente puede invocar. No tiene trigger/condición/acción — eso pertenece al agente. | Plugin o función |
+| **Agente** | Entidad autónoma que usa skills + reglas con su propia lógica de cuándo actuar. Tiene trigger/condición/acción propio. | Empleado con instrucciones |
+| **Regla** | Condicional If-Then que controla cuándo el agente activa una skill. Vive en la ficha del agente, no en la skill. | Manual de procedimientos del empleado |
+
+**Lo que cambia en UI**: Las cards de skill dejan de mostrar `trigger/condición/acción`. La ficha del agente tiene tab "Configuración" donde se configura su lógica, sus skills asignadas y su autopilot.
+
+### Cambios de Arquitectura Visual (v16.0)
+
+| Elemento | Antes (v15.0) | Después (v16.0) |
+|---|---|---|
+| Hub modo experto | Ciclo de Negocio debajo de Decisiones | Ciclo de Negocio ARRIBA de Decisiones |
+| Toggle Básico/Experto | Dentro de sección Decisiones Pendientes | En el header del Hub (fuera de Decisiones) |
+| Alertas por pantalla | Hasta 3 capas simultáneas: crítica + insight + sugerencia | Máx 1 activa: jerarquía crítica > info > sugerencia |
+| Autopilot | En mode-bar + skills + chat lateral (3 lugares) | Solo en ficha del agente (1 lugar canónico) |
+| Editar objetivo | Abre wizard completo de onboarding | Mini-modal inline solo para el objetivo |
+| Onboarding | Pregunta pedidos/semana + tiempo en Dropi | Datos que Dropi ya sabe — eliminadas esas preguntas |
+
+### GaliGoalOnboardingComponent (v16.0 — update)
+**Path**: `src/app/pages/gali-v5/components/gali-goal-onboarding/`
+
+Cambio: eliminar steps con `pedidosPerWeek` y "¿Cuánto tiempo llevas en Dropi?". Si el usuario tiene historial, Gali lo muestra como contexto desde `kpis-global.json`. Si es nuevo, mensaje: "Gali irá aprendiendo conforme lances tus primeros proyectos." El wizard no pregunta lo que el sistema ya sabe.
+
+### Cambios Post-Revisionplan (v17.0 — Jun 10, 2026)
+
+**Fuente**: `docs/Descubrimientos/Revisionplan.md` · Plan: `.cursor/plans/gali_v5_pendientes_cata_613e261a.plan.md`
+
+| Área | Cambio implementado |
+|---|---|
+| **Hub jerarquía** | Ciclo arriba de Decisiones (experto) · Toggle Básico/Experto en mode-bar · Objetivo editable mini-modal · FAB acciones · Widgets metas/plan semanal |
+| **Alertas** | `primaryAlertActive` en Hub + Wallet + Dashboard + Novedades · Intent-bar se suprime · Confirm modal en Señales |
+| **Explicabilidad** | `resolucionResumen` en señales · "Ver qué hizo Gali/Vigilante" en proyecto-detalle y novedades · `GaliTermTooltip` shared |
+| **Agentes** | Wizard 6 pasos · Persistencia · Tab Configuración · Umbrales cableados · Skill picker modal |
+| **Reglas** | Editor libre + localStorage · Ontología copy corregido |
+| **Skills/Marketplace** | Marketplace desanidado a `/gali-v5/marketplace` con 5 tabs · Skills sidebar sin trigger.agent fallback |
+| **Proyectos** | Lista mergea `projects.json` · Portfolio health · Confirmación lanzamiento + toast borrador · Deep link `?signalId=` |
+| **UX prototipo** | `DropiPrototypeFeedbackService` — feedback en botones sin handler |
+
+### Pendiente post-v17.0 (Fases 4–5 Revisionplan)
+
+- Tab "Capacidad" aditivo en skill-editor (sin borrar pipeline legacy)
+- Multi-chat con threads/carpetas en right-panel
+- Grafo Obsidian en micromundo (extender SVG existente)
+- Búsqueda IA conversacional en nuevo-proyecto (panel adicional)
+- `GaliTermTooltip` adoptado transversalmente en wallet/dashboard (componente creado, integración parcial)
+- Verificación visual alertas mutuamente excluyentes en todos los módulos

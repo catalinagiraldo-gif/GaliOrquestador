@@ -21,7 +21,7 @@
 .agency-panel {
   width: 420px;
   max-width: 100vw;
-  height: 100vh;
+  height: calc(100vh - var(--dropi-header-height, 53px));
   background: $white;
   border-left: 1px solid $gray-100;
   box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);

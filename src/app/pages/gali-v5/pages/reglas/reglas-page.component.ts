@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
 
 export interface EscalamientoRegla {
   id: string;
@@ -38,7 +39,7 @@ const STORAGE_KEY = 'gali_reglas_state';
 @Component({
   selector: 'app-reglas-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, GaliOntologyStripComponent],
   templateUrl: './reglas-page.component.html',
   styleUrl: './reglas-page.component.scss',
 })
@@ -162,4 +163,65 @@ export class ReglasPageComponent {
   }
 
   readonly showNewRule = signal(false);
+  readonly newRuleText = signal('');
+  readonly newRuleAgent = signal<'Chatea Pro' | 'Roax' | 'Vigilante'>('Chatea Pro');
+  readonly newRuleSaved = signal(false);
+
+  readonly agentOptions: Array<{ name: 'Chatea Pro' | 'Roax' | 'Vigilante'; color: string }> = [
+    { name: 'Chatea Pro', color: '#34d399' },
+    { name: 'Roax', color: '#f97316' },
+    { name: 'Vigilante', color: '#fbbf24' },
+  ];
+
+  readonly allAgentsForAssign = [
+    { id: 'chatea-pro', nombre: 'Chatea Pro', color: '#34d399', custom: false },
+    { id: 'roax',       nombre: 'Roax',       color: '#f97316', custom: false },
+    { id: 'vigilante',  nombre: 'Vigilante',  color: '#fbbf24', custom: false },
+    { id: 'ada-spy',    nombre: 'ADA Spy',    color: '#818cf8', custom: false },
+    { id: 'kronos',     nombre: 'Kronos',     color: '#60a5fa', custom: false },
+    { id: 'custom-1',   nombre: 'Mi Agente Drops v2', color: '#a78bfa', custom: true },
+  ];
+
+  readonly assignedAgentIds = signal<string[]>(['chatea-pro']);
+
+  toggleAssignedAgent(id: string): void {
+    this.assignedAgentIds.update(ids =>
+      ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]
+    );
+  }
+
+  prefillRuleExample(): void {
+    const examples = {
+      'Chatea Pro': 'Si el cliente lleva más de 24h sin responder → enviar seguimiento automático con el estado del pedido.',
+      'Roax': 'Si el ROAS cae por debajo de 1.5x durante 12h → pausar el conjunto de anuncios y notificarme.',
+      'Vigilante': 'Si la novedad de una transportadora supera el 15% esta semana → cambiar pedidos nuevos a la alternativa.',
+    };
+    this.newRuleText.set(examples[this.newRuleAgent()]);
+  }
+
+  addNewRule(): void {
+    const text = this.newRuleText().trim();
+    if (!text) return;
+    const agent = this.newRuleAgent();
+    const colorMap = { 'Chatea Pro': '#34d399', 'Roax': '#f97316', 'Vigilante': '#fbbf24' };
+    const newRegla: GaliRegla = {
+      id: `r${Date.now()}`,
+      agent,
+      agentColor: colorMap[agent],
+      ifLabel: text.split('→')[0]?.replace(/^Si /i, '').trim() ?? text,
+      thenLabel: text.split('→')[1]?.trim() ?? 'Acción pendiente de definir',
+      ejemplo: text,
+      active: true,
+      scope: `Personalizada · ${this.assignedAgentIds().length} agente${this.assignedAgentIds().length !== 1 ? 's' : ''}`,
+    };
+    this.reglas.update(list => [newRegla, ...list]);
+    this.persist();
+    this.newRuleSaved.set(true);
+    setTimeout(() => {
+      this.newRuleText.set('');
+      this.assignedAgentIds.set(['chatea-pro']);
+      this.newRuleSaved.set(false);
+      this.showNewRule.set(false);
+    }, 1200);
+  }
 }

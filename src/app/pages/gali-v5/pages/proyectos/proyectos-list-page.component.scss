@@ -267,3 +267,191 @@ $hub-danger: #ef4444;
     color: $primary-500;
   }
 }
+
+// ── Estados adicionales ──────────────────────────────────────────────────────
+.prow-badge--recien {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  animation: recien-pulse 2.5s ease-in-out infinite;
+}
+
+.prow-badge--fallo {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.proyecto-row--fallo {
+  border-left: 3px solid rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.02);
+
+  .prow-metric__val { color: $hub-muted; }
+}
+
+.prow-action-btn--fallo {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+  &:hover { background: rgba(239, 68, 68, 0.14); }
+}
+
+.prow-action-btn--draft {
+  background: $gray-50;
+  color: $hub-muted;
+  border-color: $hub-border;
+  border-style: dashed;
+  &:hover { background: $gray-100; color: $hub-text; }
+}
+
+@keyframes recien-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.7; }
+}
+
+// ══════════════════════════════════════════════════
+// PORTFOLIO HEALTH DASHBOARD
+// ══════════════════════════════════════════════════
+
+.portfolio-health {
+  background: #1c1c1e;
+  border-radius: $radius-lg;
+  margin-bottom: $size-4;
+  overflow: hidden;
+}
+
+.ph-toggle {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-4 $size-3 $size-5;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255, 255, 255, 0.04); }
+}
+
+.ph-toggle__title {
+  font-family: $font-secondary;
+  font-size: 10px;
+  font-weight: $font-medium;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  flex-shrink: 0;
+}
+
+.ph-toggle__stats {
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.ph-stat-num {
+  font-family: $font-primary;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ph-stat-label {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ph-stat-sep {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: $font-xs;
+  padding: 0 $size-1;
+}
+
+.ph-stat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--ok { background: #10b981; }
+  &--new { background: #f59e0b; }
+  &--fallo { background: #ef4444; }
+}
+
+.ph-toggle__chevron {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-left: $size-2;
+}
+
+.ph-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: $size-2 $size-3 $size-3;
+
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.ph-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 56px 28px 76px;
+  align-items: center;
+  gap: $size-2;
+  padding: 4px $size-2;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+}
+
+.ph-row__icon {
+  font-size: 13px;
+  text-align: center;
+  line-height: 1;
+}
+
+.ph-row__name {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ph-bar-wrap {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ph-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+  min-width: 0;
+}
+
+.ph-row__pedidos {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: right;
+}
+
+.ph-row__estado {
+  font-family: $font-primary;
+  font-size: 10px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}

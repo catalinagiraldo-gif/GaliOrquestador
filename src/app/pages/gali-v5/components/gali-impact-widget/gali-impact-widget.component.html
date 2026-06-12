@@ -1,0 +1,93 @@
+<!-- MODE: hub -->
+@if (mode === 'hub') {
+  <div class="impact-widget impact-widget--hub">
+    <div class="impact-widget__header">
+      <span class="gali-star">✦</span>
+      <h3 class="impact-widget__title">Gali en números</h3>
+      @if (semanaActual(); as s) {
+        <span class="impact-widget__period">Semana {{ s.semana_iso }}</span>
+      }
+      <a routerLink="/gali-v5/impacto" class="impact-widget__link">Ver historial →</a>
+    </div>
+
+    @if (semanaActual(); as s) {
+      <div class="impact-widget__grid">
+        <div class="impact-stat">
+          <span class="impact-stat__val">{{ s.acciones_totales }}</span>
+          <span class="impact-stat__lbl">acciones ejecutadas</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-stat__val">{{ formatPesos(s.pesos_ahorrados) }}</span>
+          <span class="impact-stat__lbl">ahorrados esta semana</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-stat__val">{{ s.novedades_evitadas }}</span>
+          <span class="impact-stat__lbl">novedades evitadas</span>
+        </div>
+        <div class="impact-stat">
+          <span class="impact-stat__val">{{ s.horas_libradas }}h</span>
+          <span class="impact-stat__lbl">que no operaste tú</span>
+        </div>
+      </div>
+    }
+
+    <p class="impact-widget__tendencia" [ngClass]="tendenciaClass">
+      {{ tendenciaLabel }}
+    </p>
+  </div>
+}
+
+<!-- MODE: agent -->
+@if (mode === 'agent') {
+  <div class="impact-widget impact-widget--agent">
+    <span class="gali-star gali-star--sm">✦</span>
+    <span class="impact-agent-stat">
+      <strong>{{ statsAgente().acciones }}</strong> acciones este mes
+    </span>
+    @if (statsAgente().pesos > 0) {
+      <span class="impact-agent-divider">·</span>
+      <span class="impact-agent-stat">
+        <strong>{{ formatPesos(statsAgente().pesos) }}</strong> de impacto
+      </span>
+    }
+    @if (statsAgente().novedades > 0) {
+      <span class="impact-agent-divider">·</span>
+      <span class="impact-agent-stat">
+        <strong>{{ statsAgente().novedades }}</strong> novedades evitadas
+      </span>
+    }
+  </div>
+}
+
+<!-- MODE: wallet -->
+@if (mode === 'wallet') {
+  <div class="impact-widget impact-widget--wallet">
+    <div class="impact-widget__kronos-header">
+      <span class="kronos-dot"></span>
+      <h3>Lo que Gali hizo por ti este mes</h3>
+      <span class="impact-widget__period">Mayo 2026</span>
+    </div>
+    <div class="impact-widget__grid impact-widget__grid--4">
+      <div class="impact-stat">
+        <span class="impact-stat__val">{{ acumuladoMes().acciones }}</span>
+        <span class="impact-stat__lbl">acciones ejecutadas automáticamente</span>
+      </div>
+      <div class="impact-stat">
+        <span class="impact-stat__val">{{ formatPesos(acumuladoMes().pesos) }}</span>
+        <span class="impact-stat__lbl">ahorrados en novedades evitadas</span>
+      </div>
+      <div class="impact-stat">
+        <span class="impact-stat__val">{{ semanaActual()?.campanas_escaladas }}</span>
+        <span class="impact-stat__lbl">campañas escaladas por Roax</span>
+      </div>
+      <div class="impact-stat">
+        <span class="impact-stat__val">{{ semanaActual()?.senales_detectadas }}</span>
+        <span class="impact-stat__lbl">señales de mercado detectadas</span>
+      </div>
+    </div>
+    <p class="impact-widget__kronos-note">
+      "Este mes, cada $1 invertido en Gali generó <strong>{{ roiMultiplier }}</strong> en valor recuperado."
+    </p>
+    <a routerLink="/gali-v5/impacto" class="impact-widget__link">Ver historial completo →</a>
+  </div>
+}

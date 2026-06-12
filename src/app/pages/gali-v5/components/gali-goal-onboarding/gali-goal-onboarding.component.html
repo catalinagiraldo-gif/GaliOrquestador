@@ -5,8 +5,8 @@
     <div class="onboarding-modal__header">
       <span class="onboarding-modal__logo">✦ Gali</span>
       <div class="onboarding-modal__steps">
-        @for (s of [1, 2, 3, 4, 5]; track s; let last = $last) {
-          <span class="step-dot" [class.step-dot--active]="step() >= s" [class.step-dot--done]="step() > s"></span>
+        @for (s of [1, 2, 3, 4]; track s; let last = $last) {
+          <span class="step-dot" [class.step-dot--active]="visualStep >= s" [class.step-dot--done]="visualStep > s"></span>
           @if (!last) {
             <span class="step-line"></span>
           }
@@ -54,6 +54,19 @@
           }
         </div>
 
+        @if (kpiDataAvailable && !isNewDropshipper) {
+          <div class="onboarding-kpi-context">
+            <span class="onboarding-kpi-context__icon">✓</span>
+            <span>{{ onboardingContextMsg() }}</span>
+          </div>
+        }
+        @if (isNewDropshipper) {
+          <div class="onboarding-kpi-context onboarding-kpi-context--new">
+            <span class="onboarding-kpi-context__icon">✦</span>
+            <span>Gali irá aprendiendo de tu operación conforme lances tus primeros proyectos.</span>
+          </div>
+        }
+
         <button
           type="button"
           class="onboarding-modal__cta"
@@ -64,56 +77,10 @@
       </div>
     }
 
-    <!-- Step 2: Estado actual -->
-    @if (step() === 2) {
-      <div class="onboarding-modal__body">
-        <div class="onboarding-modal__eyebrow">Paso 2 de 5</div>
-        <h1 class="onboarding-modal__title">Cuéntame sobre tu operación actual</h1>
-        <p class="onboarding-modal__subtitle">Esto le permite a Gali darte recomendaciones calibradas a tu nivel.</p>
-
-        <div class="estado-fields">
-          <div class="estado-field">
-            <label class="estado-field__label">¿Cuántos pedidos tienes por semana ahora?</label>
-            <div class="slider-wrap">
-              <span class="slider-min">0</span>
-              <input
-                type="range"
-                class="pedidos-slider"
-                min="0" max="200" step="5"
-                [ngModel]="pedidosPerWeek()"
-                (ngModelChange)="pedidosPerWeek.set(+$event)" />
-              <span class="slider-max">200+</span>
-            </div>
-            <div class="slider-value">{{ pedidosLabel }}</div>
-          </div>
-
-          <div class="estado-field">
-            <label class="estado-field__label">¿Cuánto llevas operando en Dropi?</label>
-            <div class="tenure-options">
-              @for (opt of [['< 1 mes', 'nuevo'], ['1–6 meses', '1-6'], ['6–12 meses', '6-12'], ['Más de 1 año', '1y+']] ; track opt[1]) {
-                <button
-                  type="button"
-                  class="tenure-opt"
-                  [class.tenure-opt--selected]="mesesOperando() === opt[1]"
-                  (click)="mesesOperando.set(opt[1])">
-                  {{ opt[0] }}
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="onboarding-modal__nav">
-          <button type="button" class="onboarding-modal__back" (click)="step.set(1)">← Atrás</button>
-          <button type="button" class="onboarding-modal__cta" (click)="goToStep3()">Continuar →</button>
-        </div>
-      </div>
-    }
-
-    <!-- Step 3: Conecta tus datos (NUEVO) -->
+    <!-- Step 3: Conecta tus datos -->
     @if (step() === 3) {
       <div class="onboarding-modal__body">
-        <div class="onboarding-modal__eyebrow">Paso 3 de 5</div>
+        <div class="onboarding-modal__eyebrow">Paso 2 de 4 · Fuentes de datos</div>
         <h1 class="onboarding-modal__title">Conecta tus datos para que Gali aprenda</h1>
         <p class="onboarding-modal__subtitle">Cuantas más fuentes conectes, más preciso será Gali desde el día 1.</p>
 
@@ -149,7 +116,7 @@
         <p class="onboarding-modal__footnote">Puedes conectar más fuentes después desde <strong>Conexiones →</strong></p>
 
         <div class="onboarding-modal__nav">
-          <button type="button" class="onboarding-modal__back" (click)="step.set(2)">← Atrás</button>
+          <button type="button" class="onboarding-modal__back" (click)="step.set(1)">← Atrás</button>
           <button type="button" class="onboarding-modal__cta" (click)="goToStep4()">
             {{ connectedSources().length > 0 ? 'Continuar con ' + connectedSources().length + ' fuente(s) →' : 'Saltar por ahora →' }}
           </button>
@@ -160,7 +127,7 @@
     <!-- Step 4: Arquitectura Agentes / Skills / Reglas -->
     @if (step() === 4) {
       <div class="onboarding-modal__body">
-        <div class="onboarding-modal__eyebrow">Paso 4 de 5</div>
+        <div class="onboarding-modal__eyebrow">Paso 3 de 4 · Sistema</div>
         <h1 class="onboarding-modal__title">Cómo funciona Gali por dentro</h1>
         <p class="onboarding-modal__subtitle">Tres piezas distintas — así no se mezclan en una sola bolsa.</p>
 
@@ -172,7 +139,7 @@
           <div class="onboarding-arch__arrow">↓ usa</div>
           <div class="onboarding-arch__row">
             <span class="onboarding-arch__badge onboarding-arch__badge--skill">Skill</span>
-            <span>Receta con historial: trigger + condición + acción</span>
+            <span>Capacidad reutilizable: qué puede hacer un agente · tiene historial</span>
           </div>
           <div class="onboarding-arch__arrow">≠</div>
           <div class="onboarding-arch__row">
@@ -195,7 +162,7 @@
     <!-- Step 5: Agente recomendado + Día 1 path -->
     @if (step() === 5) {
       <div class="onboarding-modal__body onboarding-modal__body--step4">
-        <div class="onboarding-modal__eyebrow">Paso 5 de 5 · Tu plan para hoy</div>
+        <div class="onboarding-modal__eyebrow">Paso 4 de 4 · Tu plan para hoy</div>
         <h1 class="onboarding-modal__title">Tu Día 1 con Gali</h1>
 
         @if (recommendedAgent; as agent) {
@@ -219,6 +186,30 @@
               </button>
             </div>
           }
+        </div>
+
+        <!-- Selector de módulos — alimenta widget "Tu día a día" en Hub (B3) -->
+        <div class="focus-modules-picker">
+          <p class="focus-modules-picker__label">
+            ¿En qué áreas pasas más tiempo?
+            <span class="focus-modules-picker__hint">Elige 2 o 3 — Gali personaliza tu Hub</span>
+          </p>
+          <div class="focus-modules-picker__grid">
+            @for (m of focusModuleOptions; track m.key) {
+              <button type="button"
+                class="focus-mod-chip"
+                [class.focus-mod-chip--selected]="focusModules().includes(m.key)"
+                [style.--mod-color]="m.color"
+                (click)="toggleFocusModule(m.key)">
+                <span class="focus-mod-chip__icon">{{ m.icon }}</span>
+                <span class="focus-mod-chip__label">{{ m.label }}</span>
+                <span class="focus-mod-chip__desc">{{ m.desc }}</span>
+                @if (focusModules().includes(m.key)) {
+                  <span class="focus-mod-chip__check">✓</span>
+                }
+              </button>
+            }
+          </div>
         </div>
 
         <!-- CTA adicional: ver grafo de negocio en Micromundo -->
@@ -252,8 +243,7 @@
 
         <div class="veterano-summary">
           <p class="veterano-line">
-            Llevas <strong>{{ mesesLabel }}</strong> en Dropi
-            con <strong>~{{ pedidosLabel }}</strong>.
+            Tienes <strong>{{ pedidosLabel }}</strong> en Dropi esta semana.
           </p>
           @if (selectedGoal(); as g) {
             <p class="veterano-line">
@@ -272,8 +262,8 @@
         </div>
 
         <div class="onboarding-modal__nav">
-          <button type="button" class="onboarding-modal__back" (click)="step.set(2)">
-            Ajustar perfil
+          <button type="button" class="onboarding-modal__back" (click)="step.set(1)">
+            Cambiar objetivo
           </button>
           <button type="button" class="onboarding-modal__cta" (click)="finishVeterano()">
             Ir al Hub →

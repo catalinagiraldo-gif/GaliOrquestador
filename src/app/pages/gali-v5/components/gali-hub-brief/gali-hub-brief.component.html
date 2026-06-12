@@ -1,0 +1,35 @@
+<div class="hub-brief" [attr.data-estado]="estadoNegocio()">
+  <div class="hub-brief__gali-icon">
+    <span class="gali-star">✦</span>
+    <span class="gali-label">Gali</span>
+  </div>
+
+  <div class="hub-brief__content">
+    <p class="hub-brief__titulo">{{ tituloBrief() }}</p>
+    <p class="hub-brief__subtexto">{{ subtextoBrief() }}</p>
+    @if (data().ahorroSemanal && data().completedActions > 0) {
+      <p class="hub-brief__impact">
+        {{ data().completedActions }} acciones automáticas · ahorró {{ data().ahorroSemanal }} esta semana
+      </p>
+    }
+  </div>
+
+  @if (mostrarBotonResuelto() || mostrarBotonDecisiones()) {
+    <div class="hub-brief__actions">
+      @if (mostrarBotonResuelto()) {
+        <button
+          class="hub-brief__btn hub-brief__btn--secondary"
+          (click)="onVerResuelto.emit()">
+          Ver qué resolví →
+        </button>
+      }
+      @if (mostrarBotonDecisiones()) {
+        <button
+          class="hub-brief__btn hub-brief__btn--primary"
+          (click)="onVerDecisiones.emit()">
+          Ver la decisión →
+        </button>
+      }
+    </div>
+  }
+</div>

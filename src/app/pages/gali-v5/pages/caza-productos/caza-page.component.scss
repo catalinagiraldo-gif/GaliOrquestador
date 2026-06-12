@@ -80,10 +80,36 @@
   }
 }
 
-.caza-historial__intro {
-  font-size: 14px;
-  color: $gray-600;
-  margin: 0 0 $size-4;
+.caza-historial__ada-header {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-2;
+  margin-bottom: $size-4;
+  padding: $size-3 $size-4;
+  background: rgba($primary-500, 0.05);
+  border-radius: 10px;
+  border-left: 3px solid $primary-500;
+}
+
+.caza-historial__ada-spark {
+  color: $primary-500;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.caza-historial__ada-intro {
+  font-size: 13px;
+  color: $gray-700;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.caza-semantic--secondary {
+  margin-top: $size-6;
+  padding-top: $size-5;
+  border-top: 1px solid $gray-100;
+  opacity: 0.85;
 }
 
 .historial-list {

@@ -1,0 +1,32 @@
+<div class="ontology-strip" [class.ontology-strip--expanded]="expanded()">
+  <button type="button" class="ontology-strip__toggle" (click)="toggle()" [attr.aria-expanded]="expanded()">
+    <span class="ontology-strip__gali">✦ Gali</span>
+    <span class="ontology-strip__arrow">→</span>
+    <span class="ontology-strip__layer" [class.ontology-strip__layer--active]="highlight === 'agent'">Agentes</span>
+    <span class="ontology-strip__sep">·</span>
+    <span class="ontology-strip__layer" [class.ontology-strip__layer--active]="highlight === 'skill'">Skills</span>
+    <span class="ontology-strip__vs">vs</span>
+    <span class="ontology-strip__layer" [class.ontology-strip__layer--active]="highlight === 'rule'">Reglas</span>
+    <i class="pi ontology-strip__chevron" [class.pi-chevron-down]="!expanded()" [class.pi-chevron-up]="expanded()"></i>
+  </button>
+
+  @if (expanded()) {
+    <div class="ontology-strip__body gali-stagger-in">
+      <article class="ontology-strip__card" [class.ontology-strip__card--active]="highlight === 'agent'">
+        <span class="ontology-strip__badge ontology-strip__badge--agent">Agente</span>
+        <p>Ejecuta acciones 24/7. Roax, Vigilante, Chatea Pro, ADA Spy, Kronos.</p>
+        <a routerLink="/gali-v5/agentes">Ver agentes →</a>
+      </article>
+      <article class="ontology-strip__card" [class.ontology-strip__card--active]="highlight === 'skill'">
+        <span class="ontology-strip__badge ontology-strip__badge--skill">Skill</span>
+        <p>Capacidad reutilizable sin trigger propio. El agente la invoca; tiene historial.</p>
+        <a routerLink="/gali-v5/skills">Mis skills →</a>
+      </article>
+      <article class="ontology-strip__card" [class.ontology-strip__card--active]="highlight === 'rule'">
+        <span class="ontology-strip__badge ontology-strip__badge--rule">Regla</span>
+        <p>SI condición → ENTONCES acción. Define cuándo actúa cada agente.</p>
+        <a routerLink="/gali-v5/reglas">Mis reglas →</a>
+      </article>
+    </div>
+  }
+</div>

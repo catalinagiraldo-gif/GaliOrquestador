@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TooltipModule } from 'primeng/tooltip';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import {
   DropiTitulosComponent,
@@ -26,6 +27,7 @@ type NovedadTipo = 'recuperable' | 'irreversible' | 'cliente' | 'transportadora'
   imports: [
     CommonModule,
     FormsModule,
+    TooltipModule,
     DropiTitulosComponent,
     DropiButtonNewComponent,
     DropiSearchOficialComponent,
@@ -34,9 +36,13 @@ type NovedadTipo = 'recuperable' | 'irreversible' | 'cliente' | 'transportadora'
   templateUrl: './novedades-page.component.html',
   styleUrl: './novedades-page.component.scss',
 })
-export class NovedadesPageComponent {
+export class NovedadesPageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private ws = inject(GaliWorkspaceService);
+
+  ngOnInit(): void { this.ws.primaryAlertActive.set(true); }
+  ngOnDestroy(): void { this.ws.primaryAlertActive.set(false); }
+
 
   searchQuery = '';
   readonly breadcrumbs = ['Pedidos', 'Novedades'];

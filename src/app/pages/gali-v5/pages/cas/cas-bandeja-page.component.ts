@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DropiSearchOficialComponent, DropiTagComponent } from '../../components/shared';
-import { GaliChipComponent } from '../../components/gali-chip/gali-chip.component';
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import casData from '../../../../../../mocks/gali-v5/cas-tickets.json';
 import pqrPatternsData from '../../../../../../mocks/gali-v5/pqr-patterns.json';
@@ -40,14 +39,14 @@ interface PqrPattern {
 @Component({
   selector: 'app-cas-bandeja-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, GaliChipComponent, DropiGaliBarComponent],
+  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, DropiGaliBarComponent],
   templateUrl: './cas-bandeja-page.component.html',
   styleUrl: './cas-bandeja-page.component.scss',
 })
 export class CasBandejaPageComponent {
   private router = inject(Router);
 
-  showExplainer = true;
+  showExplainer = localStorage.getItem('gali_cas_explainer_seen') !== '1';
   searchQuery = '';
   activeFilter = signal<'todos' | 'abiertos' | 'mios'>('todos');
 
@@ -158,6 +157,11 @@ export class CasBandejaPageComponent {
 
   goToProject(): void {
     this.router.navigate(['/gali-v5/proyecto/collar-gps-2026']);
+  }
+
+  dismissCasExplainer(): void {
+    this.showExplainer = false;
+    localStorage.setItem('gali_cas_explainer_seen', '1');
   }
 
   scrollToPqr(): void {

@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DropiTitulosComponent } from '../../components/shared';
-import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 
 type EstadoConv = 'anticipo_pendiente' | 'confirmado' | 'carrito' | 'novedad';
@@ -61,12 +61,43 @@ export class ChateaProPageComponent {
   newMsg = signal('');
   showNewRule = signal(false);
 
-  reglas = signal({
+  reglas = signal<Record<string, boolean>>({
     anticipoZonaRural: true,
     recuperarCarrito: true,
     confirmarVerde: true,
     notificarNovedad: true,
   });
+
+  // J6: richer rule items with per-rule agent assignment
+  readonly agentOptions = [
+    { id: 'chatea-pro', label: 'Chatea Pro', color: '#34d399', desc: 'Respuesta automática WhatsApp' },
+    { id: 'cas-manual', label: 'CAS Manual', color: '#f59e0b', desc: 'Escala a agente humano en CAS' },
+    { id: 'gali', label: 'Gali General', color: '#f49a3d', desc: 'Gali decide el mejor canal' },
+  ];
+
+  readonly ruleItems = signal([
+    { key: 'anticipoZonaRural', condition: 'zona rural detectada', action: 'solicitar anticipo $25k', agentId: 'chatea-pro' },
+    { key: 'recuperarCarrito', condition: 'carrito abandonado +6h', action: 'enviar secuencia recuperación', agentId: 'chatea-pro' },
+    { key: 'confirmarVerde', condition: 'huella verde + wallet OK', action: 'confirmar automáticamente', agentId: 'chatea-pro' },
+    { key: 'notificarNovedad', condition: 'novedad logística detectada', action: 'notificar cliente WhatsApp', agentId: 'gali' },
+  ]);
+
+  readonly showAgentPickerFor = signal<string | null>(null);
+
+  getAgent(agentId: string) {
+    return this.agentOptions.find(a => a.id === agentId) ?? this.agentOptions[0];
+  }
+
+  setRuleAgent(key: string, agentId: string): void {
+    this.ruleItems.update(items =>
+      items.map(r => r.key === key ? { ...r, agentId } : r)
+    );
+    this.showAgentPickerFor.set(null);
+  }
+
+  toggleRuleActive(key: string): void {
+    this.reglas.update(r => ({ ...r, [key]: !(r as Record<string, boolean>)[key] }));
+  }
 
   get stats() {
     const convs = this.conversaciones();
@@ -76,6 +107,16 @@ export class ChateaProPageComponent {
       carritos: convs.filter(c => c.estado === 'carrito').length,
       tasa: '91.5%',
     };
+  }
+
+  get chateaBarStats(): GaliBarStat[] {
+    const s = this.stats;
+    return [
+      { value: s.confirmados, label: 'confirmados hoy', variant: 'ok' },
+      { value: s.anticiposPendientes, label: 'anticipos pendientes', variant: 'warn' },
+      { value: s.carritos, label: 'carritos activos', variant: 'neutral' },
+      { value: s.tasa, label: 'tasa confirmación', variant: 'ok' },
+    ];
   }
 
   selectedConv(): Conversacion | undefined {

@@ -1,0 +1,122 @@
+<div class="detalle" [class.detalle--alerta]="isAlerta" [class.detalle--senal]="!isAlerta">
+
+  @if (senal; as s) {
+    <!-- ─────── HEADER SEÑAL ─────── -->
+    <div class="detalle__header">
+      <div class="header-top">
+        <span class="tipo-badge tipo-badge--{{ s.tipo }}">
+          {{ s.tipo === 'scale' ? '⚡ Escala' :
+             s.tipo === 'trend' ? '🔭 Tendencia' :
+             s.tipo === 'opportunity' ? '💎 Oportunidad' :
+             s.tipo === 'risk' ? '⚠️ Riesgo' : '✅ Completada' }}
+        </span>
+        <span class="agente-label">Detectado por {{ s.agente | titlecase }}</span>
+      </div>
+      <h2 class="detalle-titulo">{{ s.titulo }}</h2>
+
+      <div class="ventana-row">
+        <span class="ventana-label">Ventana de acción:</span>
+        <span class="ventana-valor" [style.color]="windowColor">
+          @if (s.ventanaDias <= 6) { <span class="ventana-clock">⏰</span> }
+          {{ s.ventanaDias }} días
+          @if (s.ventanaDias <= 6) { <span class="ventana-urgente">— actúa pronto</span> }
+        </span>
+      </div>
+    </div>
+
+    <!-- ─────── MACROMUNDO ─────── -->
+    <div class="macromundo-block">
+      <div class="macromundo-header">
+        <span class="macromundo-icon">🌐</span>
+        <span class="macromundo-tag">Según datos de la red Dropi</span>
+      </div>
+      <p class="macromundo-text">{{ s.contextoMacromundo }}</p>
+    </div>
+
+    <!-- ─────── RECOMENDACIÓN ─────── -->
+    <div class="recomendacion-block">
+      <p class="recomendacion-label">Acción recomendada por Gali</p>
+      <p class="recomendacion-text">{{ s.recomendacion }}</p>
+      @if (s.metrica) {
+        <div class="metrica-pill">{{ s.metrica }}</div>
+      }
+    </div>
+
+    <!-- ─────── CTAs ─────── -->
+    <div class="detalle-actions">
+      <button class="btn-cta btn-cta--primary" (click)="ctaPrimario.emit(item)">
+        {{ s.ctaPrincipal }}
+      </button>
+      <button class="btn-cta btn-cta--secondary" (click)="ctaSecundario.emit(item)">
+        {{ s.ctaSecundario }}
+      </button>
+    </div>
+
+    <!-- ─────── ACCIONES SECUNDARIAS ─────── -->
+    <div class="detalle-secondary-actions">
+      <button class="btn-text" (click)="guardarDespues.emit(item)">
+        Guardar para después
+      </button>
+      <button class="btn-text btn-text--muted" (click)="ignorar.emit(item)">
+        Ignorar esta señal
+      </button>
+    </div>
+  }
+
+  @if (alerta; as a) {
+    <!-- ─────── HEADER ALERTA ─────── -->
+    <div class="detalle__header detalle__header--alerta">
+      <div class="header-top">
+        <span class="urgency-badge urgency-badge--{{ a.tipo }}">
+          {{ a.tipo === 'critical' ? '🔴 Crítico' : '🟡 Advertencia' }}
+        </span>
+        <span class="agente-label">Detectado por {{ a.agente | titlecase }}</span>
+      </div>
+      <h2 class="detalle-titulo">{{ a.titulo }}</h2>
+    </div>
+
+    <!-- ─────── DESCRIPCIÓN ALERTA ─────── -->
+    <div class="alerta-descripcion-block">
+      <p class="alerta-descripcion">{{ a.descripcion }}</p>
+    </div>
+
+    <!-- ─────── IMPACTO ─────── -->
+    <div class="impacto-block impacto-block--{{ a.tipo }}">
+      <span class="impacto-label">⚠️ Impacto si no actúas</span>
+      <p class="impacto-text">{{ a.impacto }}</p>
+      @if (a.pedidosAfectados && a.pedidosAfectados > 0) {
+        <span class="pedidos-badge">{{ a.pedidosAfectados }} pedidos en riesgo</span>
+      }
+    </div>
+
+    @if (a.originPedidoId) {
+      <div class="origen-pedido-block">
+        <i class="pi pi-box"></i>
+        <span>Esta alerta fue generada por la novedad del pedido <strong>{{ a.originPedidoId }}</strong></span>
+        <button type="button" class="origen-pedido-cta" (click)="navigateToPedido(a.originPedidoId)">
+          Ver pedido →
+        </button>
+      </div>
+    }
+
+    <!-- ─────── CTAs ALERTA ─────── -->
+    <div class="detalle-actions">
+      <button
+        class="btn-cta btn-cta--urgent"
+        [class.btn-cta--warning]="a.tipo === 'warning'"
+        (click)="ctaPrimario.emit(item)">
+        {{ a.ctaPrincipal }}
+      </button>
+      <button class="btn-cta btn-cta--secondary" (click)="ctaSecundario.emit(item)">
+        {{ a.ctaSecundario }}
+      </button>
+    </div>
+
+    <div class="detalle-secondary-actions">
+      <button class="btn-text btn-text--muted" (click)="ignorar.emit(item)">
+        Descartar alerta
+      </button>
+    </div>
+  }
+
+</div>

@@ -1,6 +1,11 @@
 export type SignalType = 'opportunity' | 'scale' | 'trend' | 'risk' | 'completed';
 export type AlertType  = 'critical' | 'warning' | 'info';
 
+export interface SignalMetricPair {
+  label: string;
+  val: string;
+}
+
 export interface GaliSignal {
   id: string;
   tipo: SignalType;
@@ -14,6 +19,18 @@ export interface GaliSignal {
   proyectoId?: string;
   metrica?: string;
   fechaDeteccion: string;
+  segunDatos?: string;
+  skillCta?: string;
+  /** Resumen de lo que Gali ya hizo antes de mostrar esta señal */
+  resolucionResumen?: string;
+  /** Métricas del estado ANTES de tomar la acción */
+  beforeState?: SignalMetricPair[];
+  /** Métricas del estado DESPUÉS (proyectado/resultado) */
+  afterState?: SignalMetricPair[];
+  /** Breve descripción de qué hizo Gali para llegar aquí */
+  galiFlowDesc?: string;
+  /** Si true, la acción Lanzar lleva a nuevo-proyecto pre-cargado */
+  canLaunch?: boolean;
 }
 
 export interface GaliAlerta {
@@ -28,6 +45,10 @@ export interface GaliAlerta {
   proyectoId?: string;
   pedidosAfectados?: number;
   fechaDeteccion: string;
+  /** Resumen de lo que Gali ya hizo antes de mostrar esta alerta */
+  resolucionResumen?: string;
+  /** ID del pedido que originó esta alerta (para deep-link desde mis-pedidos) */
+  originPedidoId?: string;
 }
 
 export const MOCK_SENALES: GaliSignal[] = [
@@ -36,9 +57,9 @@ export const MOCK_SENALES: GaliSignal[] = [
     tipo: 'scale',
     titulo: 'Ventana de escala para Collar GPS',
     contextoMacromundo:
-      '847 dropshippers activos en categoría mascotas en Dropi esta semana. ' +
-      'Los que escalaron pauta en los últimos 7 días tienen ROAS promedio 2.3x. ' +
-      'Tú tienes ROAS 1.93x y margen del 22% — estás en el cuartil correcto.',
+      'Según datos de la red Dropi: 847 dropshippers activos en categoría mascotas esta semana. ' +
+      'Los que escalaron pauta en los últimos 7 días generan en promedio $2.3 por cada $1 invertido en pauta. ' +
+      'Tú generas $1.93 por $1 y tienes margen del 22% — estás en el grupo de dropshippers que más se beneficia al escalar ahora.',
     recomendacion:
       'Roax propone escalar pauta de $66k a $86k/día (+30%). ' +
       'Estimado: +12 pedidos/sem · ganancia adicional ~$105k/sem.',
@@ -48,7 +69,21 @@ export const MOCK_SENALES: GaliSignal[] = [
     agente: 'roax',
     proyectoId: 'collar-gps-2026',
     metrica: 'ROAS 1.93x · Margen 22% · +30% pauta',
+    segunDatos: 'Según datos de 847 dropshippers en categoría mascotas en Dropi esta semana',
     fechaDeteccion: '2026-06-03T08:00:00Z',
+    resolucionResumen: 'Roax monitoreó ROAS durante 72h y confirmó estabilidad antes de sugerir el escalado. Simuló 3 escenarios de presupuesto y seleccionó el de menor riesgo.',
+    galiFlowDesc: 'Roax monitoreó ROAS por 72h · comparó 847 casos similares · simuló 3 escenarios',
+    beforeState: [
+      { label: 'Pauta diaria', val: '$66.000/día' },
+      { label: 'ROAS real', val: '1.93x' },
+      { label: 'Pedidos/sem', val: '47' },
+    ],
+    afterState: [
+      { label: 'Pauta diaria', val: '$86.000/día (+30%)' },
+      { label: 'ROAS proyectado', val: '1.9x–2.1x' },
+      { label: 'Pedidos/sem est.', val: '~61 (+14)' },
+    ],
+    canLaunch: false,
   },
   {
     id: 'sen-002',
@@ -66,7 +101,21 @@ export const MOCK_SENALES: GaliSignal[] = [
     ctaSecundario: 'Crear proyecto nuevo',
     agente: 'ada',
     metrica: 'Score 87/100 · Margen est. 28%',
+    segunDatos: 'Según datos de 847 dropshippers en categoría hogar y bienestar esta semana en Dropi',
     fechaDeteccion: '2026-06-03T10:30:00Z',
+    resolucionResumen: 'ADA Spy escaneó 1.240 productos esta semana y filtró los de score > 80. El difusor pasó los 3 criterios clave: margen > 25%, proveedor con stock > 500 uds, tendencia creciente.',
+    galiFlowDesc: 'ADA Spy escaneó 1.240 productos · filtró score > 80 · validó proveedor con stock 2.400 uds',
+    beforeState: [
+      { label: 'Difusor en catálogo', val: 'No' },
+      { label: 'Ventana disponible', val: '7–10 días' },
+      { label: 'Competidores activos', val: '3 del top-10' },
+    ],
+    afterState: [
+      { label: 'Proyecto nuevo', val: 'Creado con plantilla' },
+      { label: 'Margen estimado', val: '28%' },
+      { label: 'Stock proveedor', val: '2.400 uds disponibles' },
+    ],
+    canLaunch: true,
   },
   {
     id: 'sen-003',
@@ -84,8 +133,21 @@ export const MOCK_SENALES: GaliSignal[] = [
     ctaSecundario: 'Ver análisis de Roax',
     agente: 'roax',
     proyectoId: 'skincare-kbeauty',
-    metrica: 'CTR estimado +0.3pp · +8-15 pedidos/sem',
+    metrica: 'CTR estimado +27% · +8-15 pedidos/sem extra',
+    segunDatos: 'Según datos de 312 dropshippers en K-Beauty esta semana en Dropi Colombia',
     fechaDeteccion: '2026-06-03T14:00:00Z',
+    galiFlowDesc: 'Roax cruzó datos de tu campaña con 312 competidores · detectó audiencia sin cubrir en Medellín',
+    beforeState: [
+      { label: 'Ciudades activas', val: 'Bogotá, Cali, Barranquilla' },
+      { label: 'CTR actual', val: '1.1%' },
+      { label: 'Pedidos/sem', val: '47' },
+    ],
+    afterState: [
+      { label: 'Ciudades + Medellín', val: '+4ª ciudad' },
+      { label: 'CTR estimado', val: '1.4% (+27%)' },
+      { label: 'Pedidos extras/sem', val: '+8–15 sin más presupuesto' },
+    ],
+    canLaunch: false,
   },
   {
     id: 'sen-004',
@@ -105,7 +167,20 @@ export const MOCK_SENALES: GaliSignal[] = [
     agente: 'ada',
     proyectoId: 'collar-gps-2026',
     metrica: '87 uds · ~13 días de stock restante',
+    skillCta: 'Pausar campaña si stock < 50 unidades',
     fechaDeteccion: '2026-06-04T07:00:00Z',
+    galiFlowDesc: 'ADA Spy monitoreó stock 7 días · calculó ritmo real · encontró 2 proveedores alternativos',
+    beforeState: [
+      { label: 'Stock restante', val: '87 uds' },
+      { label: 'Días estimados', val: '~13 días' },
+      { label: 'Proveedor alternativo', val: 'Sin confirmar' },
+    ],
+    afterState: [
+      { label: 'Pedido de reposición', val: 'Solicitado a PetStore' },
+      { label: 'Alternativa activa', val: 'TechPet (+$800/ud)' },
+      { label: 'Alerta automática', val: 'Activada < 50 uds' },
+    ],
+    canLaunch: false,
   },
   {
     id: 'sen-005',
@@ -123,8 +198,63 @@ export const MOCK_SENALES: GaliSignal[] = [
     ctaSecundario: 'Revisar proyecto',
     agente: 'roax',
     proyectoId: 'fitness-bands',
-    metrica: 'CTR 1.4% · $20k/día propuesto',
+    metrica: 'CTR 1.4% estable · presupuesto sugerido $20k/día',
+    segunDatos: 'Según datos de 524 dropshippers en fitness esta semana en Dropi',
     fechaDeteccion: '2026-06-04T09:00:00Z',
+    galiFlowDesc: 'Roax monitoreó CTR 5 días · confirmó estabilidad · comparó con 524 casos en Dropi',
+    beforeState: [
+      { label: 'Estado campaña', val: 'Pausada' },
+      { label: 'Pauta diaria', val: '$0/día' },
+      { label: 'CTR última semana', val: '1.4% estable' },
+    ],
+    afterState: [
+      { label: 'Estado campaña', val: 'Activa' },
+      { label: 'Pauta diaria', val: '$20.000/día' },
+      { label: 'Pedidos esperados', val: '+6–9/sem estimados' },
+    ],
+    canLaunch: false,
+  },
+  {
+    id: 'sen-006',
+    tipo: 'opportunity',
+    titulo: 'Ventana de mercado: Cali y búsquedas de collar mascotas',
+    contextoMacromundo:
+      'Según datos de 1.200 dropshippers en Colombia esta semana, el volumen de ' +
+      'búsquedas de "collar mascotas" en Cali subió 34% vs semana anterior ' +
+      '(847 búsquedas locales vs 631). Los dropshippers con presencia en Cali ' +
+      'tienen CTR 1.6% vs tu promedio nacional de 1.1%.',
+    recomendacion:
+      'Gali recomienda lanzar creatividad nueva en Cali con ángulo emocional ' +
+      '(mascotas + familia) antes del viernes, que es cuando los competidores ' +
+      'típicamente reaccionan a este tipo de tendencias en la red Dropi.',
+    ventanaDias: 7,
+    ctaPrincipal: 'Crear proyecto Cali ahora',
+    ctaSecundario: 'Ver análisis de mercado',
+    agente: 'ada',
+    metrica: 'CTR est. +0.5pp · Ventana 7 días',
+    fechaDeteccion: '2026-06-09T09:00:00Z',
+    canLaunch: true,
+  },
+  {
+    id: 'sen-007',
+    tipo: 'risk',
+    titulo: 'Saturación de audiencia en Meta — Bandas de Fitness',
+    contextoMacromundo:
+      'Según datos de 520 dropshippers activos en fitness en Dropi esta semana, ' +
+      'el creative de formato estático lleva en promedio 19 días activos antes de ' +
+      'saturarse. Tu creative actual lleva 21 días. El 78% de dropshippers que ' +
+      'no rotaron creative antes del día 21 vieron su ROAS caer por debajo del objetivo.',
+    recomendacion:
+      'Roax recomienda pausar el creative actual y activar el creativo B ' +
+      'que tenías en cola. Estimado de recuperación: CTR 1.4→1.8% en 72h.',
+    ventanaDias: 5,
+    ctaPrincipal: 'Activar creative B ahora',
+    ctaSecundario: 'Ver historial de creativos',
+    agente: 'roax',
+    proyectoId: 'fitness-bands',
+    metrica: 'Creative 21 días · ROAS en riesgo',
+    fechaDeteccion: '2026-06-10T08:00:00Z',
+    canLaunch: false,
   },
 ];
 
@@ -143,6 +273,8 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
     proyectoId: 'collar-gps-2026',
     pedidosAfectados: 12,
     fechaDeteccion: '2026-06-04T06:00:00Z',
+    resolucionResumen: 'Vigilante monitoreó Coordinadora Bogotá por 3 días consecutivos y comparó con el histórico de las últimas 4 semanas. Identificó los 12 pedidos afectados por destino y los marcó para reasignación.',
+    originPedidoId: 'PED-48291',
   },
   {
     id: 'alt-002',
@@ -158,20 +290,52 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
     agente: 'kronos',
     pedidosAfectados: 0,
     fechaDeteccion: '2026-06-04T08:00:00Z',
+    resolucionResumen: 'Kronos detectó la desconexión de Siigo el día 2 y calculó el valor acumulado sin facturar diariamente. Generó un reporte de las transacciones pendientes listo para importar al reconectar.',
   },
   {
     id: 'alt-003',
     tipo: 'warning',
-    titulo: 'Skincare K-Beauty: CTR cayó −38% en 48h',
+    titulo: 'Skincare K-Beauty: tu anuncio está perdiendo efectividad',
     descripcion:
-      'El CTR del creative activo de Skincare pasó de 1.8% a 1.1% en las últimas 48h. ' +
-      'Roax detectó saturación de audiencia — el creative lleva 18 días activo (umbral: 14 días).',
-    impacto: 'ROAS en riesgo de caer bajo objetivo si no se cambia creativo esta semana',
+      'Tu anuncio de Skincare está perdiendo efectividad — el clic de cada 100 usuarios bajó de 1.8 a 1.1 en las últimas 48h. ' +
+      'Roax detectó que el creative lleva 18 días activo (límite recomendado: 14 días) y la audiencia se está saturando.',
+    impacto: 'Las ventas de Skincare en riesgo de caer esta semana si no se cambia el anuncio',
     ctaPrincipal: 'Activar creative alternativo',
     ctaSecundario: 'Ver diagnóstico de Roax',
     agente: 'roax',
     proyectoId: 'skincare-kbeauty',
     pedidosAfectados: 0,
     fechaDeteccion: '2026-06-04T10:00:00Z',
+  },
+  {
+    id: 'alt-004',
+    tipo: 'warning',
+    titulo: 'Stock bajo: Collar GPS — 87 unidades restantes',
+    descripcion:
+      'A tu ritmo de 47 pedidos/semana, el stock se agota en ~13 días. ' +
+      'PetStore Colombia tarda 8-12 días en reponer. Tienes ~6 días útiles de margen.',
+    impacto: 'Riesgo de campaña sin stock en ~6 días útiles',
+    ctaPrincipal: 'Activar pausa automática si stock < 50 uds',
+    ctaSecundario: 'Ver proveedores alternativos',
+    agente: 'ada',
+    proyectoId: 'collar-gps-2026',
+    pedidosAfectados: 0,
+    fechaDeteccion: '2026-06-04T11:00:00Z',
+  },
+  {
+    id: 'alt-005',
+    tipo: 'critical',
+    titulo: 'Bandas de Fitness: ROAS cayó bajo umbral — 1.2x en últimas 48h',
+    descripcion:
+      'El ROAS de Bandas de Fitness cayó de 2.1x a 1.2x en las últimas 48 horas. ' +
+      'Tu margen mínimo para no perder dinero con este producto es 1.4x. ' +
+      'Roax identificó que el creative activo lleva 21 días y está saturado.',
+    impacto: 'Estás perdiendo dinero en cada peso de pauta invertido · $18k/día en riesgo',
+    ctaPrincipal: 'Pausar campaña inmediatamente',
+    ctaSecundario: 'Ver diagnóstico de Roax',
+    agente: 'roax',
+    proyectoId: 'fitness-bands',
+    pedidosAfectados: 0,
+    fechaDeteccion: '2026-06-10T07:30:00Z',
   },
 ];

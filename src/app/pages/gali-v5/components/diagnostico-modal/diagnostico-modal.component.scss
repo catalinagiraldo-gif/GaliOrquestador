@@ -148,6 +148,8 @@ $hub-info: #3b82f6;
 .diag-col {
   padding: $size-5 $size-6;
   overflow-y: auto;
+  height: 480px;
+  max-height: 480px;
 
   &--acciones {
     border-left: 1px solid $hub-border;

@@ -1,49 +1,71 @@
-<div class="mkt">
+<div class="mkt-page">
 
-  <!-- Hero header -->
-  <header class="mkt__hero">
-    <div class="mkt__hero-left">
-      <span class="mkt__eyebrow">🌐 Comunidad Dropi</span>
-      <h1 class="mkt__title">Marketplace de Skills</h1>
-      <p class="mkt__desc">Recetas creadas por la comunidad y el equipo Dropi. Instala en un clic, activa en segundos.</p>
-    </div>
-    <div class="mkt__hero-right">
-      <div class="mkt__stats">
-        <div class="mkt__stat">
-          <span class="mkt__stat-num">{{ instaladosCount() }}</span>
-          <span class="mkt__stat-label">Skills activas</span>
-        </div>
-        <div class="mkt__stat">
-          <span class="mkt__stat-num">{{ allSkills.length }}</span>
-          <span class="mkt__stat-label">Disponibles</span>
-        </div>
+  <!-- Header -->
+  <div class="mkt-page__header">
+    <div class="mkt-page__header-left">
+      <a routerLink="/gali-v5/skills" class="mkt-page__back">
+        <i class="pi pi-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="mkt-page__title">Marketplace Gali</h1>
+        <span class="mkt-page__sub">Skills · Agentes · Reglas · Plugins · creados por la comunidad Dropi</span>
       </div>
-      <button type="button" class="btn-mkt btn-mkt--primary" (click)="showEditor.set(true)">
-        <i class="pi pi-plus"></i>
-        Crear mi skill
+    </div>
+    <div class="mkt-page__header-right">
+      <button type="button" class="mkt-page__btn mkt-page__btn--ghost" (click)="showEditor.set(true)">
+        <i class="pi pi-plus"></i> Crear mi skill
+      </button>
+      <button type="button" class="mkt-page__btn mkt-page__btn--publish" (click)="openPublishModal()">
+        <i class="pi pi-upload"></i> {{ publishBtnLabel() }}
       </button>
     </div>
-  </header>
+  </div>
 
-  <!-- Skills personalizados para ti -->
-  <section class="mkt__personalized">
-    <div class="mkt__personalized-header">
+  <!-- Categorías principales -->
+  <div class="mkt-category-tabs">
+    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'skills'" (click)="mainCategory.set('skills')">
+      <span class="mkt-category-tab__icon">⚡</span>
+      <span class="mkt-category-tab__label">Skills</span>
+      <span class="mkt-category-tab__count">11</span>
+    </button>
+    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'agentes'" (click)="mainCategory.set('agentes')">
+      <span class="mkt-category-tab__icon">🤖</span>
+      <span class="mkt-category-tab__label">Agentes</span>
+      <span class="mkt-category-tab__count">5</span>
+    </button>
+    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'reglas'" (click)="mainCategory.set('reglas')">
+      <span class="mkt-category-tab__icon">📋</span>
+      <span class="mkt-category-tab__label">Reglas</span>
+      <span class="mkt-category-tab__count">5</span>
+    </button>
+    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'plugins'" (click)="mainCategory.set('plugins')">
+      <span class="mkt-category-tab__icon">🔌</span>
+      <span class="mkt-category-tab__label">Plugins MCP</span>
+      <span class="mkt-category-tab__count">6</span>
+    </button>
+  </div>
+
+  <!-- ══ SKILLS ══ -->
+  @if (mainCategory() === 'skills') {
+
+  <section class="mkt-personalized">
+    <div class="mkt-personalized__header">
       <h2>✦ Personalizado para ti</h2>
       <span>Basado en tu ROAS real 1.93x, novedades Bogotá 15% y Collar GPS activo</span>
     </div>
-    <div class="mkt__personalized-grid">
+    <div class="mkt-personalized__grid">
       @for (skill of personalizedSkills; track skill.id) {
-        <div class="mkt-p-card">
-          <div class="mkt-p-card__agent-bar" [style.background]="skill.agentColor + '20'" [style.border-color]="skill.agentColor + '40'">
-            <span class="mkt-p-card__agent-dot" [style.background]="skill.agentColor"></span>
-            <span class="mkt-p-card__agent-name" [style.color]="skill.agentColor">{{ skill.agent }}</span>
+        <div class="mkt-personalized-card">
+          <div class="mkt-personalized-card__agent" [style.border-color]="skill.agentColor + '40'">
+            <span class="mkt-personalized-card__dot" [style.background]="skill.agentColor"></span>
+            <span [style.color]="skill.agentColor">{{ skill.agent }}</span>
           </div>
-          <strong class="mkt-p-card__title">{{ skill.title }}</strong>
-          <p class="mkt-p-card__reason">{{ skill.reason }}</p>
+          <strong class="mkt-personalized-card__title">{{ skill.title }}</strong>
+          <p class="mkt-personalized-card__reason">{{ skill.reason }}</p>
           @if (isPersonalizedInstalled(skill.id)) {
-            <span class="mkt-p-card__installed">✓ Activado</span>
+            <span class="mkt-personalized-card__installed">✓ Activado</span>
           } @else {
-            <button class="mkt-p-card__cta" type="button" (click)="installPersonalized(skill.id)" data-proto-skip>
+            <button type="button" class="mkt-personalized-card__cta" (click)="installPersonalized(skill.id)" data-proto-skip>
               {{ skill.cta }}
             </button>
           }
@@ -52,133 +74,662 @@
     </div>
   </section>
 
-  <!-- Filters bar -->
-  <div class="mkt__filters">
-    <div class="mkt__search-wrap">
-      <i class="pi pi-search"></i>
+  <!-- ── MIS PUBLICACIONES: Skills ── -->
+  @if (myPublishedSkills().length > 0) {
+  <div class="my-pubs-section">
+    <div class="my-pubs-section__header">
+      <span class="my-pubs-section__title">Mis publicaciones</span>
+      <span class="my-pubs-section__count">{{ myPublishedSkills().length }}</span>
+      <div class="my-pubs-section__stats">
+        <span class="my-pubs-section__stat">47 usuarios activos</span>
+        <span class="my-pubs-section__stat">12 copias</span>
+        <span class="my-pubs-section__stat">4.7 ★ promedio</span>
+      </div>
+      <button type="button" class="my-pubs-section__add" (click)="openPublishModal()">+ Publicar skill</button>
+    </div>
+    <div class="my-pubs-grid">
+      @for (p of myPublishedSkills(); track p.id) {
+        <div class="my-pubs-card" [class.my-pubs-card--pending]="p.pendingReview">
+          <strong class="my-pubs-card__name">{{ p.nombre }}</strong>
+          <span class="my-pubs-card__desc">{{ p.desc }}</span>
+          <div class="my-pubs-card__footer">
+            @if (p.pendingReview) {
+              <span class="my-pubs-card__status my-pubs-card__status--review">En revisión</span>
+            } @else {
+              <span class="my-pubs-card__stat">{{ p.usos }} usos</span>
+              @if (p.rating > 0) { <span class="my-pubs-card__stat">⭐ {{ p.rating }}</span> }
+              <button type="button" class="my-pubs-card__edit" data-proto-skip>Ver stats →</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Search + Tabs -->
+  <div class="mkt-page__toolbar">
+    <div class="mkt-page__search-wrap">
+      <i class="pi pi-search mkt-page__search-icon"></i>
       <input
         type="text"
-        placeholder="Buscar skills..."
-        class="mkt__search"
-        [ngModel]="busqueda()"
-        (ngModelChange)="busqueda.set($event)" />
+        class="mkt-page__search"
+        placeholder="Buscar skills por nombre, sección o agente…"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+      />
     </div>
-
-    <div class="mkt__tipo-filters">
-      <button
-        *ngFor="let t of ['todos', 'gratuita', 'experto', 'premium']"
-        type="button"
-        class="tipo-chip"
-        [class.tipo-chip--active]="tipoFiltro() === t"
-        (click)="setTipoFiltro(t)"
-        data-proto-skip>
-        {{ t === 'todos' ? 'Todos' : t === 'gratuita' ? 'Gratuitas' : t === 'experto' ? 'Expertos' : 'Premium' }}
+    <div class="mkt-page__tabs">
+      <button type="button" class="mkt-page__tab"
+        [class.mkt-page__tab--active]="activeTab() === 'populares'"
+        (click)="activeTab.set('populares')">
+        🔥 Populares
+      </button>
+      <button type="button" class="mkt-page__tab"
+        [class.mkt-page__tab--active]="activeTab() === 'por-seccion'"
+        (click)="activeTab.set('por-seccion')">
+        📂 Por sección
+      </button>
+      <button type="button" class="mkt-page__tab"
+        [class.mkt-page__tab--active]="activeTab() === 'expertos'"
+        (click)="activeTab.set('expertos')">
+        ⭐ Expertos
+      </button>
+      <button type="button" class="mkt-page__tab"
+        [class.mkt-page__tab--active]="activeTab() === 'nuevas'"
+        (click)="activeTab.set('nuevas')">
+        ✨ Nuevas
       </button>
     </div>
   </div>
 
-  <!-- Agent tabs -->
-  <nav class="mkt__agent-tabs">
-    <button
-      *ngFor="let tab of agenteTabs"
-      type="button"
-      class="agent-tab"
-      [class.agent-tab--active]="agenteTab() === tab.id"
-      (click)="agenteTab.set(tab.id)"
-      data-proto-skip>
-      <span>{{ tab.icono }}</span>
-      <span>{{ tab.label }}</span>
-    </button>
-  </nav>
-
-  <!-- Skills grid -->
-  <div class="mkt__content">
-    <p class="mkt__count" *ngIf="filteredSkills().length > 0">
-      {{ filteredSkills().length }} skills {{ agenteTab() !== 'todos' ? 'de ' + agenteTab() : '' }}
-    </p>
-
-    <!-- Empty state -->
-    <div class="mkt__empty" *ngIf="filteredSkills().length === 0">
-      <span class="mkt__empty-icon">🔍</span>
-      <p>No hay skills con ese filtro todavía.</p>
+  <!-- Section filters (solo en "Por sección") -->
+  @if (activeTab() === 'por-seccion') {
+    <div class="mkt-page__section-filters">
+      <button type="button" class="mkt-sec-filter"
+        [class.mkt-sec-filter--active]="activeSectionFilter() === null"
+        (click)="activeSectionFilter.set(null)">
+        Todas
+      </button>
+      @for (sec of sectionFilters; track sec) {
+        <button type="button" class="mkt-sec-filter"
+          [class.mkt-sec-filter--active]="activeSectionFilter() === sec"
+          (click)="setSection(sec)">
+          {{ sec }}
+        </button>
+      }
     </div>
+  }
 
-    <div class="mkt__grid">
-      <div
-        *ngFor="let skill of filteredSkills()"
-        class="skill-card"
-        [class.skill-card--instalada]="isInstalada(skill)"
-        [class.skill-card--premium]="skill.tipo === 'premium'">
-
-        <!-- Card header with agente badge -->
-        <div class="skill-card__top">
-          <span class="skill-card__icon">{{ skill.icono }}</span>
-          <span class="skill-card__agente-tag">{{ skill.agente }}</span>
-          <span class="skill-card__badge" [class]="getTipoBadgeClass(skill.tipo)">
-            {{ skill.tipo === 'gratuita' ? 'Gratis' : skill.tipo === 'experto' ? '✦ Experto' : '⭐ Premium' }}
-          </span>
-        </div>
-
-        <!-- Main info -->
-        <h3 class="skill-card__nombre">{{ skill.nombre }}</h3>
-
-        <!-- Rating & Usage -->
-        <div class="skill-card__meta">
-          <div class="skill-card__stars">
-            <span class="skill-card__star-val">⭐ {{ skill.rating }}</span>
-            <span class="skill-card__usos">· {{ formatUsos(skill.usos) }} usos</span>
-          </div>
-          <div class="skill-card__creador">
-            Por {{ skill.creador }}
-            <span *ngIf="skill.verificado" class="skill-card__verified" title="Verificado por Dropi">✓</span>
-          </div>
-        </div>
-
-        <p class="skill-card__desc">{{ skill.descripcion }}</p>
-
-        <!-- CTA -->
-        <div class="skill-card__footer">
-          <button
-            *ngIf="!isInstalada(skill) && !isInstalando(skill)"
-            type="button"
-            class="btn-skill btn-skill--install"
-            (click)="instalar(skill)">
-            Activar
-          </button>
-          <button
-            *ngIf="isInstalando(skill)"
-            type="button"
-            class="btn-skill btn-skill--loading"
-            disabled>
-            <i class="pi pi-spin pi-spinner"></i>
-          </button>
-          <button
-            *ngIf="isInstalada(skill) && !isInstalando(skill)"
-            type="button"
-            class="btn-skill btn-skill--installed">
-            <i class="pi pi-check"></i> Activa
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Share CTA -->
-    <div class="mkt__share-cta" (click)="showEditor.set(true)" style="cursor: pointer;">
-      <span class="mkt__share-icon">💡</span>
-      <div>
-        <strong>¿Tienes una receta que funciona?</strong>
-        <p>Publícala y ayuda a otros dropshippers. Si supera 500 activaciones, apareces en el newsletter de Dropi.</p>
-      </div>
-      <button type="button" class="btn-mkt btn-mkt--primary" data-proto-skip>Compartir mi receta →</button>
-    </div>
+  <!-- Stats strip -->
+  <div class="mkt-page__stats-strip">
+    <span class="mkt-stat">
+      <strong>{{ filteredSkills().length }}</strong> skills encontradas
+    </span>
+    <span class="mkt-stat-sep">·</span>
+    <span class="mkt-stat">
+      <strong>12.4k</strong> instalaciones activas
+    </span>
+    <span class="mkt-stat-sep">·</span>
+    <span class="mkt-stat">
+      <strong>47</strong> creadores
+    </span>
+    <span class="mkt-stat-sep">·</span>
+    <span class="mkt-stat mkt-stat--highlight">
+      <span class="mkt-stat__dot"></span> Comunidad activa
+    </span>
   </div>
 
-  <!-- Skills Editor Modal -->
-  <app-skills-editor-modal
-    *ngIf="showEditor()"
-    agenteNombre="Mi agente"
-    (closed)="showEditor.set(false)"
-    (saved)="showEditor.set(false)">
-  </app-skills-editor-modal>
+  <!-- Grid -->
+  <div class="mkt-page__grid">
 
-</div>
+    @for (skill of filteredSkills(); track skill.id) {
+      <div class="mkt-card" [class.mkt-card--verified]="skill.verificado">
+
+        <!-- Top badges -->
+        <div class="mkt-card__top">
+          <div class="mkt-card__badges">
+            <span class="mkt-card__tipo"
+              [class.mkt-card__tipo--op]="skill.tipo === 'Operación'"
+              [class.mkt-card__tipo--exp]="skill.tipo === 'Experto'"
+              [class.mkt-card__tipo--prem]="skill.tipo === 'Premium'"
+              [class.mkt-card__tipo--lanz]="skill.tipo === 'Lanzamiento'">
+              {{ skill.tipo }}
+            </span>
+            @for (sec of skill.secciones; track sec) {
+              <span class="mkt-card__sec">{{ sec }}</span>
+            }
+          </div>
+          @if (skill.tag) {
+            <span class="mkt-card__tag">{{ skill.tag }}</span>
+          }
+        </div>
+
+        <!-- Skill name & desc -->
+        <h3 class="mkt-card__nombre">{{ skill.nombre }}</h3>
+        <p class="mkt-card__desc">{{ skill.descripcion }}</p>
+
+        <!-- Creator profile -->
+        <div class="mkt-creator">
+          <div class="mkt-creator__avatar" [style.background]="skill.autorColor">
+            {{ skill.autorAvatar }}
+          </div>
+          <div class="mkt-creator__info">
+            <span class="mkt-creator__name">
+              {{ skill.autor }}
+              @if (skill.verificado) {
+                <span class="mkt-creator__check">✓</span>
+              }
+            </span>
+            @if (skill.autorBio) {
+              <span class="mkt-creator__bio">{{ skill.autorBio }}</span>
+            }
+            @if (skill.handle) {
+              <span class="mkt-creator__handle">{{ skill.handle }}</span>
+            }
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="mkt-card__stats">
+          <span class="mkt-stat-pill">
+            <i class="pi pi-star-fill"></i> {{ skill.rating }}
+          </span>
+          <span class="mkt-stat-pill">
+            <i class="pi pi-copy"></i> {{ skill.copias }} copias
+          </span>
+          <span class="mkt-stat-pill">
+            <i class="pi pi-users"></i> {{ skill.uses }}
+          </span>
+          @if (skill.comments > 0) {
+            <span class="mkt-stat-pill">
+              <i class="pi pi-comment"></i> {{ skill.comments }}
+            </span>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="mkt-card__actions">
+          <button type="button" class="mkt-card__btn mkt-card__btn--ghost"
+            (click)="forkSkill(skill.id)">
+            <i class="pi pi-copy"></i> Usar como base
+          </button>
+          <button type="button" class="mkt-card__btn mkt-card__btn--primary"
+            (click)="activateSkill(skill.id)">
+            Activar →
+          </button>
+        </div>
+
+      </div>
+    }
+
+    @if (filteredSkills().length === 0) {
+      <div class="mkt-page__empty">
+        <i class="pi pi-search" style="font-size: 28px; opacity: .3"></i>
+        <p>No hay skills que coincidan con tu búsqueda.</p>
+        <button type="button" class="mkt-page__btn mkt-page__btn--ghost"
+          (click)="searchQuery.set(''); activeSectionFilter.set(null)">
+          Limpiar filtros
+        </button>
+      </div>
+    }
+
+  </div>
+
+  } <!-- /mainCategory === skills -->
+
+  <!-- ══ AGENTES ══ -->
+  @if (mainCategory() === 'agentes') {
+  <div class="mkt-agents-section">
+    <p class="mkt-section-intro">Instala agentes preconfigurados por Dropi o la comunidad. Cada agente trae sus skills y reglas listas para activar.</p>
+
+    <!-- Mis publicaciones -->
+    @if (myPublishedAgentes().length > 0) {
+    <div class="my-pubs-section">
+      <div class="my-pubs-section__header">
+        <span class="my-pubs-section__title">Mis publicaciones</span>
+        <span class="my-pubs-section__count">{{ myPublishedAgentes().length }}</span>
+        <button type="button" class="my-pubs-section__add" (click)="openPublishModal()">+ Publicar agente</button>
+      </div>
+      <div class="my-pubs-grid">
+        @for (p of myPublishedAgentes(); track p.id) {
+          <div class="my-pubs-card" [class.my-pubs-card--pending]="p.pendingReview">
+            <strong class="my-pubs-card__name">{{ p.nombre }}</strong>
+            <span class="my-pubs-card__desc">{{ p.desc }}</span>
+            <div class="my-pubs-card__footer">
+              @if (p.pendingReview) {
+                <span class="my-pubs-card__status my-pubs-card__status--review">En revisión</span>
+              } @else {
+                <span class="my-pubs-card__stat">{{ p.usos }} usos</span>
+                @if (p.rating > 0) { <span class="my-pubs-card__stat">⭐ {{ p.rating }}</span> }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    }
+
+    <div class="mkt-agents-grid">
+      @for (ag of mktAgentes; track ag.id) {
+        <div class="mkt-agent-card" [class.mkt-agent-card--instalado]="ag.instalado">
+          <div class="mkt-agent-card__header">
+            <span class="mkt-agent-card__dot" [style.background]="ag.color"></span>
+            <strong class="mkt-agent-card__nombre">{{ ag.nombre }}</strong>
+            @if (ag.instalado) { <span class="mkt-agent-card__badge">✓ Instalado</span> }
+          </div>
+          <p class="mkt-agent-card__desc">{{ ag.descripcion }}</p>
+          <div class="mkt-agent-card__skills">
+            @for (h of ag.habilidades; track h) {
+              <span class="mkt-agent-skill-chip">{{ h }}</span>
+            }
+          </div>
+          <div class="mkt-agent-card__footer">
+            <span class="mkt-agent-card__meta">⭐ {{ ag.rating }} · {{ ag.usos }} usos</span>
+            <span class="mkt-agent-card__creador">por {{ ag.creador }}</span>
+            @if (isAgentInstalled(ag.id)) {
+              <span class="mkt-installed-badge">✓ Instalado</span>
+            } @else {
+              <button type="button" class="mkt-agent-card__cta" (click)="openAgentPreview(ag)">Ver agente →</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  } <!-- /agentes -->
+
+  <!-- ══ REGLAS ══ -->
+  @if (mainCategory() === 'reglas') {
+  <div class="mkt-reglas-section">
+    <p class="mkt-section-intro">Reglas condicionales If-Then listas para usar. Cópialas tal cual o edítalas para tu operación.</p>
+
+    <!-- Mis publicaciones -->
+    @if (myPublishedReglas().length > 0) {
+    <div class="my-pubs-section">
+      <div class="my-pubs-section__header">
+        <span class="my-pubs-section__title">Mis publicaciones</span>
+        <span class="my-pubs-section__count">{{ myPublishedReglas().length }}</span>
+        <button type="button" class="my-pubs-section__add" (click)="openPublishModal()">+ Publicar regla</button>
+      </div>
+      <div class="my-pubs-grid">
+        @for (p of myPublishedReglas(); track p.id) {
+          <div class="my-pubs-card" [class.my-pubs-card--pending]="p.pendingReview">
+            <strong class="my-pubs-card__name">{{ p.nombre }}</strong>
+            <span class="my-pubs-card__desc">{{ p.desc }}</span>
+            <div class="my-pubs-card__footer">
+              @if (p.pendingReview) {
+                <span class="my-pubs-card__status my-pubs-card__status--review">En revisión</span>
+              } @else {
+                <span class="my-pubs-card__stat">{{ p.usos }} usos</span>
+                @if (p.rating > 0) { <span class="my-pubs-card__stat">⭐ {{ p.rating }}</span> }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    }
+
+    <div class="mkt-reglas-list">
+      @for (r of mktReglas; track r.id) {
+        <div class="mkt-regla-card" [class.mkt-regla-card--instalada]="r.instalada">
+          <div class="mkt-regla-card__header">
+            <div class="mkt-regla-card__agent-chip" [style.background]="r.agentColor + '20'" [style.color]="r.agentColor">
+              {{ r.agente }}
+            </div>
+            <strong class="mkt-regla-card__titulo">{{ r.titulo }}</strong>
+            @if (r.instalada) { <span class="mkt-regla-card__active-badge">● Activa</span> }
+          </div>
+          <p class="mkt-regla-card__desc">{{ r.descripcion }}</p>
+          <code class="mkt-regla-card__ejemplo">{{ r.ejemplo }}</code>
+          <div class="mkt-regla-card__footer">
+            <span class="mkt-regla-card__usos">{{ r.usos }} usuarios</span>
+            @if (isReglaInstalled(r.id)) {
+              <span class="mkt-installed-badge">✓ Activa</span>
+            } @else {
+              <button type="button" class="mkt-regla-card__cta" (click)="openReglaPreview(r)">Ver regla →</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  } <!-- /reglas -->
+
+  <!-- ══ PLUGINS MCP ══ -->
+  @if (mainCategory() === 'plugins') {
+  <div class="mkt-plugins-section">
+    <p class="mkt-section-intro">Conexiones y herramientas externas que amplían lo que Gali puede hacer. Actívalas para enriquecer los datos de tus agentes.</p>
+    <div class="mkt-plugins-grid">
+      @for (p of mktPlugins; track p.id) {
+        <div class="mkt-plugin-card" [class.mkt-plugin-card--instalado]="p.instalado">
+          <div class="mkt-plugin-card__header">
+            <span class="mkt-plugin-card__icon">{{ p.icono }}</span>
+            <div class="mkt-plugin-card__info">
+              <strong class="mkt-plugin-card__nombre">{{ p.nombre }}</strong>
+              <span class="mkt-plugin-card__tipo">{{ p.tipo }}</span>
+            </div>
+            @if (p.instalado) { <span class="mkt-plugin-card__badge">✓ Conectado</span> }
+          </div>
+          <p class="mkt-plugin-card__desc">{{ p.descripcion }}</p>
+          <div class="mkt-plugin-card__footer">
+            <span class="mkt-plugin-card__proveedor">{{ p.proveedor }}</span>
+            <span class="mkt-plugin-card__precio" [class.mkt-plugin-card__precio--free]="p.gratis">
+              {{ p.gratis ? 'Gratis' : 'Gali Pro' }}
+            </span>
+            @if (!p.instalado) {
+              <button type="button" class="mkt-plugin-card__cta" data-proto-skip>Conectar →</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+    <p class="mkt-plugins-section__link">
+      <a routerLink="/gali-v5/conexiones">Ver mapa de conexiones activas →</a>
+    </p>
+  </div>
+  } <!-- /plugins -->
+
+</div><!-- /mkt-page -->
+
+@if (showEditor()) {
+  <app-skills-editor-modal (closed)="showEditor.set(false)" />
+}
+
+<!-- ── Modal: Publicar en Marketplace ─────────────────────────────────── -->
+@if (publishOpen()) {
+  <div class="mkt-preview-backdrop" (click)="closePublishModal()">
+    <div class="pub-modal" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
+      <div class="pub-modal__header">
+        <h2 class="pub-modal__title">{{ publishModalTitle() }}</h2>
+        <button type="button" class="mkt-preview-modal__close" (click)="closePublishModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Step: choose ──────────────────────────────────── -->
+      @if (publishStep() === 'choose') {
+        <div class="pub-modal__body">
+          <p class="pub-modal__hint">¿Cómo quieres publicar?</p>
+          <div class="pub-modal__paths">
+            <button type="button" class="pub-path-card" (click)="goPublishNew()">
+              <span class="pub-path-card__icon">✦</span>
+              <strong class="pub-path-card__title">Crear de cero</strong>
+              <span class="pub-path-card__desc">Define nombre, descripción y comportamiento. Gali te ayuda a estructurarlo.</span>
+              <span class="pub-path-card__arrow">→</span>
+            </button>
+            <button type="button" class="pub-path-card" (click)="goPublishExisting()"
+              [disabled]="myExistingForCategory.length === 0">
+              <span class="pub-path-card__icon">📤</span>
+              <strong class="pub-path-card__title">Publicar uno existente</strong>
+              <span class="pub-path-card__desc">Toma uno de los que ya tienes en tu cuenta y lo comparte con la comunidad.</span>
+              <span class="pub-path-card__arrow">→</span>
+            </button>
+          </div>
+        </div>
+        <div class="pub-modal__footer">
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="closePublishModal()">Cancelar</button>
+        </div>
+      }
+
+      <!-- Step: new ─────────────────────────────────────── -->
+      @if (publishStep() === 'new') {
+        <div class="pub-modal__body">
+          <div class="pub-form">
+            <label class="pub-form__label">Nombre</label>
+            <input type="text" class="pub-form__input"
+              placeholder="Ej: Auto-confirmación zona verde Bogotá"
+              [value]="publishName()"
+              (input)="publishName.set($any($event.target).value)" />
+
+            <label class="pub-form__label">Descripción breve</label>
+            <textarea class="pub-form__textarea" rows="3"
+              placeholder="Explica qué hace, cuándo se activa y qué beneficio da al dropshipper…"
+              [value]="publishDesc()"
+              (input)="publishDesc.set($any($event.target).value)">
+            </textarea>
+
+            @if (mainCategory() === 'reglas') {
+              <label class="pub-form__label">Agente responsable</label>
+              <div class="pub-form__agent-row">
+                @for (opt of allKnownAgents.slice(0,5); track opt.id) {
+                  <button type="button" class="new-rule-agent-chip"
+                    [class.new-rule-agent-chip--selected]="publishAgent() === opt.nombre"
+                    [style.--c]="opt.color"
+                    (click)="publishAgent.set(opt.nombre)">
+                    <span class="new-rule-agent-chip__dot"></span>
+                    {{ opt.nombre }}
+                  </button>
+                }
+              </div>
+            }
+
+            <div class="pub-form__gali-tip">
+              <span class="pub-form__gali-tip__icon">✦</span>
+              <p>Gali revisará tu publicación antes de hacerla visible para la comunidad. Suele tomar menos de 24h.</p>
+            </div>
+          </div>
+        </div>
+        <div class="pub-modal__footer">
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="goPublishBack()">← Volver</button>
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--primary"
+            [disabled]="!publishName().trim()"
+            (click)="confirmPublish()">
+            Enviar para revisión →
+          </button>
+        </div>
+      }
+
+      <!-- Step: existing ────────────────────────────────── -->
+      @if (publishStep() === 'existing') {
+        <div class="pub-modal__body">
+          <p class="pub-modal__hint">Selecciona cuál quieres compartir con la comunidad:</p>
+          <div class="pub-existing-list">
+            @for (item of myExistingForCategory; track item.id) {
+              <button type="button" class="pub-existing-item"
+                [class.pub-existing-item--selected]="publishPickId() === item.id"
+                (click)="selectExistingItem(item.id)">
+                <span class="pub-existing-item__icon">{{ item.icon }}</span>
+                <div class="pub-existing-item__info">
+                  <strong>{{ item.nombre }}</strong>
+                  <span>{{ item.desc }}</span>
+                </div>
+                <span class="pub-existing-item__check">{{ publishPickId() === item.id ? '✓' : '' }}</span>
+              </button>
+            }
+            @if (myExistingForCategory.length === 0) {
+              <p class="pub-modal__empty">No tienes ítems de este tipo en tu cuenta todavía.</p>
+            }
+          </div>
+        </div>
+        <div class="pub-modal__footer">
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="goPublishBack()">← Volver</button>
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--primary"
+            [disabled]="!publishPickId()"
+            (click)="confirmPublish()">
+            Publicar seleccionado →
+          </button>
+        </div>
+      }
+
+      <!-- Step: done ────────────────────────────────────── -->
+      @if (publishStep() === 'done') {
+        <div class="pub-modal__body pub-modal__body--done">
+          <span class="pub-modal__done-icon">✓</span>
+          <strong class="pub-modal__done-title">¡Enviado a revisión!</strong>
+          <p class="pub-modal__done-desc">Gali revisará tu publicación y estará visible en el Marketplace en menos de 24h. Aparecerá en "Mis publicaciones".</p>
+        </div>
+      }
+
+    </div>
+  </div>
+}
+
+<!-- ── Modal: Preview Agente ──────────────────────────────────────────── -->
+@if (previewAgent()) {
+  <div class="mkt-preview-backdrop" (click)="closeAgentPreview()">
+    <div class="mkt-preview-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="mkt-preview-modal__close" (click)="closeAgentPreview()">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="mkt-preview-modal__agent-header">
+        <span class="mkt-preview-modal__dot" [style.background]="previewAgent()!.color"></span>
+        <div>
+          <h2 class="mkt-preview-modal__title">{{ previewAgent()!.nombre }}</h2>
+          <span class="mkt-preview-modal__meta">Agente Dropi · por {{ previewAgent()!.creador }}</span>
+        </div>
+        <div class="mkt-preview-modal__stats">
+          <span class="mkt-preview-stat">⭐ {{ previewAgent()!.rating }}</span>
+          <span class="mkt-preview-stat">{{ previewAgent()!.usos }} usos</span>
+        </div>
+      </div>
+
+      <p class="mkt-preview-modal__desc">{{ previewAgent()!.descripcion }}</p>
+
+      <div class="mkt-preview-modal__section">
+        <span class="mkt-preview-modal__section-label">SKILLS INCLUIDAS</span>
+        <div class="mkt-preview-modal__chips">
+          @for (h of previewAgent()!.habilidades; track h) {
+            <span class="mkt-preview-chip">{{ h }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="mkt-preview-modal__section">
+        <span class="mkt-preview-modal__section-label">CÓMO ACTÚA</span>
+        <p class="mkt-preview-modal__how">
+          {{ previewAgent()!.nombre }} opera de forma autónoma dentro de su área usando las skills asignadas.
+          Puedes configurar su nivel de autonomía y umbrales desde la ficha del agente en
+          <a routerLink="/gali-v5/agentes" class="mkt-preview-link" (click)="closeAgentPreview()">Agentes →</a>
+        </p>
+      </div>
+
+      <div class="mkt-preview-modal__footer">
+        <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="closeAgentPreview()">
+          Cancelar
+        </button>
+        <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--primary" (click)="confirmInstallAgent()">
+          Instalar {{ previewAgent()!.nombre }} →
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: Preview Regla + Asignación ──────────────────────────────── -->
+@if (previewRegla()) {
+  <div class="mkt-preview-backdrop" (click)="closeReglaPreview()">
+    <div class="mkt-preview-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="mkt-preview-modal__close" (click)="closeReglaPreview()">
+        <i class="pi pi-times"></i>
+      </button>
+
+      <div class="mkt-preview-modal__regla-header">
+        <div class="mkt-preview-modal__agent-chip"
+          [style.background]="previewRegla()!.agentColor + '22'"
+          [style.color]="previewRegla()!.agentColor"
+          [style.border-color]="previewRegla()!.agentColor + '44'">
+          ● {{ previewRegla()!.agente }}
+        </div>
+        <h2 class="mkt-preview-modal__title">{{ previewRegla()!.titulo }}</h2>
+      </div>
+
+      <p class="mkt-preview-modal__desc">{{ previewRegla()!.descripcion }}</p>
+
+      <div class="mkt-preview-modal__section">
+        <span class="mkt-preview-modal__section-label">LÓGICA IF-THEN</span>
+        <code class="mkt-preview-modal__code">{{ previewRegla()!.ejemplo }}</code>
+      </div>
+
+      <div class="mkt-preview-modal__section">
+        <span class="mkt-preview-modal__section-label">AGREGAR A MIS AGENTES</span>
+        <p class="mkt-preview-modal__assign-hint">La regla se activará en los agentes que selecciones.</p>
+        <div class="mkt-assign-agents">
+          @for (ag of allKnownAgents; track ag.id) {
+            <label class="mkt-assign-agent-row" [class.mkt-assign-agent-row--checked]="assignAgentIds().includes(ag.id)">
+              <input type="checkbox"
+                [checked]="assignAgentIds().includes(ag.id)"
+                (change)="toggleAssignAgent(ag.id)" />
+              <span class="mkt-assign-agent-dot" [style.background]="ag.color"></span>
+              <span class="mkt-assign-agent-name">{{ ag.nombre }}</span>
+              @if (ag.custom) {
+                <span class="mkt-assign-agent-badge">personalizado</span>
+              }
+            </label>
+          }
+        </div>
+      </div>
+
+      <div class="mkt-preview-modal__footer">
+        <span class="mkt-preview-modal__assign-count">
+          @if (assignAgentIds().length > 0) {
+            {{ assignAgentIds().length }} agente{{ assignAgentIds().length !== 1 ? 's' : '' }} seleccionado{{ assignAgentIds().length !== 1 ? 's' : '' }}
+          }
+        </span>
+        <div class="mkt-preview-modal__footer-btns">
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="closeReglaPreview()">
+            Cancelar
+          </button>
+          <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--primary" (click)="confirmInstallRegla()">
+            Usar esta regla →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Toast: skill publicada -->
+@if (shareDone()) {
+  <div class="mkt-toast">
+    <i class="pi pi-check-circle"></i>
+    Skill publicada en el marketplace ✦
+  </div>
+}
+
+<!-- Share modal -->
+@if (showShareModal()) {
+  <div class="mkt-modal-backdrop" (click)="showShareModal.set(false)">
+    <div class="mkt-modal" (click)="$event.stopPropagation()">
+      <div class="mkt-modal__header">
+        <span class="mkt-modal__icon">🔗</span>
+        <h3 class="mkt-modal__title">Publicar skill en el marketplace</h3>
+        <button type="button" class="mkt-modal__close" (click)="showShareModal.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <p class="mkt-modal__desc">
+        Al publicar tu skill, otros dropshippers podrán activarla o usarla como base.
+        Ganarás créditos de comunidad por cada copia que hagan de tu skill.
+      </p>
+      <div class="mkt-modal__options">
+        <label class="mkt-modal__option">
+          <input type="radio" name="share-vis" value="public" checked>
+          <span>
+            <strong>Pública</strong> — visible para todos en el marketplace
+          </span>
+        </label>
+        <label class="mkt-modal__option">
+          <input type="radio" name="share-vis" value="link">
+          <span>
+            <strong>Solo con link</strong> — comparte con quien quieras
+          </span>
+        </label>
+      </div>
+      <div class="mkt-modal__footer">
+        <button type="button" class="mkt-modal__btn mkt-modal__btn--cancel"
+          (click)="showShareModal.set(false)">
+          Cancelar
+        </button>
+        <button type="button" class="mkt-modal__btn mkt-modal__btn--primary"
+          (click)="confirmShare()">
+          Publicar en marketplace ✦
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -556,3 +556,252 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   pointer-events: none;
 }
+
+// ── Editor inline nueva regla ─────────────────────────────────────
+.new-rule-editor {
+  margin-bottom: $size-6;
+  padding: $size-5;
+  border-radius: $radius-lg;
+  border: 1.5px solid $primary-200;
+  background: rgba($primary-500, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $gray-800;
+  }
+
+  &__hint {
+    font-size: $font-xs;
+    color: $gray-400;
+  }
+
+  &__label {
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $gray-500;
+    margin-right: $size-2;
+  }
+
+  &__agent-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $size-2;
+  }
+
+  &__area {
+    width: 100%;
+    box-sizing: border-box;
+    padding: $size-3;
+    border: 1.5px solid $gray-200;
+    border-radius: $radius-md;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-800;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    background: $white;
+
+    &:focus {
+      border-color: $primary-400;
+    }
+
+    &::placeholder {
+      color: $gray-300;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $size-2;
+  }
+
+  &__btn {
+    border: none;
+    border-radius: $radius-md;
+    padding: 8px 16px;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+
+    &--gali {
+      background: rgba($primary-500, 0.1);
+      color: $primary-600;
+
+      &:hover {
+        background: rgba($primary-500, 0.18);
+      }
+    }
+
+    &--ghost {
+      background: transparent;
+      color: $gray-500;
+      border: 1px solid $gray-200;
+
+      &:hover {
+        background: $gray-50;
+      }
+    }
+
+    &--primary {
+      background: $primary-500;
+      color: $white;
+
+      &:hover:not(:disabled) {
+        background: $primary-600;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.new-rule-agent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: $radius-full;
+  border: 1.5px solid $gray-200;
+  background: $white;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  color: $gray-600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c, $gray-300);
+  }
+
+  &--selected {
+    background: $gray-50;
+    border-color: var(--c, $gray-300);
+    color: $gray-800;
+    font-weight: $font-semibold;
+  }
+}
+
+// ── Sección asignación de agentes en editor de nueva regla ────────────────
+.new-rule-editor {
+  &__assign-section {
+    margin-top: $size-3;
+  }
+
+  &__assign-label {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: 700;
+    color: $gray-600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $size-2;
+  }
+
+  &__assign-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: $primary-500;
+    background: rgba($primary-500, 0.1);
+    border-radius: 8px;
+    padding: 1px 7px;
+  }
+
+  &__agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: $size-2;
+  }
+
+  &__btn--saved {
+    background: #16a34a !important;
+    border-color: #16a34a !important;
+    pointer-events: none;
+  }
+}
+
+.new-rule-assign-row {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-2 $size-3;
+  border: 1px solid $gray-200;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+
+  input[type="checkbox"] { display: none; }
+
+  &:hover { border-color: rgba($primary-500, 0.4); background: rgba($primary-500, 0.03); }
+
+  &--checked {
+    border-color: $primary-500;
+    background: rgba($primary-500, 0.05);
+  }
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: 500;
+    color: $gray-700;
+    flex: 1;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: #7c3aed;
+    background: rgba(124,58,237,0.08);
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+
+  &__check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid $gray-300;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: transparent;
+    transition: background 0.1s, border-color 0.1s;
+    flex-shrink: 0;
+  }
+
+  &--checked &__check {
+    background: $primary-500;
+    border-color: $primary-500;
+    color: #fff;
+  }
+}

@@ -4,11 +4,58 @@
     agent="Gali"
     status="orquestando proyectos"
     message="{{ activeCount }} proyectos activos · {{ proyectos.length }} en total · ADA Spy tiene 2 análisis listos"
-    ctaLabel="Diagnóstico cruzado →"
+    ctaLabel="Diagnóstico cruzado"
+    ctaTooltip="Análisis cruzado automático: Gali compara el rendimiento de tus proyectos para detectar patrones y oportunidades entre ellos"
     secondaryCta="Ver en Hub"
     (ctaClick)="openDiagnostico()"
     (secondaryClick)="goToHub()"
   />
+
+  <!-- Portfolio Health Dashboard -->
+  <div class="portfolio-health">
+    <button type="button" class="ph-toggle" (click)="togglePortfolioHealth()" data-proto-skip>
+      <span class="ph-toggle__title">Salud del portafolio</span>
+      <div class="ph-toggle__stats">
+        <span class="ph-stat-num">{{ totalPedidos }}</span>
+        <span class="ph-stat-label">pedidos</span>
+        <span class="ph-stat-sep">·</span>
+        <span class="ph-stat-dot ph-stat-dot--ok"></span>
+        <span class="ph-stat-num">{{ activeCount }}</span>
+        <span class="ph-stat-label">saludables</span>
+        @if (recienLanzadoCount > 0) {
+          <span class="ph-stat-sep">·</span>
+          <span class="ph-stat-dot ph-stat-dot--new"></span>
+          <span class="ph-stat-num">{{ recienLanzadoCount }}</span>
+          <span class="ph-stat-label">nuevos</span>
+        }
+        @if (falloCount > 0) {
+          <span class="ph-stat-sep">·</span>
+          <span class="ph-stat-dot ph-stat-dot--fallo"></span>
+          <span class="ph-stat-num">{{ falloCount }}</span>
+          <span class="ph-stat-label">con fallo</span>
+        }
+      </div>
+      <i class="pi ph-toggle__chevron"
+        [class.pi-chevron-down]="!portfolioHealthOpen()"
+        [class.pi-chevron-up]="portfolioHealthOpen()"></i>
+    </button>
+
+    @if (portfolioHealthOpen()) {
+      <div class="ph-grid">
+        @for (p of portfolioRows; track p.id) {
+          <div class="ph-row" (click)="goToProject(p.id)" data-proto-skip>
+            <span class="ph-row__icon">{{ p.icono }}</span>
+            <span class="ph-row__name" [title]="p.nombre">{{ p.nombre }}</span>
+            <div class="ph-bar-wrap">
+              <div class="ph-bar" [style.width.%]="p.barPct" [style.background-color]="p.healthColor"></div>
+            </div>
+            <span class="ph-row__pedidos">{{ p.pedidos || '—' }}</span>
+            <span class="ph-row__estado" [style.color]="p.healthColor">{{ estadoLabel(p.estado) }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
 
   <!-- Breadcrumb -->
   <nav class="proyectos-page__breadcrumbs" aria-label="Breadcrumb">
@@ -67,7 +114,8 @@
         class="proyecto-row"
         [class.proyecto-row--warn]="p.galiStatus === 'warn'"
         [class.proyecto-row--pausado]="p.estado === 'pausado'"
-        [class.proyecto-row--borrador]="p.estado === 'borrador'">
+        [class.proyecto-row--borrador]="p.estado === 'borrador'"
+        [class.proyecto-row--fallo]="p.estado === 'campaña_fallida'">
 
         <!-- Estado badge -->
         <div class="proyecto-row__estado">
@@ -75,7 +123,9 @@
             [class.prow-badge--escala]="p.estado === 'en_escala'"
             [class.prow-badge--activo]="p.estado === 'activo'"
             [class.prow-badge--pausado]="p.estado === 'pausado'"
-            [class.prow-badge--borrador]="p.estado === 'borrador'">
+            [class.prow-badge--borrador]="p.estado === 'borrador'"
+            [class.prow-badge--recien]="p.estado === 'recien_lanzado'"
+            [class.prow-badge--fallo]="p.estado === 'campaña_fallida'">
             {{ estadoLabel(p.estado) }}
           </span>
         </div>
@@ -125,14 +175,22 @@
 
         <!-- Acción -->
         <div class="proyecto-row__action">
-          <button
-            class="prow-action-btn"
-            type="button"
-            (click)="goToProject(p.id)"
-            data-proto-skip>
-            Ver proyecto
-            <i class="pi pi-arrow-right"></i>
-          </button>
+          @if (p.estado === 'campaña_fallida') {
+            <button class="prow-action-btn prow-action-btn--fallo" type="button" (click)="goToProject(p.id)">
+              Diagnosticar
+              <i class="pi pi-search"></i>
+            </button>
+          } @else if (p.estado === 'borrador') {
+            <button class="prow-action-btn prow-action-btn--draft" type="button" (click)="goToProject(p.id)">
+              Continuar borrador
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          } @else {
+            <button class="prow-action-btn" type="button" (click)="goToProject(p.id)">
+              Ver proyecto
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          }
         </div>
       </div>
     }
@@ -140,7 +198,7 @@
 
   <!-- Resumen global -->
   <div class="proyectos-page__summary">
-    <span>Total semana: 70 pedidos · $609k ganancia neta · {{ activeCount }} proyectos activos</span>
+    <span>Total semana: {{ totalPedidos }} pedidos · {{ activeCount }} activos · {{ falloCount }} con campaña fallida</span>
   </div>
 </div>
 

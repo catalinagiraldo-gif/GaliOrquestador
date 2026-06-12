@@ -607,3 +607,448 @@ $kronos-border: rgba(96, 165, 250, 0.25);
     color: $error;
   }
 }
+
+// ── Gali ROI Panel ──────────────────────────────────────────────
+.gali-roi-panel {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.06) 0%, rgba(96, 165, 250, 0.02) 100%);
+  border: 1px solid $kronos-border;
+  border-radius: $radius-md;
+  padding: $size-5 $size-6;
+  margin-bottom: $size-5;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-3;
+    margin-bottom: $size-5;
+  }
+
+  &__kronos-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $kronos;
+    margin-top: 5px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+  }
+
+  &__title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $gray-800;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 12px;
+    color: $gray-500;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $size-4;
+    margin-bottom: $size-4;
+
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__footer {
+    font-size: 11px;
+    color: $gray-400;
+    border-top: 1px solid rgba(96, 165, 250, 0.12);
+    padding-top: $size-3;
+  }
+}
+
+.gali-roi-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: $size-4;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: $radius-sm;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+
+  &__icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  &__valor {
+    font-size: 20px;
+    font-weight: 700;
+    color: $kronos;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: 11px;
+    color: $gray-500;
+    line-height: 1.35;
+  }
+}
+
+// ── Siigo Drawer ────────────────────────────────────────────────
+.siigo-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.siigo-drawer {
+  width: 480px;
+  max-width: 100vw;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 32px rgba(0, 0, 0, 0.12);
+  overflow-y: auto;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: $size-5 $size-6;
+    border-bottom: 1px solid $gray-100;
+    flex-shrink: 0;
+  }
+
+  &__logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0066cc;
+    letter-spacing: -0.03em;
+  }
+
+  &__subtitle {
+    display: block;
+    font-size: 12px;
+    color: $gray-500;
+    margin-top: 2px;
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: $gray-500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-xs;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0,0,0,0.05); }
+  }
+
+  &__steps {
+    display: flex;
+    align-items: center;
+    padding: $size-4 $size-6;
+    background: $gray-50;
+    border-bottom: 1px solid $gray-100;
+    flex-shrink: 0;
+    gap: 0;
+  }
+
+  &__body {
+    padding: $size-6;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $size-5;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: $gray-500;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $size-3;
+    margin-top: auto;
+    padding-top: $size-4;
+
+    &--center {
+      justify-content: center;
+    }
+  }
+}
+
+.siigo-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  &__num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    background: $white;
+    border: 2px solid $gray-100;
+    color: $gray-400;
+    transition: all 0.2s;
+  }
+
+  &__label {
+    font-size: 11px;
+    color: $gray-400;
+    white-space: nowrap;
+  }
+
+  &--active &__num {
+    background: $primary-500;
+    border-color: $primary-500;
+    color: #fff;
+  }
+
+  &--active &__label {
+    color: $primary-500;
+    font-weight: 600;
+  }
+
+  &--done &__num {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+  }
+
+  &--done &__label {
+    color: #16a34a;
+  }
+
+  &__connector {
+    flex: 1;
+    height: 2px;
+    background: $gray-100;
+    margin: 0 $size-2;
+    margin-bottom: 14px;
+    transition: background 0.2s;
+
+    &--done {
+      background: #22c55e;
+    }
+  }
+}
+
+.siigo-field {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $gray-800;
+  }
+
+  &__input, &__select {
+    height: 40px;
+    border: 1px solid $gray-100;
+    border-radius: $radius-sm;
+    padding: 0 $size-3;
+    font-size: 13px;
+    color: $gray-800;
+    background: #fff;
+    transition: border-color 0.15s;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-500;
+    }
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: $gray-400;
+  }
+}
+
+.siigo-mapping-preview {
+  background: rgba(0, 102, 204, 0.04);
+  border: 1px solid rgba(0, 102, 204, 0.15);
+  border-radius: $radius-sm;
+  padding: $size-4;
+
+  &__title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #0066cc;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $size-3;
+  }
+}
+
+.siigo-mapping-row {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  font-size: 12px;
+
+  &__from {
+    color: $gray-500;
+    padding: 4px 8px;
+    background: #fff;
+    border: 1px solid $gray-100;
+    border-radius: $radius-xs;
+  }
+
+  &__arrow {
+    color: $gray-400;
+    font-size: 14px;
+  }
+
+  &__to {
+    color: #0066cc;
+    font-weight: 500;
+    padding: 4px 8px;
+    background: rgba(0, 102, 204, 0.06);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    border-radius: $radius-xs;
+  }
+}
+
+.siigo-progress {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__bar {
+    height: 8px;
+    background: $gray-50;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, $kronos 0%, #3b82f6 100%);
+    border-radius: 4px;
+    transition: width 0.12s linear;
+  }
+
+  &__label {
+    font-size: 12px;
+    color: $gray-500;
+  }
+}
+
+.siigo-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $size-4;
+  text-align: center;
+  padding: $size-6 0;
+
+  &__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid #22c55e;
+    color: #22c55e;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: $gray-800;
+    letter-spacing: -0.02em;
+  }
+
+  &__body {
+    font-size: 13px;
+    color: $gray-500;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  &__stats {
+    display: flex;
+    gap: $size-6;
+    margin-top: $size-2;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    span {
+      font-size: 22px;
+      font-weight: 700;
+      color: #22c55e;
+      letter-spacing: -0.03em;
+    }
+
+    small {
+      font-size: 11px;
+      color: $gray-500;
+    }
+  }
+}
+
+.siigo-btn {
+  height: 40px;
+  padding: 0 $size-5;
+  border-radius: $radius-sm;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+
+  &--primary {
+    background: $primary-500;
+    color: #fff;
+    flex: 1;
+
+    &:hover { opacity: 0.9; }
+  }
+
+  &--secondary {
+    background: transparent;
+    color: $gray-500;
+    border: 1px solid $gray-100;
+
+    &:hover { background: $gray-50; }
+  }
+}

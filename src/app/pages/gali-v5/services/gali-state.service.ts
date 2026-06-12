@@ -253,6 +253,12 @@ export class GaliStateService {
   /** Tab solicitado al abrir el panel desde una notificación de agente */
   readonly requestedPanelTab = signal<string | null>(null);
 
+  /** Thread de proyecto solicitado desde una card de proyecto */
+  readonly requestedProjectThread = signal<{ projectId: string; projectLabel: string } | null>(null);
+
+  /** Thread de agente solicitado desde la ficha de agente */
+  readonly requestedAgentThread = signal<{ agentId: string; agentLabel: string; agentColor: string } | null>(null);
+
   openPanelToMemory(): void {
     this.requestedPanelTab.set('memory');
     this.galiMode.set(1);

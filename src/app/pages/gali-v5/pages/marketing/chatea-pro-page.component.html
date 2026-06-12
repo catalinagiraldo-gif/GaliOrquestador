@@ -3,46 +3,13 @@
 
   <dropi-gali-bar
     agent="Chatea Pro"
-    status="gestionando confirmaciones"
-    message="{{ stats.confirmados }} confirmados · {{ stats.anticiposPendientes }} anticipos · resolvió 8 novedades automáticamente"
-    ctaLabel="Ver señales en Gali →"
+    status="activo · gestionando confirmaciones"
+    [stats]="chateaBarStats"
+    ctaLabel="Ver señales"
+    secondaryCta="Bandeja CAS"
     (ctaClick)="goToSignals()"
+    (secondaryClick)="goToCas()"
   />
-
-  <!-- Status bar operativo -->
-  <div class="chatea-page__status-bar">
-    <div class="chatea-status-bar">
-      <div class="chatea-status-bar__id">
-        <span class="chatea-status-bar__dot"></span>
-        <span class="chatea-status-bar__label">✦ Chatea Pro</span>
-        <span class="chatea-status-bar__active">activo</span>
-      </div>
-      <div class="chatea-status-bar__stats">
-        <div class="chatea-stat">
-          <strong class="chatea-stat__val chatea-stat__val--ok">{{ stats.confirmados }}</strong>
-          <span class="chatea-stat__label">confirmados hoy</span>
-        </div>
-        <span class="chatea-stat__sep">·</span>
-        <div class="chatea-stat">
-          <strong class="chatea-stat__val chatea-stat__val--warn">{{ stats.anticiposPendientes }}</strong>
-          <span class="chatea-stat__label">anticipos pendientes</span>
-        </div>
-        <span class="chatea-stat__sep">·</span>
-        <div class="chatea-stat">
-          <strong class="chatea-stat__val chatea-stat__val--cart">{{ stats.carritos }}</strong>
-          <span class="chatea-stat__label">carritos activos</span>
-        </div>
-        <span class="chatea-stat__sep">·</span>
-        <div class="chatea-stat">
-          <strong class="chatea-stat__val">{{ stats.tasa }}</strong>
-          <span class="chatea-stat__label">tasa confirmación</span>
-        </div>
-      </div>
-      <button class="chatea-status-bar__cas-link" type="button" (click)="goToCas()" data-proto-skip>
-        Ver bandeja CAS →
-      </button>
-    </div>
-  </div>
 
   <!-- Layout principal: conversaciones + chat + reglas -->
   <div class="chatea-page__layout">
@@ -141,85 +108,59 @@
       </p>
 
       <div class="rules-list">
-        <div class="rule-item-v2">
-          <div class="rule-item-v2__logic">
-            <span class="rule-item-v2__if">SI</span>
-            <span class="rule-item-v2__condition">zona rural detectada</span>
-            <span class="rule-item-v2__then">→</span>
-            <span class="rule-item-v2__action">solicitar anticipo $25k</span>
+        @for (rule of ruleItems(); track rule.key) {
+          <div class="rule-item-v2">
+            <div class="rule-item-v2__logic">
+              <span class="rule-item-v2__if">SI</span>
+              <span class="rule-item-v2__condition">{{ rule.condition }}</span>
+              <span class="rule-item-v2__then">→</span>
+              <span class="rule-item-v2__action">{{ rule.action }}</span>
+            </div>
+            <div class="rule-item-v2__footer">
+              <!-- Agent picker — J6 -->
+              <div class="rule-agent-wrap">
+                <button
+                  type="button"
+                  class="rule-agent-btn"
+                  (click)="showAgentPickerFor.set(showAgentPickerFor() === rule.key ? null : rule.key)"
+                  data-proto-skip>
+                  <span class="rule-agent-btn__dot" [style.background]="getAgent(rule.agentId).color"></span>
+                  <span class="rule-agent-btn__label">{{ getAgent(rule.agentId).label }}</span>
+                  <i class="pi pi-chevron-down rule-agent-btn__caret"></i>
+                </button>
+                @if (showAgentPickerFor() === rule.key) {
+                  <div class="rule-agent-dropdown">
+                    @for (opt of agentOptions; track opt.id) {
+                      <button
+                        type="button"
+                        class="rule-agent-option"
+                        [class.rule-agent-option--active]="rule.agentId === opt.id"
+                        (click)="setRuleAgent(rule.key, opt.id)"
+                        data-proto-skip>
+                        <span class="rule-agent-option__dot" [style.background]="opt.color"></span>
+                        <div class="rule-agent-option__body">
+                          <strong>{{ opt.label }}</strong>
+                          <span>{{ opt.desc }}</span>
+                        </div>
+                        @if (rule.agentId === opt.id) {
+                          <i class="pi pi-check rule-agent-option__check"></i>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+              <button
+                class="rule-toggle"
+                [class.rule-toggle--on]="(reglas())[rule.key]"
+                type="button"
+                (click)="toggleRuleActive(rule.key)"
+                data-proto-skip>
+                <span class="rule-toggle__knob"></span>
+              </button>
+            </div>
           </div>
-          <div class="rule-item-v2__footer">
-            <span class="rule-item-v2__agent">Chatea Pro</span>
-            <button
-              class="rule-toggle"
-              [class.rule-toggle--on]="reglas().anticipoZonaRural"
-              type="button"
-              (click)="toggleRegla('anticipoZonaRural')"
-              data-proto-skip>
-              <span class="rule-toggle__knob"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="rule-item-v2">
-          <div class="rule-item-v2__logic">
-            <span class="rule-item-v2__if">SI</span>
-            <span class="rule-item-v2__condition">carrito abandonado +6h</span>
-            <span class="rule-item-v2__then">→</span>
-            <span class="rule-item-v2__action">enviar secuencia recuperación</span>
-          </div>
-          <div class="rule-item-v2__footer">
-            <span class="rule-item-v2__agent">Chatea Pro</span>
-            <button
-              class="rule-toggle"
-              [class.rule-toggle--on]="reglas().recuperarCarrito"
-              type="button"
-              (click)="toggleRegla('recuperarCarrito')"
-              data-proto-skip>
-              <span class="rule-toggle__knob"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="rule-item-v2">
-          <div class="rule-item-v2__logic">
-            <span class="rule-item-v2__if">SI</span>
-            <span class="rule-item-v2__condition">huella verde + wallet OK</span>
-            <span class="rule-item-v2__then">→</span>
-            <span class="rule-item-v2__action">confirmar automáticamente</span>
-          </div>
-          <div class="rule-item-v2__footer">
-            <span class="rule-item-v2__agent">Chatea Pro</span>
-            <button
-              class="rule-toggle"
-              [class.rule-toggle--on]="reglas().confirmarVerde"
-              type="button"
-              (click)="toggleRegla('confirmarVerde')"
-              data-proto-skip>
-              <span class="rule-toggle__knob"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="rule-item-v2">
-          <div class="rule-item-v2__logic">
-            <span class="rule-item-v2__if">SI</span>
-            <span class="rule-item-v2__condition">novedad logística detectada</span>
-            <span class="rule-item-v2__then">→</span>
-            <span class="rule-item-v2__action">notificar cliente WhatsApp</span>
-          </div>
-          <div class="rule-item-v2__footer">
-            <span class="rule-item-v2__agent">Chatea Pro</span>
-            <button
-              class="rule-toggle"
-              [class.rule-toggle--on]="reglas().notificarNovedad"
-              type="button"
-              (click)="toggleRegla('notificarNovedad')"
-              data-proto-skip>
-              <span class="rule-toggle__knob"></span>
-            </button>
-          </div>
-        </div>
+        }
       </div>
 
       <div class="rules-vs-skills">

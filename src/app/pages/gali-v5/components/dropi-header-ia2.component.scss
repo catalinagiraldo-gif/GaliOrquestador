@@ -119,6 +119,40 @@
     }
   }
 
+  // ── Breadcrumb contextual (AJ-2.4) ───────────────────────────
+  &__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    animation: gali-fade-in 150ms ease-out;
+  }
+
+  &__bc-root,
+  &__bc-link {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-regular;
+    color: $gray-500;
+    text-decoration: none;
+    transition: color 0.12s ease;
+
+    &:hover { color: $primary-500; }
+  }
+
+  &__bc-sep {
+    font-size: 11px;
+    color: $gray-300;
+    user-select: none;
+  }
+
+  &__bc-current {
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    color: $gray-700;
+  }
+
   // ── Zona contextual transversal ───────────────────────────────
   &__context {
     display: flex;
@@ -287,11 +321,34 @@
     color: $primary-600;
     flex-shrink: 0;
     transition: border-color 0.15s ease, background 0.15s ease;
+    position: relative;
 
     &:hover {
       border-color: $primary-500;
       background: rgba($primary-500, 0.1);
     }
+
+    &--critical {
+      border-color: rgba(220, 38, 38, 0.35);
+      background: rgba(220, 38, 38, 0.06);
+      color: #dc2626;
+
+      .header-ia2__signals-num,
+      .header-ia2__signals-label { color: #dc2626; }
+    }
+  }
+
+  &__signals-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #dc2626;
+    flex-shrink: 0;
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
   }
 
   &__signals-num {
@@ -441,7 +498,7 @@
 .health-panel {
   width: 400px;
   max-width: 100vw;
-  height: 100vh;
+  height: calc(100vh - var(--dropi-header-height, 53px));
   background: $white;
   border-left: 1px solid $gray-100;
   box-shadow: -4px 0 28px rgba(0, 0, 0, 0.12);

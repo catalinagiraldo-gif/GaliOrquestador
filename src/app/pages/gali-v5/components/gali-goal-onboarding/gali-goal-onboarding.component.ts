@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import PROJECTS from '../../../../../../mocks/gali-v5/projects.json';
+import KPIS_GLOBAL from '../../../../../../mocks/gali-v5/kpis-global.json';
 
 const STORAGE_KEY = 'gali_goal_configured';
 
@@ -77,11 +78,29 @@ export class GaliGoalOnboardingComponent {
   readonly step = signal<1 | 2 | 3 | 4 | 5 | 6>(1);
   readonly onboardingPath = signal<'nuevo' | 'veterano'>('nuevo');
   readonly selectedGoal = signal<GoalOption | null>(null);
-  readonly pedidosPerWeek = signal(20);
-  readonly mesesOperando = signal<string>('1-6');
+  /** Pedidos/semana — fuente autoritativa: kpis-global.json (Dropi ya lo sabe) */
+  readonly kpiPedidosTotal = (KPIS_GLOBAL as { pedidos_sem_total: { valor: number } }).pedidos_sem_total.valor;
+  readonly kpiDataAvailable = true;
   readonly customGoal = signal('');
   readonly showCustom = signal(false);
   readonly connectedSources = signal<string[]>([]);
+
+  readonly focusModules = signal<string[]>(['pedidos', 'marketing']);
+
+  readonly focusModuleOptions = [
+    { key: 'pedidos',    label: 'Pedidos',      icon: '📦', color: '#fbbf24', desc: 'Novedades, confirmaciones' },
+    { key: 'marketing',  label: 'Marketing',    icon: '📢', color: '#f97316', desc: 'Campañas, ROAS, pauta' },
+    { key: 'logistica',  label: 'Logística',    icon: '🚚', color: '#60a5fa', desc: 'Transportadoras, tracking' },
+    { key: 'financiero', label: 'Financiero',   icon: '💰', color: '#34d399', desc: 'PIL, márgenes, cartera' },
+    { key: 'proyectos',  label: 'Proyectos',    icon: '🎯', color: '#a78bfa', desc: 'Productos en campaña' },
+    { key: 'chatea',     label: 'Chatea Pro',   icon: '💬', color: '#10b981', desc: 'WhatsApp, respuestas auto' },
+  ];
+
+  toggleFocusModule(key: string): void {
+    this.focusModules.update(list =>
+      list.includes(key) ? list.filter(k => k !== key) : [...list, key]
+    );
+  }
   // sprint 11.2: fricción derivada del objetivo seleccionado
   readonly selectedFriccion = computed<string>(() => {
     const g = this.selectedGoal();
@@ -115,23 +134,25 @@ export class GaliGoalOnboardingComponent {
   }
 
   get pedidosLabel(): string {
-    // sprint 11.3: projects.json is authoritative; slider is fallback for first session
-    const fromProject = (this.proyectoActivo() as any)?.pedidos_sem_label as string | undefined;
+    const fromProject = (this.proyectoActivo() as { pedidos_sem_label?: string })?.pedidos_sem_label;
     if (fromProject) return fromProject;
-    const v = this.pedidosPerWeek();
+    const v = this.kpiPedidosTotal;
+    if (v === 0) return '0 pedidos';
     if (v <= 5) return '0–5 pedidos';
-    if (v <= 20) return `~${v}/sem`;
-    if (v <= 50) return `~${v}/sem`;
-    if (v <= 100) return `~${v}/sem`;
-    return '100+/sem';
+    return `~${v}/sem`;
   }
 
-  get mesesLabel(): string {
-    const m = this.mesesOperando();
-    return m === 'nuevo' ? 'menos de 1 mes' :
-           m === '1-6'   ? '1 a 6 meses' :
-           m === '6-12'  ? '6 a 12 meses' : 'más de 1 año';
+  get isNewDropshipper(): boolean {
+    return this.kpiPedidosTotal === 0;
   }
+
+  readonly onboardingContextMsg = computed(() => {
+    const total = this.kpiPedidosTotal;
+    if (total === 0) return null;
+    if (total <= 10) return `Tienes ${total} pedidos esta semana — vas bien empezando.`;
+    if (total <= 50) return `Tienes ${total} pedidos esta semana. ¿Cuál es tu objetivo este mes?`;
+    return `Tienes ${total} pedidos esta semana — operación activa. ¿Qué quieres lograr ahora?`;
+  });
 
   selectGoal(g: GoalOption): void {
     this.selectedGoal.set(g);
@@ -144,21 +165,10 @@ export class GaliGoalOnboardingComponent {
   }
 
   goToStep2(): void {
-    if (this.selectedGoal() || this.customGoal().trim()) {
-      this.step.set(2);
-    }
-  }
-
-  goToStep3(): void {
-    const meses = this.mesesOperando();
-    const pedidos = this.pedidosPerWeek();
-    const esVeterano = meses === '6-12' || meses === '1y+' || pedidos > 20;
-    if (esVeterano) {
-      this.onboardingPath.set('veterano');
-      this.step.set(6);
-    } else {
-      this.step.set(3);
-    }
+    if (!this.selectedGoal() && !this.customGoal().trim()) return;
+    const esVeterano = this.kpiPedidosTotal > 20;
+    this.onboardingPath.set(esVeterano ? 'veterano' : 'nuevo');
+    this.step.set(esVeterano ? 6 : 3);
   }
 
   goToStep4(): void {
@@ -221,6 +231,12 @@ export class GaliGoalOnboardingComponent {
     this.router.navigate(['/gali-v5/micromundo'], { queryParams: { tab: 'documentos' } });
   }
 
+  /** Maps actual step signal value to 1-4 visual dot progress for the header indicator */
+  get visualStep(): number {
+    const map: Record<number, number> = { 1: 1, 3: 2, 4: 3, 5: 4, 6: 1 };
+    return map[this.step()] ?? 1;
+  }
+
   skip(): void {
     this.finish();
   }
@@ -228,21 +244,43 @@ export class GaliGoalOnboardingComponent {
   private finish(): void {
     localStorage.setItem(STORAGE_KEY, '1');
     const g = this.selectedGoal();
+    const custom = this.customGoal().trim();
+
     if (g) {
       localStorage.setItem('gali_goal_label', g.label);
       localStorage.setItem('gali_goal_id', g.id);
-      localStorage.setItem('gali_goal_pedidos_target', String(this.pedidosPerWeek()));
+    } else if (custom) {
+      localStorage.setItem('gali_goal_label', custom);
+      localStorage.setItem('gali_goal_id', 'custom');
+    } else if (!localStorage.getItem('gali_goal_id')) {
+      localStorage.setItem('gali_goal_label', 'Automatizar mi operación para trabajar menos horas');
+      localStorage.setItem('gali_goal_id', 'automatizar');
     }
+    localStorage.setItem('gali_goal_pedidos_target', String(this.kpiPedidosTotal));
+    this.ws.updateGoalLabel(localStorage.getItem('gali_goal_label') ?? '');
+
+    // Save weekly plan for Hub widget
+    const goalId = g?.id ?? (custom ? 'custom' : (localStorage.getItem('gali_goal_id') ?? 'automatizar'));
+    const weeklyPlanMap: Record<string, string[]> = {
+      'escalar-pedidos': ['Activa Roax en tu campaña principal', 'Revisa ROAS vs meta esta semana', 'Configura auto-pausa si CTR < 0.8%'],
+      'primer-producto': ['Elige tu primer producto en Caza Productos', 'Crea tu primer proyecto con precio y costo', 'Activa Vigilante para proteger pedidos'],
+      'primer-millon': ['Revisa tu P&L real vs ROAS declarado', 'Activa escalado automático de presupuesto', 'Conecta tus campañas Meta Ads'],
+      'automatizar': ['Configura Chatea Pro para respuestas automáticas', 'Activa confirmación automática pedidos verdes', 'Revisa umbrales de Vigilante'],
+    };
+    const planSteps = weeklyPlanMap[goalId] ?? weeklyPlanMap['automatizar'];
+    localStorage.setItem('gali_weekly_plan', JSON.stringify(planSteps));
+    localStorage.setItem('gali_onboarding_done', '1');
+
     // Zero-state: user has 0 orders/week = needs guided setup
-    if (this.pedidosPerWeek() === 0) {
+    if (this.kpiPedidosTotal === 0) {
       localStorage.setItem('gali_zero_state', '1');
     } else {
       localStorage.removeItem('gali_zero_state');
     }
-    // Complexity level: new users start in novice mode
-    const isNovice = this.mesesOperando() === 'nuevo' || this.pedidosPerWeek() <= 5;
+    const isNovice = this.kpiPedidosTotal <= 5;
     localStorage.setItem('gali_complexity', isNovice ? 'novice' : 'expert');
     localStorage.setItem('gali_connected_sources', JSON.stringify(this.connectedSources()));
+    localStorage.setItem('gali_dia_a_dia_modules', JSON.stringify(this.focusModules()));
     this.closed.emit();
   }
 }

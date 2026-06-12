@@ -1,563 +1,2310 @@
-@import 'styles/gali-v5-tokens';
-
-$hub-card: #ffffff;
-$hub-border: #e5e7eb;
-$hub-text: #1c1c1e;
-$hub-muted: #6b7280;
-$hub-caption: #9ca3af;
-$hub-success: #10b981;
-$hub-bg: #fafaf8;
+@import '../../../../../styles/gali-os-tokens';
+@import '../../../../../styles/variables';
+@import '../shared/dropi-page-host';
 
 :host {
-  display: block;
+  @include dropi-page-host;
+  display: flex;
+  flex-direction: column;
+  background: $os-bg;
+}
+
+// ── Page shell ──────────────────────────────────────────────────────────────
+
+.mkt-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   flex: 1;
   min-height: 0;
-  width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  background: $os-bg;
+  font-family: $os-font-body;
+  -webkit-font-smoothing: antialiased;
+
+  // ── Header ──
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $os-4;
+    padding: $os-4 $os-5;
+    border-bottom: 1px solid $os-border;
+    background: $os-surface;
+    flex-shrink: 0;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+  }
+
+  &__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: $os-bg;
+    border: 1px solid $os-border;
+    color: $os-text-secondary;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+
+    &:hover {
+      background: $os-surface-3;
+      color: $os-text-primary;
+    }
+
+    i { font-size: 13px; }
+  }
+
+  &__title {
+    font-family: $os-font-display;
+    font-size: 18px;
+    font-weight: 800;
+    color: $os-text-primary;
+    margin: 0 0 2px;
+    line-height: 1.2;
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: $os-text-muted;
+    font-family: $os-font-mono;
+  }
+
+  &__header-right {
+    display: flex;
+    gap: $os-2;
+  }
+
+  // ── Toolbar ──
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    padding: $os-3 $os-5;
+    background: $os-surface;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  &__search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 380px;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: $os-text-muted;
+    pointer-events: none;
+  }
+
+  &__search {
+    width: 100%;
+    padding: 7px 10px 7px 30px;
+    border: 1px solid $os-border;
+    border-radius: 8px;
+    background: $os-bg;
+    font-size: 13px;
+    color: $os-text-primary;
+    font-family: $os-font-body;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &::placeholder { color: $os-text-muted; }
+    &:focus { border-color: $os-accent; }
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid $os-border;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 500;
+    color: $os-text-secondary;
+    font-family: $os-font-body;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+
+    &:hover {
+      background: $os-surface-3;
+      color: $os-text-primary;
+    }
+
+    &--active {
+      background: $os-accent;
+      color: #fff;
+      border-color: $os-accent;
+      font-weight: 600;
+    }
+  }
+
+  // ── Section filters ──
+  &__section-filters {
+    display: flex;
+    gap: $os-2;
+    padding: $os-2 $os-5;
+    background: $os-bg;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  // ── Stats strip ──
+  &__stats-strip {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    padding: $os-2 $os-5;
+    background: $os-surface;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  // ── Grid ──
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $os-4;
+    padding: $os-5;
+    align-content: start;
+  }
+
+  // ── Empty state ──
+  &__empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $os-3;
+    padding: $os-8 $os-5;
+    color: $os-text-muted;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  // ── Buttons ──
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: $os-font-body;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+
+    &--publish {
+      background: $os-accent;
+      color: #fff;
+
+      &:hover { opacity: 0.88; }
+    }
+
+    &--ghost {
+      background: transparent;
+      color: $os-text-secondary;
+      border: 1px solid $os-border;
+
+      &:hover {
+        background: $os-surface-3;
+        color: $os-text-primary;
+      }
+    }
+  }
 }
 
-.mkt {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: $hub-bg;
+// ── Section filter pills ─────────────────────────────────────────────────────
+
+.mkt-sec-filter {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid $os-border;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: $os-text-secondary;
+  font-family: $os-font-body;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: $os-surface-3;
+    color: $os-text-primary;
+  }
+
+  &--active {
+    background: $os-accent;
+    color: #fff;
+    border-color: $os-accent;
+  }
+}
+
+// ── Stats strip ──────────────────────────────────────────────────────────────
+
+.mkt-stat {
+  font-size: 12px;
+  color: $os-text-secondary;
+
+  strong {
+    color: $os-text-primary;
+    font-weight: 600;
+  }
+
+  &-sep {
+    color: $os-border;
+    font-size: 12px;
+  }
+
+  &--highlight {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #22c55e;
+    font-weight: 500;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+// ── Skill Card ───────────────────────────────────────────────────────────────
+
+.mkt-card {
   display: flex;
   flex-direction: column;
+  gap: $os-3;
+  padding: $os-4;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: rgba($os-accent, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  &--verified {
+    border-left: 3px solid $os-accent;
+  }
+
+  // Top row
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $os-2;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__tipo {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    &--op   { background: rgba(#f49a3d, 0.12); color: $os-accent; }
+    &--exp  { background: rgba(#818cf8, 0.12); color: #818cf8; }
+    &--prem { background: rgba(#fbbf24, 0.12); color: #fbbf24; }
+    &--lanz { background: rgba(#34d399, 0.12); color: #34d399; }
+  }
+
+  &__sec {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    background: $os-surface-3;
+    color: $os-text-secondary;
+  }
+
+  &__tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    background: rgba(#22c55e, 0.1);
+    color: #22c55e;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__nombre {
+    font-size: 14px;
+    font-weight: 700;
+    color: $os-text-primary;
+    font-family: $os-font-display;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+    margin: 0;
+    flex: 1;
+  }
+
+  &__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $os-2;
+    margin-top: auto;
+  }
+
+  &__btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: $os-font-body;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s, background 0.15s;
+
+    &--primary {
+      background: $os-accent;
+      color: #fff;
+
+      &:hover { opacity: 0.88; }
+    }
+
+    &--ghost {
+      background: $os-surface-3;
+      color: $os-text-secondary;
+      border: 1px solid $os-border;
+
+      &:hover {
+        background: darken($os-surface-3, 3%);
+        color: $os-text-primary;
+      }
+    }
+  }
 }
 
-// Hero
-.mkt__hero {
-  background: linear-gradient(135deg, #1c1c1e 0%, #2d2d30 100%);
-  padding: $size-6 $size-8;
+// ── Creator block ─────────────────────────────────────────────────────────────
+
+.mkt-creator {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: $size-6;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  animation: fadeDown 0.35s ease both;
-}
+  gap: $os-2;
+  padding: $os-2;
+  background: $os-bg;
+  border-radius: 8px;
+  border: 1px solid $os-border;
 
-.mkt__hero-left { display: flex; flex-direction: column; gap: $size-2; }
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
 
-.mkt__eyebrow {
-  font-family: $font-secondary;
-  font-size: 11px;
-  font-weight: $font-medium;
-  color: $primary-500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
 
-.mkt__title {
-  font-family: $font-primary;
-  font-size: $font-2xl;
-  font-weight: $font-bold;
-  color: $white;
-  margin: 0;
-  line-height: 1.2;
-}
+  &__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: $os-text-primary;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
 
-.mkt__desc {
-  font-family: $font-primary;
-  font-size: $font-sm;
-  color: rgba($white, 0.6);
-  margin: 0;
-  max-width: 400px;
-}
+  &__check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: $os-accent;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+  }
 
-.mkt__hero-right {
-  display: flex;
-  align-items: center;
-  gap: $size-5;
-  flex-shrink: 0;
-}
+  &__bio {
+    font-size: 11px;
+    color: $os-text-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.mkt__stats {
-  display: flex;
-  gap: $size-5;
-}
-
-.mkt__stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.mkt__stat-num {
-  font-family: $font-primary;
-  font-size: 24px;
-  font-weight: $font-bold;
-  color: $primary-500;
-  line-height: 1;
-}
-
-.mkt__stat-label {
-  font-family: $font-primary;
-  font-size: 11px;
-  color: rgba($white, 0.5);
-}
-
-// Filters bar
-.mkt__filters {
-  display: flex;
-  align-items: center;
-  gap: $size-4;
-  padding: $size-4 $size-8;
-  background: $hub-card;
-  border-bottom: 1px solid $hub-border;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.mkt__search-wrap {
-  display: flex;
-  align-items: center;
-  gap: $size-2;
-  flex: 1 1 200px;
-  min-width: 160px;
-  padding: 8px $size-4;
-  border: 1.5px solid $hub-border;
-  border-radius: $radius-md;
-  background: #f9fafb;
-  transition: border-color 0.15s;
-
-  &:focus-within { border-color: $primary-500; background: $hub-card; }
-
-  .pi { font-size: 14px; color: $hub-caption; flex-shrink: 0; }
-}
-
-.mkt__search {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-family: $font-primary;
-  font-size: $font-sm;
-  color: $hub-text;
-
-  &::placeholder { color: $hub-caption; }
-  &:focus { outline: none; }
-}
-
-.mkt__tipo-filters { display: flex; gap: $size-2; flex-wrap: wrap; }
-
-.tipo-chip {
-  padding: 6px $size-3;
-  border-radius: $radius-full;
-  font-family: $font-primary;
-  font-size: $font-xs;
-  font-weight: $font-medium;
-  cursor: pointer;
-  border: 1px solid $hub-border;
-  background: $hub-card;
-  color: $hub-muted;
-  transition: all 0.15s;
-
-  &:hover { border-color: $primary-500; color: $primary-500; }
-
-  &--active {
-    background: $primary-500;
-    border-color: $primary-500;
-    color: $white;
+  &__handle {
+    font-size: 11px;
+    color: $os-accent;
+    font-family: $os-font-mono;
   }
 }
 
-// Agent tabs
-.mkt__agent-tabs {
-  display: flex;
-  gap: 0;
-  background: $hub-card;
-  border-bottom: 1px solid $hub-border;
-  padding: 0 $size-8;
-  flex-shrink: 0;
-  overflow-x: auto;
+// ── Stat pills ────────────────────────────────────────────────────────────────
+
+.mkt-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: $os-surface-3;
+  font-size: 11px;
+  color: $os-text-secondary;
+
+  i { font-size: 10px; }
 }
 
-.agent-tab {
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+.mkt-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: $size-2;
-  padding: $size-3 $size-4;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  font-family: $font-primary;
-  font-size: $font-sm;
-  color: $hub-muted;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
+  gap: 8px;
+  padding: 10px 20px;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-left: 3px solid $os-accent;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $os-text-primary;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  animation: toast-in 0.3s ease;
 
-  &:hover { color: $hub-text; }
+  i { color: $os-accent; font-size: 15px; }
+}
 
-  &--active {
-    color: $primary-500;
-    border-bottom-color: $primary-500;
-    font-weight: $font-semibold;
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+// ── Share modal ───────────────────────────────────────────────────────────────
+
+.mkt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  animation: fade-in 0.2s ease;
+}
+
+.mkt-modal {
+  width: 460px;
+  max-width: 95vw;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: 16px;
+  padding: $os-5;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modal-in 0.25s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $os-2;
+    margin-bottom: $os-3;
   }
-}
 
-// Content
-.mkt__content {
-  flex: 1;
-  padding: $size-5 $size-8 $size-8;
-  display: flex;
-  flex-direction: column;
-  gap: $size-5;
-  animation: fadeUp 0.35s ease 0.1s both;
-}
+  &__icon {
+    font-size: 20px;
+    line-height: 1;
+  }
 
-.mkt__count {
-  font-family: $font-primary;
-  font-size: $font-sm;
-  color: $hub-muted;
-  margin: 0;
-}
-
-.mkt__empty {
-  text-align: center;
-  padding: $size-10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $size-3;
-
-  &-icon { font-size: 40px; }
-
-  p {
-    font-family: $font-primary;
-    font-size: $font-sm;
-    color: $hub-muted;
+  &__title {
+    flex: 1;
+    font-family: $os-font-display;
+    font-size: 15px;
+    font-weight: 700;
+    color: $os-text-primary;
     margin: 0;
   }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: $os-surface-3;
+    border-radius: 6px;
+    cursor: pointer;
+    color: $os-text-secondary;
+    transition: background 0.15s;
+
+    &:hover { background: $os-border; }
+    i { font-size: 12px; }
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+    margin: 0 0 $os-4;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $os-2;
+    margin-bottom: $os-4;
+  }
+
+  &__option {
+    display: flex;
+    align-items: flex-start;
+    gap: $os-2;
+    padding: $os-3;
+    border: 1px solid $os-border;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: $os-text-secondary;
+    transition: border-color 0.15s;
+
+    &:hover { border-color: $os-accent; }
+
+    input[type="radio"] { margin-top: 2px; accent-color: $os-accent; }
+
+    strong { color: $os-text-primary; }
+  }
+
+  &__footer {
+    display: flex;
+    gap: $os-2;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: $os-font-body;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+
+    &--cancel {
+      background: $os-surface-3;
+      color: $os-text-secondary;
+      border: 1px solid $os-border;
+    }
+
+    &--primary {
+      background: $os-accent;
+      color: #fff;
+
+      &:hover { opacity: 0.88; }
+    }
+  }
 }
 
-// Skills grid
-.mkt__grid {
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+// ── Skill Creator Dashboard ──────────────────────────────────────────────────
+
+.creator-dashboard {
+  margin-bottom: $size-5;
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-xl;
+  overflow: hidden;
+  background: $white;
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: $size-3;
+    padding: $size-3 $size-5;
+    background: linear-gradient(135deg, rgba($primary-500, 0.04) 0%, $white 70%);
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__title {
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $gray-800;
+  }
+
+  &__sub {
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-bottom: 1px solid $gray-100;
+  }
+}
+
+.creator-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $size-4 $size-3;
+  border-right: 1px solid $gray-100;
+  text-align: center;
+
+  &:last-child { border-right: none; }
+
+  &__value {
+    font-size: 24px;
+    font-weight: $font-bold;
+    color: $gray-800;
+    line-height: 1.1;
+  }
+
+  &__label {
+    margin-top: $size-1;
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+
+  &--highlight &__value {
+    color: $primary-600;
+  }
+}
+
+.creator-my-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.creator-skill-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: 1fr auto auto;
+  gap: $size-3;
+  align-items: center;
+  padding: $size-3 $size-5;
+  border-bottom: 1px solid $gray-50;
+  transition: background 0.1s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $gray-50; }
+  &--draft { opacity: 0.7; }
+
+  &__info {
+    min-width: 0;
+
+    strong {
+      display: block;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-800;
+    }
+  }
+
+  &__meta {
+    display: block;
+    font-size: $font-xs;
+    color: $gray-500;
+    margin-top: 2px;
+  }
+
+  &__metrics {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex-shrink: 0;
+  }
+
+  &__rating {
+    font-size: $font-xs;
+    color: #b45309;
+    font-weight: $font-semibold;
+  }
+
+  &__version {
+    font-size: 11px;
+    color: $gray-400;
+    font-family: $font-secondary;
+  }
+
+  &__status {
+    font-size: 11px;
+    font-weight: $font-semibold;
+
+    &--active { color: #15803d; }
+    &--draft { color: $gray-400; }
+  }
+
+  &__edit {
+    padding: $size-1 $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-full;
+    background: $white;
+    color: $primary-600;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: $font-primary;
+    white-space: nowrap;
+    transition: border-color 0.12s, background 0.12s;
+
+    &:hover {
+      border-color: $primary-500;
+      background: rgba($primary-500, 0.04);
+    }
+  }
+}
+
+// ── Categoría tabs principales ───────────────────────────────────────────
+.mkt-category-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 $os-5;
+  border-bottom: 1px solid $os-border-strong;
+  margin-bottom: $os-5;
+  background: $os-surface;
+}
+
+.mkt-category-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: $os-4 $os-5;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  font-family: $os-font-body;
+  font-size: 14px;
+  font-weight: 500;
+  color: $os-text-secondary;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: $os-text-primary; background: $os-surface-3; }
+
+  &--active {
+    color: $os-accent;
+    border-bottom-color: $os-accent;
+    font-weight: 600;
+    background: none;
+  }
+
+  &__icon { font-size: 15px; }
+
+  &__count {
+    background: $os-surface-3;
+    color: $os-text-muted;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+  }
+
+  &--active &__count {
+    background: $os-accent-dim;
+    color: $os-accent;
+  }
+}
+
+// ── Sección intro ────────────────────────────────────────────────────────
+.mkt-section-intro {
+  font-family: $os-font-body;
+  font-size: 13px;
+  color: $os-text-secondary;
+  padding: 0 $size-6 $size-4;
+  max-width: 640px;
+}
+
+// ── Agentes grid ────────────────────────────────────────────────────────
+.mkt-agents-section { padding: 0 $size-6 $size-8; }
+
+.mkt-agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: $size-4;
 }
 
-.skill-card {
-  background: $hub-card;
-  border: 1px solid $hub-border;
-  border-radius: $radius-xl;
+.mkt-agent-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
   padding: $size-5;
   display: flex;
   flex-direction: column;
   gap: $size-3;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s, border-color 0.15s;
 
-  &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+  &:hover { box-shadow: $shadow-small; border-color: rgba($os-accent, 0.35); }
+
+  &--instalado { border-color: rgba(52,211,153,0.35); background: rgba(52,211,153,0.04); }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  &--instalada {
-    background: #f0fdf4;
-    border-color: #bbf7d0;
+  &__dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 
-  &--premium {
-    border-color: rgba($primary-500, 0.2);
+  &__nombre {
+    font-family: $os-font-display;
+    font-size: 15px;
+    color: $os-text-primary;
+    flex: 1;
+  }
 
-    &:hover { box-shadow: 0 8px 24px rgba($primary-500, 0.1); }
+  &__badge {
+    font-size: 11px;
+    color: #16a34a;
+    background: rgba(22,163,74,0.08);
+    border: 1px solid rgba(22,163,74,0.2);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-weight: 600;
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+  }
+
+  &__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-secondary;
+  }
+
+  &__cta {
+    margin-left: auto;
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.08);
+    border: 1px solid rgba($os-accent, 0.25);
+    border-radius: $os-radius-sm;
+    padding: $size-2 $size-4;
+    cursor: pointer;
+
+    &:hover { background: rgba($os-accent, 0.15); }
+
+    &--installed {
+      color: #16a34a;
+      background: rgba(22,163,74,0.08);
+      border-color: rgba(22,163,74,0.25);
+      cursor: default;
+    }
   }
 }
 
-.skill-card__top {
-  display: flex;
-  align-items: center;
-  gap: $size-2;
-}
-
-.skill-card__icon {
-  font-size: 20px;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.skill-card__agente-tag {
-  font-family: $font-primary;
+.mkt-agent-skill-chip {
+  font-family: $os-font-body;
   font-size: 11px;
-  background: #f3f4f6;
-  color: $hub-muted;
-  border-radius: $radius-sm;
-  padding: 2px 6px;
-  flex-shrink: 0;
-}
-
-.skill-card__badge {
-  margin-left: auto;
+  background: #e8e8ed;
+  color: #3d3d4f;
+  border-radius: 8px;
   padding: 2px 8px;
-  border-radius: $radius-pill;
-  font-family: $font-primary;
-  font-size: 11px;
-  font-weight: $font-semibold;
-  flex-shrink: 0;
+  font-weight: 500;
+}
 
-  &.badge--gratuita { background: #dcfce7; color: #166534; }
-  &.badge--experto  { background: $hub-text; color: $white; }
-  &.badge--premium  {
-    background: linear-gradient(90deg, $primary-500, #f59e0b);
-    color: $white;
+// ── Reglas list ─────────────────────────────────────────────────────────
+.mkt-reglas-section { padding: 0 $size-6 $size-8; }
+
+.mkt-reglas-list { display: flex; flex-direction: column; gap: $size-3; }
+
+.mkt-regla-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  padding: $size-5;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover { box-shadow: $shadow-small; }
+
+  &--instalada { border-color: rgba($os-accent, 0.35); background: rgba($os-accent, 0.02); }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: $size-2;
+    flex-wrap: wrap;
+  }
+
+  &__agent-chip {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 2px 10px;
+  }
+
+  &__titulo {
+    font-family: $os-font-body;
+    font-size: 14px;
+    font-weight: 600;
+    color: $os-text-primary;
+    flex: 1;
+  }
+
+  &__active-badge {
+    font-size: 11px;
+    color: $os-accent;
+    font-weight: 600;
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    margin-bottom: $size-2;
+  }
+
+  &__ejemplo {
+    display: block;
+    font-family: $os-font-mono;
+    font-size: 11.5px;
+    background: #1e1e2e;
+    border-radius: $os-radius-sm;
+    padding: $size-3 $size-4;
+    color: #a8c8f0;
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: $size-3;
+    border-left: 3px solid $os-accent;
+    line-height: 1.6;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-secondary;
+  }
+
+  &__cta {
+    margin-left: auto;
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.08);
+    border: 1px solid rgba($os-accent, 0.25);
+    border-radius: $os-radius-sm;
+    padding: $size-2 $size-4;
+    cursor: pointer;
+
+    &:hover { background: rgba($os-accent, 0.15); }
+
+    &--installed {
+      color: #16a34a;
+      background: rgba(22,163,74,0.08);
+      border-color: rgba(22,163,74,0.25);
+      cursor: default;
+    }
   }
 }
 
-.skill-card__nombre {
-  font-family: $font-primary;
-  font-size: $font-base;
-  font-weight: $font-semibold;
-  color: $hub-text;
-  margin: 0;
-  line-height: 1.3;
+// ── Plugins grid ─────────────────────────────────────────────────────────
+.mkt-plugins-section { padding: 0 $size-6 $size-8; }
+
+.mkt-plugins-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $size-4;
 }
 
-.skill-card__meta {
+.mkt-plugin-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  padding: $size-5;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: $size-3;
+  transition: box-shadow 0.15s, border-color 0.15s;
+
+  &:hover { box-shadow: $shadow-small; }
+
+  &--instalado { border-color: rgba(52,211,153,0.35); }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__icon { font-size: 22px; }
+
+  &__info { flex: 1; }
+
+  &__nombre {
+    display: block;
+    font-family: $os-font-display;
+    font-size: 14px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
+  &__tipo {
+    font-family: $os-font-body;
+    font-size: 11px;
+    color: $os-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__badge {
+    font-size: 11px;
+    color: #16a34a;
+    background: rgba(22,163,74,0.08);
+    border: 1px solid rgba(22,163,74,0.2);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-secondary;
+    margin-top: auto;
+  }
+
+  &__precio {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: #dc2626;
+    background: rgba(220,38,38,0.08);
+    border-radius: 8px;
+    padding: 2px 8px;
+
+    &--free {
+      color: #16a34a;
+      background: rgba(22,163,74,0.08);
+    }
+  }
+
+  &__cta {
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.08);
+    border: 1px solid rgba($os-accent, 0.25);
+    border-radius: $os-radius-sm;
+    padding: $size-2 $size-4;
+    cursor: pointer;
+
+    &:hover { background: rgba($os-accent, 0.15); }
+
+    &--installed {
+      color: #16a34a;
+      background: rgba(22,163,74,0.08);
+      border-color: rgba(22,163,74,0.25);
+      cursor: default;
+    }
+  }
 }
 
-.skill-card__stars {
-  display: flex;
-  align-items: center;
-  gap: $size-1;
-}
-
-.skill-card__star-val {
-  font-family: $font-primary;
-  font-size: $font-xs;
-  font-weight: $font-semibold;
-  color: $hub-text;
-}
-
-.skill-card__usos {
-  font-family: $font-primary;
-  font-size: $font-xs;
-  color: $hub-muted;
-}
-
-.skill-card__creador {
-  font-family: $font-primary;
-  font-size: $font-xs;
-  color: $hub-caption;
-}
-
-.skill-card__verified {
-  color: $hub-success;
-  font-weight: $font-bold;
-  margin-left: 2px;
-}
-
-.skill-card__desc {
-  flex: 1;
-  font-family: $font-primary;
-  font-size: $font-xs;
-  color: $hub-muted;
-  line-height: 1.5;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.skill-card__footer {
-  margin-top: auto;
-  padding-top: $size-3;
-  border-top: 1px solid $hub-border;
-}
-
-.btn-skill {
-  width: 100%;
-  padding: 8px;
-  border-radius: $radius-md;
-  font-family: $font-primary;
-  font-size: $font-xs;
-  font-weight: $font-semibold;
-  cursor: pointer;
-  transition: all 0.15s;
+// ── Preview modals (Agente + Regla) ─────────────────────────────────────
+.mkt-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 16, 0.62);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: $size-2;
-
-  &--install {
-    background: $primary-500;
-    border: none;
-    color: $white;
-
-    &:hover { background: $primary-600; }
-  }
-
-  &--loading {
-    background: rgba($primary-500, 0.1);
-    border: none;
-    color: $primary-500;
-    cursor: not-allowed;
-
-    .pi { font-size: 14px; }
-  }
-
-  &--installed {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #166534;
-    cursor: default;
-  }
+  padding: $os-5;
+  animation: mktFadeIn 0.18s ease;
 }
 
-// Buttons
-.btn-mkt {
-  padding: 8px $size-5;
-  border-radius: $radius-md;
-  font-family: $font-primary;
-  font-size: $font-sm;
-  font-weight: $font-semibold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: $size-2;
-  transition: all 0.15s;
-
-  &--primary {
-    background: $primary-500;
-    border: none;
-    color: $white;
-
-    &:hover { background: $primary-600; }
-  }
+@keyframes mktFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-// Share CTA
-.mkt__share-cta {
-  display: flex;
-  align-items: center;
-  gap: $size-5;
-  padding: $size-5 $size-6;
-  background: $hub-card;
-  border: 1.5px dashed $hub-border;
-  border-radius: $radius-xl;
-  transition: border-color 0.15s;
-
-  &:hover { border-color: $primary-500; }
-}
-
-.mkt__share-icon { font-size: 32px; flex-shrink: 0; }
-
-.mkt__share-cta > div {
-  flex: 1;
-
-  strong {
-    font-family: $font-primary;
-    font-size: $font-base;
-    font-weight: $font-bold;
-    color: $hub-text;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  p {
-    font-family: $font-primary;
-    font-size: $font-sm;
-    color: $hub-muted;
-    margin: 0;
-    line-height: 1.4;
-  }
-}
-
-@keyframes fadeDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeUp   { from { opacity: 0; transform: translateY(6px); }  to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 1100px) {
-  .mkt__hero, .mkt__filters, .mkt__agent-tabs, .mkt__content {
-    padding-left: $size-5;
-    padding-right: $size-5;
-  }
-}
-
-@media (max-width: 640px) {
-  .mkt__hero { flex-direction: column; gap: $size-4; }
-  .mkt__grid { grid-template-columns: 1fr; }
-  .mkt__share-cta { flex-direction: column; align-items: flex-start; }
-}
-
-// ── Sección personalizada ───────────────────────────────
-.mkt__personalized {
-  margin-bottom: 24px;
-  padding: 20px;
-  border: 1px solid rgba(255, 97, 2, 0.15);
-  border-radius: 12px;
-  background: rgba(255, 97, 2, 0.03);
-
-  &-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 16px;
-
-    h2 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1c1c1e;
-      margin: 0;
-    }
-
-    span {
-      font-size: 12px;
-      color: #6b7280;
-    }
-  }
-
-  &-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-
-    @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
-    @media (max-width: 600px) { grid-template-columns: 1fr; }
-  }
-}
-
-.mkt-p-card {
+.mkt-preview-modal {
+  background: $os-surface;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.12);
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    padding: $os-5 $os-6;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-family: $os-font-display;
+    font-size: 17px;
+    font-weight: 700;
+    color: $os-text-primary;
+    flex: 1;
+  }
+
+  &__creator {
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-muted;
+    background: $os-surface-2;
+    border-radius: 8px;
+    padding: 2px 8px;
+  }
+
+  &__close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: $os-surface-3;
+    color: $os-text-secondary;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+    flex-shrink: 0;
+
+    &:hover { background: rgba($os-accent, 0.12); color: $os-accent; }
+  }
+
+  &__body {
+    padding: $os-5 $os-6;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $os-4;
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 14px;
+    line-height: 1.6;
+    color: $os-text-secondary;
+  }
+
+  &__section-label {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 700;
+    color: $os-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: $os-2;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  &__chip {
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 500;
+    background: #e8e8ed;
+    color: #3d3d4f;
+    border-radius: 8px;
+    padding: 3px 10px;
+  }
+
+  &__stats {
+    display: flex;
+    gap: $os-4;
+
+    span {
+      font-family: $os-font-body;
+      font-size: 12px;
+      color: $os-text-muted;
+    }
+  }
+
+  &__code-block {
+    background: #1e1e2e;
+    border-radius: $os-radius-md;
+    padding: $os-4 $os-5;
+    font-family: $os-font-mono;
+    font-size: 12.5px;
+    color: #a8c8f0;
+    line-height: 1.7;
+    overflow-x: auto;
+    border-left: 3px solid $os-accent;
+    white-space: pre;
+
+    strong { color: #fbbf24; font-weight: 600; }
+    em     { color: #86efac; font-style: normal; }
+  }
+
+  &__footer {
+    padding: $os-4 $os-6;
+    border-top: 1px solid $os-border;
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    flex-shrink: 0;
+    background: $os-surface;
+  }
+
+  &__cancel {
+    font-family: $os-font-body;
+    font-size: 14px;
+    color: $os-text-secondary;
+    background: none;
+    border: 1px solid $os-border-strong;
+    border-radius: $os-radius-sm;
+    padding: $os-3 $os-5;
+    cursor: pointer;
+
+    &:hover { border-color: $os-accent; color: $os-accent; }
+  }
+
+  &__confirm {
+    margin-left: auto;
+    font-family: $os-font-body;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background: $os-accent;
+    border: none;
+    border-radius: $os-radius-sm;
+    padding: $os-3 $os-6;
+    cursor: pointer;
+    transition: filter 0.12s;
+
+    &:hover { filter: brightness(0.9); }
+
+    &--done {
+      background: #16a34a;
+      cursor: default;
+      &:hover { filter: none; }
+    }
+  }
+}
+
+// ── Asignación de agentes dentro del modal ───────────────────────────────
+.mkt-assign-agents {
+  &__label {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 700;
+    color: $os-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: $os-3;
+    display: block;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $os-2;
+  }
+}
+
+.mkt-assign-agent-row {
+  display: flex;
+  align-items: center;
+  gap: $os-3;
+  padding: $os-3 $os-4;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-sm;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+
+  &:hover { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.03); }
+
+  &--selected {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.06);
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 500;
+    color: $os-text-primary;
+    flex: 1;
+  }
+
+  &__tag {
+    font-size: 10px;
+    font-family: $os-font-body;
+    color: $os-text-muted;
+    background: $os-surface-3;
+    border-radius: 6px;
+    padding: 1px 7px;
+  }
+
+  &__check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid $os-border-strong;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: transparent;
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  &--selected &__check {
+    background: $os-accent;
+    border-color: $os-accent;
+    color: #fff;
+  }
+}
+
+// ── Badge instalado en tarjeta ───────────────────────────────────────────
+.mkt-installed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: $os-font-body;
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  background: rgba(22,163,74,0.1);
+  border: 1px solid rgba(22,163,74,0.25);
   border-radius: 10px;
-  transition: all 0.15s ease;
+  padding: 2px 8px;
+}
 
-  &:hover { border-color: #d1d5db; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+// ── Preview modal — estilos que coinciden con HTML real ───────────────────
+.mkt-preview-modal {
+  // Headers
+  &__agent-header {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    padding: $os-5 $os-6 $os-4;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+  }
 
-  &__agent-bar {
-    display: flex; align-items: center; gap: 6px;
-    padding: 4px 10px; border-radius: 20px; border: 1px solid;
+  &__regla-header {
+    padding: $os-5 $os-6 $os-4;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $os-2;
+  }
+
+  &__agent-chip {
+    display: inline-flex;
+    align-items: center;
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
     width: fit-content;
   }
 
-  &__agent-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  &__meta {
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-muted;
+  }
 
-  &__agent-name { font-size: 11px; font-weight: 600; }
+  &__stats {
+    display: flex;
+    gap: $os-3;
+    margin-left: auto;
+  }
 
-  &__title { font-size: 13px; font-weight: 700; color: #1c1c1e; line-height: 1.3; }
+  &__section {
+    padding: $os-4 $os-6;
+    display: flex;
+    flex-direction: column;
+    gap: $os-2;
+    flex-shrink: 0;
+  }
 
-  &__reason { font-size: 11px; color: #6b7280; line-height: 1.4; flex: 1; }
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 
-  &__cta {
-    padding: 6px 14px; border: none; border-radius: 6px;
-    background: #ff6102; color: white; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: background 0.15s ease; align-self: flex-start;
-    &:hover { background: #e55802; }
+  &__how {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &__code {
+    display: block;
+    background: #1e1e2e;
+    border-radius: $os-radius-md;
+    padding: $os-4 $os-5;
+    font-family: $os-font-mono;
+    font-size: 12px;
+    color: #a8c8f0;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    border-left: 3px solid $os-accent;
+  }
+
+  &__assign-hint {
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-muted;
+    margin: 0;
+  }
+
+  &__assign-count {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-accent;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  &__footer-btns {
+    display: flex;
+    gap: $os-3;
+  }
+
+  &__btn {
+    font-family: $os-font-body;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: $os-radius-sm;
+    padding: $os-3 $os-5;
+    cursor: pointer;
+    transition: filter 0.12s, background 0.12s;
+
+    &--ghost {
+      color: $os-text-secondary;
+      background: none;
+      border: 1px solid $os-border-strong;
+      &:hover { border-color: $os-accent; color: $os-accent; }
+    }
+
+    &--primary {
+      color: #fff;
+      background: $os-accent;
+      border: none;
+      &:hover { filter: brightness(0.9); }
+    }
+  }
+}
+
+.mkt-preview-stat {
+  font-family: $os-font-body;
+  font-size: 12px;
+  color: $os-text-muted;
+  background: $os-surface-3;
+  border-radius: 8px;
+  padding: 2px 8px;
+}
+
+.mkt-preview-chip {
+  font-family: $os-font-body;
+  font-size: 12px;
+  font-weight: 500;
+  background: #e8e8ed;
+  color: #3d3d4f;
+  border-radius: 8px;
+  padding: 3px 10px;
+}
+
+.mkt-preview-link {
+  color: $os-accent;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// ── Assign agent rows ───────────────────────────────────────────────────
+.mkt-assign-agents {
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+}
+
+.mkt-assign-agent-row {
+  display: flex;
+  align-items: center;
+  gap: $os-3;
+  padding: $os-3 $os-4;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-sm;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+
+  input[type="checkbox"] { display: none; }
+
+  &:hover { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.03); }
+
+  &--checked {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.06);
+  }
+}
+
+.mkt-assign-agent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mkt-assign-agent-name {
+  font-family: $os-font-body;
+  font-size: 13px;
+  font-weight: 500;
+  color: $os-text-primary;
+  flex: 1;
+}
+
+.mkt-assign-agent-badge {
+  font-size: 10px;
+  font-family: $os-font-body;
+  color: $os-text-muted;
+  background: $os-surface-3;
+  border-radius: 6px;
+  padding: 1px 7px;
+}
+
+// desc y footer con padding propio (no están en __body)
+.mkt-preview-modal__desc {
+  padding: $os-3 $os-6;
+  font-family: $os-font-body;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: $os-text-secondary;
+  margin: 0;
+}
+
+// scroll overflow en el modal
+.mkt-preview-modal {
+  overflow-y: auto;
+}
+
+// ── "Mis publicaciones" section (agentes + reglas tabs) ──────────────────
+.my-pubs-section {
+  background: $os-surface-2;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  padding: $os-4 $os-5;
+  margin-bottom: $os-5;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $os-3;
+    margin-bottom: $os-3;
+  }
+
+  &__title {
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 700;
+    color: $os-text-primary;
+  }
+
+  &__count {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.1);
+    border-radius: 8px;
+    padding: 1px 7px;
+  }
+
+  &__add {
+    margin-left: auto;
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 600;
+    color: $os-accent;
+    background: none;
+    border: 1px dashed rgba($os-accent, 0.4);
+    border-radius: $os-radius-sm;
+    padding: $os-2 $os-4;
+    cursor: pointer;
+
+    &:hover { background: rgba($os-accent, 0.06); border-style: solid; }
+  }
+}
+
+.my-pubs-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $os-3;
+}
+
+.my-pubs-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-sm;
+  padding: $os-3 $os-4;
+  min-width: 200px;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--pending { border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.04); }
+
+  &__name {
+    font-family: $os-font-body;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 11px;
+    color: $os-text-muted;
+  }
+
+  &__footer {
+    display: flex;
+    gap: $os-2;
+    margin-top: 4px;
+  }
+
+  &__stat {
+    font-family: $os-font-body;
+    font-size: 11px;
+    color: $os-text-muted;
+    background: $os-surface-3;
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+
+  &__status {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 1px 6px;
+
+    &--review {
+      color: #92400e;
+      background: rgba(251,191,36,0.15);
+    }
+  }
+}
+
+// ── Creator add btn ───────────────────────────────────────────────────────
+.creator-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: $size-3 $size-4;
+  border: 1px dashed rgba($primary-500, 0.4);
+  border-radius: $radius-sm;
+  background: none;
+  color: $primary-500;
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: $size-2;
+  transition: background 0.12s, border-style 0.12s;
+
+  &:hover { background: rgba($primary-500, 0.05); border-style: solid; }
+}
+
+// ── Publish modal ─────────────────────────────────────────────────────────
+.pub-modal {
+  background: $os-surface;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.28);
+  width: 100%;
+  max-width: 540px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $os-5 $os-6;
+    border-bottom: 1px solid $os-border;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-family: $os-font-display;
+    font-size: 16px;
+    font-weight: 700;
+    color: $os-text-primary;
+  }
+
+  &__body {
+    padding: $os-5 $os-6;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $os-4;
+
+    &--done {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: $os-8 $os-6;
+    }
+  }
+
+  &__hint {
+    font-family: $os-font-body;
+    font-size: 14px;
+    color: $os-text-secondary;
+    margin: 0;
+  }
+
+  &__paths {
+    display: flex;
+    flex-direction: column;
+    gap: $os-3;
+  }
+
+  &__footer {
+    padding: $os-4 $os-6;
+    border-top: 1px solid $os-border;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $os-3;
+    flex-shrink: 0;
+  }
+
+  &__empty {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-muted;
+    text-align: center;
+    padding: $os-6;
+  }
+
+  &__done-icon {
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(22,163,74,0.12);
+    color: #16a34a;
+    font-size: 26px;
+    line-height: 56px;
+    text-align: center;
+    margin: 0 auto $os-4;
+  }
+
+  &__done-title {
+    font-family: $os-font-display;
+    font-size: 18px;
+    font-weight: 700;
+    color: $os-text-primary;
+    display: block;
+    margin-bottom: $os-3;
+  }
+
+  &__done-desc {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 360px;
+  }
+}
+
+// ── Path cards (choose step) ──────────────────────────────────────────────
+.pub-path-card {
+  display: flex;
+  align-items: flex-start;
+  gap: $os-4;
+  padding: $os-5;
+  background: $os-surface-2;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.14s, background 0.14s, box-shadow 0.14s;
+  width: 100%;
+
+  &:hover {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.04);
+    box-shadow: 0 2px 8px rgba($os-accent, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    &:hover { border-color: $os-border; background: $os-surface-2; box-shadow: none; }
+  }
+
+  &__icon { font-size: 22px; flex-shrink: 0; }
+
+  &__title {
+    display: block;
+    font-family: $os-font-body;
+    font-size: 15px;
+    font-weight: 700;
+    color: $os-text-primary;
+    margin-bottom: 4px;
+  }
+
+  &__desc {
+    display: block;
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+  }
+
+  &__arrow {
+    margin-left: auto;
+    font-size: 18px;
+    color: $os-accent;
+    flex-shrink: 0;
+    align-self: center;
+  }
+}
+
+// ── Publish form (new step) ────────────────────────────────────────────────
+.pub-form {
+  display: flex;
+  flex-direction: column;
+  gap: $os-4;
+
+  &__label {
+    display: block;
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 700;
+    color: $os-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $os-2;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    font-family: $os-font-body;
+    font-size: 14px;
+    color: $os-text-primary;
+    background: $os-surface-2;
+    border: 1px solid $os-border-strong;
+    border-radius: $os-radius-sm;
+    padding: $os-3 $os-4;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.12s;
+
+    &:focus { outline: none; border-color: $os-accent; }
+  }
+
+  &__agent-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $os-2;
+    margin-top: $os-2;
+  }
+
+  &__gali-tip {
+    display: flex;
+    gap: $os-3;
+    align-items: flex-start;
+    background: rgba($os-accent, 0.05);
+    border: 1px solid rgba($os-accent, 0.2);
+    border-radius: $os-radius-sm;
+    padding: $os-3 $os-4;
+
+    &__icon {
+      color: $os-accent;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    p {
+      font-family: $os-font-body;
+      font-size: 12px;
+      color: $os-text-secondary;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+// ── Existing items list (existing step) ───────────────────────────────────
+.pub-existing-list {
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+}
+
+.pub-existing-item {
+  display: flex;
+  align-items: center;
+  gap: $os-3;
+  padding: $os-3 $os-4;
+  background: $os-surface-2;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-sm;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.12s, background 0.12s;
+
+  &:hover { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.03); }
+
+  &--selected {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.06);
+  }
+
+  &__icon { font-size: 18px; flex-shrink: 0; }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+
+    strong {
+      font-family: $os-font-body;
+      font-size: 13px;
+      font-weight: 600;
+      color: $os-text-primary;
+    }
+
+    span {
+      font-family: $os-font-body;
+      font-size: 11px;
+      color: $os-text-muted;
+    }
+  }
+
+  &__check {
+    width: 20px;
+    height: 20px;
+    border: 2px solid $os-border-strong;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: transparent;
+    flex-shrink: 0;
+    transition: all 0.1s;
+  }
+
+  &--selected &__check {
+    background: $os-accent;
+    border-color: $os-accent;
+    color: #fff;
+  }
+}
+
+// ── Skill creator review status ───────────────────────────────────────────
+.creator-skill-row__status--review {
+  color: #92400e;
+  background: rgba(251,191,36,0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+// ── my-pubs-section extras ────────────────────────────────────────────────
+.my-pubs-section {
+  &__stats {
+    display: flex;
+    gap: $os-2;
+    margin-left: $os-2;
+  }
+
+  &__stat {
+    font-family: $os-font-body;
+    font-size: 11px;
+    color: $os-text-muted;
+    background: $os-surface-3;
+    border-radius: 6px;
+    padding: 1px 7px;
+  }
+}
+
+.my-pubs-card {
+  &__edit {
+    margin-left: auto;
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    color: $os-accent;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── Personalizado para ti ───────────────────────────────────────────────────
+.mkt-personalized {
+  margin: $os-4 $os-5;
+  padding: $os-4;
+  border: 1px solid rgba($os-accent, 0.25);
+  border-radius: $os-radius-md;
+  background: linear-gradient(135deg, rgba($os-accent, 0.06) 0%, $os-surface 60%);
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $os-3;
+    margin-bottom: $os-3;
+  }
+
+  &__title {
+    font-family: $os-font-display;
+    font-size: 14px;
+    font-weight: 700;
+    color: $os-text-primary;
+    margin: 0;
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: $os-text-muted;
+    font-family: $os-font-body;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: $os-3;
+  }
+}
+
+.mkt-personalized-card {
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+  padding: $os-3;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  background: $os-surface;
+
+  &__agent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 3px 8px;
+    border: 1px solid $os-border;
+    border-radius: $os-radius-sm;
+    font-size: 10px;
+    font-weight: 600;
+    color: $os-text-secondary;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $os-text-primary;
+    line-height: 1.3;
+  }
+
+  &__reason {
+    font-size: 11px;
+    color: $os-text-muted;
+    line-height: 1.45;
+    margin: 0;
+    flex: 1;
   }
 
   &__installed {
-    font-size: 12px; font-weight: 600; color: #10b981;
-    padding: 4px 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: $os-ok;
+  }
+
+  &__cta {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border: none;
+    border-radius: $os-radius-sm;
+    background: $os-accent;
+    color: #fff;
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.9; }
   }
 }

@@ -939,6 +939,35 @@ abbr[title] {
   }
 }
 
+.fin-kpi-inline-row {
+  display: inline-flex;
+  align-items: center;
+  gap: $size-2;
+  margin-top: $size-2;
+  flex-wrap: wrap;
+}
+
+.fin-kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px $size-2;
+  background: rgba(#60a5fa, 0.08);
+  border: 1px solid rgba(#60a5fa, 0.18);
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  color: $gray-600;
+
+  .term-info {
+    color: $gray-500;
+    border-bottom: 1px dashed $gray-300;
+    cursor: help;
+    font-size: 11px;
+  }
+
+  strong { color: $gray-800; font-weight: $font-semibold; }
+}
+
 // ── Weekly section title group ───────────────────────────────────────────────
 
 .weekly-section__title-group {

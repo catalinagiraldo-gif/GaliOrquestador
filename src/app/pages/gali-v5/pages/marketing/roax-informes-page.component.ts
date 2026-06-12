@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DropiTitulosComponent, DropiButtonNewComponent } from '../../components/shared';
 import informesData from '../../../../../../mocks/gali-v5/marketing-roax-informes.json';
 import { GALI_V5_DROPI_LOGO } from '../../gali-v5.constants';
@@ -9,7 +9,7 @@ import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 @Component({
   selector: 'app-roax-informes-page',
   standalone: true,
-  imports: [CommonModule, DropiTitulosComponent, DropiButtonNewComponent],
+  imports: [CommonModule, RouterModule, DropiTitulosComponent, DropiButtonNewComponent],
   templateUrl: './roax-informes-page.component.html',
   styleUrl: './roax-informes-page.component.scss',
 })

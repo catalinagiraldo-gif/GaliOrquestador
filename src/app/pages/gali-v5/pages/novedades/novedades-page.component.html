@@ -9,7 +9,7 @@
       <span>{{ galiSummary.recuperables }} recuperables · {{ galiSummary.irreversibles }} irreversibles · puede resolver {{ galiSummary.puedeResolver }} sin tu intervención</span>
     </div>
     <button type="button" class="gali-nov-banner__cta" (click)="goToOperar()">
-      Ver señales en Gali →
+      Ver qué hizo Vigilante →
     </button>
   </div>
 
@@ -78,4 +78,52 @@
   </div>
 
   <dropi-paginator />
+
+  <!-- ✦ HUELLA VIGILANTE — J1: Qué hizo Vigilante por esta novedad -->
+  <div class="huella-vigilante-section">
+    <div class="huella-vigilante-section__header">
+      <span class="huella-vigilante-section__icon">🛡</span>
+      <div>
+        <strong class="huella-vigilante-section__title">Huella Vigilante</strong>
+        <span class="huella-vigilante-section__sub">Todo lo que Vigilante hizo antes de mostrarte esta novedad</span>
+      </div>
+      <span class="huella-vigilante-section__badge"
+        pTooltip="Rastro de las acciones que tomó Vigilante en este pedido: qué detectó, qué decidió y cuándo. Solo llegan a tu bandeja las novedades que requieren tu decisión."
+        tooltipPosition="left">¿Qué es esto?</span>
+    </div>
+    <p class="huella-vigilante-section__desc">
+      Antes de alertarte, Vigilante ya ejecutó estos pasos automáticamente para cada novedad.
+      Solo llegan a tu bandeja las que <strong>requieren tu decisión final</strong>.
+    </p>
+    <div class="huella-steps">
+      <div class="huella-step">
+        <span class="huella-step__num">1</span>
+        <div class="huella-step__body">
+          <strong>Detectó la novedad</strong>
+          <span>Vigilante monitorea cada transportadora cada 2h. Si la tasa supera el umbral definido, genera la alerta.</span>
+        </div>
+      </div>
+      <div class="huella-step">
+        <span class="huella-step__num">2</span>
+        <div class="huella-step__body">
+          <strong>Clasificó automáticamente</strong>
+          <span>Leyó el reporte de la transportadora y clasificó: recuperable (re-envío), irreversible (reembolso) o en disputa.</span>
+        </div>
+      </div>
+      <div class="huella-step">
+        <span class="huella-step__num">3</span>
+        <div class="huella-step__body">
+          <strong>Intentó resolver sin molestar</strong>
+          <span>Las novedades recuperables donde la regla es clara → Chatea Pro notificó al cliente y coordinó nuevo intento. No llegaron a tu bandeja.</span>
+        </div>
+      </div>
+      <div class="huella-step huella-step--last">
+        <span class="huella-step__num">4</span>
+        <div class="huella-step__body">
+          <strong>Solo escaló lo que tú debes decidir</strong>
+          <span>Lo que ves aquí es lo que supera su umbral de confianza. Tú tienes la última palabra en casos ambiguos o de alto valor.</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

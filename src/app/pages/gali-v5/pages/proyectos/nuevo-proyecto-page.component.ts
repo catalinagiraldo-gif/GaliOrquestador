@@ -80,6 +80,35 @@ export class NuevoProyectoPageComponent {
   readonly campanaSkill1Active = signal(true);
   readonly campanaSkill2Active = signal(true);
   readonly isLaunching = signal(false);
+  readonly showLaunchModal = signal(false);
+  readonly launchSuccess = signal(false);
+  readonly showConfirmLaunch = signal(false);
+  readonly showDraftToast = signal(false);
+  readonly launchedProjectId = signal('');
+  readonly agentesProyecto = signal<Record<string, boolean>>({
+    roax: true, vigilante: true, chatea: true, ada: false, kronos: false,
+  });
+
+  get precioSugerido(): number {
+    return Math.round((this.cogs() + this.fleteUnit()) * 2.5);
+  }
+
+  get margenProyectado(): number {
+    const pv = this.precioVenta();
+    if (pv <= 0) return 0;
+    const costo = this.cogs() + this.fleteUnit();
+    return Math.round(((pv - costo) / pv) * 100);
+  }
+
+  get galiPresupuestoRec(): string {
+    const p = this.pedidosTarget();
+    const daily = Math.round((p * 20000) / 7 / 1000) * 1000;
+    return `$${daily.toLocaleString('es-CO')}/día`;
+  }
+
+  toggleAgente(key: string): void {
+    this.agentesProyecto.update(m => ({ ...m, [key]: !m[key] }));
+  }
 
   get angulos(): Angulo[] {
     const p = this.selectedProduct();
@@ -218,6 +247,10 @@ export class NuevoProyectoPageComponent {
   }
 
   launchProject(): void {
+    if (this.step() === 'launch') {
+      this.showConfirmLaunch.set(true);
+      return;
+    }
     this.isLaunching.set(true);
     setTimeout(() => {
       this.isLaunching.set(false);
@@ -225,11 +258,40 @@ export class NuevoProyectoPageComponent {
     }, 1800);
   }
 
+  confirmLaunch(): void {
+    this.showConfirmLaunch.set(false);
+    const slug = (this.projectName() || this.selectedProduct()?.name || 'proyecto')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    this.launchedProjectId.set(`${slug}-${Date.now().toString(36)}`);
+    this.finalLaunch();
+  }
+
+  finalLaunch(): void {
+    this.showLaunchModal.set(true);
+    this.launchSuccess.set(false);
+    setTimeout(() => {
+      this.launchSuccess.set(true);
+    }, 2200);
+  }
+
+  closeLaunchModal(): void {
+    this.showLaunchModal.set(false);
+    const id = this.launchedProjectId();
+    if (id) {
+      this.router.navigate(['/gali-v5/proyecto', id]);
+    } else {
+      this.router.navigate(['/gali-v5/proyectos']);
+    }
+  }
+
   goBack(): void {
     window.history.back();
   }
 
   saveDraft(): void {
-    window.history.back();
+    this.showDraftToast.set(true);
+    setTimeout(() => this.showDraftToast.set(false), 3000);
   }
 }

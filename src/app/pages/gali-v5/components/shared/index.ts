@@ -4,3 +4,8 @@ export * from './dropi-search-oficial.component';
 export * from './dropi-tag.component';
 export * from './dropi-paginator.component';
 export * from './dropi-table-shell.component';
+export * from './confirm-action-modal.component';
+export * from './gali-term-tooltip.component';
+export * from '../gali-hub-brief/gali-hub-brief.component';
+export * from '../gali-decision-theater/gali-decision-theater.component';
+export * from '../../directives/alert-hierarchy.directive';

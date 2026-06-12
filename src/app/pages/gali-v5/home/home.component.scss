@@ -1,4 +1,5 @@
 @import '../../../../styles/gali-v5-tokens';
+@import '../../../../styles/gali-os-tokens';
 
 :host {
   display: block;
@@ -16,8 +17,18 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  background: $gray-50;
+  background: #fff;
   padding-bottom: $size-8;
+  gap: $size-6;
+
+  // C1 — Ciclo de negocio primero en modo experto (heurística Cata)
+  &.mission--expert-view {
+    .hub-header-compact { order: 0; }
+    .momento-3 { order: 1; }
+    .momento-1 { order: 2; }
+    .momento-2 { order: 3; }
+    .hub-quick-actions { order: 4; }
+  }
 
   &__entry-banner {
     flex-shrink: 0;
@@ -529,7 +540,7 @@
   padding: $size-3;
   cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  min-width: 0;
+  min-width: 120px;
 
   &:hover {
     border-color: $primary-300;
@@ -637,9 +648,11 @@
     font-size: 11px;
     color: $gray-400;
     line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    max-width: 100%;
+    word-break: break-word;
   }
 
   &__link {
@@ -661,8 +674,10 @@
   text-align: center;
   flex-shrink: 0;
   justify-self: center;
+  transition: color 0.2s;
 
   &--rev { color: $gray-300; }
+  &--active { color: $primary-400; }
 }
 
 .anatomy-v-connector {
@@ -1487,189 +1502,28 @@
   &:hover { color: $gray-700; }
 }
 
-// ── Hub Goal Strip ─────────────────────────────────────────────────────────────
-
-.hub-goal-strip {
-  display: flex;
-  align-items: center;
-  gap: $size-2;
-  padding: $size-2 $size-6;
-  background: #fff7ed;
-  border-left: 3px solid $primary-500;
-  font-size: $font-xs;
-  color: $gray-600;
-  flex-wrap: wrap;
-
-  &__glyph { color: $primary-500; font-size: 12px; }
-  &__goal { font-weight: $font-semibold; color: $gray-800; }
-  &__sep { color: $gray-300; }
-  &__tagline { font-style: italic; }
-}
-
 // ── Fase 2: Novice Layout (Panel de Nave) ─────────────────────────────────────
-.mission__novice {
-  padding: $size-6 $size-6 $size-4;
-  animation: slideUp 0.35s ease;
-}
-
-.novice__greeting {
-  display: flex;
-  align-items: center;
-  gap: $size-3;
-  margin-bottom: $size-5;
-}
-
-.novice__greeting-icon {
-  font-size: 28px;
-  color: $primary-500;
-  flex-shrink: 0;
-}
-
-.novice__greeting-title {
-  font-size: $font-lg;
-  font-weight: $font-bold;
-  color: $gray-900;
-  margin: 0 0 2px;
-}
-
-.novice__greeting-sub {
-  font-size: $font-xs;
-  color: $gray-500;
-}
-
-.novice__agent-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $size-3;
-  margin-bottom: $size-4;
-}
-
-.novice__agent-tile {
-  padding: $size-4;
-  border-radius: $radius-lg;
-  border: 1.5px solid rgba(var(--agent-color-raw, 209, 213, 219), 0.3);
-  border-color: color-mix(in srgb, var(--agent-color, #e0e0e0) 30%, transparent);
-  background: $white;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  }
-}
-
-.novice__agent-tile-header {
-  display: flex;
-  align-items: center;
-  gap: $size-2;
-  margin-bottom: $size-2;
-}
-
-.novice__agent-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  animation: gali-pulse 2s ease-in-out infinite;
-}
-
-.novice__agent-name {
-  font-size: $font-sm;
-  font-weight: $font-semibold;
-  color: $gray-800;
-  flex: 1;
-}
-
-.novice__agent-status {
-  font-size: 10px;
-  font-weight: $font-medium;
-  padding: 2px 6px;
-  border-radius: $radius-full;
-  background: $gray-100;
-  color: $gray-500;
-
-  &--active {
-    background: rgba(52, 211, 153, 0.15);
-    color: #047857;
-  }
-
-  &--waiting {
-    background: rgba(251, 191, 36, 0.15);
-    color: #92400e;
-  }
-}
-
-.novice__agent-desc {
-  font-size: $font-xs;
-  color: $gray-600;
-  margin: 0 0 $size-2;
-  line-height: 1.4;
-}
-
-.novice__agent-last {
-  font-size: 10px;
-  color: $gray-400;
-  display: block;
-}
-
-.novice__chat-wrap {
-  margin-bottom: $size-3;
-}
-
-.novice__chat-field {
-  font-size: $font-sm;
-}
-
-.novice__expert-link {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: $size-2;
-  background: none;
-  border: none;
-  font-size: $font-xs;
-  color: $gray-400;
-  cursor: pointer;
-  font-family: $font-primary;
-  transition: color 0.12s;
-
-  &:hover { color: $primary-500; }
-}
 
 // ── Complexity toggle footer ─────────────────────────────────────────────────
-.mission__complexity-toggle {
+.hub-reconfig-row {
   display: flex;
-  gap: $size-2;
   justify-content: center;
-  padding: $size-3 $size-6;
-  border-top: 1px solid $gray-100;
+  padding: $size-2 $size-6 $size-3;
 }
 
-.complexity-toggle-btn {
-  padding: 6px 12px;
-  border-radius: $radius-full;
-  border: 1px solid $gray-200;
-  background: $white;
-  color: $gray-500;
-  font-size: $font-xs;
+.hub-reconfig-link {
+  background: transparent;
+  border: none;
   font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-400;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s;
+  padding: 0;
+  transition: color 0.15s ease;
+  letter-spacing: 0.02em;
 
   &:hover {
-    background: $gray-50;
-    color: $gray-700;
-  }
-
-  &--reset {
-    color: $primary-600;
-    border-color: rgba($primary-500, 0.3);
-
-    &:hover {
-      background: rgba($primary-500, 0.05);
-    }
+    color: $primary-500;
   }
 }
 
@@ -1868,6 +1722,123 @@
   border-left: 3px solid $gray-200;
 }
 
+// ── Edit-goal modal ──────────────────────────────────────────────────────────
+.edit-goal-modal {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $size-6;
+  width: 460px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $size-5;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__icon { font-size: 18px; }
+
+  &__title {
+    font-family: $font-primary;
+    font-size: $font-base;
+    font-weight: $font-bold;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+    margin-bottom: $size-4;
+  }
+
+  &__label {
+    display: block;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $size-1;
+  }
+
+  &__input {
+    width: 100%;
+    padding: $size-2 $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-800;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+
+    &::placeholder { color: $gray-400; }
+    &:focus { border-color: $primary-400; box-shadow: 0 0 0 3px rgba($primary-500, 0.1); }
+
+    &--num { width: 80px; flex-shrink: 0; }
+  }
+
+  &__select {
+    flex: 1;
+    padding: $size-2 $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    color: $gray-800;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    &:focus { border-color: $primary-400; }
+  }
+
+  &__row {
+    display: flex;
+    gap: $size-3;
+    flex-wrap: wrap;
+  }
+
+  &__field-group {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  &__metric-row {
+    display: flex;
+    gap: $size-2;
+    align-items: center;
+  }
+
+  &__hint {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-2;
+    padding: $size-2 $size-3;
+    background: #fff7ed;
+    border-radius: $radius-sm;
+    border: 1px solid rgba($primary-500, 0.2);
+    font-family: $font-primary;
+    font-size: $font-xs;
+    color: $gray-600;
+    line-height: 1.5;
+
+    .pi { color: $primary-500; font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  }
+}
+
 // ── Fase 3: Node-detail skill button ─────────────────────────────────────────
 .node-detail__skill-btn {
   display: inline-flex;
@@ -1935,18 +1906,18 @@
 
   &--1 {
     border-left: 2px solid $primary-500;
-    background: $gray-50;
+    background: #fff;
     padding: $size-4 $size-5;
   }
 
   &--2 {
-    background: $white;
+    background: #fff;
     padding: $size-4 $size-5;
     border: 1px solid $gray-100;
   }
 
   &--3 {
-    background: $gray-100;
+    background: #fff;
     padding: 0;
     overflow: hidden;
     transition: max-height 200ms ease-out;
@@ -2034,6 +2005,61 @@
     display: flex;
     flex-direction: column;
   }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+}
+
+// ── Action buttons in cycle header (Umbrales / Señales / Personalizar) ────────
+
+.mission__agency-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  color: $gray-700;
+  background: white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+
+  i { font-size: 12px; }
+
+  &:hover {
+    border-color: $primary-400;
+    color: $primary-600;
+    background: rgba($primary-500, 0.04);
+  }
+}
+
+.mission__section-see-all {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  color: $primary-600;
+  background: rgba($primary-500, 0.06);
+  border: 1px solid rgba($primary-500, 0.18);
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba($primary-500, 0.12);
+    border-color: rgba($primary-500, 0.35);
+  }
 }
 
 // ── Ciclo horizontal (CA-5) ──────────────────────────────────────────────────
@@ -2049,19 +2075,239 @@
 
   .anatomy-node {
     flex-shrink: 0;
-    min-width: 130px;
-    max-width: 160px;
+    min-width: 140px;
+    max-width: 200px;
     scroll-snap-align: start;
+
+    // Allow sub text to wrap inside cycle cards
+    .anatomy-node__sub {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
   }
 
   .anatomy-arrow {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    padding: 0 $size-2;
+    padding: 0 $size-1;
     color: $gray-300;
-    font-size: 16px;
+    font-size: 18px;
+    transition: color 0.2s;
+
+    &--active {
+      color: $primary-400;
+    }
   }
+}
+
+// ── DIAG-1: Grafo radial interactivo ─────────────────────────────────────────
+
+.mission__anatomy-body--graph {
+  display: flex;
+  flex-direction: row;
+  gap: $size-4;
+  align-items: flex-start;
+
+  // Constrain node-detail to be proportional to the graph
+  .mission__node-detail {
+    flex: 0 0 210px;
+    max-height: 320px;
+    overflow-y: auto;
+    align-self: flex-start;
+  }
+}
+
+.hub-graph-wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: 380px;
+  transition: max-width 0.3s ease;
+
+  &--detail-open {
+    max-width: 280px;
+  }
+}
+
+.hub-graph-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+// Hex background outline
+.hub-graph__hex-bg {
+  fill: none;
+  stroke: rgba(0,0,0,0.05);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+// Cycle edges
+.hub-graph__edge {
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.5;
+
+  &--ok        { stroke: #9ca3af; }
+  &--highlight { stroke: #f97316; }
+  &--alert     { stroke: #ef4444; stroke-width: 2; }
+  &--warn      { stroke: #f59e0b; }
+}
+
+// Spokes
+.hub-graph__spoke {
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.25;
+
+  &--ok        { stroke: #9ca3af; }
+  &--highlight { stroke: #f97316; }
+  &--alert     { stroke: #ef4444; }
+  &--warn      { stroke: #f59e0b; }
+}
+
+// Center GALI
+.hub-graph__center {
+  cursor: default;
+}
+
+.hub-graph__center-circle {
+  fill: $primary-500;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 8px rgba(244, 154, 61, 0.4));
+}
+
+.hub-graph__center-glyph {
+  font-family: $font-primary;
+  font-size: 16px;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.hub-graph__center-label {
+  font-family: $font-primary;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  fill: rgba(255,255,255,0.85);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+// Outer nodes
+.hub-graph__node {
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &--ok .hub-graph__node-circle {
+    fill: #f9fafb;
+    stroke: #d1d5db;
+    stroke-width: 1.5;
+  }
+
+  &--highlight .hub-graph__node-circle {
+    fill: #fff7ed;
+    stroke: #f97316;
+    stroke-width: 2;
+  }
+
+  &--alert .hub-graph__node-circle {
+    fill: #fef2f2;
+    stroke: #ef4444;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(239,68,68,0.3));
+  }
+
+  &--warn .hub-graph__node-circle {
+    fill: #fffbeb;
+    stroke: #f59e0b;
+    stroke-width: 1.5;
+  }
+
+  &--selected .hub-graph__node-circle {
+    stroke: $primary-500;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px rgba(244,154,61,0.5));
+  }
+
+  &:hover .hub-graph__node-circle {
+    stroke-width: 2.5;
+    opacity: 0.95;
+  }
+}
+
+.hub-graph__node-label {
+  font-family: $font-primary;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  fill: #374151;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.hub-graph__node-metric {
+  font-family: $font-primary;
+  font-size: 9.5px;
+  font-weight: 600;
+  fill: #111827;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.hub-graph__alert-bg {
+  fill: #ef4444;
+}
+
+.hub-graph__alert-text {
+  font-family: $font-primary;
+  font-size: 9px;
+  font-weight: 700;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+// Tooltip de términos técnicos (ⓘ)
+.term-info {
+  font-size: 10px;
+  color: $gray-400;
+  cursor: help;
+  flex-shrink: 0;
+  transition: color 0.12s;
+
+  &:hover { color: $primary-500; }
+}
+
+.term-pill {
+  display: inline;
+  font-weight: $font-semibold;
+  color: $primary-600;
+  border-bottom: 1px dotted $primary-400;
+  cursor: help;
+  transition: color 0.12s;
+
+  &:hover { color: $primary-500; }
+}
+
+.anatomy-node__roas-label-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.anatomy-node__sub-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
 // ROAS wrap en tarjeta Marketing (CA-6)
@@ -2312,6 +2558,20 @@
 }
 
 // FAB "+" con mini-menú acciones rápidas (C17)
+// ── FAB posicionado sticky bottom-right ──────────────────────────────────────
+.hub-quick-actions {
+  position: sticky;
+  bottom: $size-6;
+  z-index: 50;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 $size-6;
+  pointer-events: none;
+
+  .hub-fab-wrap,
+  .hub-fab-backdrop { pointer-events: auto; }
+}
+
 .hub-fab-backdrop {
   position: fixed;
   inset: 0;
@@ -2324,24 +2584,28 @@
 }
 
 .hub-fab-plus {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: $primary-500;
   color: $white;
   border: none;
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   font-weight: 300;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s, background 0.15s;
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba($primary-500, 0.4);
 
-  &:hover { background: $primary-600; }
-  &--open { transform: rotate(45deg); background: $gray-700; }
+  &:hover {
+    background: $primary-600;
+    box-shadow: 0 6px 20px rgba($primary-500, 0.5);
+  }
+  &--open { transform: rotate(45deg); background: $gray-700; box-shadow: none; }
 }
 
 .hub-fab-menu {
@@ -2415,4 +2679,960 @@
     color: $gray-500;
     margin-left: auto;
   }
+}
+
+// ── Vigilante Recommendation Banner (CA-16) ──────────────────────
+// ══ UNIFIED ALERT BAND (F1, F5) ════════════════════════════════════════════
+
+// ── Tu día a día — widget personalizado post-onboarding (B3) ────────────────
+
+.hub-dia-strip {
+  background: $white;
+  border: 1px solid $gray-100;
+  border-radius: $os-radius-lg;
+  padding: 14px 16px 12px;
+  flex-shrink: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  &__label {
+    font-family: $os-font-body;
+    font-size: 12px;
+    font-weight: 700;
+    color: $os-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: $os-accent-text;
+    background: $os-accent-dim;
+    padding: 2px 7px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__edit {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $os-text-muted;
+    font-size: 11px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background 0.12s, color 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    &:hover {
+      background: $gray-100;
+      color: $os-text-primary;
+    }
+  }
+
+  &__cards {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+}
+
+.hub-dia-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 155px;
+  max-width: 175px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--mod-color) 5%, #{$white});
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  animation: hubDiaIn 0.3s ease both;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--mod-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+
+    .hub-dia-card__arrow {
+      transform: translateX(2px);
+      opacity: 1;
+    }
+  }
+
+  &__color-bar {
+    height: 3px;
+    background: var(--mod-color);
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 12px 8px;
+    flex: 1;
+  }
+
+  &__icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__module {
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 700;
+    color: $os-text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__kpi {
+    font-family: $os-font-body;
+    font-size: 11px;
+    color: $os-text-muted;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px 10px;
+  }
+
+  &__agent {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.85;
+  }
+
+  &__arrow {
+    font-size: 10px;
+    color: $os-text-muted;
+    opacity: 0.5;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+}
+
+@keyframes hubDiaIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Scroll fix for cycle/net (F3) ───────────────────────────────────────────
+.mission__anatomy-body {
+  .mission__net {
+    cursor: grab;
+    &:active { cursor: grabbing; }
+  }
+}
+
+.vigilante-rec-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-4;
+  padding: $size-3 $size-4;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-left: 3px solid #fbbf24;
+  border-radius: $radius-md;
+  margin-bottom: $size-4;
+  animation: slideDown 0.2s ease;
+
+  &__left {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-3;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fbbf24;
+    flex-shrink: 0;
+    margin-top: 4px;
+    box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__agent {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: #d97706;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__msg {
+    font-size: $font-xs;
+    color: $gray-700;
+    line-height: 1.45;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+  }
+
+  &__cta {
+    height: 30px;
+    padding: 0 $size-3;
+    background: #fbbf24;
+    color: $gray-900;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    &:hover { opacity: 0.85; }
+  }
+
+  &__snooze {
+    height: 30px;
+    padding: 0 $size-3;
+    background: transparent;
+    color: $gray-500;
+    border: 1px solid $gray-200;
+    border-radius: $radius-sm;
+    font-size: $font-xs;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    &:hover { background: $gray-50; color: $gray-700; }
+  }
+
+  &__dismiss {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: none;
+    color: $gray-400;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-xs;
+    flex-shrink: 0;
+    transition: all 0.12s;
+    &:hover { background: rgba(0,0,0,0.06); color: $gray-700; }
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Weekly plan widget ───────────────────────────────────────────────────────
+.weekly-plan-widget {
+  margin: $size-4 $size-8;
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-lg;
+  background: rgba($primary-500, 0.03);
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $size-3 $size-5;
+    border-bottom: 1px solid rgba($primary-500, 0.1);
+    background: rgba($primary-500, 0.04);
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__icon { font-size: 14px; }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $gray-800;
+  }
+
+  &__progress {
+    font-size: 10px;
+    font-weight: 600;
+    color: $primary-500;
+    background: rgba($primary-500, 0.1);
+    padding: 1px 7px;
+    border-radius: 100px;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__edit-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: $primary-500;
+    background: transparent;
+    border: 1px solid rgba($primary-500, 0.3);
+    border-radius: $radius-sm;
+    padding: 2px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover { background: rgba($primary-500, 0.08); }
+  }
+
+  &__collapse-btn {
+    font-size: 13px;
+    color: $gray-400;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: $radius-xs;
+    transition: color 0.12s;
+    &:hover { color: $gray-700; }
+  }
+
+  &__steps {
+    padding: $size-3 $size-5;
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+
+  &--collapsed .weekly-plan-widget__header {
+    border-bottom: none;
+  }
+}
+
+.weekly-plan-step {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  width: 100%;
+  padding: $size-2 $size-3;
+  border: none;
+  background: transparent;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(0, 0, 0, 0.03); }
+
+  &__check {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    color: $gray-400;
+  }
+
+  &__text {
+    font-size: 13px;
+    color: $gray-700;
+    font-weight: 500;
+  }
+
+  &--done {
+    .weekly-plan-step__check { color: #16a34a; }
+    .weekly-plan-step__text {
+      color: $gray-400;
+      text-decoration: line-through;
+    }
+  }
+}
+
+// Bloque metas de la semana
+.hub-metas-block {
+  display: flex;
+  align-items: center;
+  gap: $size-5;
+  padding: $size-3 $size-6;
+  border-top: 1px solid $gray-100;
+  border-bottom: 1px solid $gray-100;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-wrap: wrap;
+
+  &:hover { background: rgba($gray-50, 0.8); }
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 160px;
+  }
+  &__eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: $gray-400;
+  }
+  &__label {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $gray-800;
+  }
+  &__center {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex: 2;
+    min-width: 200px;
+  }
+  &__kpi { font-size: $font-xs; color: $gray-600; white-space: nowrap; }
+  &__bar {
+    flex: 1;
+    height: 6px;
+    background: $gray-200;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  &__bar-fill {
+    height: 100%;
+    background: $primary-400;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  &__pct {
+    font-size: $font-xs;
+    font-weight: 600;
+    color: $primary-600;
+    min-width: 32px;
+  }
+  &__right { flex-shrink: 0; }
+  &__estado {
+    font-size: $font-xs;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    &--camino { background: rgba($primary-100, 0.8); color: $primary-700; }
+    &--riesgo { background: rgba(#f97316, 0.1); color: #c2410c; }
+    &--cumplida { background: rgba(#22c55e, 0.1); color: #15803d; }
+  }
+
+  &--camino .hub-metas-block__bar-fill { background: $primary-400; }
+  &--riesgo .hub-metas-block__bar-fill { background: #f97316; }
+  &--cumplida .hub-metas-block__bar-fill { background: #22c55e; }
+}
+
+// ── Diagnóstico cruzado widget (Hub Zone 2) ─────────────────────────────
+.hub-diag-widget {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-4;
+  margin-top: $size-5;
+  padding: $size-4 $size-6;
+  background: linear-gradient(135deg, rgba(244,154,61,0.06) 0%, rgba(249,115,22,0.04) 100%);
+  border: 1px solid rgba(244,154,61,0.28);
+  border-radius: $os-radius-md;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: rgba(244,154,61,0.55);
+    background: linear-gradient(135deg, rgba(244,154,61,0.10) 0%, rgba(249,115,22,0.07) 100%);
+  }
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $size-4;
+  }
+
+  &__pulse {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f97316;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 0 rgba(249,115,22,0.5);
+    animation: hub-diag-pulse 2s infinite;
+  }
+
+  &__title {
+    display: block;
+    font-family: $os-font-body;
+    font-size: 14px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
+  &__sub {
+    display: block;
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-secondary;
+    margin-top: 2px;
+  }
+
+  &__btn {
+    flex-shrink: 0;
+    font-family: $os-font-body;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f49a3d;
+    background: rgba(244,154,61,0.10);
+    border: 1px solid rgba(244,154,61,0.30);
+    border-radius: $os-radius-sm;
+    padding: $size-2 $size-4;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover {
+      background: rgba(244,154,61,0.20);
+      border-color: rgba(244,154,61,0.60);
+    }
+  }
+}
+
+@keyframes hub-diag-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(249,115,22,0.5); }
+  70%  { box-shadow: 0 0 0 8px rgba(249,115,22,0);   }
+  100% { box-shadow: 0 0 0 0   rgba(249,115,22,0);   }
+}
+
+// ── Agent Pulse Bar (modo experto) ────────────────────────────────────────────
+
+// ── Novice agent stats row ────────────────────────────────────────────────────
+.novice__agent-stats {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  margin: 2px 0;
+}
+
+.novice__agent-stat {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-semibold;
+  color: $gray-500;
+
+  &--rate {
+    font-weight: $font-bold;
+  }
+}
+
+// ══════════════════════════════════════════════════
+// MEMORIA GALI WIDGET — Hub modo experto (V4)
+// ══════════════════════════════════════════════════
+
+.hub-memoria-card {
+  background: #ffffff;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  animation: fadeDown 0.3s ease both 0.1s;
+}
+
+.hub-memoria-card__header {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-3 $size-4;
+  border-bottom: 1px solid $gray-100;
+  background: rgba(255, 97, 2, 0.02);
+}
+
+.hub-memoria-card__glyph {
+  color: $primary-500;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.hub-memoria-card__title {
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.hub-memoria-card__link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $primary-500;
+  padding: 2px 0;
+
+  &:hover { text-decoration: underline; }
+}
+
+.hub-memoria-card__items {
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-memoria-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border-bottom: 1px solid $gray-100;
+  transition: background 0.15s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(0, 0, 0, 0.02); }
+}
+
+.hub-memoria-item__icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hub-memoria-item__title {
+  display: block;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  color: $gray-800;
+  margin-bottom: 1px;
+}
+
+.hub-memoria-item__desc {
+  display: block;
+  font-family: $font-primary;
+  font-size: $font-xs;
+  color: $gray-500;
+  line-height: 1.4;
+}
+
+// ── CENTRO DE MANDO — V1 (Expert mode command center) ─────────────────────
+
+// ── Spec 9 — 3 Momentos ──────────────────────────────────────────────────
+
+// ── Header compacto (Spec 9) ─────────────────────────────────────────────
+.hub-header-compact {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-6;
+  flex-shrink: 0;
+  border-bottom: 1px solid $gray-100;
+  background: #fff;
+}
+
+.hub-header-compact__goal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 500;
+  color: $gray-700;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: $radius-sm;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba($primary-500, 0.06);
+    color: $gray-900;
+
+    .hub-header-compact__goal-edit { opacity: 1; }
+  }
+}
+
+.hub-header-compact__goal-icon { font-size: 14px; }
+
+.hub-header-compact__goal-text {
+  font-weight: 600;
+  color: $gray-800;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hub-header-compact__goal-meta {
+  padding: 2px 7px;
+  background: #fff7ed;
+  border: 1px solid rgba($primary-500, 0.25);
+  border-radius: $radius-full;
+  font-size: 11px;
+  font-weight: 600;
+  color: $primary-600;
+}
+
+.hub-header-compact__goal-plazo {
+  font-size: 11px;
+  color: $gray-400;
+}
+
+.hub-header-compact__goal-edit {
+  font-size: 11px;
+  color: $gray-400;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.hub-header-compact__queue {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-600);
+  background: var(--orange-50);
+  border: 1px solid var(--primary-100);
+  border-radius: $radius-full;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.hub-header-compact__right {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  margin-left: auto;
+}
+
+.hub-header-compact__cta {
+  padding: 6px 14px;
+  border: 1px solid var(--primary-200);
+  border-radius: $radius-md;
+  background: var(--orange-50);
+  color: var(--primary-700);
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background $motion-fast $ease-standard, border-color $motion-fast $ease-standard;
+
+  &:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-300);
+  }
+}
+
+.hub-metas-block--compact {
+  margin: 0 $size-6 $size-4;
+  padding: $size-3 $size-4;
+  display: flex;
+  align-items: center;
+  gap: $size-4;
+  border-radius: $radius-md;
+  background: $white;
+  border: 1px solid var(--surface-200);
+}
+
+.weekly-plan-widget--compact {
+  margin: 0 $size-6 $size-4;
+}
+
+.growth-projection-banner--subtle {
+  margin: $size-3 $size-6;
+  padding: $size-3 $size-4;
+  background: #fff;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  border-left: 3px solid rgba($primary-500, 0.4);
+
+  .growth-projection-banner__text {
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+}
+
+.hub-momento {
+  width: 100%;
+}
+
+.momento-1 {
+  animation: gali-fade-up $motion-medium $ease-entrance both;
+}
+
+.momento-2 {
+  animation: gali-fade-up $motion-medium $ease-entrance 80ms both;
+
+  gali-decision-theater {
+    display: block;
+    margin: 0 $size-6;
+  }
+}
+
+.momento-3 {
+  border-top: 1px solid $gray-100;
+  background: #fff;
+  animation: gali-fade-up $motion-medium $ease-entrance 160ms both;
+}
+
+.momento-3__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $size-3 $size-6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background $motion-fast $ease-standard;
+
+  &:hover { background: var(--surface-200); }
+
+  .pi {
+    color: var(--gray-400);
+    font-size: 14px;
+    transition: transform $motion-medium $ease-standard;
+  }
+}
+
+.momento-3__toggle-label {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.momento-3__complexity-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--primary-600);
+  background: var(--orange-50);
+  border: 1px solid var(--primary-100);
+  border-radius: $radius-full;
+  padding: 2px 8px;
+}
+
+.momento-3__toggle-preview {
+  flex: 1;
+  min-width: 0;
+  margin: 0 $size-3;
+  font-family: $font-mono;
+  font-size: 11px;
+  color: var(--gray-500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.momento-3__body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: min(72vh, 900px);
+  transition: max-height $motion-slow $ease-standard,
+              opacity $motion-medium $ease-standard;
+  opacity: 1;
+  padding-bottom: $size-8;
+}
+
+.momento-3.is-collapsed .momento-3__body {
+  max-height: 0;
+  opacity: 0;
+}
+
+// Modo calma
+.modo-calma {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 $size-6;
+  padding: $size-8 $size-6;
+  text-align: center;
+  gap: $size-2;
+  background: $white;
+  border: 1px solid var(--surface-200);
+  border-radius: $radius-md;
+  animation: gali-fade-up $motion-medium $ease-entrance 80ms both,
+             gali-breathe 4s ease-in-out 0.6s infinite;
+}
+
+.modo-calma__titulo {
+  font-family: $font-primary;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 0;
+}
+
+.modo-calma__subtexto {
+  font-family: $font-primary;
+  font-size: 13px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.modo-calma__link {
+  font-family: $font-primary;
+  font-size: 13px;
+  color: var(--primary-500);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover { color: var(--primary-700); }
+}
+
+@keyframes modo-calma-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.75; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-momento,
+  .momento-1,
+  .momento-2,
+  .momento-3 { animation-duration: 1ms !important; }
+  .momento-3__body { transition-duration: 1ms !important; }
+  .modo-calma__icon { animation-duration: 1ms !important; }
+  .modo-calma { animation-duration: 1ms !important; }
 }

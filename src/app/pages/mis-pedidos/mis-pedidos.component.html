@@ -125,6 +125,12 @@
                   <img src="assets/icons/pedidos/huella.svg" alt="" />
                   <span *ngIf="pedido.huellaStatus === 'alert'" class="alert-dot"></span>
                 </button>
+                <button *ngIf="pedido.huellaStatus === 'alert'"
+                  class="action-icon action-icon--gali-signal"
+                  title="Ver señal de Gali relacionada con este pedido"
+                  (click)="verSenalGali(pedido)">
+                  ✦
+                </button>
                 <button class="action-icon icon-bell" title="Notificaciones">
                   <img src="assets/icons/pedidos/bell-ring.svg" alt="" />
                   <span *ngIf="pedido.notificaciones > 0" class="notification-badge">{{ pedido.notificaciones }}</span>

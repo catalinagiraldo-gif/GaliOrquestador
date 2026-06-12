@@ -246,11 +246,7 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/skills/skill-editor-page.component').then(m => m.SkillEditorPageComponent),
   },
-  {
-    path: 'skills/comunidad',
-    loadComponent: () =>
-      import('./pages/skills/skills-comunidad-page.component').then(m => m.SkillsComunidadPageComponent),
-  },
+  redirect('skills/comunidad', 'marketplace'),
   {
     path: 'skills',
     loadComponent: () =>
@@ -277,6 +273,13 @@ export const GALI_V5_CHILD_ROUTES: Routes = [
     path: 'senales',
     loadComponent: () =>
       import('./pages/senales/senales-page.component').then(m => m.SenalesPageComponent),
+  },
+
+  // ── Impacto Gali (Spec 15) ──
+  {
+    path: 'impacto',
+    loadComponent: () =>
+      import('./impacto-page/gali-impacto-page.component').then(m => m.GaliImpactoPageComponent),
   },
 
   {

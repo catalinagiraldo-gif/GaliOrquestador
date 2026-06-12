@@ -174,11 +174,7 @@ $panel-info:     #3b82f6;
     border-bottom: 1px solid $panel-border;
     flex-shrink: 0;
     background: $panel-bg;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar { display: none; }
+    overflow: visible;
   }
 
   &__tab {
@@ -235,6 +231,72 @@ $panel-info:     #3b82f6;
     font-size: 10px;
     font-weight: $font-bold;
     line-height: 1;
+  }
+
+  // ── Tab overflow ─────────────────────────────────────
+  &__tab-overflow {
+    position: relative;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &__tab--overflow {
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+    min-width: 36px;
+  }
+
+  &__tab-overflow-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  &__overflow-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 200;
+    background: $panel-bg;
+    border: 1px solid $panel-border;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    min-width: 140px;
+    overflow: hidden;
+    animation: gali-fade-in 0.14s ease;
+  }
+
+  &__overflow-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 9px 14px;
+    border: none;
+    background: transparent;
+    color: $panel-muted;
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+
+    .pi { font-size: 12px; opacity: 0.7; }
+
+    &:hover {
+      background: rgba(0,0,0,0.05);
+      color: $panel-text;
+    }
+
+    &--active {
+      color: $panel-accent;
+      font-weight: 700;
+      background: rgba($panel-accent, 0.06);
+      .pi { opacity: 1; }
+    }
   }
 
   // ── Content ──────────────────────────────────────────
@@ -1760,5 +1822,1201 @@ $panel-info:     #3b82f6;
       color: $panel-accent;
       background: rgba($panel-accent, 0.04);
     }
+  }
+}
+
+// Multi-thread bar
+.gali-thread-bar {
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+  padding: $size-1 $size-3;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: $panel-surface;
+
+  &__active {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex: 1;
+    border: none;
+    background: none;
+    padding: $size-1 $size-2;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    color: $gray-700;
+    font-size: $font-xs;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.12s;
+    &:hover { background: rgba(0,0,0,0.04); }
+  }
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &__title {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  &__badge {
+    background: $panel-accent;
+    color: $white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 5px;
+    flex-shrink: 0;
+  }
+  &__new {
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: $radius-sm;
+    background: none;
+    color: $gray-500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+    &:hover { border-color: $panel-accent; color: $panel-accent; }
+  }
+}
+
+.gali-thread-list {
+  background: $panel-bg;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  max-height: 180px;
+  overflow-y: auto;
+}
+.gali-thread-item {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-2 $size-3;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover { background: rgba(0,0,0,0.03); }
+  &--active { background: rgba($panel-accent, 0.06); }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+  }
+  &__title {
+    font-size: $font-xs;
+    font-weight: 500;
+    color: $gray-800;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  &__ctx {
+    font-size: 10px;
+    color: $gray-400;
+  }
+  &__unread {
+    background: $panel-accent;
+    color: $white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 5px;
+    flex-shrink: 0;
+  }
+}
+
+.gali-thread-empty {
+  padding: $size-6;
+  text-align: center;
+  font-size: $font-xs;
+  color: $gray-500;
+  font-style: italic;
+}
+
+// ══════════════════════════════════════════════════
+// THREAD TABS — always-visible multi-workspace strip
+// ══════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════
+// THREAD MICRO-RAIL — expands 32px → 168px on hover
+// ══════════════════════════════════════════════════
+
+.gali-thread-rail {
+  width: 32px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 6px;
+  gap: 2px;
+  background: $panel-surface;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::-webkit-scrollbar { display: none; }
+
+  &--expanded {
+    width: 168px;
+    align-items: stretch;
+    padding: 8px 4px 6px;
+  }
+
+  // ── Collapsed button (dot only) ──────────────────
+  &__btn {
+    position: relative;
+    width: 26px;
+    height: 28px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+    flex-shrink: 0;
+    text-align: left;
+
+    &:hover { background: rgba(0, 0, 0, 0.05); }
+
+    &--active {
+      background: rgba($primary-500, 0.07);
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        bottom: 5px;
+        width: 2px;
+        background: $panel-accent;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+
+    &--add {
+      margin-top: 6px;
+      color: $gray-400;
+
+      .pi { font-size: 10px; }
+
+      &:hover {
+        color: $panel-accent;
+        background: rgba($primary-500, 0.06);
+      }
+    }
+
+    // In expanded rail: full-width row layout
+    .gali-thread-rail--expanded & {
+      width: 100%;
+      height: 30px;
+      padding: 0 7px 0 8px;
+      gap: 7px;
+      border-radius: 6px;
+      justify-content: flex-start;
+    }
+  }
+
+  // ── Editing row (div, not button) ────────────────
+  &__row {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    padding: 0 7px 0 8px;
+    gap: 7px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    background: rgba($primary-500, 0.05);
+
+    &--active {
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        bottom: 5px;
+        width: 2px;
+        background: $panel-accent;
+        border-radius: 0 2px 2px 0;
+      }
+    }
+  }
+
+  // ── Dot ─────────────────────────────────────────
+  &__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+
+    .gali-thread-rail__btn--active & { transform: scale(1.2); }
+  }
+
+  // ── Collapsed badge ──────────────────────────────
+  &__badge {
+    position: absolute;
+    top: 3px;
+    right: 2px;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 3px;
+    background: $panel-accent;
+    color: #fff;
+    border-radius: 7px;
+    font-family: $font-primary;
+    font-size: 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  // ── Expanded: thread name ────────────────────────
+  &__name {
+    flex: 1;
+    min-width: 0;
+    font-family: $font-primary;
+    font-size: 11.5px;
+    color: $gray-700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.08s;
+
+    .gali-thread-rail--expanded & { opacity: 1; }
+
+    &--muted { color: $gray-400; }
+  }
+
+  // ── Expanded: inline unread pill ─────────────────
+  &__unread-pill {
+    flex-shrink: 0;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: $panel-accent;
+    color: #fff;
+    border-radius: 8px;
+    font-family: $font-primary;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.1s ease 0.08s;
+
+    .gali-thread-rail--expanded & { opacity: 1; }
+  }
+
+  // ── Expanded: row action buttons ─────────────────
+  &__row-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.1s;
+
+    .gali-thread-rail--expanded & { opacity: 1; }
+  }
+
+  &__action {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray-400;
+    cursor: pointer;
+    transition: color 0.1s, background 0.1s;
+
+    .pi { font-size: 9px; }
+
+    &:hover { color: $gray-700; background: rgba(0, 0, 0, 0.06); }
+
+    &--del:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+  }
+
+  // ── Collapsed: corner × to archive ──────────────
+  &__close {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 13px;
+    height: 13px;
+    background: $gray-200;
+    color: $gray-600;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+
+    &:hover { background: #ef4444; color: #fff; }
+  }
+
+  // ── Search bar (expanded only) ───────────────────
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    padding: 4px 7px;
+    margin-bottom: 4px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 6px;
+    flex-shrink: 0;
+
+    .pi-search {
+      font-size: 9px;
+      color: $gray-400;
+      flex-shrink: 0;
+    }
+
+    &-input {
+      flex: 1;
+      min-width: 0;
+      height: 18px;
+      background: none;
+      border: none;
+      outline: none;
+      font-family: $font-primary;
+      font-size: 11px;
+      color: $gray-800;
+
+      &::placeholder { color: $gray-400; }
+    }
+
+    &-clear {
+      flex-shrink: 0;
+      font-size: 12px;
+      color: $gray-400;
+      cursor: pointer;
+      line-height: 1;
+      padding: 1px 2px;
+
+      &:hover { color: $gray-700; }
+    }
+  }
+
+  &__no-results {
+    padding: 6px 8px;
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $gray-400;
+    text-align: center;
+  }
+
+  // ── Rename input ─────────────────────────────────
+  &__name-input {
+    flex: 1;
+    min-width: 0;
+    height: 22px;
+    padding: 0 5px;
+    font-family: $font-primary;
+    font-size: 11.5px;
+    color: $gray-800;
+    background: #fff;
+    border: 1px solid $panel-accent;
+    border-radius: 4px;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary-500, 0.12);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// BEFORE/AFTER ACTION LOG (Live tab)
+// ══════════════════════════════════════════════════
+
+.baf-section {
+  margin-bottom: 12px;
+}
+
+.baf-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 6px;
+}
+
+.baf-section__title {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: 600;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.baf-section__count {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $gray-400;
+}
+
+.baf-entry {
+  margin: 0 8px 8px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.baf-entry__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.baf-entry__agent-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.baf-entry__agent {
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: 600;
+  color: $gray-800;
+}
+
+.baf-entry__time {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $gray-400;
+  margin-left: auto;
+}
+
+.baf-entry__accion {
+  font-family: $font-primary;
+  font-size: 11px;
+  color: $gray-600;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.baf-entry__diff {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+
+.baf-entry__before,
+.baf-entry__after {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.baf-entry__diff-label {
+  font-family: $font-primary;
+  font-size: 9px;
+  color: $gray-400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.baf-entry__diff-metric {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $gray-500;
+}
+
+.baf-entry__diff-val {
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 700;
+
+  &--before { color: $gray-400; }
+  &--after { color: #10b981; }
+}
+
+.baf-entry__arrow {
+  font-size: 14px;
+  color: $gray-300;
+  flex-shrink: 0;
+}
+
+.baf-entry__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.baf-entry__impact {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $gray-500;
+}
+
+.baf-entry__link {
+  font-family: $font-primary;
+  font-size: 10px;
+  color: $panel-accent;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+}
+
+.live-separator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 8px;
+
+  span {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $gray-400;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ── H1-H3: Thread switcher badge in header ──
+
+.gali-panel__thread-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba($primary-500, 0.1);
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-full;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 10px;
+  color: $panel-accent;
+  font-weight: 600;
+  transition: background 0.15s;
+
+  &:hover, &--open { background: rgba($primary-500, 0.18); }
+
+  &__count {
+    font-weight: 700;
+  }
+
+  &__label {
+    font-weight: 400;
+    opacity: 0.8;
+  }
+
+  &__unread {
+    background: #ef4444;
+    color: $white;
+    border-radius: $radius-full;
+    padding: 0 5px;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 14px;
+    text-align: center;
+  }
+
+  i { font-size: 8px; opacity: 0.7; }
+}
+
+// ── Active thread bar (shows current chat context) ──
+
+.gali-panel__thread-bar {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-1 $size-4;
+  background: rgba($primary-500, 0.04);
+  border-bottom: 1px solid $panel-border;
+  flex-shrink: 0;
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: 10px;
+    font-weight: 600;
+    color: $panel-text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__switch {
+    background: none;
+    border: 1px solid $panel-border;
+    border-radius: $radius-sm;
+    color: $panel-muted;
+    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover { background: rgba($primary-500, 0.08); color: $panel-accent; }
+  }
+}
+
+// ── Thread drawer dropdown (H1/H3: Cursor/Claude Code style) ──
+
+.gali-thread-drawer {
+  flex-shrink: 0;
+  background: #1e1e2e;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: threadDrawerIn 0.18s ease;
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-2 $size-4;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+
+    i { font-size: 11px; color: rgba(255,255,255,0.3); }
+
+    input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: rgba(255,255,255,0.8);
+      font-size: $font-xs;
+      font-family: $font-primary;
+      &::placeholder { color: rgba(255,255,255,0.25); }
+    }
+  }
+
+  &__list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-2 $size-4;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.12s;
+
+    &:hover { background: rgba(255,255,255,0.05); }
+    &--active { background: rgba($primary-500, 0.15); }
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__title {
+    font-size: $font-xs;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__context {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__unread {
+    background: $primary-500;
+    color: $white;
+    border-radius: $radius-full;
+    padding: 0 5px;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  &__new {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    padding: $size-2 $size-4;
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    width: 100%;
+    cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    font-size: $font-xs;
+    font-family: $font-primary;
+    transition: color 0.15s;
+
+    i { font-size: 10px; }
+    &:hover { color: $panel-accent; }
+  }
+}
+
+@keyframes threadDrawerIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── C2: Thread drawer sections ────────────────────────────────────────────────
+
+.gali-thread-section {
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px 4px;
+    font-family: $font-primary;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.3);
+
+    .pi {
+      font-size: 8px;
+      opacity: 0.5;
+    }
+  }
+}
+
+.gali-thread-drawer {
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__pin-btn {
+    opacity: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.12s, background 0.12s;
+    color: rgba(255, 255, 255, 0.4);
+
+    .pi { font-size: 9px; }
+    &:hover { color: $primary-500; background: rgba($primary-500, 0.15); }
+  }
+
+  &__item:hover &__pin-btn { opacity: 1; }
+
+  &__empty {
+    padding: 12px 16px;
+    font-family: $font-primary;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+    text-align: center;
+  }
+}
+
+// ── C3: Context selector ──────────────────────────────────────────────────────
+
+.gali-ctx-selector {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 0 4px;
+  animation: threadDrawerIn 0.15s ease;
+
+  &__header {
+    padding: 4px 16px 8px;
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  &__categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 6px;
+  }
+
+  &__cat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: $font-primary;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+
+    .pi { font-size: 12px; opacity: 0.6; }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    &--free {
+      margin-top: 2px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 11px;
+    }
+  }
+
+  &__chevron {
+    margin-left: auto !important;
+    font-size: 9px !important;
+    opacity: 0.4 !important;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 6px;
+    animation: threadDrawerIn 0.12s ease;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: $font-primary;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.95);
+    }
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  &__item-desc {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &__cancel {
+    width: 100%;
+    padding: 7px 16px;
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.25);
+    font-family: $font-primary;
+    font-size: 11px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 4px;
+    transition: color 0.12s;
+
+    &:hover { color: rgba(255, 255, 255, 0.6); }
+  }
+}
+
+// ── C7: Rich cards ────────────────────────────────────────────────────────────
+
+@keyframes gali-bar-grow {
+  from { transform: scaleY(0); transform-origin: bottom; }
+  to   { transform: scaleY(1); transform-origin: bottom; }
+}
+
+.gali-rich-card {
+  margin-top: 6px;
+  border-radius: $radius-md;
+  overflow: hidden;
+  animation: execCardIn 0.2s ease;
+}
+
+// ── ROAS Chart Card ──
+.roas-card {
+  background: $panel-surface;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__label {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $panel-muted;
+  }
+
+  &__current {
+    font-family: $font-secondary;
+    font-size: 18px;
+    font-weight: 700;
+    color: $panel-success;
+
+    &--low { color: $panel-warning; }
+  }
+
+  &__chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 36px;
+  }
+
+  &__target {
+    font-family: $font-primary;
+    font-size: 10px;
+    color: $panel-muted;
+  }
+
+  &__gap {
+    &--low { color: $panel-warning; font-weight: 600; }
+    &--ok  { color: $panel-success; font-weight: 600; }
+  }
+}
+
+.roas-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+}
+
+.roas-bar {
+  width: 100%;
+  min-height: 3px;
+  background: rgba($primary-500, 0.25);
+  border-radius: 2px 2px 0 0;
+  animation: gali-bar-grow 0.3s ease-out forwards;
+
+  &--target { background: $panel-success; }
+}
+
+.roas-bar__label {
+  font-family: $font-primary;
+  font-size: 9px;
+  color: $panel-caption;
+}
+
+// ── Pedidos Summary Card ──
+.pedidos-card {
+  display: flex;
+  align-items: center;
+  background: $panel-surface;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  &__sep {
+    width: 1px;
+    height: 36px;
+    background: $panel-border;
+    flex-shrink: 0;
+  }
+}
+
+.pedidos-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+
+  &__val {
+    font-family: $font-secondary;
+    font-size: 18px;
+    font-weight: 700;
+    color: $panel-text;
+    line-height: 1;
+
+    &--warn { color: $panel-warning; }
+  }
+
+  &__label {
+    font-family: $font-primary;
+    font-size: 9px;
+    color: $panel-muted;
+    text-align: center;
+    line-height: 1.2;
+  }
+}
+
+// ── Novedad Alert Card ──
+.novedad-card {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: $radius-md;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__bar {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 2px;
+    background: $panel-warning;
+    animation: gali-bar-grow 0.4s ease-out forwards;
+
+    &--warn { background: $panel-warning; }
+    &--crit { background: $panel-danger; }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__pct {
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: 700;
+    color: $panel-warning;
+
+    &--crit { color: $panel-danger; }
+  }
+
+  &__ciudad,
+  &__carrier {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: $panel-muted;
+  }
+
+  &__carrier {
+    background: $panel-surface;
+    border: 1px solid $panel-border;
+    border-radius: $radius-full;
+    padding: 1px 7px;
+    font-size: 10px;
+  }
+}
+
+// ── Reduced motion ────────────────────────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .gali-rich-card,
+  .roas-bar,
+  .novedad-card__fill,
+  .gali-thread-section,
+  .gali-ctx-selector {
+    animation-duration: 1ms !important;
   }
 }

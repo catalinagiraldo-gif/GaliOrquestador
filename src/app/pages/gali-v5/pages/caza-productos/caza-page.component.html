@@ -14,20 +14,6 @@
     (ctaClick)="goToCatalogo()"
   />
 
-  <div class="caza-semantic">
-    <label class="caza-semantic__label">Búsqueda semántica ADA Spy</label>
-    <div class="caza-semantic__row">
-      <input
-        type="search"
-        class="caza-semantic__input"
-        placeholder='Ej: "algo para vender en Bogotá a madres jóvenes"'
-        [ngModel]="semanticQuery()"
-        (ngModelChange)="semanticQuery.set($event)" />
-      <button type="button" class="caza-semantic__btn" (click)="buscarSemantico()">Buscar con IA</button>
-    </div>
-    <p class="caza-semantic__hint">No busques solo por nombre — describe audiencia, ciudad o problema y ADA rankea categorías + productos.</p>
-  </div>
-
   <dropi-titulos title="Caza productos" [breadcrumbs]="breadcrumbs">
     <dropi-button-new titulosActions label="Crear publicación" hierarchy="primary" [width]="200" />
   </dropi-titulos>
@@ -46,10 +32,13 @@
 
   @if (mode() === 'historial') {
     <section class="caza-historial">
-      <p class="caza-historial__intro">
-        ADA Spy analiza tus nichos ({{ userProfile.nichos.join(', ') }}) y sugiere productos para fortalecer tu portafolio.
-        Mejor ROAS actual: <strong>{{ userProfile.mejorRoas }}</strong>
-      </p>
+      <div class="caza-historial__ada-header">
+        <span class="caza-historial__ada-spark">✦</span>
+        <p class="caza-historial__ada-intro">
+          ADA Spy detectó para ti esta semana — basado en tus nichos <strong>{{ userProfile.nichos.join(', ') }}</strong>
+          y tu mejor ROAS actual de <strong>{{ userProfile.mejorRoas }}</strong>.
+        </p>
+      </div>
       <div class="historial-list">
         @for (p of productosHistorial; track p.id) {
           <article class="historial-card">
@@ -78,6 +67,21 @@
             </button>
           </article>
         }
+      </div>
+
+      <!-- Búsqueda secundaria — acción alternativa (CA-10) -->
+      <div class="caza-semantic caza-semantic--secondary">
+        <label class="caza-semantic__label">Buscar otro producto →</label>
+        <div class="caza-semantic__row">
+          <input
+            type="search"
+            class="caza-semantic__input"
+            placeholder='Ej: "algo para vender en Bogotá a madres jóvenes"'
+            [ngModel]="semanticQuery()"
+            (ngModelChange)="semanticQuery.set($event)" />
+          <button type="button" class="caza-semantic__btn" (click)="buscarSemantico()">Buscar con IA</button>
+        </div>
+        <p class="caza-semantic__hint">Describe audiencia, ciudad o problema y ADA rankea categorías + productos.</p>
       </div>
     </section>
   }

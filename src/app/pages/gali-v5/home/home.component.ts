@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, inject, signal, computed, effect, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -7,19 +7,19 @@ import { AuthService } from '../../../services/auth.service';
 import { GaliWorkspaceService } from '../services/gali-workspace.service';
 import { GaliStateService } from '../services/gali-state.service';
 import PROJECTS_DATA from '../../../../../mocks/gali-v5/projects.json';
-import {
-  GaliSignalCardV2Component,
-  GaliSignalData,
-} from '../components/gali-signal-card-v2/gali-signal-card-v2.component';
-import {
-  GaliProjectPanelComponent,
-  ProjectPanelData,
-} from '../components/gali-project-panel/gali-project-panel.component';
+import { GaliSignalData } from '../components/gali-signal-card-v2/gali-signal-card-v2.component';
+import { ProjectPanelData } from '../components/gali-project-panel/gali-project-panel.component';
 import {
   GaliGoalOnboardingComponent,
   shouldShowOnboarding,
 } from '../components/gali-goal-onboarding/gali-goal-onboarding.component';
 import { GaliAgencyThresholdsPanelComponent } from '../components/gali-agency-thresholds-panel/gali-agency-thresholds-panel.component';
+import { DiagnosticoModalComponent } from '../components/diagnostico-modal/diagnostico-modal.component';
+import { GaliHubBriefComponent, HubBriefData } from '../components/gali-hub-brief/gali-hub-brief.component';
+import { GaliDecisionTheaterComponent, DecisionTheaterData, DecisionOption, DecisionUrgency } from '../components/gali-decision-theater/gali-decision-theater.component';
+import { AlertHierarchyDirective } from '../directives/alert-hierarchy.directive';
+import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
+import { GaliImpactWidgetComponent } from '../components/gali-impact-widget/gali-impact-widget.component';
 
 type AgentStatus = 'activo' | 'esperando' | 'pausa';
 
@@ -41,6 +41,8 @@ interface AgentLive {
   descripcion: string;
   ultimaAccion: string;
   color: string;
+  acciones: number;
+  tasa: number;
 }
 
 interface ProyectoPL {
@@ -111,10 +113,14 @@ function matchLanzar(text: string): string {
     FormsModule,
     RouterModule,
     TooltipModule,
-    GaliSignalCardV2Component,
-    GaliProjectPanelComponent,
     GaliGoalOnboardingComponent,
     GaliAgencyThresholdsPanelComponent,
+    DiagnosticoModalComponent,
+    GaliHubBriefComponent,
+    GaliDecisionTheaterComponent,
+    AlertHierarchyDirective,
+    GaliGlosarioDirective,
+    GaliImpactWidgetComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -126,12 +132,32 @@ export class DropiHomeComponent implements AfterViewChecked {
 
   readonly showOnboarding = signal(shouldShowOnboarding());
   readonly isZeroState = signal(localStorage.getItem('gali_zero_state') === '1');
+
+  private readonly ALL_MODULES: { key: string; label: string; icon: string; color: string; agent: string; kpi: string; route: string }[] = [
+    { key: 'pedidos',    label: 'Pedidos',     icon: '📦', color: '#fbbf24', agent: 'Vigilante',  kpi: '43 hoy · 3 novedades',  route: '/gali-v5/mis-pedidos/mis-pedidos' },
+    { key: 'marketing',  label: 'Marketing',   icon: '📢', color: '#f97316', agent: 'Roax',        kpi: 'ROAS 1.93x · CTR 2.1%', route: '/gali-v5/marketing/roax-informes' },
+    { key: 'logistica',  label: 'Logística',   icon: '🚚', color: '#60a5fa', agent: 'Vigilante',  kpi: '2 alertas activas',     route: '/gali-v5/logistica/torre-logistica' },
+    { key: 'financiero', label: 'Financiero',  icon: '💰', color: '#34d399', agent: 'Kronos',      kpi: 'PIL 12% · Margen 22%',  route: '/gali-v5/reportes/dashboard-financiero' },
+    { key: 'proyectos',  label: 'Proyectos',   icon: '🎯', color: '#a78bfa', agent: 'Roax',        kpi: '2 activos · 1 lanzado', route: '/gali-v5/proyectos' },
+    { key: 'chatea',     label: 'Chatea Pro',  icon: '💬', color: '#10b981', agent: 'Chatea Pro',  kpi: '12 confirmaciones hoy', route: '/gali-v5/marketing/chatea-pro' },
+  ];
+
+  readonly focusModuleKeys = signal<string[]>(
+    JSON.parse(localStorage.getItem('gali_dia_a_dia_modules') ?? '["pedidos","marketing"]')
+  );
+
+  readonly focusModules = computed(() =>
+    this.focusModuleKeys()
+      .map(key => this.ALL_MODULES.find(m => m.key === key))
+      .filter((m): m is NonNullable<typeof m> => !!m)
+  );
   readonly isSimpleView = computed(() => this.ws.complexityLevel() === 'novice');
   readonly showAgencyPanel = signal(false);
   readonly zone3Collapsed = signal(true);
   readonly showBulkModal = signal(false);
   readonly bulkModalStep = signal<1 | 2>(1);
   readonly showReconfigureModal = signal(false);
+  readonly showDiagnostico = signal(false);
   readonly showFabMenu = signal(false);
   private readonly insightBannerUserExpanded = signal(false);
 
@@ -415,6 +441,8 @@ export class DropiHomeComponent implements AfterViewChecked {
       descripcion: 'ROAS 1.93x · Pauta $66k/día · Video B ganando',
       ultimaAccion: 'Escaló presupuesto +15% · hace 2h',
       color: '#f97316',
+      acciones: 18,
+      tasa: 94,
     },
     {
       id: 'vigilante',
@@ -424,6 +452,8 @@ export class DropiHomeComponent implements AfterViewChecked {
       descripcion: '12 pedidos en zona de riesgo (Coordinadora)',
       ultimaAccion: 'Detectó novedad 15% Bogotá · hace 18 min',
       color: '#fbbf24',
+      acciones: 34,
+      tasa: 91,
     },
     {
       id: 'chatea',
@@ -433,6 +463,8 @@ export class DropiHomeComponent implements AfterViewChecked {
       descripcion: '43/47 confirmados · 1 caso pendiente',
       ultimaAccion: 'Resolvió 8 novedades · hace 1h',
       color: '#34d399',
+      acciones: 127,
+      tasa: 88,
     },
     {
       id: 'ada',
@@ -442,7 +474,15 @@ export class DropiHomeComponent implements AfterViewChecked {
       descripcion: '3 oportunidades analizadas esta semana',
       ultimaAccion: 'Difusor aromaterapia · hace 1h',
       color: '#818cf8',
+      acciones: 6,
+      tasa: 79,
     },
+  ];
+
+  readonly topMemories = [
+    { icon: '📈', title: 'ROAS mejora con video corto', desc: 'Video <15s da ROAS 2.4× vs imagen — aprendido en 3 proyectos' },
+    { icon: '🔄', title: 'Novedades Cali resueltas', desc: 'Migración a Servientrega redujo novedad del 18% → 6%' },
+    { icon: '👥', title: 'Audiencia de alto valor', desc: 'Mujeres 28-45 con mascotas pequeñas: 23% mejor CTR' },
   ];
 
   readonly expandedPLId = signal<string | null>('collar-gps');
@@ -583,6 +623,26 @@ export class DropiHomeComponent implements AfterViewChecked {
   // ── Anatomy grid interactivo ──────────────────────────────────────────────
   readonly activeNode = signal<string | null>(null);
 
+  // Graph node positions — radial layout (center 250,250 radius 155)
+  readonly graphNodes = [
+    { id: 'producto',  label: 'PRODUCTO',  x: 250, y: 95,  status: 'ok',        metric: '47/sem',    alertCount: 0, agentColor: '#818cf8' },
+    { id: 'marketing', label: 'MARKETING', x: 384, y: 172, status: 'highlight',  metric: '1.93×',     alertCount: 0, agentColor: '#f97316' },
+    { id: 'pedidos',   label: 'PEDIDOS',   x: 384, y: 328, status: 'alert',      metric: '47 activas', alertCount: 3, agentColor: '#fbbf24' },
+    { id: 'logistica', label: 'LOGÍSTICA', x: 250, y: 405, status: 'ok',        metric: '15%',        alertCount: 0, agentColor: '#fbbf24' },
+    { id: 'finanzas',  label: 'FINANZAS',  x: 116, y: 328, status: 'warn',      metric: '$411k/sem', alertCount: 0, agentColor: '#60a5fa' },
+    { id: 'reportes',  label: 'REPORTES',  x: 116, y: 172, status: 'ok',        metric: '$1.82M',    alertCount: 0, agentColor: '#34d399' },
+  ];
+
+  // Cycle edges connecting adjacent nodes (in order)
+  readonly graphEdges = [
+    { from: { x: 250, y: 95 },  to: { x: 384, y: 172 }, status: 'ok' },
+    { from: { x: 384, y: 172 }, to: { x: 384, y: 328 }, status: 'alert' },
+    { from: { x: 384, y: 328 }, to: { x: 250, y: 405 }, status: 'ok' },
+    { from: { x: 250, y: 405 }, to: { x: 116, y: 328 }, status: 'warn' },
+    { from: { x: 116, y: 328 }, to: { x: 116, y: 172 }, status: 'ok' },
+    { from: { x: 116, y: 172 }, to: { x: 250, y: 95 },  status: 'ok' },
+  ];
+
   toggleNode(id: string): void {
     this.activeNode.update(cur => cur === id ? null : id);
   }
@@ -707,45 +767,72 @@ export class DropiHomeComponent implements AfterViewChecked {
 
   readonly showNewSkill = signal(false);
   readonly showScaleConfirm = signal(false);
+  readonly showEditGoalModal = signal(false);
+  readonly editGoalText = signal('');
+  readonly editGoalTarget = signal('100');
+  readonly editGoalUnit = signal('pedidos/semana');
+  readonly editGoalDeadline = signal('');
 
-  /** Insight bar adaptativo según el perfil del usuario (businessDNA) */
-  readonly currentInsight = computed(() => {
-    const dna = this.ws.businessDNA();
-    // Sesión 0-1: usuario muy nuevo → guía de primer paso
-    if (dna.sessionCount <= 1 && !dna.hasData) {
-      return {
-        text: 'Bienvenido a Gali. Conecta tu catálogo y ADA Spy buscará tu primer producto ganador.',
-        ctaLabel: 'Abrir ADA Spy →',
-        ctaRoute: '/gali-v5/productos/caza-productos',
-        agente: 'ADA Spy',
-      };
-    }
-    // Sin fuentes conectadas → prompt de conexión
-    if (dna.sources.length === 0 && dna.sessionCount <= 3) {
-      return {
-        text: 'Conecta Meta Ads para que Roax optimice tus campañas con datos reales, no solo el ROAS declarado.',
-        ctaLabel: 'Conectar Meta Ads →',
-        ctaRoute: '/gali-v5/conexiones',
-        agente: 'Roax',
-      };
-    }
-    // Objetivo escalar pedidos → insight de logística
-    if (dna.goalId === 'escalar-pedidos' && dna.sessionCount > 2) {
-      return {
-        text: 'Para escalar de ' + dna.pedidosTarget + ' a ' + Math.round(dna.pedidosTarget * 2.5) + ' pedidos/sem, Vigilante recomienda activar Smart Routing antes de subir pauta.',
-        ctaLabel: 'Ver smart routing →',
-        ctaRoute: '/gali-v5/logistica/torre-logistica',
-        agente: 'Vigilante',
-      };
-    }
-    // Estado operacional (usuario activo con datos)
-    return {
-      text: 'Collar GPS lleva 52h con ROAS real 1.93x. Roax sugiere escalar presupuesto +30% ($66k → $86k/día).',
-      ctaLabel: 'Aprobar escala',
-      ctaRoute: null,
-      agente: 'Roax',
-    };
+  readonly metaKpiCurrent = signal(38);
+  readonly metaKpiTarget = signal(50);
+  readonly hubGoalLabel = computed(() =>
+    this.ws.businessDNA().goalLabel
+    ?? localStorage.getItem('gali_goal_label')
+    ?? 'Automatizar mi operación para trabajar menos horas'
+  );
+
+  readonly metaLabel = computed(() => this.hubGoalLabel());
+  readonly metaEstado = computed<'en_camino' | 'en_riesgo' | 'cumplida'>(() => {
+    const pct = this.metaKpiTarget() > 0 ? (this.metaKpiCurrent() / this.metaKpiTarget()) : 0;
+    if (pct >= 1) return 'cumplida';
+    if (pct >= 0.6) return 'en_camino';
+    return 'en_riesgo';
   });
+
+  readonly showWeeklyPlan = signal(localStorage.getItem('gali_onboarding_done') === '1');
+  readonly weeklyPlanCollapsed = signal(false);
+  readonly weeklyPlanSteps = signal<string[]>(
+    JSON.parse(localStorage.getItem('gali_weekly_plan') ?? 'null') ?? [
+      'Activa Roax en tu campaña principal',
+      'Revisa ROAS vs meta esta semana',
+      'Configura auto-pausa si CTR < 0.8%',
+    ]
+  );
+  readonly weeklyPlanDone = signal<Set<number>>(new Set());
+
+  toggleWeeklyPlanStep(idx: number): void {
+    this.weeklyPlanDone.update(s => {
+      const next = new Set(s);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
+  }
+
+  onOnboardingClosed(): void {
+    this.showOnboarding.set(false);
+    this.isZeroState.set(localStorage.getItem('gali_zero_state') === '1');
+    this.ws.ensureGoalFromStorage();
+  }
+
+  openEditGoal(): void {
+    this.editGoalText.set(this.hubGoalLabel());
+    this.editGoalDeadline.set(localStorage.getItem('gali_goal_deadline') ?? '');
+    this.editGoalTarget.set(localStorage.getItem('gali_goal_target') ?? '100');
+    this.editGoalUnit.set(localStorage.getItem('gali_goal_unit') ?? 'pedidos/semana');
+    this.showEditGoalModal.set(true);
+  }
+
+  saveEditGoal(): void {
+    const label = this.editGoalText().trim();
+    if (!label) return;
+    this.ws.updateGoalLabel(label);
+    try {
+      localStorage.setItem('gali_goal_deadline', this.editGoalDeadline());
+      localStorage.setItem('gali_goal_target', this.editGoalTarget());
+      localStorage.setItem('gali_goal_unit', this.editGoalUnit());
+    } catch {}
+    this.showEditGoalModal.set(false);
+  }
 
   openScaleConfirm(): void {
     this.showScaleConfirm.set(true);
@@ -818,9 +905,146 @@ export class DropiHomeComponent implements AfterViewChecked {
     this.lanzarStep.set('configurando');
   }
 
+  // ── Spec 9 — 3 Momentos ──────────────────────────────────────────
+
+  readonly momento3Collapsed = signal<boolean>(true);
+  readonly isProcessingDecision = signal(false);
+
+  toggleMomento3(): void {
+    this.momento3Collapsed.update(v => !v);
+  }
+
+  readonly decisionQueueCount = computed(() =>
+    Math.max(0, this.pendingApprovalSignals.length - 1)
+  );
+
+  readonly currentDecision = computed<DecisionTheaterData | null>(() => {
+    const pending = this.pendingApprovalSignals;
+    if (pending.length === 0) return null;
+    return this.mapSignalToDecision(pending[0]);
+  });
+
+  readonly ultimaAccionGali = computed<string>(() => {
+    const actions = this.completedSignals;
+    if (actions.length === 0) return 'hace unos momentos';
+    const last = actions[0];
+    return `hace ${last.timestamp} · ${last.titulo}`;
+  });
+
+  readonly hubBriefData = computed<HubBriefData>(() => ({
+    userName:             this.userName(),
+    pendingDecisions:     this.pendingApprovalSignals.length,
+    completedActions:     this.completedSignals.length,
+    roasReal:             this.activeProject?.roas_real ?? 0,
+    roasObjective:        2.0,
+    alertasCriticas:      this.signals.filter(s => s.tipo === 'critica').length,
+    ahorroSemanal:        '$85k',
+    proyectosPrincipales: this.activeProject ? [this.activeProject.nombre] : [],
+  }));
+
+  private agentColorMap: Record<string, string> = {
+    'Vigilante':  '#fbbf24',
+    'Roax':       '#f97316',
+    'Kronos':     '#60a5fa',
+    'Chatea Pro': '#10b981',
+    'ADA Spy':    '#818cf8',
+  };
+
+  private mapSignalToDecision(sig: GaliSignalData): DecisionTheaterData {
+    const urgMap: Record<string, DecisionUrgency> = {
+      alta:  'critical',
+      media: 'high',
+      baja:  'medium',
+    };
+    const opts: DecisionOption[] = (sig.opciones ?? []).map((o, i) => ({
+      id:              o.id,
+      label:           o.label,
+      description:     o.sublabel ?? '',
+      impactoEstimado: o.sublabel ?? '',
+      isPrimary:       i === 0,
+    }));
+    return {
+      signalId:          sig.id,
+      agente:            sig.agente,
+      agenteColor:       this.agentColorMap[sig.agente] ?? '#f59e0b',
+      urgencia:          urgMap[sig.urgencia] ?? 'medium',
+      titulo:            sig.titulo,
+      contexto:          sig.contexto,
+      riesgoSiNoActua:   sig.metrica_label ? `${sig.metrica_label}: ${sig.metrica_valor} (umbral: ${sig.umbral})` : 'Revisar señales activas',
+      impactoEstimado:   sig.afectados ? `${sig.afectados} pedidos afectados` : 'Ver señales',
+      options:           opts,
+      pendingQueueCount: this.decisionQueueCount(),
+    };
+  }
+
+  handleDecisionOption(event: { signalId: string; optionId: string }): void {
+    this.isProcessingDecision.set(true);
+    setTimeout(() => {
+      this.isProcessingDecision.set(false);
+    }, 800);
+  }
+
+  postponeDecision(): void {
+    // Move top decision to back of queue — prototype: no-op
+  }
+
+  scrollToDecisionQueue(): void {
+    this.router.navigate(['/gali-v5/senales']);
+  }
+
+  scrollToMomento2(): void {
+    document.getElementById('hub-momento-2')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  scrollToMomento3(): void {
+    this.momento3Collapsed.set(false);
+    setTimeout(() => {
+      document.querySelector('.hub-momento.momento-3')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  openCompletedPanel(): void {
+    this.gali.requestedPanelTab.set('history');
+    this.gali.togglePanel();
+  }
+
+  readonly momento3Preview = computed(() => {
+    const active = this.proyectosPL.filter(p => p.estado === 'activo' || p.estado === 'escala').length;
+    return `${active} proyectos activos · ROAS 1.93x · ${this.pendingApprovalSignals.length} decisiones`;
+  });
+
   constructor() {
     this.auth.user$.subscribe(u => {
       if (u?.name) this.userName.set(u.name.split(' ')[0]);
+    });
+    effect(() => {
+      const hasCritical = this.pendingApprovalSignals.length > 0
+        || this.signals.some(s => s.tipo === 'critica' && s.estado === 'pending_decision');
+      this.ws.primaryAlertActive.set(hasCritical);
+    });
+    effect(() => {
+      this.ws.editGoalRequest();
+      this.openEditGoal();
+    });
+    effect(() => {
+      this.ws.reconfigureRequest();
+      this.showReconfigureModal.set(true);
+    });
+    effect(() => {
+      const level = this.ws.complexityLevel();
+      if (level === 'expert') {
+        this.momento3Collapsed.set(false);
+      } else {
+        this.momento3Collapsed.set(true);
+      }
+    });
+    effect(() => {
+      const tick = this.ws.complexityChangeTick();
+      if (tick > 0 && this.ws.complexityLevel() === 'expert') {
+        setTimeout(() => this.scrollToMomento3(), 120);
+      }
     });
   }
 }

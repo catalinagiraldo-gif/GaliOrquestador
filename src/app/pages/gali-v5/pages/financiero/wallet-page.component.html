@@ -1,11 +1,18 @@
 <div class="wallet-page">
 
+  <div class="gali-page-header">
+    <h1 class="gali-page-header__title">Finanzas</h1>
+    <span class="gali-page-header__sub">P&L real · Cartera · Gestión financiera de tu negocio</span>
+  </div>
+
   <!-- Kronos agent bar — identidad azul #60a5fa -->
   <div class="kronos-bar">
     <div class="kronos-bar__left">
       <span class="kronos-bar__dot"></span>
       <div class="kronos-bar__identity">
-        <span class="kronos-bar__name">Kronos</span>
+        <span class="kronos-bar__name"
+          pTooltip="Kronos: tu agente financiero. Monitorea P&L, facturación y flujo de caja en tiempo real. Conectado a Siigo para sincronización automática."
+          tooltipPosition="right">Kronos</span>
         <span class="kronos-bar__role">Agente Financiero · activo</span>
       </div>
     </div>
@@ -32,10 +39,142 @@
         · {{ siigo.dias_sin_sincronizar }} días sin sincronizar
       </span>
     </div>
-    <button type="button" class="siigo-error-card__cta" routerLink="/gali-v5/conexiones">
-      Conectar Siigo ahora →
+    <button type="button" class="siigo-error-card__cta" (click)="openSiigoDrawer()">
+      Conectar Siigo →
     </button>
   </div>
+
+  <!-- ── SIIGO DRAWER (3 pasos) ── -->
+  @if (showSiigoDrawer()) {
+    <div class="siigo-drawer-backdrop" (click)="closeSiigoDrawer()">
+      <div class="siigo-drawer" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="siigo-drawer__header">
+          <div class="siigo-drawer__title-wrap">
+            <span class="siigo-drawer__logo">Siigo</span>
+            <span class="siigo-drawer__subtitle">Configuración de facturación</span>
+          </div>
+          <button type="button" class="siigo-drawer__close" (click)="closeSiigoDrawer()">×</button>
+        </div>
+
+        <!-- Steps indicator -->
+        <div class="siigo-drawer__steps">
+          <div class="siigo-step" [class.siigo-step--active]="siigoStep() === 1" [class.siigo-step--done]="siigoStep() > 1">
+            <span class="siigo-step__num">{{ siigoStep() > 1 ? '✓' : '1' }}</span>
+            <span class="siigo-step__label">Credenciales</span>
+          </div>
+          <div class="siigo-step__connector" [class.siigo-step__connector--done]="siigoStep() > 1"></div>
+          <div class="siigo-step" [class.siigo-step--active]="siigoStep() === 2" [class.siigo-step--done]="siigoStep() > 2">
+            <span class="siigo-step__num">{{ siigoStep() > 2 ? '✓' : '2' }}</span>
+            <span class="siigo-step__label">Mapeo</span>
+          </div>
+          <div class="siigo-step__connector" [class.siigo-step__connector--done]="siigoStep() > 2"></div>
+          <div class="siigo-step" [class.siigo-step--active]="siigoStep() === 3">
+            <span class="siigo-step__num">3</span>
+            <span class="siigo-step__label">Sincronización</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Credenciales -->
+        @if (siigoStep() === 1) {
+          <div class="siigo-drawer__body">
+            <p class="siigo-drawer__desc">
+              Ingresa tus credenciales de Siigo Nube. Kronos usará estas credenciales para registrar automáticamente cada pedido entregado como factura electrónica.
+            </p>
+            <div class="siigo-field">
+              <label class="siigo-field__label">Correo de Siigo</label>
+              <input type="email" class="siigo-field__input" placeholder="usuario@empresa.co"
+                [value]="siigoEmail()" (input)="siigoEmail.set($any($event.target).value)" />
+            </div>
+            <div class="siigo-field">
+              <label class="siigo-field__label">Contraseña API</label>
+              <input type="password" class="siigo-field__input" placeholder="Tu clave de integración Siigo"
+                [value]="siigoPassword()" (input)="siigoPassword.set($any($event.target).value)" />
+              <span class="siigo-field__hint">La encuentras en Siigo → Configuración → API</span>
+            </div>
+            <div class="siigo-drawer__actions">
+              <button type="button" class="siigo-btn siigo-btn--secondary" (click)="closeSiigoDrawer()">Cancelar</button>
+              <button type="button" class="siigo-btn siigo-btn--primary" (click)="siigoNext()">Verificar credenciales →</button>
+            </div>
+          </div>
+        }
+
+        <!-- Step 2: Mapeo de cuentas -->
+        @if (siigoStep() === 2) {
+          <div class="siigo-drawer__body">
+            <p class="siigo-drawer__desc">
+              Indica qué cuenta contable en Siigo corresponde a las ventas de Dropi. Kronos necesita esto para registrar las facturas en el lugar correcto.
+            </p>
+            <div class="siigo-field">
+              <label class="siigo-field__label">Cuenta de ingresos (ventas)</label>
+              <select class="siigo-field__select" [value]="siigoCuenta()" (change)="siigoCuenta.set($any($event.target).value)">
+                <option value="">Seleccionar cuenta contable</option>
+                <option value="4135">4135 — Comercio al por mayor y menor</option>
+                <option value="4120">4120 — Servicios de intermediación</option>
+                <option value="4110">4110 — Actividades de servicios</option>
+              </select>
+            </div>
+            <div class="siigo-field">
+              <label class="siigo-field__label">Centro de costos</label>
+              <select class="siigo-field__select">
+                <option>Ventas Colombia</option>
+                <option>Dropshipping</option>
+                <option>E-commerce general</option>
+              </select>
+            </div>
+            <div class="siigo-mapping-preview">
+              <div class="siigo-mapping-preview__title">Vista previa del mapeo</div>
+              <div class="siigo-mapping-row">
+                <span class="siigo-mapping-row__from">Pedido Dropi "Entregado"</span>
+                <span class="siigo-mapping-row__arrow">→</span>
+                <span class="siigo-mapping-row__to">Factura electrónica Siigo · cuenta {{ siigoCuenta() || '4135' }}</span>
+              </div>
+            </div>
+            <div class="siigo-drawer__actions">
+              <button type="button" class="siigo-btn siigo-btn--secondary" (click)="siigoStep.set(1)">← Atrás</button>
+              <button type="button" class="siigo-btn siigo-btn--primary" (click)="siigoNext()">Confirmar mapeo →</button>
+            </div>
+          </div>
+        }
+
+        <!-- Step 3: Sincronización inicial -->
+        @if (siigoStep() === 3) {
+          <div class="siigo-drawer__body">
+            @if (siigoSyncProgress() < 100) {
+              <p class="siigo-drawer__desc">
+                Kronos está sincronizando los últimos <strong>28 pedidos entregados</strong> sin facturar. Esto puede tomar unos segundos.
+              </p>
+              <div class="siigo-progress">
+                <div class="siigo-progress__bar">
+                  <div class="siigo-progress__fill" [style.width.%]="siigoSyncProgress()"></div>
+                </div>
+                <span class="siigo-progress__label">{{ siigoSyncProgress() }}% — sincronizando facturas...</span>
+              </div>
+            } @else {
+              <div class="siigo-success">
+                <div class="siigo-success__icon">✓</div>
+                <div class="siigo-success__title">¡Siigo conectado exitosamente!</div>
+                <p class="siigo-success__body">
+                  Kronos registró <strong>28 facturas</strong> por <strong>$450k</strong> en Siigo.<br/>
+                  A partir de ahora, cada pedido que llegue a "Entregado" se facturará automáticamente.
+                </p>
+                <div class="siigo-success__stats">
+                  <div class="siigo-success__stat"><span>28</span><small>facturas creadas</small></div>
+                  <div class="siigo-success__stat"><span>$450k</span><small>en ingresos registrados</small></div>
+                  <div class="siigo-success__stat"><span>0</span><small>errores de mapeo</small></div>
+                </div>
+              </div>
+              <div class="siigo-drawer__actions siigo-drawer__actions--center">
+                <button type="button" class="siigo-btn siigo-btn--primary" (click)="closeSiigoDrawer()">Listo →</button>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  }
 
   <dropi-titulos title="Historial de wallet" [breadcrumbs]="breadcrumbs">
     <dropi-button-new titulosActions label="Transferir entre wallets" icon="pi-arrows-h" hierarchy="outline" [width]="220" />
@@ -104,6 +243,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Lo que Gali hizo por ti este mes — widget reutilizable (Spec 15 CA-11) -->
+  <app-gali-impact-widget mode="wallet"></app-gali-impact-widget>
 
   <!-- Nota operativa -->
   <div class="wallet-page__alert">

@@ -8,6 +8,48 @@ import { DropiPanelSplitterComponent } from '../dropi-panel-splitter/dropi-panel
 
 type PanelTab = 'chat' | 'agentes' | 'senales' | 'live' | 'memory' | 'files';
 
+// ── C1: Interfaces WorkspaceChat ─────────────────────────────────────────────
+
+export type ThreadCategory = 'proyecto' | 'agente' | 'libre';
+
+export interface GaliRichCard {
+  type: 'roas_chart' | 'pedidos_summary' | 'novedad_alert' | 'action_buttons';
+  roasData?: { label: string; value: number }[];
+  roasCurrent?: number;
+  roasTarget?: number;
+  pedidosCount?: number;
+  pedidosNovedad?: number;
+  pedidosPendientes?: number;
+  novedadPct?: number;
+  novedadCiudad?: string;
+  novedadTransportadora?: string;
+  actions?: { label: string; action: string; isPrimary?: boolean }[];
+}
+
+export interface ChatMessage {
+  id: string;
+  from: 'user' | 'gali';
+  text: string;
+  time: string;
+  richCard?: GaliRichCard;
+}
+
+export interface ChatThread {
+  id: string;
+  title: string;
+  agente: string;
+  agentColor: string;
+  category: ThreadCategory;
+  contextId?: string;
+  contextLabel?: string;
+  messages: ChatMessage[];
+  unread: number;
+  isPinned?: boolean;
+  createdAt: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 @Component({
   selector: 'gali-right-panel',
   standalone: true,
@@ -28,8 +70,347 @@ export class GaliRightPanelComponent implements AfterViewChecked {
 
   activeTab = signal<PanelTab>('chat');
   chatInput = signal('');
+  readonly showOverflowMenu = signal(false);
 
-  // Agente más relevante actualmente (basado en el agente con status 'activo' más reciente)
+  readonly secondaryTabs: PanelTab[] = ['live', 'memory', 'files'];
+  readonly isSecondaryTabActive = computed(() => this.secondaryTabs.includes(this.activeTab()));
+
+  // Multi-thread system
+  readonly showThreadList = signal(false);
+  readonly hoveredThreadId = signal<string | null>(null);
+
+  // ── C8: localStorage persistence for pins ──────────────────────────────────
+  private readonly PINNED_KEY = 'gali_pinned_threads_v1';
+
+  private loadPinnedFromStorage(): string[] {
+    try {
+      const raw = localStorage.getItem(this.PINNED_KEY);
+      return raw ? JSON.parse(raw) : ['gali-main'];
+    } catch {
+      return ['gali-main'];
+    }
+  }
+
+  readonly pinnedThreadIds = signal<string[]>(this.loadPinnedFromStorage());
+
+  pinThread(id: string): void {
+    if (id === 'gali-main') return;
+    this.pinnedThreadIds.update(ids => {
+      const next = ids.includes(id) ? ids.filter(i => i !== id) : [...ids, id];
+      try { localStorage.setItem(this.PINNED_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // Rail expand + rename + search
+  readonly isHoveringRail = signal(false);
+  readonly isSearchFocused = signal(false);
+  readonly editingThreadId = signal<string | null>(null);
+  readonly threadSearch = signal('');
+  readonly railExpanded = computed(() =>
+    this.isHoveringRail() || this.editingThreadId() !== null || this.isSearchFocused()
+  );
+
+  startEditThread(id: string, event: MouseEvent): void {
+    event.stopPropagation();
+    this.editingThreadId.set(id);
+  }
+
+  saveEditThread(id: string, value: string): void {
+    const name = value.trim();
+    if (name) {
+      this.threads.update(list =>
+        list.map(t => t.id === id ? { ...t, title: name } : t)
+      );
+    }
+    this.editingThreadId.set(null);
+  }
+
+  onThreadNameKeydown(event: KeyboardEvent, id: string): void {
+    if (event.key === 'Enter') {
+      this.saveEditThread(id, (event.target as HTMLInputElement).value);
+    } else if (event.key === 'Escape') {
+      this.editingThreadId.set(null);
+    }
+  }
+
+  readonly activeThreadId = signal('gali-main');
+
+  // ── C1: Updated threads signal with 4 mock threads ─────────────────────────
+  readonly threads = signal<ChatThread[]>([
+    {
+      id: 'gali-main',
+      title: 'Gali · Hub general',
+      agente: 'Gali',
+      agentColor: '#f49a3d',
+      category: 'libre',
+      messages: [],
+      unread: 0,
+      createdAt: Date.now(),
+    },
+    {
+      id: 'roax-collar',
+      title: 'Roax · Collar GPS',
+      agente: 'Roax',
+      agentColor: '#f97316',
+      category: 'proyecto',
+      contextId: 'collar-gps-2026',
+      contextLabel: 'Collar GPS',
+      messages: [
+        {
+          id: 'r1',
+          from: 'gali',
+          text: 'El CTR del creativo A cayó a 1.2%. Tengo listo un creativo de respaldo — ¿lo activo?',
+          time: 'hace 10 min',
+          richCard: {
+            type: 'roas_chart',
+            roasCurrent: 1.93,
+            roasTarget: 2.5,
+            roasData: [
+              { label: 'L', value: 2.1 },
+              { label: 'M', value: 2.3 },
+              { label: 'X', value: 1.9 },
+              { label: 'J', value: 1.8 },
+              { label: 'V', value: 1.93 },
+            ],
+          },
+        },
+      ],
+      unread: 1,
+      createdAt: Date.now() - 3600000,
+    },
+    {
+      id: 'vigilante-novedades',
+      title: 'Vigilante · Novedades Bogotá',
+      agente: 'Vigilante',
+      agentColor: '#fbbf24',
+      category: 'agente',
+      contextId: 'vigilante',
+      contextLabel: 'Vigilante',
+      messages: [
+        {
+          id: 'v1',
+          from: 'gali',
+          text: 'Novedad en Bogotá subió al 18% esta semana. ¿Quieres que reasigne a Envia para los próximos 5 días?',
+          time: 'hace 2h',
+          richCard: {
+            type: 'novedad_alert',
+            novedadPct: 18,
+            novedadCiudad: 'Bogotá',
+            novedadTransportadora: 'Coordinadora',
+          },
+        },
+      ],
+      unread: 1,
+      createdAt: Date.now() - 7200000,
+    },
+    {
+      id: 'kronos-finanzas',
+      title: 'Kronos · P&L semanal',
+      agente: 'Kronos',
+      agentColor: '#60a5fa',
+      category: 'agente',
+      contextId: 'kronos',
+      contextLabel: 'Kronos',
+      messages: [
+        {
+          id: 'k1',
+          from: 'gali',
+          text: 'Esta semana cerraste con $2.74M en ingresos. El margen neto bajó 2pts por el incremento en fletes.',
+          time: 'hoy 8am',
+          richCard: {
+            type: 'pedidos_summary',
+            pedidosCount: 47,
+            pedidosNovedad: 3,
+            pedidosPendientes: 8,
+          },
+        },
+      ],
+      unread: 0,
+      createdAt: Date.now() - 14400000,
+    },
+  ]);
+  // ──────────────────────────────────────────────────────────────────────────
+
+  readonly activeThread = computed(() =>
+    this.threads().find(t => t.id === this.activeThreadId()) ?? this.threads()[0]
+  );
+
+  readonly totalUnread = computed(() =>
+    this.threads().reduce((sum, t) => sum + t.unread, 0)
+  );
+
+  // ── C2: Grouping computed signals ─────────────────────────────────────────
+  readonly pinnedThreads = computed(() =>
+    this.threads().filter(t => this.pinnedThreadIds().includes(t.id))
+  );
+
+  readonly projectThreads = computed(() =>
+    this.threads().filter(
+      t => t.category === 'proyecto' && !this.pinnedThreadIds().includes(t.id)
+    )
+  );
+
+  readonly agentThreads = computed(() =>
+    this.threads().filter(
+      t => t.category === 'agente' && !this.pinnedThreadIds().includes(t.id)
+    )
+  );
+
+  readonly freeThreads = computed(() =>
+    this.threads().filter(
+      t => t.category === 'libre' && !this.pinnedThreadIds().includes(t.id)
+    )
+  );
+
+  readonly filteredPinned = computed(() => this.filterBySearch(this.pinnedThreads()));
+  readonly filteredProjects = computed(() => this.filterBySearch(this.projectThreads()));
+  readonly filteredAgents = computed(() => this.filterBySearch(this.agentThreads()));
+  readonly filteredFree = computed(() => this.filterBySearch(this.freeThreads()));
+
+  private filterBySearch(threads: ChatThread[]): ChatThread[] {
+    const q = this.threadSearch().toLowerCase().trim();
+    return q ? threads.filter(t => t.title.toLowerCase().includes(q)) : threads;
+  }
+
+  readonly filteredThreads = computed(() => {
+    const all = [
+      ...this.pinnedThreads(),
+      ...this.projectThreads(),
+      ...this.agentThreads(),
+      ...this.freeThreads(),
+    ];
+    const q = this.threadSearch().toLowerCase().trim();
+    return q ? all.filter(t => t.title.toLowerCase().includes(q)) : all;
+  });
+  // ──────────────────────────────────────────────────────────────────────────
+
+  switchThread(threadId: string): void {
+    this.activeThreadId.set(threadId);
+    this.showThreadList.set(false);
+    this.threadSearch.set('');
+    this.threads.update(list =>
+      list.map(t => t.id === threadId ? { ...t, unread: 0 } : t)
+    );
+  }
+
+  createThread(): void {
+    const id = `thread-${Date.now()}`;
+    const newThread: ChatThread = {
+      id, title: 'Nueva conversación', agente: 'Gali', agentColor: '#f49a3d',
+      category: 'libre',
+      messages: [], unread: 0, createdAt: Date.now(),
+    };
+    this.threads.update(list => [...list, newThread]);
+    this.switchThread(id);
+  }
+
+  archiveThread(id: string): void {
+    if (id === 'gali-main') return;
+    this.threads.update(list => list.filter(t => t.id !== id));
+    if (this.activeThreadId() === id) this.activeThreadId.set('gali-main');
+  }
+
+  // ── C3: Context selector ──────────────────────────────────────────────────
+  readonly showContextSelector = signal(false);
+  readonly newThreadCategory = signal<ThreadCategory | null>(null);
+  readonly newThreadContextId = signal<string | null>(null);
+  readonly newThreadContextLabel = signal('');
+
+  readonly availableProjects = [
+    { id: 'collar-gps-2026', label: 'Collar GPS para Mascotas', agentColor: '#f97316' },
+    { id: 'skincare-kbeauty', label: 'Skincare K-Beauty', agentColor: '#a78bfa' },
+    { id: 'difusor-aroma', label: 'Difusor Aromaterapia', agentColor: '#34d399' },
+  ];
+
+  readonly availableAgents = [
+    { id: 'roax', label: 'Roax', desc: 'Campañas y ROAS', color: '#f97316' },
+    { id: 'vigilante', label: 'Vigilante', desc: 'Novedades y logística', color: '#fbbf24' },
+    { id: 'kronos', label: 'Kronos', desc: 'P&L y finanzas', color: '#60a5fa' },
+    { id: 'chatea', label: 'Chatea Pro', desc: 'WhatsApp y atención', color: '#34d399' },
+    { id: 'ada', label: 'Ada', desc: 'Catálogo y precios', color: '#818cf8' },
+  ];
+
+  openContextSelector(): void {
+    this.showThreadList.set(true);
+    this.showContextSelector.set(true);
+    this.newThreadCategory.set(null);
+    this.newThreadContextId.set(null);
+    this.newThreadContextLabel.set('');
+  }
+
+  selectCategory(category: ThreadCategory): void {
+    this.newThreadCategory.set(category);
+    if (category === 'libre') {
+      this.confirmCreateThread();
+    }
+  }
+
+  selectContext(id: string, label: string): void {
+    this.newThreadContextId.set(id);
+    this.newThreadContextLabel.set(label);
+    this.confirmCreateThread();
+  }
+
+  confirmCreateThread(): void {
+    const category = this.newThreadCategory() ?? 'libre';
+    const contextId = this.newThreadContextId() ?? undefined;
+    const contextLabel = this.newThreadContextLabel() || undefined;
+
+    let agente = 'Gali';
+    let agentColor = '#f49a3d';
+    if (category === 'agente' && contextId) {
+      const found = this.availableAgents.find(a => a.id === contextId);
+      if (found) { agente = found.label; agentColor = found.color; }
+    }
+
+    const title = contextLabel ? `${agente} · ${contextLabel}` : 'Nueva conversación';
+    const id = `thread-${Date.now()}`;
+    const newThread: ChatThread = {
+      id, title, agente, agentColor, category,
+      contextId, contextLabel,
+      messages: [],
+      unread: 0,
+      createdAt: Date.now(),
+    };
+
+    this.threads.update(list => [...list, newThread]);
+    this.switchThread(id);
+    this.showContextSelector.set(false);
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  readonly beforeAfterLog = [
+    {
+      id: 'baf-1', agente: 'Roax', agentColor: '#f97316',
+      accion: 'Pausó Video A → activó Video B',
+      hace: 'hace 2h',
+      antesLabel: 'CTR', antesVal: '1.2%',
+      despuesLabel: 'CTR', despuesVal: '1.8%',
+      impact: '+50% CTR · ROAS 2.6→2.9x',
+      route: '/gali-v5/proyecto/collar-gps-2026',
+    },
+    {
+      id: 'baf-2', agente: 'Vigilante', agentColor: '#fbbf24',
+      accion: 'Cambió 12 pedidos Coordinadora → Envia (Cali)',
+      hace: 'hace 4h',
+      antesLabel: 'Novedades', antesVal: '9.8%',
+      despuesLabel: 'Novedades', despuesVal: '6.4%',
+      impact: 'Estimado: 4 novedades ahorradas · $85k',
+      route: '/gali-v5/proyecto/collar-gps-2026',
+    },
+    {
+      id: 'baf-3', agente: 'Chatea Pro', agentColor: '#34d399',
+      accion: 'Gestionó 8 novedades · 7 resueltas automáticamente',
+      hace: 'hace 6h',
+      antesLabel: 'Novedades abiertas', antesVal: '8',
+      despuesLabel: 'Novedades abiertas', despuesVal: '1',
+      impact: '87.5% resolución automática',
+      route: '/gali-v5/mis-pedidos/mis-pedidos',
+    },
+  ];
+
   readonly activeAgentInfo = computed(() => {
     return this.gali.agents().find(a => a.status === 'activo') ?? null;
   });
@@ -46,6 +427,106 @@ export class GaliRightPanelComponent implements AfterViewChecked {
     return this.agentColors[id.toLowerCase()] ?? '#9b9ba8';
   }
 
+  // ── C5: Pre-cargar thread desde proyecto ──────────────────────────────────
+  readonly pendingProjectThread = signal<{ projectId: string; projectLabel: string } | null>(null);
+
+  openProjectThread(projectId: string, projectLabel: string): void {
+    const existing = this.threads().find(
+      t => t.category === 'proyecto' && t.contextId === projectId
+    );
+
+    if (existing) {
+      this.switchThread(existing.id);
+    } else {
+      const id = `proj-${projectId}-${Date.now()}`;
+      const newThread: ChatThread = {
+        id,
+        title: `Gali · ${projectLabel}`,
+        agente: 'Gali',
+        agentColor: '#f49a3d',
+        category: 'proyecto',
+        contextId: projectId,
+        contextLabel: projectLabel,
+        messages: [
+          {
+            id: 'ctx-preload',
+            from: 'gali',
+            text: `Abrí el contexto de ${projectLabel}. Tengo los datos actuales de campaña, ROAS y novedades. ¿Qué quieres revisar?`,
+            time: 'ahora',
+            richCard: {
+              type: 'action_buttons',
+              actions: [
+                { label: 'Ver ROAS', action: `ask_roas_${projectId}` },
+                { label: 'Ver novedades', action: `ask_novedades_${projectId}` },
+                { label: 'Ver pedidos', action: `ask_pedidos_${projectId}`, isPrimary: true },
+              ],
+            },
+          },
+        ],
+        unread: 0,
+        createdAt: Date.now(),
+      };
+      this.threads.update(list => [...list, newThread]);
+      this.switchThread(id);
+    }
+
+    this.activeTab.set('chat');
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // ── C6: Pre-cargar thread desde agente ────────────────────────────────────
+  openAgentThread(agentId: string, agentLabel: string, agentColor: string): void {
+    const existing = this.threads().find(
+      t => t.category === 'agente' && t.contextId === agentId
+    );
+
+    if (existing) {
+      this.switchThread(existing.id);
+    } else {
+      const recentActions = this.beforeAfterLog
+        .filter(e => e.agente.toLowerCase() === agentLabel.toLowerCase())
+        .slice(0, 2);
+
+      const recentText = recentActions.length
+        ? `Últimas acciones de ${agentLabel}: ${recentActions.map(a => a.accion).join(' · ')}`
+        : `${agentLabel} está activo. ¿Qué quieres revisar o configurar?`;
+
+      const id = `agent-${agentId}-${Date.now()}`;
+      const newThread: ChatThread = {
+        id,
+        title: `${agentLabel} · Configuración`,
+        agente: agentLabel,
+        agentColor,
+        category: 'agente',
+        contextId: agentId,
+        contextLabel: agentLabel,
+        messages: [
+          {
+            id: 'agent-preload',
+            from: 'gali',
+            text: recentText,
+            time: 'ahora',
+            richCard: {
+              type: 'action_buttons',
+              actions: [
+                { label: 'Ver historial', action: `agent_history_${agentId}` },
+                { label: 'Configurar umbral', action: `agent_config_${agentId}` },
+                { label: 'Ver impacto', action: `agent_impact_${agentId}`, isPrimary: true },
+              ],
+            },
+          },
+        ],
+        unread: 0,
+        createdAt: Date.now(),
+      };
+      this.threads.update(list => [...list, newThread]);
+      this.switchThread(id);
+    }
+
+    this.activeTab.set('chat');
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   constructor() {
     effect(() => {
       const req = this.gali.requestedPanelTab();
@@ -54,10 +535,27 @@ export class GaliRightPanelComponent implements AfterViewChecked {
         this.gali.requestedPanelTab.set(null);
       }
     }, { allowSignalWrites: true });
+
+    effect(() => {
+      const req = this.gali.requestedProjectThread();
+      if (req) {
+        this.openProjectThread(req.projectId, req.projectLabel);
+        this.gali.requestedProjectThread.set(null);
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
+      const req = this.gali.requestedAgentThread();
+      if (req) {
+        this.openAgentThread(req.agentId, req.agentLabel, req.agentColor);
+        this.gali.requestedAgentThread.set(null);
+      }
+    }, { allowSignalWrites: true });
   }
 
   setTab(tab: PanelTab): void {
     this.activeTab.set(tab);
+    this.showOverflowMenu.set(false);
   }
 
   close(): void {
@@ -99,7 +597,33 @@ export class GaliRightPanelComponent implements AfterViewChecked {
     const text = this.chatInput().trim();
     if (!text) return;
     this.chatInput.set('');
-    this.gali.sendMessage(text);
+    if (this.activeThreadId() === 'gali-main') {
+      this.gali.sendMessage(text);
+    } else {
+      const msgId = `msg-${Date.now()}`;
+      this.threads.update(list =>
+        list.map(t =>
+          t.id === this.activeThreadId()
+            ? { ...t, messages: [...t.messages, { id: msgId, from: 'user' as const, text, time: 'ahora' }] }
+            : t
+        )
+      );
+      setTimeout(() => {
+        const replyId = `reply-${Date.now()}`;
+        const thread = this.activeThread();
+        const reply = thread?.agente === 'Roax'
+          ? 'Entendido. Ajustando estrategia de campaña en base a tu indicación.'
+          : 'Recibido. Monitoreando la situación y te aviso si hay cambios relevantes.';
+        this.threads.update(list =>
+          list.map(t =>
+            t.id === this.activeThreadId()
+              ? { ...t, messages: [...t.messages, { id: replyId, from: 'gali' as const, text: reply, time: 'ahora' }] }
+              : t
+          )
+        );
+        this.markScrollNeeded();
+      }, 700);
+    }
     this.markScrollNeeded();
   }
 
@@ -189,7 +713,6 @@ export class GaliRightPanelComponent implements AfterViewChecked {
   });
 
   undoMemoryItem(id: string): void {
-    // Mock: show a toast and mark as undone
     console.log('Undo memory item', id);
   }
 
@@ -263,7 +786,6 @@ export class GaliRightPanelComponent implements AfterViewChecked {
     console.log('Use file in campaign', fileId);
   }
 
-  /** Maps split % to pixel width for the internal splitter */
   contextSplitPx(): number {
     const panelW = this.gali.panelWidth();
     return Math.round(panelW * (this.gali.contextSplitWidth() / 100));

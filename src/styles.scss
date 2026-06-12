@@ -1,6 +1,77 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 @import 'primeicons/primeicons.css';
 @import 'styles/variables';
+@import 'styles/animations';
+@import 'styles/glosario';
+
+// ── PrimeNG Tooltip — estilos globales (el CSS del componente no se inyecta sin tema) ─
+.p-tooltip {
+  position: absolute;
+  padding: 0.25rem 0;
+  pointer-events: none;
+  max-width: 280px;
+  z-index: 9999;
+
+  &.p-tooltip-top    { padding: 0.25rem 0; }
+  &.p-tooltip-bottom { padding: 0.25rem 0; }
+  &.p-tooltip-left,
+  &.p-tooltip-right  { padding: 0 0.25rem; }
+
+  .p-tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+  }
+
+  &.p-tooltip-top .p-tooltip-arrow {
+    bottom: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px 5px 0;
+    border-top-color: rgba(30, 30, 40, 0.92);
+  }
+
+  &.p-tooltip-bottom .p-tooltip-arrow {
+    top: 0;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 0 5px 5px;
+    border-bottom-color: rgba(30, 30, 40, 0.92);
+  }
+
+  &.p-tooltip-left .p-tooltip-arrow {
+    top: 50%;
+    right: 0;
+    margin-top: -5px;
+    border-width: 5px 0 5px 5px;
+    border-left-color: rgba(30, 30, 40, 0.92);
+  }
+
+  &.p-tooltip-right .p-tooltip-arrow {
+    top: 50%;
+    left: 0;
+    margin-top: -5px;
+    border-width: 5px 5px 5px 0;
+    border-right-color: rgba(30, 30, 40, 0.92);
+  }
+
+  .p-tooltip-text {
+    background: rgba(30, 30, 40, 0.92);
+    color: #f0f0f4;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+  }
+}
 
 *,
 *::before,
@@ -50,4 +121,26 @@ p {
 ::-webkit-scrollbar-thumb {
   background: $gray-300;
   border-radius: $radius-xl;
+}
+
+// ── Gali V5 — Page header compartido ────────────────────────────────────────
+.gali-page-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fff;
+  flex-shrink: 0;
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 2px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: #9ca3af;
+    font-family: 'Inter', sans-serif;
+  }
 }

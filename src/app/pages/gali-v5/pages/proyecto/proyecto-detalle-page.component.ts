@@ -4,6 +4,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DiagnosticoModalComponent } from '../../components/diagnostico-modal/diagnostico-modal.component';
 import { SkillsEditorModalComponent } from '../../components/skills-editor-modal/skills-editor-modal.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import { ProyectoTimelineComponent } from '../../components/proyecto-timeline/proyecto-timeline.component';
+import { ProyectoTimelineData } from '../../components/proyecto-timeline/proyecto-timeline.model';
 import PROJECTS_DATA from '../../../../../../mocks/gali-v5/projects.json';
 
 export type TabId = 'resumen' | 'producto' | 'estrategia' | 'creativos' | 'campanas' | 'pedidos' | 'pl';
@@ -64,7 +66,7 @@ interface PlLine {
 @Component({
   selector: 'app-proyecto-detalle-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, DiagnosticoModalComponent, SkillsEditorModalComponent],
+  imports: [CommonModule, RouterLink, DiagnosticoModalComponent, SkillsEditorModalComponent, ProyectoTimelineComponent],
   templateUrl: './proyecto-detalle-page.component.html',
   styleUrl: './proyecto-detalle-page.component.scss',
 })
@@ -78,14 +80,57 @@ export class ProyectoDetallePageComponent implements OnInit {
     PROJECTS_DATA.find((p: { id: string }) => p.id === this.proyectoId()) ?? PROJECTS_DATA[0]
   );
 
+  readonly proyectoEstado = computed(() => (this.proyectoData() as any)?.estado ?? this.proyecto.estado);
+  readonly proyectoNombreReal = computed(() => (this.proyectoData() as any)?.nombre ?? this.proyecto.nombre);
+  readonly estadoLabelReal = computed((): string => {
+    const map: Record<string, string> = {
+      en_escala: 'En escala', activo: 'Activo', pausado: 'Pausado',
+      borrador: 'Borrador', recien_lanzado: 'Recién lanzado', 'campaña_fallida': 'Campaña fallida',
+    };
+    return map[this.proyectoEstado()] ?? this.proyecto.estadoLabel;
+  });
+  readonly isRecienLanzado = computed(() => this.proyectoEstado() === 'recien_lanzado');
+  readonly isCampanaFallida = computed(() => this.proyectoEstado() === 'campaña_fallida');
+  readonly isNormalState = computed(() => !this.isRecienLanzado() && !this.isCampanaFallida());
+  readonly lanzadoHaceHoras = computed(() => (this.proyectoData() as any)?.lanzado_hace_horas ?? 0);
+  readonly galiNotaProyecto = computed(() => (this.proyectoData() as any)?.gali_nota ?? '');
+  readonly galiRecomendacion = computed(() => (this.proyectoData() as any)?.gali_recomendacion ?? '');
+
+  private readonly ICONOS_MAP: Record<string, string> = {
+    'collar-gps-2026': '🐕', 'skincare-kbeauty': '✨', 'fitness-bands': '💪',
+    'difusor-aromaterapia': '🌿', 'mini-proyector-fallo': '📺',
+    'rodillo-jade-borrador': '💎', 'proyector-portatil': '📺', 'reloj-smartwatch': '⌚',
+  };
+  readonly proyectoIcono = computed(() => this.ICONOS_MAP[this.proyectoId()] ?? this.proyecto.icono);
+
   activeTab = signal<TabId>('resumen');
   showDiagnostic = signal(false);
   showSkillsEditor = signal(false);
   skillsEditorAgente = signal('Roax');
+  mostrarCrearProyecto = signal(false);
+  wizardStepInicial = signal<string>('presupuesto');
+
+  readonly proyectoTimeline = computed<ProyectoTimelineData | null>(() => {
+    const p = this.proyectoData() as any;
+    return p?.timeline ?? null;
+  });
+
+  readonly agentActions = computed<any[]>(() => {
+    const p = this.proyectoData() as any;
+    return p?.agent_actions ?? [];
+  });
 
   goToSignals(): void {
     this.ws.setMode('operar');
-    this.router.navigate(['/gali-v5']);
+    const pid = this.proyectoId();
+    const signalMap: Record<string, string> = {
+      'collar-gps-2026': 'sen-001',
+      'skincare-kbeauty': 'sen-003',
+    };
+    const signalId = signalMap[pid] ?? 'sen-001';
+    this.router.navigate(['/gali-v5/senales'], {
+      queryParams: { signalId, projectId: pid },
+    });
   }
 
   goToSkillEditor(agente = 'vigilante'): void {
@@ -97,6 +142,27 @@ export class ProyectoDetallePageComponent implements OnInit {
   goToMedir(): void {
     this.ws.setMode('medir');
     this.router.navigate(['/gali-v5']);
+  }
+
+  irASenal(signalId: string): void {
+    this.router.navigate(['/gali-v5/senales'], {
+      queryParams: { signalId, projectId: this.proyectoId() },
+    });
+  }
+
+  reactivarProyecto(): void {
+    this.mostrarCrearProyecto.set(true);
+    this.wizardStepInicial.set('estrategia');
+  }
+
+  irAStepBorrador(stepId: string): void {
+    this.mostrarCrearProyecto.set(true);
+    this.wizardStepInicial.set(stepId);
+  }
+
+  continuarBorrador(): void {
+    this.mostrarCrearProyecto.set(true);
+    this.wizardStepInicial.set('resumen');
   }
 
   readonly tabs: { id: TabId; label: string }[] = [
@@ -224,6 +290,26 @@ export class ProyectoDetallePageComponent implements OnInit {
     { label: 'Logística / flete',       value: '- $94.000',  pct: '-8%',  variant: 'costo' },
     { label: 'Novedades (3 un.)',        value: '- $85.500',  pct: '-7%',  variant: 'alerta' },
     { label: 'Ganancia neta',           value: '$411.000',  pct: '33%',  variant: 'neto' },
+  ];
+
+  readonly activationSteps = [
+    { label: 'Pixel de seguimiento instalado', done: true, active: false },
+    { label: 'Campaña Meta Ads configurada', done: true, active: false },
+    { label: 'Agentes asignados al proyecto', done: true, active: false },
+    { label: 'Roax monitoreando CTR en tiempo real', done: false, active: true },
+    { label: 'Primeros pedidos estimados en ~6h', done: false, active: false },
+  ];
+
+  readonly fallaCausas: { tipo: 'error' | 'warn'; label: string; valor: string; umbral: string; causa: string }[] = [
+    { tipo: 'error', label: 'CTR activo', valor: '0.4%', umbral: '< 0.8%', causa: 'Creativos saturados' },
+    { tipo: 'error', label: 'ROAS real', valor: '0.7x', umbral: '< 1.5x', causa: 'Inversión sin retorno' },
+    { tipo: 'warn', label: 'Tasa novedades', valor: '35%', umbral: '> 15%', causa: 'Retornos altos' },
+  ];
+
+  readonly fallaAprendizajes = [
+    'Audiencia 18-35 en Meta Colombia saturada para este ángulo visual',
+    'Precio $180k compite directamente con plataformas de streaming',
+    'Ángulo "Calidad HD" no conectó — probar "experiencia cine en casa"',
   ];
 
   readonly memoriaDecisiones = [

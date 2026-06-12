@@ -1,0 +1,51 @@
+<div class="spm-overlay" (click)="close()">
+  <div class="spm-modal" (click)="$event.stopPropagation()">
+
+    <div class="spm-modal__header">
+      <div>
+        <p class="spm-modal__eyebrow">Asignar skill a {{ agentName }}</p>
+        <h2 class="spm-modal__title">Elige una skill del catálogo</h2>
+      </div>
+      <button type="button" class="spm-modal__close" (click)="close()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="spm-modal__search">
+      <i class="pi pi-search spm-modal__search-icon"></i>
+      <input
+        type="text"
+        class="spm-modal__search-input"
+        placeholder="Buscar skill…"
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)" />
+    </div>
+
+    <div class="spm-modal__body">
+      @if (availableSkills().length === 0) {
+        <p class="spm-modal__empty">No hay más skills disponibles para asignar.</p>
+      }
+      @for (skill of availableSkills(); track skill.name) {
+        <button type="button" class="spm-skill-card" (click)="addSkill(skill)">
+          <div class="spm-skill-card__header">
+            <span class="spm-skill-card__name">{{ skill.name }}</span>
+            <span class="spm-skill-card__cat">{{ skill.category }}</span>
+          </div>
+          <p class="spm-skill-card__desc">{{ skill.description }}</p>
+          <div class="spm-skill-card__agents">
+            @for (a of skill.agentes; track a) {
+              <span class="spm-skill-card__agent-tag">{{ a }}</span>
+            }
+          </div>
+        </button>
+      }
+    </div>
+
+    <div class="spm-modal__footer">
+      <a routerLink="/gali-v5/marketplace" class="spm-modal__footer-link" (click)="close()">
+        Ver marketplace de skills →
+      </a>
+    </div>
+
+  </div>
+</div>

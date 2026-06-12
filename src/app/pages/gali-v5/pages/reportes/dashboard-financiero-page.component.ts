@@ -1,7 +1,9 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
+import { GaliGlosarioDirective } from '../../directives/gali-glosario.directive';
 import { GaliModuleActivationBarComponent } from '../../components/gali-module-activation-bar/gali-module-activation-bar.component';
 import KPIS_GLOBAL from '../../../../../../mocks/gali-v5/kpis-global.json';
 
@@ -49,12 +51,17 @@ interface ChannelRow {
 @Component({
   selector: 'app-dashboard-financiero-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliInsightDirective, GaliModuleActivationBarComponent],
+  imports: [CommonModule, RouterModule, GaliInsightDirective, GaliGlosarioDirective, GaliModuleActivationBarComponent],
   templateUrl: './dashboard-financiero-page.component.html',
   styleUrl: './dashboard-financiero-page.component.scss',
 })
-export class DashboardFinancieroPageComponent {
+export class DashboardFinancieroPageComponent implements OnInit, OnDestroy {
+  private ws = inject(GaliWorkspaceService);
   readonly Math = Math;
+
+  ngOnInit(): void { this.ws.primaryAlertActive.set(true); }
+  ngOnDestroy(): void { this.ws.primaryAlertActive.set(false); }
+
   readonly activeWeekFilter = signal<'4s' | '8s' | '12s'>('4s');
   readonly activeProjection = signal<'conservador' | 'base' | 'optimista'>('base');
   // C2: expose for template tooltip

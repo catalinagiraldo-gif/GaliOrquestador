@@ -532,7 +532,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       { id: 'hdr-config-agentes', label: 'Configuración', type: 'header' as const },
       { id: 'nav-skills', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
       { id: 'nav-reglas', label: 'Reglas', route: '/gali-v5/reglas', icon: `${G5}/page-check.svg` },
-      { id: 'nav-marketplace', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+      { id: 'nav-marketplace', label: 'Marketplace', route: '/gali-v5/marketplace', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
     ],
     agentFooter: {
       agentId: 'gali',
@@ -563,7 +563,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       {
         id: 'marketplace-skills',
         label: 'Marketplace',
-        route: '/gali-v5/skills/comunidad',
+        route: '/gali-v5/marketplace',
         icon: `${G5}/trophy.svg`,
         badge: 'nuevo' as SectionBadge,
       },
@@ -593,7 +593,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       { id: 'hdr-orq-reglas', label: 'Orquestación IA', type: 'header' as const },
       { id: 'nav-agentes-r', label: 'Agentes', route: '/gali-v5/agentes', icon: `${G5}/id-badge.svg` },
       { id: 'nav-skills-r', label: 'Skills', route: '/gali-v5/skills', icon: `${G5}/apps-add.svg` },
-      { id: 'nav-mkt-r', label: 'Marketplace', route: '/gali-v5/skills/comunidad', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
+      { id: 'nav-mkt-r', label: 'Marketplace', route: '/gali-v5/marketplace', icon: `${G5}/handshake.svg`, badge: 'nuevo' as SectionBadge },
     ],
     agentFooter: {
       agentId: 'chatea',
@@ -611,7 +611,7 @@ export const DROPI_SECTION_PANELS: Record<string, SectionPanel> = {
       {
         id: 'mkt-skills',
         label: 'Skills',
-        route: '/gali-v5/skills/comunidad',
+        route: '/gali-v5/marketplace',
         icon: `${G5}/apps-add.svg`,
         badge: 'nuevo' as SectionBadge,
       },
@@ -805,7 +805,7 @@ export const GALI_MISSION_PANEL: SectionPanel = {
         { label: 'Agentes',     route: '/gali-v5/agentes' },
         { label: 'Skills',      route: '/gali-v5/skills' },
         { label: 'Reglas',      route: '/gali-v5/reglas' },
-        { label: 'Marketplace', route: '/gali-v5/skills/comunidad' },
+        { label: 'Marketplace', route: '/gali-v5/marketplace' },
         { label: 'Conexiones',  route: '/gali-v5/conexiones' },
       ],
     },

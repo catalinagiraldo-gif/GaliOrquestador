@@ -1541,3 +1541,326 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+// Calculadora de precio
+.np-precio-calc {
+  background: rgba($primary-50, 0.4);
+  border: 1px solid rgba($primary-200, 0.6);
+  border-radius: $radius-lg;
+  padding: $size-5 $size-6;
+  margin-bottom: $size-5;
+
+  &__title {
+    margin: 0 0 $size-1;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $gray-800;
+  }
+  &__sub {
+    margin: 0 0 $size-4;
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $size-3;
+    margin-bottom: $size-4;
+  }
+  &__result-row {
+    display: flex;
+    align-items: center;
+    gap: $size-4;
+    flex-wrap: wrap;
+  }
+  &__sugerido {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 120px;
+  }
+  &__label {
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+  &__val {
+    font-size: $font-xl;
+    font-weight: 700;
+    color: $primary-600;
+  }
+  &__hint {
+    font-size: 10px;
+    color: $gray-400;
+  }
+  &__divider {
+    width: 1px;
+    height: 48px;
+    background: $gray-200;
+  }
+  &__margen {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: $size-2 $size-3;
+    border-radius: $radius-md;
+    background: $gray-100;
+    min-width: 100px;
+
+    span:first-child { font-size: $font-xs; color: $gray-500; }
+    strong { font-size: $font-md; font-weight: 700; }
+
+    &--ok {
+      background: rgba(#22c55e, 0.08);
+      strong { color: #16a34a; }
+    }
+    &--warn {
+      background: rgba($primary-400, 0.08);
+      strong { color: $primary-600; }
+    }
+  }
+  &__margen-tip {
+    font-size: 10px;
+    color: $gray-500;
+  }
+}
+
+// Gali presupuesto recomendado
+.np-gali-rec-badge {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  background: rgba($primary-50, 0.7);
+  border: 1px solid rgba($primary-200, 0.5);
+  border-radius: $radius-md;
+  padding: $size-2 $size-3;
+  margin-bottom: $size-3;
+  font-size: $font-xs;
+  color: $gray-700;
+  flex-wrap: wrap;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $primary-500;
+    flex-shrink: 0;
+  }
+  &__sub {
+    color: $gray-400;
+    font-size: 11px;
+  }
+
+  strong { color: $primary-600; }
+}
+
+// Agentes del proyecto
+.np-campana-agentes {
+  margin-top: $size-5;
+
+  &__title {
+    margin: 0 0 $size-1;
+    font-family: $font-primary;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $gray-800;
+  }
+  &__sub {
+    margin: 0 0 $size-3;
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+}
+
+.np-agente-card {
+  display: flex;
+  flex-direction: column;
+  gap: $size-1;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+  margin-bottom: $size-2;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--active {
+    border-color: rgba($primary-400, 0.5);
+    background: rgba($primary-50, 0.3);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $size-3;
+  }
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  &__name {
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $gray-800;
+  }
+  &__desc {
+    margin: 0;
+    font-size: $font-xs;
+    color: $gray-500;
+    padding-left: $size-5;
+  }
+}
+
+// Modal de lanzamiento
+.np-launch-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.np-launch-modal {
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $size-8 $size-10;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $size-4;
+  }
+  &__spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid $gray-200;
+    border-top-color: $primary-500;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  &__msg {
+    margin: 0;
+    font-size: $font-md;
+    font-weight: 600;
+    color: $gray-800;
+  }
+  &__sub {
+    margin: 0;
+    font-size: $font-xs;
+    color: $gray-400;
+  }
+  &__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $size-3;
+  }
+  &__icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+  &__title {
+    margin: 0;
+    font-size: $font-xl;
+    font-weight: 700;
+    color: $gray-900;
+  }
+  &__desc {
+    margin: 0;
+    font-size: $font-sm;
+    color: $gray-600;
+    line-height: 1.5;
+  }
+  &__cta {
+    margin-top: $size-2;
+    background: $primary-500;
+    color: $white;
+    border: none;
+    border-radius: $radius-md;
+    padding: $size-3 $size-6;
+    font-size: $font-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover { background: $primary-600; }
+  }
+}
+
+.np-launch-modal--confirm {
+  max-width: 420px;
+  padding: $size-6;
+
+  .np-launch-modal__summary {
+    display: flex;
+    flex-direction: column;
+    gap: $size-3;
+    margin: $size-4 0 $size-5;
+    text-align: left;
+  }
+
+  .np-launch-modal__summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: $size-4;
+    font-size: $font-sm;
+    color: $gray-600;
+
+    strong {
+      color: $gray-900;
+      text-align: right;
+    }
+  }
+
+  .np-launch-modal__confirm-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+
+  .np-launch-modal__cancel {
+    background: none;
+    border: none;
+    color: $gray-500;
+    font-size: $font-sm;
+    cursor: pointer;
+    padding: $size-2;
+  }
+}
+
+// Toast borrador guardado
+.np-draft-toast {
+  position: fixed;
+  bottom: $size-6;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $gray-900;
+  color: $white;
+  border-radius: $radius-md;
+  padding: $size-3 $size-5;
+  font-size: $font-sm;
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  z-index: 1100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+
+  &__icon {
+    color: #22c55e;
+    font-weight: 700;
+  }
+}

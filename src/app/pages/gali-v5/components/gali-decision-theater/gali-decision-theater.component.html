@@ -1,0 +1,55 @@
+<div class="decision-theater" [attr.data-urgency]="decision().urgencia">
+  <div class="decision-theater__header">
+    <div class="decision-theater__agent">
+      <span class="decision-theater__agent-dot" [style.background]="decision().agenteColor"></span>
+      <span class="decision-theater__agent-name">{{ decision().agente }}</span>
+      <span class="decision-theater__urgency-badge">{{ urgencyLabel() }}</span>
+    </div>
+
+    @if (decision().pendingQueueCount > 0) {
+      <div class="decision-theater__queue">
+        <span class="queue-count">+{{ decision().pendingQueueCount }} en cola</span>
+        <button class="queue-link" (click)="onVerCola.emit()">Ver todas →</button>
+      </div>
+    }
+  </div>
+
+  <h3 class="decision-theater__titulo">{{ decision().titulo }}</h3>
+
+  <div class="decision-theater__context-grid">
+    <div class="context-block">
+      <p class="context-block__label">Contexto</p>
+      <p class="context-block__text">{{ decision().contexto }}</p>
+    </div>
+    <div class="context-block context-block--risk">
+      <p class="context-block__label">Si no actúas</p>
+      <p class="context-block__text">{{ decision().riesgoSiNoActua }}</p>
+    </div>
+    <div class="context-block context-block--impact">
+      <p class="context-block__label">Impacto estimado si actúas</p>
+      <p class="context-block__text context-block__text--highlight">{{ decision().impactoEstimado }}</p>
+    </div>
+  </div>
+
+  <div class="decision-theater__options">
+    @for (option of decision().options; track option.id) {
+      <button
+        class="decision-option"
+        [class.decision-option--primary]="option.isPrimary"
+        [disabled]="isLoading()"
+        (click)="selectOption(option.id)">
+        <span class="decision-option__label">{{ option.label }}</span>
+        @if (option.impactoEstimado) {
+          <span class="decision-option__impact">{{ option.impactoEstimado }}</span>
+        }
+      </button>
+    }
+
+    <button
+      class="decision-option decision-option--ghost"
+      [disabled]="isLoading()"
+      (click)="onDecidir.emit()">
+      Decidir después →
+    </button>
+  </div>
+</div>

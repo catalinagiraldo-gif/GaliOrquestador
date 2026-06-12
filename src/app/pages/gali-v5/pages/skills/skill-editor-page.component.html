@@ -41,6 +41,71 @@
     <!-- LEFT: Configurator -->
     <div class="se__left">
 
+      <!-- Tab switcher: Capacidad (nuevo) vs Pipeline avanzado (legacy) -->
+      <div class="se__tab-bar">
+        <button type="button" class="se__tab" [class.se__tab--active]="activeEditorTab() === 'capacidad'"
+          (click)="activeEditorTab.set('capacidad')">Capacidad</button>
+        <button type="button" class="se__tab" [class.se__tab--active]="activeEditorTab() === 'pipeline'"
+          (click)="activeEditorTab.set('pipeline')">
+          Pipeline avanzado
+          <span class="se__tab-legacy-badge">legacy</span>
+        </button>
+      </div>
+
+      @if (activeEditorTab() === 'capacidad') {
+        <!-- Tab Capacidad: descripción en lenguaje humano + agentes compatibles -->
+        <div class="se__section">
+          <label class="se__label">Nombre de la skill</label>
+          <input
+            type="text"
+            class="se__input"
+            placeholder="Ej: Auto-pausa si CTR cae en campaña principal"
+            [value]="draft().nombre"
+            (input)="onNombreInput($event)" />
+        </div>
+
+        <div class="se__section">
+          <label class="se__label">¿Qué hace esta skill?</label>
+          <textarea
+            class="se__textarea"
+            rows="3"
+            placeholder="Describe en lenguaje simple qué automatización realiza. Ej: Pausa el adset cuando el CTR cae bajo el umbral definido por 48h consecutivas."
+            [value]="capacidadDraft().descripcion"
+            (input)="onCapacidadDescripcionInput($event)"></textarea>
+        </div>
+
+        <div class="se__section">
+          <label class="se__label">Resultado esperado</label>
+          <input
+            type="text"
+            class="se__input"
+            placeholder="Ej: Evitar gasto ineficiente cuando el creativo se satura"
+            [value]="capacidadDraft().resultadoEsperado"
+            (input)="onCapacidadResultadoInput($event)" />
+        </div>
+
+        <div class="se__section">
+          <label class="se__label">Agentes que pueden usar esta skill</label>
+          <div class="se__agent-grid">
+            @for (ag of agentOptions; track ag.id) {
+              <button
+                type="button"
+                class="se__agent-btn"
+                [class.se__agent-btn--selected]="isCapacidadAgenteSelected(ag.id)"
+                [style.--agent-color]="ag.color"
+                (click)="toggleCapacidadAgente(ag.id)">
+                <span class="se__agent-dot" [style.background]="ag.color"></span>
+                <span class="se__agent-name">{{ ag.label }}</span>
+                <span class="se__agent-sub">{{ ag.sublabel }}</span>
+              </button>
+            }
+          </div>
+          <p class="se__hint-note">También configura el agente responsable en el tab Pipeline →</p>
+        </div>
+      }
+
+      @if (activeEditorTab() === 'pipeline') {
+
       <!-- Nombre -->
       <div class="se__section">
         <label class="se__label">Nombre de la skill</label>
@@ -71,8 +136,15 @@
         </div>
       </div>
 
-      <!-- TRIGGER -->
-      <div class="se__section se__block se__block--trigger">
+      <!-- Ontología C5: trigger/condición/acción pertenecen al agente -->
+      <div class="se__ontology-notice">
+        <strong>Las automatizaciones (trigger, condición, acción) se configuran en el agente</strong>
+        que usa esta skill — no aquí. Esta skill define <em>qué capacidad</em> tiene el agente.
+        <a routerLink="/gali-v5/agentes">Ir a Agentes →</a>
+      </div>
+
+      <!-- TRIGGER (legacy — oculto en UI, conservado para prototipo) -->
+      <div class="se__section se__block se__block--trigger" hidden>
         <span class="se__block-tag">TRIGGER</span>
         <p class="se__block-title">¿Cuándo se activa?</p>
 
@@ -127,8 +199,8 @@
         }
       </div>
 
-      <!-- CONDITIONS -->
-      <div class="se__section se__block se__block--condition">
+      <!-- CONDITIONS (legacy — oculto, C5) -->
+      <div class="se__section se__block se__block--condition" hidden>
         <div class="se__block-header">
           <div>
             <span class="se__block-tag">CONDICIÓN</span>
@@ -170,8 +242,8 @@
         }
       </div>
 
-      <!-- ACTION -->
-      <div class="se__section se__block se__block--action">
+      <!-- ACTION (legacy — oculto, C5) -->
+      <div class="se__section se__block se__block--action" hidden>
         <span class="se__block-tag">ACCIÓN</span>
         <p class="se__block-title">¿Qué hace Gali?</p>
         <select class="se__select se__select--full" [value]="draft().action" (change)="onActionChange($event)">
@@ -181,8 +253,8 @@
         </select>
       </div>
 
-      <!-- NOTIFICATION -->
-      <div class="se__section se__block se__block--notif">
+      <!-- NOTIFICATION (legacy — oculto, C5) -->
+      <div class="se__section se__block se__block--notif" hidden>
         <span class="se__block-tag">NOTIFICACIÓN</span>
         <p class="se__block-title">¿Qué aviso recibes?</p>
         <input type="text" class="se__input"
@@ -190,6 +262,8 @@
           [value]="draft().notification"
           (input)="onNotificationInput($event)" />
       </div>
+
+      } <!-- end @if pipeline -->
 
     </div>
 
@@ -201,8 +275,8 @@
           <span class="se__preview-agent" [style.color]="agentColor()">{{ agentLabel() }}</span>
         </div>
 
-        <!-- Pipeline visual -->
-        <div class="se__pipeline">
+        <!-- Pipeline visual (legacy — oculto, C5) -->
+        <div class="se__pipeline" hidden>
           <!-- Trigger -->
           <div class="se__pipe-step">
             <div class="se__pipe-label">TRIGGER</div>

@@ -27,7 +27,7 @@ const INTENT_MAP: Array<{ patterns: string[]; mode: WorkspaceMode; navigate?: st
   styleUrl: './gali-intent-bar.component.scss',
 })
 export class GaliIntentBarComponent {
-  private readonly ws = inject(GaliWorkspaceService);
+  readonly ws = inject(GaliWorkspaceService);
   private readonly galiState = inject(GaliStateService);
   private readonly router = inject(Router);
 
@@ -50,8 +50,28 @@ export class GaliIntentBarComponent {
 
   triggerShortcut(mode: WorkspaceMode): void {
     this.ws.setMode(mode);
-    if (!this.router.url.startsWith('/gali-v5') || this.router.url.includes('/gali-v5/')) {
-      this.router.navigate(['/gali-v5']);
+    this.navigateForMode(mode);
+  }
+
+  private navigateForMode(mode: WorkspaceMode): void {
+    switch (mode) {
+      case 'operar':
+        this.router.navigate(['/gali-v5/senales'], { queryParams: { filtro: 'alertas' } });
+        break;
+      case 'lanzar':
+        this.router.navigate(['/gali-v5/proyectos/nuevo']);
+        break;
+      case 'medir':
+        this.router.navigate(['/gali-v5/reportes/dashboard-financiero']);
+        break;
+      case 'construir':
+        this.router.navigate(['/gali-v5/skills']);
+        break;
+      case 'comunidad':
+        this.router.navigate(['/gali-v5/skills'], { queryParams: { tab: 'marketplace' } });
+        break;
+      default:
+        this.router.navigate(['/gali-v5']);
     }
   }
 
@@ -62,7 +82,7 @@ export class GaliIntentBarComponent {
     for (const entry of INTENT_MAP) {
       if (entry.patterns.some(p => q.includes(p))) {
         this.ws.setMode(entry.mode);
-        this.router.navigate(['/gali-v5']);
+        this.navigateForMode(entry.mode);
         this.query.set('');
         return;
       }

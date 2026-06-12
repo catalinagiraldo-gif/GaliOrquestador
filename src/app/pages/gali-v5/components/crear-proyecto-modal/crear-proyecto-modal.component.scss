@@ -305,3 +305,576 @@
   strong { font-size: 14px; font-weight: 700; color: $gray-800; display: block; }
   span   { font-size: 12px; color: $gray-500; }
 }
+
+// ── Calculadora Brújula ──────────────────────────────────────
+.crear-modal__cta-sm {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--primary-500);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+
+  &:hover { background: var(--primary-600); }
+}
+
+.brujula-calc {
+  background: var(--surface-50);
+  border: 1px solid var(--surface-200);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  &__icon { font-size: 18px; }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin: 2px 0 0;
+  }
+}
+
+.brujula-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.brujula-input-group {
+  &__label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-600);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--surface-300);
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+
+    &:focus-within {
+      border-color: var(--primary-400);
+      box-shadow: 0 0 0 2px rgba(244,154,61,0.12);
+    }
+  }
+
+  &__prefix {
+    padding: 0 8px;
+    font-size: 13px;
+    color: var(--gray-500);
+    background: var(--surface-50);
+    border-right: 1px solid var(--surface-200);
+    line-height: 34px;
+  }
+
+  &__suffix {
+    padding: 0 8px;
+    font-size: 12px;
+    color: var(--gray-500);
+    background: var(--surface-50);
+    border-left: 1px solid var(--surface-200);
+    line-height: 34px;
+  }
+
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 8px;
+    font-size: 14px;
+    color: var(--gray-900);
+    height: 34px;
+    background: transparent;
+
+    &::placeholder { color: var(--gray-300); }
+  }
+}
+
+.brujula-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  animation: gali-fade-up 200ms ease-out both;
+}
+
+.brujula-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: var(--surface-100);
+
+  &--highlight {
+    background: var(--orange-50);
+    border: 1px solid var(--orange-100);
+  }
+
+  &__label {
+    font-size: 11px;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-900);
+
+    &--primary { color: var(--primary-600); }
+  }
+}
+
+.brujula-gali-badge {
+  background: var(--primary-500);
+  color: white;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.brujula-slider {
+  margin-bottom: 12px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  &__label { font-size: 11px; color: var(--gray-500); }
+
+  &__val-display {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-900);
+  }
+
+  &__input {
+    width: 100%;
+    accent-color: var(--primary-500);
+    cursor: pointer;
+  }
+
+  &__markers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+}
+
+.brujula-margen {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 12px;
+
+  &__label { color: var(--gray-500); }
+  &__val { font-weight: 600; }
+
+  &.margen--ok     { background: var(--green-50); .brujula-margen__val { color: var(--green-700); } }
+  &.margen--warn   { background: var(--amber-50); .brujula-margen__val { color: var(--amber-700); } }
+  &.margen--danger { background: var(--red-50);   .brujula-margen__val { color: var(--red-700);   } }
+}
+
+// ── Presupuesto sugerido ──────────────────────────────────────
+.presupuesto-field {
+  margin-bottom: 16px;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.gali-budget-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--orange-50);
+  border: 1px solid var(--orange-100);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+
+  &__spark { color: var(--primary-500); font-size: 12px; }
+
+  &__text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-600);
+  }
+
+  &__reason {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  &__usar {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary-500);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+
+    &:hover { color: var(--primary-700); }
+  }
+}
+
+// ── Agentes selector ─────────────────────────────────────────
+.agente-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.agente-toggle-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--surface-200);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  background: white;
+
+  &:hover:not(&--selected) {
+    border-color: var(--surface-300);
+    background: var(--surface-50);
+  }
+
+  &--selected {
+    border-color: var(--primary-400);
+    background: var(--orange-50);
+    box-shadow: 0 2px 8px rgba(244,154,61,0.1);
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__info { flex: 1; min-width: 0; }
+
+  &__nombre {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__rol {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  &__desc {
+    font-size: 11px;
+    color: var(--gray-600);
+    margin: 6px 0 0;
+    line-height: 1.4;
+    animation: gali-fade-up 150ms ease-out;
+  }
+}
+
+.agente-badge-default {
+  background: var(--primary-500);
+  color: white;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agente-toggle {
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--surface-300);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 200ms ease;
+  margin-top: 2px;
+
+  &__pill {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 200ms ease;
+  }
+
+  &--on {
+    background: var(--primary-500);
+
+    .agente-toggle__pill { transform: translateX(14px); }
+  }
+}
+
+.agentes-note {
+  font-size: 11px;
+  color: var(--gray-400);
+  text-align: center;
+  margin: 0 0 12px;
+}
+
+// ── Overlay de lanzamiento (C6) ──────────────────────────────
+.lanzamiento-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gali-fade-in 200ms ease-out;
+}
+
+.lanzamiento-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  animation: gali-fade-up 250ms ease-out;
+
+  &__spark {
+    font-size: 28px;
+    color: var(--primary-500);
+    display: block;
+    margin-bottom: 12px;
+    animation: gali-pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  &__title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 8px;
+  }
+
+  &__nombre {
+    color: var(--primary-500);
+    display: block;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin: 0 0 20px;
+  }
+}
+
+.lanzamiento-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  &__bar {
+    flex: 1;
+    height: 4px;
+    background: var(--surface-200);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: var(--primary-500);
+    border-radius: 999px;
+    transition: width 100ms ease-out;
+  }
+
+  &__pct {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-600);
+    min-width: 35px;
+    text-align: right;
+  }
+}
+
+.lanzamiento-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.lanzamiento-step {
+  font-size: 12px;
+  color: var(--gray-400);
+  padding: 4px 0;
+  transition: color 300ms ease;
+
+  &--done {
+    color: var(--green-600);
+    font-weight: 500;
+  }
+}
+
+// ── C10: Confirm Launch Dialog ──────────────────────────────────────────────
+.confirm-launch-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  animation: fadeIn 0.15s ease;
+}
+
+.confirm-launch-dialog {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 380px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  &__icon {
+    font-size: 24px;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+}
+
+.confirm-launch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+
+  &__label {
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+
+  &__value {
+    color: #111827;
+    text-align: right;
+  }
+}
+
+.confirm-launch-cancel {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover { background: #f9fafb; }
+}
+
+.confirm-launch-cta {
+  background: #f49a3d;
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover { opacity: 0.9; }
+}

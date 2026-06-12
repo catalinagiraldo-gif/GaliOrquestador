@@ -27,8 +27,8 @@
     </div>
   </header>
 
-  <!-- Panel conceptual: qué es el CAS y cómo funciona Chatea Pro -->
-  <div class="cas-explainer" *ngIf="showExplainer" (click)="showExplainer = false" style="cursor:pointer">
+  <!-- Panel conceptual — solo primera visita (intro ya muestra el flujo) -->
+  <div class="cas-explainer" *ngIf="showExplainer" (click)="dismissCasExplainer()" style="cursor:pointer">
     <div class="cas-explainer__flow">
       <div class="cas-explainer__node cas-explainer__node--client">
         <span class="cas-explainer__node-icon">💬</span>
@@ -47,24 +47,17 @@
         <strong>Aparece aquí para que tú decidas</strong>
       </div>
     </div>
-    <button class="cas-explainer__close" type="button">Entendido ×</button>
+    <button class="cas-explainer__close" type="button" (click)="dismissCasExplainer(); $event.stopPropagation()">Entendido ×</button>
   </div>
 
   <dropi-gali-bar
     agent="Chatea Pro"
-    status="activo en bandeja CAS"
+    status="activo · 2 patrones PQR en umbral"
     [stats]="galiBarStats"
-    ctaLabel="Ver centro operativo"
+    ctaLabel="Centro operativo"
+    secondaryCta="Ver inteligencia PQR"
     (ctaClick)="goToChateaPro()"
-  />
-
-  <gali-chip
-    agentName="Chatea Pro"
-    message="2 patrones PQR superan umbral esta semana"
-    [count]="2"
-    status="warn"
-    ctaLabel="Ver inteligencia"
-    (ctaClick)="scrollToPqr()"
+    (secondaryClick)="scrollToPqr()"
   />
 
   <aside class="cas-bandeja__inbox">

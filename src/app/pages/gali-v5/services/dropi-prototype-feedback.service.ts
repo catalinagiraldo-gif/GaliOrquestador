@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 export interface PrototypeToast {
   message: string;
@@ -9,6 +11,12 @@ export interface PrototypeToast {
 export class DropiPrototypeFeedbackService {
   private seq = 0;
   readonly toast = signal<PrototypeToast | null>(null);
+
+  constructor() {
+    inject(Router).events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.toast.set(null));
+  }
 
   show(message: string): void {
     const id = ++this.seq;

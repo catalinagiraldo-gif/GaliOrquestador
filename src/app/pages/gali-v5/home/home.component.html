@@ -1,10 +1,9 @@
 @if (showOnboarding()) {
-  <gali-goal-onboarding (closed)="showOnboarding.set(false)" />
+  <gali-goal-onboarding (closed)="onOnboardingClosed()" />
 }
 
-<div class="mission">
+<div class="mission" [class.mission--expert-view]="!isSimpleView()">
 
-  <!-- ══ DASHBOARD TABS ══ -->
   @if (dashboardTabs().length > 1 || addingTab()) {
     <div class="mission__tabs">
       @for (tab of dashboardTabs(); track tab.id) {
@@ -15,9 +14,6 @@
           <span class="mission__tab-icon">{{ tab.icon }}</span>
           <span class="mission__tab-content">
             <span class="mission__tab-name">{{ tab.label }}</span>
-            @if (tab.id !== 'principal') {
-              <span class="mission__tab-subtitle">{{ tab.label | slice:0:20 }}</span>
-            }
           </span>
           @if (tab.id !== 'principal') {
             <span class="mission__tab-close" (click)="$event.stopPropagation(); removeTab(tab.id)" title="Eliminar pestaña">×</span>
@@ -39,9 +35,7 @@
       } @else {
         <button type="button" class="mission__tab mission__tab--add"
           (click)="addingTab.set(true); newTabName.set('')"
-          title="Nuevo dashboard de proyecto"
-          pTooltip="Nuevo dashboard de proyecto"
-          tooltipPosition="bottom">+</button>
+          title="Nuevo dashboard de proyecto">+</button>
       }
     </div>
   }
@@ -49,87 +43,401 @@
   @if (ws.hubEntryContext(); as ctx) {
     <section class="mission__entry-banner">
       <div class="mission__entry-banner-inner">
-        <span class="mission__entry-banner-icon" aria-hidden="true">✦</span>
         <p class="mission__entry-banner-text">{{ ctx.message }}</p>
         <a [routerLink]="ctx.ctaRoute" class="mission__entry-banner-cta" (click)="ws.clearHubEntryContext()">{{ ctx.ctaLabel }} →</a>
-        <button type="button" class="mission__entry-banner-dismiss" (click)="ws.clearHubEntryContext()" data-proto-skip aria-label="Cerrar">×</button>
+        <button type="button" class="mission__entry-banner-dismiss" (click)="ws.clearHubEntryContext()" aria-label="Cerrar">×</button>
       </div>
     </section>
   }
 
-  <!-- ══ STRIP OBJETIVO + PROPUESTA DE VALOR ══ -->
-  @if (ws.businessDNA().goalId && !isZeroState()) {
-    <div class="hub-goal-strip">
-      <span class="hub-goal-strip__glyph">✦</span>
-      <span class="hub-goal-strip__goal">Objetivo: {{ ws.businessDNA().goalLabel }}</span>
-      <span class="hub-goal-strip__sep">·</span>
-      <span class="hub-goal-strip__tagline">Gali aprende contigo para que puedas escalar como un experto.</span>
-    </div>
-  }
-
-  <!-- ══ GALI INSIGHT (adaptativo por businessDNA) ══ -->
-  <section class="mission__insight">
-    <div class="mission__insight-inner">
-      <span class="mission__insight-dot" aria-hidden="true"></span>
-      <div class="mission__insight-body">
-        <span class="mission__insight-label">GALI · {{ currentInsight().agente }}</span>
-        <p class="mission__insight-text">{{ currentInsight().text }}</p>
+  @if (isZeroState()) {
+    <section class="mission__zero-state">
+      <div class="zero-state__header">
+        <h2 class="zero-state__title">¿Por dónde empezamos?</h2>
+        <p class="zero-state__sub">Elige tu primer módulo. Gali activará el agente correcto y te guiará desde ahí.</p>
       </div>
-      <div class="mission__insight-actions">
-        @if (currentInsight().ctaRoute === null) {
-          <!-- Acción destructiva → requiere confirmación -->
-          <button type="button" class="mission__insight-cta mission__insight-cta--primary"
-            (click)="openScaleConfirm()">
-            {{ currentInsight().ctaLabel }}
+      <div class="zero-state__cards">
+        <a class="zero-card zero-card--ada" routerLink="/gali-v5/productos/caza-productos">
+          <div class="zero-card__agent-dot" style="background:#818cf8"></div>
+          <span class="zero-card__step">Paso 1 de 3</span>
+          <h3 class="zero-card__title">Busca tu primer producto ganador</h3>
+          <p class="zero-card__desc">ADA Spy analiza tendencias LATAM y te sugiere el producto con más margen y menos competencia hoy.</p>
+          <div class="zero-card__agent">ADA Spy · Research</div>
+          <span class="zero-card__cta">Ir a Catálogo →</span>
+        </a>
+        <a class="zero-card zero-card--roax" routerLink="/gali-v5/proyectos/nuevo">
+          <div class="zero-card__agent-dot" style="background:#f97316"></div>
+          <span class="zero-card__step">Paso 2 de 3</span>
+          <h3 class="zero-card__title">Lanza tu primera campaña</h3>
+          <p class="zero-card__desc">Roax te ayuda a elegir el ángulo, configurar el presupuesto y publicar la landing. Todo en un flujo guiado.</p>
+          <div class="zero-card__agent">Roax · Media Buyer</div>
+          <span class="zero-card__cta">Nuevo Proyecto →</span>
+        </a>
+        <a class="zero-card zero-card--vigilante" routerLink="/gali-v5/logistica/torre-logistica">
+          <div class="zero-card__agent-dot" style="background:#fbbf24"></div>
+          <span class="zero-card__step">Paso 3 de 3</span>
+          <h3 class="zero-card__title">Activa tu logística</h3>
+          <p class="zero-card__desc">Vigilante monitorea tus pedidos 24/7. Configura el smart routing y define qué novedades gestiona solo.</p>
+          <div class="zero-card__agent">Vigilante · Logística</div>
+          <span class="zero-card__cta">Ver Torre Logística →</span>
+        </a>
+      </div>
+      <button type="button" class="zero-state__skip" (click)="ws.setComplexityLevel('expert')">
+        Tengo experiencia — ver hub completo →
+      </button>
+    </section>
+  } @else {
+
+    <!-- Header compacto -->
+    @if (hubGoalLabel()) {
+      <div class="hub-header-compact">
+        <button type="button" class="hub-header-compact__goal" (click)="openEditGoal()" title="Editar objetivo">
+          <span class="hub-header-compact__goal-icon">🎯</span>
+          <span class="hub-header-compact__goal-text">{{ hubGoalLabel() }}</span>
+          @if (editGoalTarget() && editGoalUnit()) {
+            <span class="hub-header-compact__goal-meta">{{ editGoalTarget() }} {{ editGoalUnit() }}</span>
+          }
+          @if (editGoalDeadline()) {
+            <span class="hub-header-compact__goal-plazo">· Plazo {{ editGoalDeadline() }}</span>
+          }
+          <i class="pi pi-pencil hub-header-compact__goal-edit"></i>
+        </button>
+        @if (decisionQueueCount() > 0) {
+          <span class="hub-header-compact__queue" (click)="scrollToMomento2()" role="button" tabindex="0">
+            +{{ decisionQueueCount() }} en cola
+          </span>
+        }
+        <div class="hub-header-compact__right">
+          <button type="button" class="hub-header-compact__cta" (click)="router.navigateByUrl('/gali-v5/proyectos/nuevo')">
+            + Nuevo proyecto
           </button>
-          <button type="button" class="mission__insight-cta mission__insight-cta--secondary"
-            [routerLink]="'/gali-v5/marketing/roax-informes'">
-            Ver detalle →
-          </button>
-        } @else {
-          <!-- Acción de navegación → directa -->
-          <a class="mission__insight-cta mission__insight-cta--primary"
-            [routerLink]="currentInsight().ctaRoute">
-            {{ currentInsight().ctaLabel }}
-          </a>
+        </div>
+      </div>
+    }
+
+    <!-- MOMENTO 1 — Brief narrativo -->
+    <section class="hub-momento momento-1 gali-stagger-in">
+      <gali-hub-brief
+        [data]="hubBriefData()"
+        (onVerDecisiones)="scrollToMomento2()"
+        (onVerResuelto)="openCompletedPanel()">
+      </gali-hub-brief>
+    </section>
+
+    <!-- MOMENTO 2 — Decisión o modo calma -->
+    <section class="hub-momento momento-2 gali-stagger-in" id="hub-momento-2">
+      @if (currentDecision(); as dec) {
+        <gali-decision-theater
+          [decision]="dec"
+          [isLoading]="isProcessingDecision()"
+          (onOptionSelected)="handleDecisionOption($event)"
+          (onDecidir)="postponeDecision()"
+          (onVerCola)="scrollToDecisionQueue()">
+        </gali-decision-theater>
+      } @else {
+        <div class="modo-calma">
+          <p class="modo-calma__titulo">Todo está corriendo.</p>
+          <p class="modo-calma__subtexto">{{ ultimaAccionGali() }}</p>
+          @if (isSimpleView()) {
+            <button type="button" class="modo-calma__link" (click)="ws.setComplexityLevel('expert', { notify: true })">
+              Ver ciclo del negocio completo →
+            </button>
+          } @else {
+            <button type="button" class="modo-calma__link" (click)="scrollToMomento3()">Ver ciclo del negocio →</button>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- FAB acciones rápidas — único -->
+    <div class="hub-quick-actions">
+      @if (showFabMenu()) {
+        <div class="hub-fab-backdrop" (click)="showFabMenu.set(false)"></div>
+      }
+      <div class="hub-fab-wrap">
+        <button type="button"
+          class="hub-fab-plus"
+          [class.hub-fab-plus--open]="showFabMenu()"
+          (click)="showFabMenu.set(!showFabMenu())"
+          aria-label="Acciones rápidas">
+          {{ showFabMenu() ? '✕' : '+' }}
+        </button>
+        @if (showFabMenu()) {
+          <div class="hub-fab-menu" role="menu">
+            <button type="button" class="hub-fab-menu__item" role="menuitem"
+              (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/proyectos/nuevo')">
+              <i class="pi pi-briefcase"></i><span>Nuevo proyecto</span>
+            </button>
+            <button type="button" class="hub-fab-menu__item" role="menuitem"
+              (click)="showFabMenu.set(false); showNewSkill.set(true)">
+              <i class="pi pi-bolt"></i><span>Nueva skill</span>
+            </button>
+            <button type="button" class="hub-fab-menu__item" role="menuitem"
+              (click)="showFabMenu.set(false); navigateToSenales()">
+              <i class="pi pi-bell"></i><span>Ver señales</span>
+            </button>
+          </div>
         }
       </div>
     </div>
-  </section>
 
-  <!-- ══ CONFIRM: APROBAR ESCALA ══ -->
+    <!-- MOMENTO 3 — Estado del negocio (solo experto, colapsable) -->
+    @if (!isSimpleView()) {
+      <section class="hub-momento momento-3" [class.is-collapsed]="momento3Collapsed()">
+        <button type="button" class="momento-3__toggle" (click)="toggleMomento3()">
+          <span class="momento-3__toggle-label">
+            Ciclo del negocio
+            <span class="momento-3__complexity-badge">Vista experto</span>
+          </span>
+          @if (momento3Collapsed()) {
+            <span class="momento-3__toggle-preview">{{ momento3Preview() }}</span>
+          }
+          <i class="pi" [class.pi-chevron-down]="momento3Collapsed()" [class.pi-chevron-up]="!momento3Collapsed()"></i>
+        </button>
+
+        @if (!momento3Collapsed()) {
+          <div class="momento-3__body">
+
+            <!-- Meta + plan -->
+            <div class="hub-metas-block hub-metas-block--compact"
+              [class.hub-metas-block--camino]="metaEstado() === 'en_camino'"
+              [class.hub-metas-block--riesgo]="metaEstado() === 'en_riesgo'"
+              (click)="openEditGoal()" role="button" tabindex="0">
+              <span class="hub-metas-block__label">{{ metaLabel() }}</span>
+              <span class="hub-metas-block__kpi">
+                {{ metaKpiCurrent() }}/{{ metaKpiTarget() }} pedidos
+              </span>
+              <span class="hub-metas-block__pct">{{ ((metaKpiCurrent() / metaKpiTarget()) * 100) | number:'1.0-0' }}%</span>
+            </div>
+
+            @if (showWeeklyPlan()) {
+              <div class="weekly-plan-widget weekly-plan-widget--compact" [class.weekly-plan-widget--collapsed]="weeklyPlanCollapsed()">
+                <div class="weekly-plan-widget__header">
+                  <span class="weekly-plan-widget__title">Tu plan esta semana</span>
+                  <span class="weekly-plan-widget__progress">{{ weeklyPlanDone().size }}/{{ weeklyPlanSteps().length }}</span>
+                  <button type="button" class="weekly-plan-widget__collapse-btn"
+                    (click)="weeklyPlanCollapsed.set(!weeklyPlanCollapsed())">
+                    {{ weeklyPlanCollapsed() ? '▸' : '▾' }}
+                  </button>
+                </div>
+                @if (!weeklyPlanCollapsed()) {
+                  <div class="weekly-plan-widget__steps">
+                    @for (step of weeklyPlanSteps(); track $index) {
+                      <button type="button" class="weekly-plan-step"
+                        [class.weekly-plan-step--done]="weeklyPlanDone().has($index)"
+                        (click)="toggleWeeklyPlanStep($index)">
+                        <span class="weekly-plan-step__check">{{ weeklyPlanDone().has($index) ? '✓' : '○' }}</span>
+                        <span class="weekly-plan-step__text">{{ step }}</span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Tu día a día -->
+            @if (focusModules().length > 0) {
+              <div class="hub-dia-strip">
+                <div class="hub-dia-strip__header">
+                  <span class="hub-dia-strip__label">Tu día a día</span>
+                  <button type="button" class="hub-dia-strip__edit" (click)="resetOnboarding()" title="Personalizar">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                </div>
+                <div class="hub-dia-strip__cards">
+                  @for (mod of focusModules(); track mod.key; let i = $index) {
+                    <a [routerLink]="mod.route" class="hub-dia-card"
+                      [style.--mod-color]="mod.color"
+                      [style.animation-delay]="(i * 55) + 'ms'">
+                      <div class="hub-dia-card__color-bar"></div>
+                      <div class="hub-dia-card__body">
+                        <span class="hub-dia-card__module">{{ mod.label }}</span>
+                        <span class="hub-dia-card__kpi">{{ mod.kpi }}</span>
+                      </div>
+                    </a>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Ciclo de negocio (anatomía antes de impacto — heurística Cata) -->
+            @if (ws.complexityLevel() === 'expert') {
+              <section class="mission__anatomy hub-zone hub-zone--2">
+                <div class="hub-cycle-header">
+                  <div class="hub-cycle-header__left">
+                    <h2 class="hub-cycle-header__title">Ciclo de negocio</h2>
+                  </div>
+                  <div class="hub-cycle-header__actions">
+                    <button type="button" class="mission__agency-btn" (click)="showAgencyPanel.set(true)">
+                      <i class="pi pi-sliders-h"></i> Umbrales
+                    </button>
+                    <button type="button" class="mission__section-see-all" (click)="navigateToSenales()">Señales →</button>
+                    <button type="button" class="mission__customize-btn" (click)="showCustomizer.set(!showCustomizer())">
+                      <i class="pi pi-sliders-h"></i> Personalizar
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mission__anatomy-header">
+                  <div class="mission__anatomy-title-group">
+                    <h3 class="mission__anatomy-title">Collar GPS v2</h3>
+                    <span class="mission__anatomy-badge mission__anatomy-badge--escala">↑ en escala</span>
+                  </div>
+                  <div class="mission__anatomy-nav">
+                    @for (p of proyectos; track p.id) {
+                      <button type="button" class="mission__anatomy-tab"
+                        [class.mission__anatomy-tab--active]="p.id === 'collar-gps-2026'"
+                        (click)="goToProject(p.id)">
+                        {{ p.nombre | slice:0:16 }}{{ p.nombre.length > 16 ? '…' : '' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                @if (pendingApprovalSignals.length === 0) {
+                  <div class="growth-projection-banner growth-projection-banner--subtle">
+                    <span class="growth-projection-banner__text">
+                      Con las recomendaciones actuales → <strong>+{{ growthDeltaPedidos }} pedidos/sem</strong> en 30 días
+                    </span>
+                  </div>
+                }
+
+                <div class="mission__anatomy-body mission__anatomy-body--graph">
+                  <!-- Grafo interactivo radial (DIAG-1) -->
+                  <div class="hub-graph-wrap" [class.hub-graph-wrap--detail-open]="activeNode()">
+                    <svg class="hub-graph-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"
+                      preserveAspectRatio="xMidYMid meet">
+
+                      <!-- Defs: gradients + filters -->
+                      <defs>
+                        <filter id="glow-orange" x="-50%" y="-50%" width="200%" height="200%">
+                          <feGaussianBlur stdDeviation="3" result="blur" />
+                          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                        <filter id="glow-red" x="-50%" y="-50%" width="200%" height="200%">
+                          <feGaussianBlur stdDeviation="2" result="blur" />
+                          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                      </defs>
+
+                      <!-- Outer hexagon background -->
+                      <polygon class="hub-graph__hex-bg"
+                        points="250,95 384,172 384,328 250,405 116,328 116,172" />
+
+                      <!-- Cycle edges -->
+                      @for (edge of graphEdges; track $index) {
+                        <line class="hub-graph__edge hub-graph__edge--{{ edge.status }}"
+                          [attr.x1]="edge.from.x" [attr.y1]="edge.from.y"
+                          [attr.x2]="edge.to.x" [attr.y2]="edge.to.y" />
+                      }
+
+                      <!-- Spokes from center to each node -->
+                      @for (node of graphNodes; track node.id) {
+                        <line class="hub-graph__spoke hub-graph__spoke--{{ node.status }}"
+                          x1="250" y1="250"
+                          [attr.x2]="node.x" [attr.y2]="node.y" />
+                      }
+
+                      <!-- Center GALI node -->
+                      <g class="hub-graph__center">
+                        <circle cx="250" cy="250" r="38" class="hub-graph__center-circle" />
+                        <text x="250" y="244" class="hub-graph__center-glyph">✦</text>
+                        <text x="250" y="262" class="hub-graph__center-label">GALI</text>
+                      </g>
+
+                      <!-- Outer nodes -->
+                      @for (node of graphNodes; track node.id) {
+                        <g class="hub-graph__node hub-graph__node--{{ node.status }}"
+                          [class.hub-graph__node--selected]="activeNode() === node.id"
+                          (click)="toggleNode(node.id)"
+                          role="button" [attr.tabindex]="0"
+                          [attr.aria-label]="node.label">
+                          <circle [attr.cx]="node.x" [attr.cy]="node.y" r="44"
+                            class="hub-graph__node-circle" />
+                          <text [attr.x]="node.x" [attr.y]="node.y - 8"
+                            class="hub-graph__node-label">{{ node.label }}</text>
+                          <text [attr.x]="node.x" [attr.y]="node.y + 11"
+                            class="hub-graph__node-metric">{{ node.metric }}</text>
+                          @if (node.alertCount > 0) {
+                            <circle [attr.cx]="node.x + 34" [attr.cy]="node.y - 34" r="11"
+                              class="hub-graph__alert-bg" />
+                            <text [attr.x]="node.x + 34" [attr.y]="node.y - 30"
+                              class="hub-graph__alert-text">{{ node.alertCount }}</text>
+                          }
+                        </g>
+                      }
+
+                    </svg>
+                  </div>
+
+                  @if (activeNodeDetail(); as detail) {
+                    <div class="mission__node-detail">
+                      <div class="node-detail__header" [style.border-left-color]="detail.color">
+                        <span class="node-detail__agent-name">{{ detail.agentName }}</span>
+                        <button type="button" class="node-detail__close" (click)="toggleNode(activeNode()!)" aria-label="Cerrar">
+                          <i class="pi pi-times"></i>
+                        </button>
+                      </div>
+                      <p class="node-detail__desc">{{ detail.description }}</p>
+                      <div class="node-detail__actions">
+                        <a [routerLink]="detail.ctaRoute" class="node-detail__cta">{{ detail.ctaLabel }} →</a>
+                        <button type="button" class="node-detail__chat-btn" (click)="openChatWithNode(activeNode()!)">
+                          Hablar con {{ detail.agentName }}
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="hub-diag-widget" (click)="showDiagnostico.set(true)" role="button" tabindex="0">
+                  <div class="hub-diag-widget__left">
+                    <strong class="hub-diag-widget__title">Diagnóstico cruzado</strong>
+                    <span class="hub-diag-widget__sub">3 hipótesis activas</span>
+                  </div>
+                  <span class="hub-diag-widget__btn">Ver análisis →</span>
+                </div>
+              </section>
+            }
+
+            <!-- Impacto Gali — fuente única desde wallet-transactions.json -->
+            <app-gali-impact-widget mode="hub" class="gali-stagger-in" />
+
+            <!-- Academy -->
+            <div class="hub-zone hub-zone--3" [class.hub-zone--3-collapsed]="zone3Collapsed()">
+              <button type="button" class="hub-zone3-handle" (click)="zone3Collapsed.set(!zone3Collapsed())">
+                <span class="hub-zone3-handle__chevron">{{ zone3Collapsed() ? '▸' : '▾' }}</span>
+                <span class="hub-zone3-handle__label">Academy · Personalizado para ti</span>
+              </button>
+              @if (!zone3Collapsed()) {
+                <section class="mission__akademy-strip">
+                  <div class="mission__akademy-inner">
+                    <div class="mission__akademy-body">
+                      <strong>Gali recomienda para ti en Academy</strong>
+                      <span><em>Optimización de P&amp;L real en Meta Ads</em> — 38 min</span>
+                    </div>
+                    <a routerLink="/gali-v5/academy" class="mission__akademy-cta">Ir a Academy →</a>
+                  </div>
+                </section>
+              }
+            </div>
+
+          </div>
+        }
+      </section>
+    }
+  }
+
+  <!-- Modal: confirmar escala -->
   @if (showScaleConfirm()) {
     <div class="mission__confirm-backdrop" (click)="showScaleConfirm.set(false)">
       <div class="mission__confirm-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
         <div class="confirm-dialog__header">
-          <span class="confirm-dialog__agent-dot" style="background:#f97316"></span>
           <h3 class="confirm-dialog__title">Confirmar escala de presupuesto</h3>
           <button type="button" class="confirm-dialog__close" (click)="showScaleConfirm.set(false)" aria-label="Cerrar">×</button>
         </div>
         <p class="confirm-dialog__desc">
           <strong>ROAS real 1.93x</strong> en Collar GPS — por encima del umbral de escala (1.8x).
-          <span class="confirm-dialog__desc-sub">Meta declara 2.9x · diferencia absorbida por novedades en Cali</span>
         </p>
-        <div class="confirm-consequence-grid">
-          <div class="consequence-row">
-            <span class="consequence-label">Presupuesto diario</span>
-            <span class="consequence-before">$66k</span>
-            <span class="consequence-arrow">→</span>
-            <span class="consequence-after">$86k</span>
-          </div>
-          <div class="consequence-row">
-            <span class="consequence-label">Gasto mensual est.</span>
-            <span class="consequence-after">~$2.58M/mes</span>
-          </div>
-          <div class="consequence-row">
-            <span class="consequence-label">Pedidos esperados/sem</span>
-            <span class="consequence-after">~61 (vs 47 actuales)</span>
-          </div>
-          <div class="consequence-row consequence-row--safe">
-            <span class="consequence-label">🛡 Protección activa</span>
-            <span>Skill "Escalado ROAS" pausa automáticamente si ROAS cae bajo 2.5x</span>
-          </div>
-        </div>
         <div class="confirm-dialog__actions">
           <button type="button" class="confirm-cancel" (click)="showScaleConfirm.set(false)">Cancelar</button>
           <button type="button" class="confirm-approve" (click)="confirmScale()">Confirmar escala →</button>
@@ -138,554 +446,24 @@
     </div>
   }
 
-  <!-- ══ ZERO STATE: panel Intensamente (3 emociones / 3 agentes) ══ -->
-  @if (isZeroState()) {
-    <section class="mission__zero-state">
-      <div class="zero-state__header">
-        <h2 class="zero-state__title">¿Por dónde empezamos?</h2>
-        <p class="zero-state__sub">Elige tu primer módulo. Gali activará el agente correcto y te guiará desde ahí.</p>
-      </div>
-      <div class="zero-state__cards">
-
-        <!-- Tarjeta 1: ADA Spy -->
-        <a class="zero-card zero-card--ada" routerLink="/gali-v5/productos/caza-productos">
-          <div class="zero-card__agent-dot" style="background:#818cf8"></div>
-          <span class="zero-card__step">Paso 1 de 3</span>
-          <div class="zero-card__emoji">🔍</div>
-          <h3 class="zero-card__title">Busca tu primer producto ganador</h3>
-          <p class="zero-card__desc">ADA Spy analiza tendencias LATAM y te sugiere el producto con más margen y menos competencia hoy.</p>
-          <div class="zero-card__agent">ADA Spy · Research</div>
-          <span class="zero-card__cta">Ir a Catálogo →</span>
-        </a>
-
-        <!-- Tarjeta 2: Roax -->
-        <a class="zero-card zero-card--roax" routerLink="/gali-v5/proyectos/nuevo">
-          <div class="zero-card__agent-dot" style="background:#f97316"></div>
-          <span class="zero-card__step">Paso 2 de 3</span>
-          <div class="zero-card__emoji">🚀</div>
-          <h3 class="zero-card__title">Lanza tu primera campaña</h3>
-          <p class="zero-card__desc">Roax te ayuda a elegir el ángulo, configurar el presupuesto y publicar la landing. Todo en un flujo guiado.</p>
-          <div class="zero-card__agent">Roax · Media Buyer</div>
-          <span class="zero-card__cta">Nuevo Proyecto →</span>
-        </a>
-
-        <!-- Tarjeta 3: Vigilante -->
-        <a class="zero-card zero-card--vigilante" routerLink="/gali-v5/logistica/torre-logistica">
-          <div class="zero-card__agent-dot" style="background:#fbbf24"></div>
-          <span class="zero-card__step">Paso 3 de 3</span>
-          <div class="zero-card__emoji">🛡</div>
-          <h3 class="zero-card__title">Activa tu logística</h3>
-          <p class="zero-card__desc">Vigilante monitorea tus pedidos 24/7. Configura el smart routing y define qué novedades gestiona solo.</p>
-          <div class="zero-card__agent">Vigilante · Logística</div>
-          <span class="zero-card__cta">Ver Torre Logística →</span>
-        </a>
-
-      </div>
-      <button type="button" class="zero-state__skip" (click)="ws.setComplexityLevel('expert')">
-        Tengo experiencia — ver hub completo →
-      </button>
-    </section>
-  }
-
-  <!-- ══ LAYOUT NOVATO: Panel de nave (Intensamente) ══ -->
-  @if (!isZeroState() && ws.complexityLevel() === 'novice') {
-    <section class="mission__novice">
-      <div class="novice__greeting">
-        <span class="novice__greeting-icon">✦</span>
-        <div>
-          <h2 class="novice__greeting-title">Hola, {{ userName() }}. ¿Qué hacemos hoy?</h2>
-          <span class="novice__greeting-sub">Tus 4 agentes están listos</span>
-        </div>
-      </div>
-      <div class="novice__agent-grid">
-        @for (ag of agentes; track ag.id) {
-          <div class="novice__agent-tile" [style.--agent-color]="ag.color">
-            <div class="novice__agent-tile-header">
-              <span class="novice__agent-dot" [style.background]="ag.color"></span>
-              <span class="novice__agent-name">{{ ag.nombre }}</span>
-              <span class="novice__agent-status"
-                [class.novice__agent-status--active]="ag.estado === 'activo'"
-                [class.novice__agent-status--waiting]="ag.estado === 'esperando'">
-                {{ ag.estado === 'activo' ? 'Activo' : ag.estado === 'esperando' ? 'En espera' : 'Pausa' }}
-              </span>
-            </div>
-            <p class="novice__agent-desc">{{ ag.descripcion }}</p>
-            <span class="novice__agent-last">{{ ag.ultimaAccion }}</span>
-          </div>
-        }
-      </div>
-      <div class="novice__chat-wrap">
-        <div class="mission__chat-input">
-          <input
-            type="text"
-            class="mission__chat-field novice__chat-field"
-            placeholder="¿Qué necesitas hoy? Escríbele a Gali…"
-            [ngModel]="lanzarInput()"
-            (ngModelChange)="lanzarInput.set($event)"
-            (keydown.enter)="sendLanzar()" />
-          <button type="button" class="mission__chat-send" [disabled]="!lanzarInput().trim() || lanzarTyping()" (click)="sendLanzar()">
-            <i class="pi pi-send"></i>
-          </button>
-        </div>
-      </div>
-      <button type="button" class="novice__expert-link" (click)="ws.setComplexityLevel('expert')">
-        Ver hub completo (modo experto) →
-      </button>
-    </section>
-  }
-
-  <!-- ══ ZONA 1 — Decisiones + Señales (CA-1) ══ -->
-  <div class="hub-zone hub-zone--1">
-    <div class="hub-zone__header">
-      <div class="hub-zone__title-row">
-        <h2 class="hub-zone__title">Decisiones pendientes</h2>
-        @if (pendingApprovalSignals.length > 0) {
-          <span class="hub-zone__badge hub-zone__badge--crit">{{ pendingApprovalSignals.length }}</span>
-        }
-      </div>
-      <!-- Toggle Vista simple / Experto (CA-3) -->
-      <div class="ui-toggle">
-        <button type="button"
-          class="ui-toggle__opt"
-          [class.ui-toggle__opt--active]="isSimpleView()"
-          (click)="ws.setComplexityLevel('novice')"
-          title="Muestra solo lo esencial">
-          Básico
-        </button>
-        <button type="button"
-          class="ui-toggle__opt"
-          [class.ui-toggle__opt--active]="!isSimpleView()"
-          (click)="ws.setComplexityLevel('expert')"
-          title="Vista completa con todas las métricas">
-          Experto
-        </button>
-      </div>
-      <div class="hub-zone__header-actions">
-        <button type="button" class="mission__agency-btn"
-          (click)="showAgencyPanel.set(true)"
-          title="Configura cuánta autonomía tiene cada agente">
-          <i class="pi pi-sliders-h"></i> Umbrales
-        </button>
-        <button type="button" class="mission__section-see-all"
-          (click)="navigateToSenales()">
-          Ver todas →
-        </button>
-        <!-- FAB "+" con mini-menú (C17) -->
-        @if (showFabMenu()) {
-          <div class="hub-fab-backdrop" (click)="showFabMenu.set(false)"></div>
-        }
-        <div class="hub-fab-wrap">
-          <button
-            type="button"
-            class="hub-fab-plus"
-            [class.hub-fab-plus--open]="showFabMenu()"
-            (click)="showFabMenu.set(!showFabMenu())"
-            aria-label="Acciones rápidas"
-            title="Acciones rápidas">
-            {{ showFabMenu() ? '✕' : '+' }}
-          </button>
-          @if (showFabMenu()) {
-            <div class="hub-fab-menu" role="menu">
-              <button type="button" class="hub-fab-menu__item" role="menuitem"
-                (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/proyectos/nuevo')">
-                <i class="pi pi-briefcase"></i>
-                <span>Nuevo proyecto</span>
-              </button>
-              <button type="button" class="hub-fab-menu__item" role="menuitem"
-                (click)="showFabMenu.set(false); showNewSkill.set(true)">
-                <i class="pi pi-bolt"></i>
-                <span>Nueva skill</span>
-              </button>
-              <button type="button" class="hub-fab-menu__item" role="menuitem"
-                (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/reglas')"
-                data-proto-skip>
-                <i class="pi pi-list-check"></i>
-                <span>Nueva regla</span>
-              </button>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Bloque 1: Gali ya lo hizo por ti (Spec 7 — CA-9) -->
-    @if (completedSignals.length > 0) {
-      <div class="mission__signals-block mission__signals-block--done">
-        <div class="mission__signals-block-header">
-          <span class="mission__signals-block-dot mission__signals-block-dot--done"></span>
-          <span class="mission__signals-block-title">Gali ya lo hizo por ti</span>
-          <span class="mission__signals-block-count">{{ completedSignals.length }}</span>
-        </div>
-        <div class="mission__signals-list mission__signals-list--done">
-          @for (sig of completedSignals; track sig.id) {
-            <gali-signal-card-v2 [signal_data]="sig" />
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Bloque 2: Necesitas decidir (Spec 7 — CA-9) -->
-    <div class="mission__signals-block mission__signals-block--pending">
-      <div class="mission__signals-block-header">
-        <span class="mission__signals-block-dot mission__signals-block-dot--pending"></span>
-        <span class="mission__signals-block-title">Necesitas decidir</span>
-        @if (pendingApprovalSignals.length > 0) {
-          <span class="mission__badge mission__badge--crit">{{ pendingApprovalSignals.length }}</span>
-        }
-      </div>
-      <div class="mission__signals-list">
-        @for (sig of pendingApprovalSignals | slice:0:3; track sig.id) {
-          <gali-signal-card-v2
-            [signal_data]="sig"
-            (onBulkAction)="showBulkModal.set(true)"
-            (onScaleConfirm)="openScaleConfirm()" />
-        }
-        @if (pendingApprovalSignals.length === 0) {
-          <div class="mission__signals-empty">
-            <span>✦</span>
-            <span>Sin decisiones pendientes — Gali gestionó todo automáticamente.</span>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Bloque "Gali esta semana" — solo en vista experto (CA-4, CA-14) -->
-    @if (!isSimpleView()) {
-    <div class="hub-gali-week insight-banner" [class.is-collapsed]="insightBannerCollapsed">
-      <div class="hub-gali-week__header insight-header" (click)="toggleInsightBanner()">
-        <span class="hub-gali-week__glyph">✦</span>
-        <strong class="hub-gali-week__title">Gali esta semana</strong>
-        <i class="pi insight-banner__chevron"
-           [class.pi-chevron-down]="insightBannerCollapsed"
-           [class.pi-chevron-up]="!insightBannerCollapsed"></i>
-        <button type="button" class="hub-gali-week__history" data-proto-skip title="próximamente"
-          (click)="$event.stopPropagation()">Ver historial →</button>
-      </div>
-      <div class="hub-gali-week__rows insight-body">
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">⚡</span>
-          <span><strong>23</strong> acciones ejecutadas automáticamente</span>
-        </div>
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">💰</span>
-          <span><strong>$85k</strong> ahorrados en novedades evitadas</span>
-        </div>
-        <div class="hub-gali-week__row">
-          <span class="hub-gali-week__icon">🔭</span>
-          <span><strong>2</strong> oportunidades de escala detectadas</span>
-        </div>
-      </div>
-    </div>
-    } <!-- /isSimpleView -->
-  </div>
-
-  <!-- ══ ZONA 2 — Ciclo de Negocio (CA-1, CA-5) — solo vista experto (CA-4) ══ -->
-  @if (!isZeroState() && ws.complexityLevel() === 'expert' && !isSimpleView()) {
-  <section class="mission__anatomy hub-zone hub-zone--2">
-    <!-- Título de sección visible (CA-5) -->
-    <div class="hub-cycle-header">
-      <div class="hub-cycle-header__left">
-        <h2 class="hub-cycle-header__title">Ciclo de negocio</h2>
-        <span class="hub-cycle-header__subtitle">Flujo de tu operación esta semana</span>
-      </div>
-      <button type="button" class="mission__customize-btn" (click)="showCustomizer.set(!showCustomizer())" data-proto-skip>
-        <i class="pi pi-sliders-h"></i> Personalizar
-      </button>
-    </div>
-
-    <div class="mission__anatomy-header">
-      <div class="mission__anatomy-title-group">
-        <h3 class="mission__anatomy-title">Collar GPS v2</h3>
-        <span class="mission__anatomy-badge mission__anatomy-badge--escala">↑ en escala</span>
-        <span class="mission__anatomy-meta">Sem 22 · Meta: 100 ventas/semana</span>
-      </div>
-      <div class="mission__anatomy-nav">
-        @for (p of proyectos; track p.id) {
-          <button
-            type="button"
-            class="mission__anatomy-tab"
-            [class.mission__anatomy-tab--active]="p.id === 'collar-gps-2026'"
-            (click)="goToProject(p.id)">
-            {{ p.nombre | slice:0:16 }}{{ p.nombre.length > 16 ? '…' : '' }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <!-- Widget de proyección de crecimiento (C19) -->
-    <div class="growth-projection-banner">
-      <span class="growth-projection-banner__glyph">🔭</span>
-      <span class="growth-projection-banner__text">
-        Con las recomendaciones actuales →
-        <strong>+{{ growthDeltaPedidos }} pedidos/sem</strong> en 30 días
-      </span>
-      <span class="growth-projection-banner__sub">Si apruebas la escala de pauta ($66k → $86k/día)</span>
-    </div>
-
-    <!-- Red de nodos + panel de detalle -->
-    <div class="mission__anatomy-body">
-      <div class="mission__net" [class.mission__net--detail-open]="activeNode()">
-
-        <!-- Fila superior: Producto → Marketing → Pedidos -->
-        <div class="anatomy-node"
-             [class.anatomy-node--selected]="activeNode() === 'producto'"
-             (click)="toggleNode('producto')"
-             role="button" tabindex="0" aria-label="Ver detalle de Producto">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">📦</span>
-            <span class="anatomy-node__label">PRODUCTO</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot anatomy-node__dot--pulse" style="background:#818cf8"></span>
-            <span class="anatomy-node__agent-name">ADA Spy</span>
-          </div>
-          <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">47/sem</span>
-            <span class="anatomy-node__sub">Estado: en escala</span>
-          </div>
-        </div>
-
-        <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'producto' || activeNode() === 'marketing'">→</div>
-
-        <div class="anatomy-node anatomy-node--highlight"
-             [class.anatomy-node--selected]="activeNode() === 'marketing'"
-             (click)="toggleNode('marketing')"
-             role="button" tabindex="0" aria-label="Ver detalle de Marketing">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">📣</span>
-            <span class="anatomy-node__label">MARKETING</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot anatomy-node__dot--pulse" style="background:#f97316"></span>
-            <span class="anatomy-node__agent-name">Roax</span>
-          </div>
-          <div class="anatomy-node__metrics">
-            <div class="anatomy-node__roas-wrap">
-              <span class="anatomy-node__main">1.93x</span>
-              <span class="anatomy-node__roas-label">ROAS real</span>
-              <span class="anatomy-node__roas-sub">Meta: 2.9x</span>
-            </div>
-            <span class="anatomy-node__sub">$66k/día · escalando</span>
-          </div>
-        </div>
-
-        <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'marketing' || activeNode() === 'pedidos'">→</div>
-
-        <div class="anatomy-node"
-             [class.anatomy-node--alert]="true"
-             [class.anatomy-node--selected]="activeNode() === 'pedidos'"
-             (click)="toggleNode('pedidos')"
-             role="button" tabindex="0" aria-label="Ver detalle de Pedidos">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">🛒</span>
-            <span class="anatomy-node__label">PEDIDOS</span>
-            <span class="anatomy-node__badge-alert">3</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot anatomy-node__dot--fast" style="background:#fbbf24"></span>
-            <span class="anatomy-node__agent-name">Vigilante</span>
-          </div>
-          <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">47 activas</span>
-            <span class="anatomy-node__sub">43 confirmadas · 3 pendientes</span>
-          </div>
-        </div>
-
-        <!-- Continuación horizontal -->
-        <div class="anatomy-arrow">→</div>
-
-        <!-- Logística · Finanzas · Reportes (misma fila) -->
-        <div class="anatomy-node"
-             [class.anatomy-node--selected]="activeNode() === 'logistica'"
-             (click)="toggleNode('logistica')"
-             role="button" tabindex="0" aria-label="Ver detalle de Logística">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">🚚</span>
-            <span class="anatomy-node__label">LOGÍSTICA</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot anatomy-node__dot--pulse" style="background:#fbbf24"></span>
-            <span class="anatomy-node__agent-name">Vigilante</span>
-          </div>
-          <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">15%</span>
-            <span class="anatomy-node__sub">Coordinadora Bogotá ⚠</span>
-          </div>
-        </div>
-
-        <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'logistica' || activeNode() === 'finanzas'">→</div>
-
-        <div class="anatomy-node anatomy-node--warn anatomy-node--has-agent"
-             [class.anatomy-node--selected]="activeNode() === 'finanzas'"
-             (click)="toggleNode('finanzas')"
-             role="button" tabindex="0" aria-label="Ver detalle de Finanzas">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">💰</span>
-            <span class="anatomy-node__label">FINANZAS</span>
-            <div class="cycle-card__agent-pill" style="--agent-color: #60a5fa">
-              <span class="agent-dot"></span>
-              <span class="agent-name">Kronos activo</span>
-            </div>
-          </div>
-          <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">$411k/sem</span>
-            <span class="anatomy-node__sub">Margen 22%</span>
-          </div>
-          <div class="anatomy-node__kronos-data">
-            <span class="anatomy-node__kronos-row">28 facturas · $450k · 6 días</span>
-            <span class="anatomy-node__fiscal-alert">⚠ Riesgo fiscal</span>
-          </div>
-          <button type="button" class="anatomy-node__kronos-cta" data-proto-skip
-            style="color:#60a5fa">Conectar Siigo →</button>
-        </div>
-
-        <div class="anatomy-arrow" [class.anatomy-arrow--active]="activeNode() === 'finanzas' || activeNode() === 'reportes'">→</div>
-
-        <div class="anatomy-node"
-             [class.anatomy-node--selected]="activeNode() === 'reportes'"
-             (click)="toggleNode('reportes')"
-             role="button" tabindex="0" aria-label="Ver detalle de Reportes">
-          <div class="anatomy-node__header">
-            <span class="anatomy-node__icon">📊</span>
-            <span class="anatomy-node__label">REPORTES</span>
-          </div>
-          <div class="anatomy-node__agent">
-            <span class="anatomy-node__dot anatomy-node__dot--pulse" style="background:#f97316"></span>
-            <span class="anatomy-node__agent-name">Roax</span>
-          </div>
-          <div class="anatomy-node__metrics">
-            <span class="anatomy-node__main">$1.82M/sem</span>
-            <span class="anatomy-node__sub">+$89k vs sem anterior</span>
-          </div>
-        </div>
-
-      </div><!-- /mission__net -->
-
-      <!-- Panel de detalle del nodo activo -->
-      @if (activeNodeDetail(); as detail) {
-        <div class="mission__node-detail">
-          <div class="node-detail__header" [style.border-left-color]="detail.color">
-            <span class="node-detail__agent-dot" [style.background]="detail.color"></span>
-            <span class="node-detail__agent-name">{{ detail.agentName }}</span>
-            <button type="button" class="node-detail__close" (click)="toggleNode(activeNode()!)" aria-label="Cerrar detalle">
-              <i class="pi pi-times"></i>
-            </button>
-          </div>
-          <p class="node-detail__desc">{{ detail.description }}</p>
-          <div class="node-detail__last">
-            <span class="node-detail__last-label">Última acción</span>
-            <span class="node-detail__last-text">{{ detail.lastAction }}</span>
-          </div>
-          @if (detail.impacts.length) {
-            <div class="node-detail__impacts">
-              <span class="node-detail__impacts-label">Afecta a</span>
-              @for (imp of detail.impacts; track imp.label) {
-                <a [routerLink]="imp.route" class="node-detail__impact-link">
-                  {{ imp.label }} →
-                </a>
-              }
-            </div>
-          }
-          <div class="node-detail__actions">
-            <a [routerLink]="detail.ctaRoute" class="node-detail__cta">{{ detail.ctaLabel }} →</a>
-            <button type="button" class="node-detail__chat-btn" (click)="openChatWithNode(activeNode()!)">
-              Hablar con {{ detail.agentName }}
-            </button>
-            <button type="button" class="node-detail__skill-btn" (click)="openNewSkill(activeNode()!)">
-              + Skill para este módulo
-            </button>
-          </div>
-        </div>
-      }
-
-    </div><!-- /mission__anatomy-body -->
-  </section>
-  } <!-- /!isZeroState && expert -->
-
-  <!-- ══ ZONA 3 — Academy colapsada (CA-8) ══ -->
-  <div class="hub-zone hub-zone--3" [class.hub-zone--3-collapsed]="zone3Collapsed()">
-    <button type="button" class="hub-zone3-handle" (click)="zone3Collapsed.set(!zone3Collapsed())">
-      <span class="hub-zone3-handle__chevron">{{ zone3Collapsed() ? '▸' : '▾' }}</span>
-      <span class="hub-zone3-handle__label">Academy · Personalizado para ti</span>
-      <span class="hub-zone3-handle__badge">1 curso nuevo</span>
-    </button>
-    @if (!zone3Collapsed()) {
-      <section class="mission__akademy-strip">
-        <div class="mission__akademy-inner">
-          <span class="mission__akademy-icon">🎓</span>
-          <div class="mission__akademy-body">
-            <strong>Gali recomienda para ti en Academy</strong>
-            <span>Basado en tu ROAS real vs declarado: <em>Optimización de P&amp;L real en Meta Ads</em> — 38 min · Avanzado</span>
-          </div>
-          <a routerLink="/gali-v5/academy" class="mission__akademy-cta">Ir a Academy →</a>
-        </div>
-      </section>
-    }
-  </div>
-
-  <!-- Toggle experto/novato -->
-  @if (ws.complexityLevel() === 'expert') {
-    <div class="mission__complexity-toggle">
-      <button type="button" class="complexity-toggle-btn"
-        (click)="ws.setComplexityLevel('novice')"
-        title="Oculta los agentes y muestra solo métricas principales">
-        ← Modo básico
-      </button>
-      <button type="button" class="complexity-toggle-btn complexity-toggle-btn--reset" (click)="showReconfigureModal.set(true)">
-        ↺ Reconfigurar Gali
-      </button>
-    </div>
-  }
-
-  <!-- Modal 2 pasos — Acción masiva transportadora (CA-3) -->
+  <!-- Modal acción masiva -->
   @if (showBulkModal()) {
     <div class="mission__confirm-backdrop" (click)="showBulkModal.set(false)">
       <div class="mission__confirm-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
         @if (bulkModalStep() === 1) {
           <div class="confirm-dialog__header">
-            <span class="confirm-dialog__agent-dot" style="background:#fbbf24"></span>
             <h3 class="confirm-dialog__title">Cambiar transportadora en pedidos activos</h3>
             <button type="button" class="confirm-dialog__close" (click)="showBulkModal.set(false)" aria-label="Cerrar">×</button>
           </div>
           <p class="confirm-dialog__desc">Vigilante detectó: Coordinadora Bogotá 15% novedad esta semana.</p>
-          <div class="confirm-consequence-grid">
-            <div class="consequence-row">
-              <span class="consequence-label">Pedidos afectados</span>
-              <span class="consequence-after">12 pedidos activos · Bogotá</span>
-            </div>
-            <div class="consequence-row">
-              <span class="consequence-label">Transportadora destino</span>
-              <span class="consequence-before">Coordinadora</span>
-              <span class="consequence-arrow">→</span>
-              <span class="consequence-after">Servientrega</span>
-            </div>
-            <div class="consequence-row">
-              <span class="consequence-label">Impacto estimado</span>
-              <span class="consequence-after">Evitar ~3 novedades ($51k)</span>
-            </div>
-            <div class="consequence-row consequence-row--safe">
-              <span class="consequence-label">⏱ Gestión adicional</span>
-              <span>~2 horas de ajuste logístico</span>
-            </div>
-          </div>
           <div class="confirm-dialog__actions">
             <button type="button" class="confirm-cancel" (click)="showBulkModal.set(false)">Cancelar</button>
             <button type="button" class="confirm-approve" (click)="bulkModalNext()">Revisar y confirmar →</button>
           </div>
         } @else {
           <div class="confirm-dialog__header">
-            <span class="confirm-dialog__agent-dot" style="background:#fbbf24"></span>
             <h3 class="confirm-dialog__title">Confirmar cambio</h3>
             <button type="button" class="confirm-dialog__close" (click)="showBulkModal.set(false)" aria-label="Cerrar">×</button>
-          </div>
-          <div class="confirm-consequence-grid">
-            <div class="consequence-row">
-              <span class="consequence-after">✓ 12 pedidos · Bogotá · → Servientrega</span>
-            </div>
-            <div class="consequence-row consequence-row--safe">
-              <span class="consequence-label">⚠ Esta acción no se puede deshacer.</span>
-              <span>Vigilante notificará cuando esté completo.</span>
-            </div>
           </div>
           <div class="confirm-dialog__actions">
             <button type="button" class="confirm-cancel" (click)="bulkModalBack()">← Volver</button>
@@ -698,23 +476,14 @@
 
 </div>
 
-<!-- Modal de advertencia — Reconfigurar Gali (C12) -->
 @if (showReconfigureModal()) {
   <div class="mission__confirm-backdrop" (click)="showReconfigureModal.set(false)">
-    <div class="mission__confirm-dialog mission__confirm-dialog--warn" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="reconfig-title">
+    <div class="mission__confirm-dialog mission__confirm-dialog--warn" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
       <div class="confirm-dialog__header">
-        <span class="confirm-dialog__agent-dot" style="background:#ef4444"></span>
-        <h3 class="confirm-dialog__title" id="reconfig-title">¿Reconfigurar Gali?</h3>
+        <h3 class="confirm-dialog__title">¿Reconfigurar Gali?</h3>
         <button type="button" class="confirm-dialog__close" (click)="showReconfigureModal.set(false)" aria-label="Cerrar">×</button>
       </div>
-      <p class="confirm-dialog__desc">Esta acción restablece la configuración inicial. Se va a resetear:</p>
-      <ul class="reconfig-reset-list">
-        <li>✦ Tu objetivo actual (100 ventas/semana)</li>
-        <li>✦ Fuentes conectadas al perfil de Mi Negocio</li>
-        <li>✦ Configuración de agentes y niveles de autonomía</li>
-        <li>✦ Preferencia de complejidad de vista (Experto/Básico)</li>
-      </ul>
-      <p class="confirm-dialog__note">Las skills, reglas y proyectos activos <strong>no se borran</strong>.</p>
+      <p class="confirm-dialog__desc">Esta acción restablece la configuración inicial.</p>
       <div class="confirm-dialog__actions">
         <button type="button" class="confirm-cancel" (click)="showReconfigureModal.set(false)">Cancelar</button>
         <button type="button" class="confirm-destructive" (click)="resetOnboarding(); showReconfigureModal.set(false)">Reconfigurar de todos modos</button>
@@ -723,12 +492,10 @@
   </div>
 }
 
-<!-- Panel de umbrales de agencia — desde el Hub -->
 @if (showAgencyPanel()) {
   <gali-agency-thresholds-panel (closed)="showAgencyPanel.set(false)" />
 }
 
-<!-- ══ DASHBOARD CUSTOMIZER PANEL ══ -->
 @if (showCustomizer()) {
   <div class="mission-customizer-overlay" (click)="saveAndCloseCustomizer()">
     <div class="mission-customizer" (click)="$event.stopPropagation()">
@@ -736,54 +503,85 @@
         <strong>Personalizar dashboard</strong>
         <button type="button" (click)="saveAndCloseCustomizer()" aria-label="Cerrar">✕</button>
       </div>
-      <p class="mission-customizer__hint">Activa o desactiva las secciones que quieres ver en tu hub de Gali.</p>
+      <p class="mission-customizer__hint">Activa o desactiva las secciones de tu hub.</p>
       <div class="mission-customizer__list">
         <label class="customizer-toggle-row">
-          <span>Insight de Gali (barra superior)</span>
-          <input type="checkbox" [checked]="dashboardSections().insight" (change)="toggleSection('insight')" />
-        </label>
-        <label class="customizer-toggle-row">
-          <span>Anatomía del proyecto (ciclo de negocio)</span>
+          <span>Ciclo de negocio</span>
           <input type="checkbox" [checked]="dashboardSections().anatomy" (change)="toggleSection('anatomy')" />
-        </label>
-        <label class="customizer-toggle-row">
-          <span>Señales activas</span>
-          <input type="checkbox" [checked]="dashboardSections().signals" (change)="toggleSection('signals')" />
-        </label>
-        <label class="customizer-toggle-row">
-          <span>Chat con Gali</span>
-          <input type="checkbox" [checked]="dashboardSections().chat" (change)="toggleSection('chat')" />
         </label>
         <label class="customizer-toggle-row">
           <span>Recomendaciones Academy</span>
           <input type="checkbox" [checked]="dashboardSections().akademy" (change)="toggleSection('akademy')" />
         </label>
       </div>
-      <p class="mission-customizer__chat-tip">
-        <span>✦</span> También puedes decirle a Gali: <em>"Personaliza mi dashboard"</em>
-      </p>
       <div class="mission-customizer__footer">
-        <button type="button" class="mission-customizer__tab-btn"
-          (click)="saveCurrentTabSections(); addingTab.set(true); saveAndCloseCustomizer()"
-          title="Guarda esta configuración como una nueva pestaña">
-          + Guardar como pestaña
-        </button>
-        <button type="button" class="mission-customizer__save-btn" (click)="saveAndCloseCustomizer()">
-          Guardar cambios
-        </button>
+        <button type="button" class="mission-customizer__save-btn" (click)="saveAndCloseCustomizer()">Guardar cambios</button>
       </div>
     </div>
   </div>
 }
 
-<!-- ══ FEEDBACK DE GALI POST-CUSTOMIZER ══ -->
 @if (customizerSaved()) {
   <div class="mission-gali-feedback" role="status">
-    <span class="mission-gali-feedback__dot">✦</span>
-    <div class="mission-gali-feedback__body">
-      <strong>Dashboard actualizado</strong>
-      <span>Guardé tu preferencia. Recuerda que puedes ajustarla en cualquier momento desde el botón "Personalizar".</span>
-    </div>
+    <strong>Dashboard actualizado</strong>
     <button type="button" class="mission-gali-feedback__dismiss" (click)="customizerSaved.set(false)" aria-label="Cerrar">✕</button>
+  </div>
+}
+
+@if (showDiagnostico()) {
+  <app-diagnostico-modal (closed)="showDiagnostico.set(false)" />
+}
+
+@if (showEditGoalModal()) {
+  <div class="mission__confirm-backdrop" (click)="showEditGoalModal.set(false)">
+    <div class="edit-goal-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="edit-goal-modal__header">
+        <div class="edit-goal-modal__title-group">
+          <span class="edit-goal-modal__icon">🎯</span>
+          <h3 class="edit-goal-modal__title">Editar objetivo</h3>
+        </div>
+        <button type="button" class="confirm-dialog__close" (click)="showEditGoalModal.set(false)" aria-label="Cerrar">×</button>
+      </div>
+      <div class="edit-goal-modal__body">
+        <label class="edit-goal-modal__label">¿Qué quieres lograr?</label>
+        <input id="edit-goal-input" type="text" class="edit-goal-modal__input"
+          [ngModel]="editGoalText()" (ngModelChange)="editGoalText.set($event)"
+          (keydown.enter)="saveEditGoal()" placeholder="Ej: Automatizar mi operación" autofocus />
+
+        <div class="edit-goal-modal__row">
+          <div class="edit-goal-modal__field-group">
+            <label class="edit-goal-modal__label">Meta numérica</label>
+            <div class="edit-goal-modal__metric-row">
+              <input type="number" class="edit-goal-modal__input edit-goal-modal__input--num"
+                [ngModel]="editGoalTarget()" (ngModelChange)="editGoalTarget.set($event)"
+                placeholder="100" min="1" />
+              <select class="edit-goal-modal__select"
+                [ngModel]="editGoalUnit()" (ngModelChange)="editGoalUnit.set($event)">
+                <option value="pedidos/semana">pedidos/semana</option>
+                <option value="pedidos/mes">pedidos/mes</option>
+                <option value="ventas/día">ventas/día</option>
+                <option value="COP/mes">COP/mes</option>
+                <option value="ROAS">ROAS objetivo</option>
+              </select>
+            </div>
+          </div>
+          <div class="edit-goal-modal__field-group">
+            <label class="edit-goal-modal__label">Plazo</label>
+            <input type="week" class="edit-goal-modal__input"
+              [ngModel]="editGoalDeadline()" (ngModelChange)="editGoalDeadline.set($event)"
+              placeholder="Semana límite" />
+          </div>
+        </div>
+
+        <div class="edit-goal-modal__hint">
+          <i class="pi pi-info-circle"></i>
+          Gali usará este objetivo para priorizar señales y decisiones en tu hub.
+        </div>
+      </div>
+      <div class="confirm-dialog__actions">
+        <button type="button" class="confirm-cancel" (click)="showEditGoalModal.set(false)">Cancelar</button>
+        <button type="button" class="confirm-approve" (click)="saveEditGoal()" [disabled]="!editGoalText().trim()">Guardar objetivo →</button>
+      </div>
+    </div>
   </div>
 }

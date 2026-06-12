@@ -410,6 +410,24 @@ $danger-500: #F46A6B;
     }
   }
 
+  &--gali-signal {
+    background: rgba(244, 154, 61, 0.1);
+    border: 1px solid rgba(244, 154, 61, 0.35);
+    color: #f49a3d;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 4px 7px;
+    height: auto;
+    width: auto;
+    min-width: 28px;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba(244, 154, 61, 0.2);
+    }
+  }
+
   &.icon-bell {
     .notification-badge {
       position: absolute;

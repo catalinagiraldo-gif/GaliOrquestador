@@ -1,0 +1,150 @@
+<div class="proyecto-timeline" [class.proyecto-timeline--gantt]="isGantt"
+  [style.--gantt-cols]="semanas.length">
+
+  <!-- Header: estado + contexto -->
+  <div class="proyecto-timeline__header">
+    <span class="estado-pill" [ngClass]="estadoClass">
+      <span class="estado-pill__dot"></span>
+      {{ estadoLabel }}
+    </span>
+    @if (contextoLabel) {
+      <span class="proyecto-timeline__contexto">{{ contextoLabel }}</span>
+    }
+    @if (isGantt) {
+      <span class="proyecto-timeline__gantt-legend">
+        <span class="gtl-dot gtl-dot--past"></span> Completado
+        <span class="gtl-dot gtl-dot--current"></span> Hoy
+        <span class="gtl-dot gtl-dot--future"></span> Proyección
+      </span>
+    }
+  </div>
+
+  <!-- ── GANTT VIEW ─────────────────────────────────────── -->
+  @if (isGantt) {
+    <div class="gantt-wrap">
+
+      <!-- Column headers -->
+      <div class="gantt-cols">
+        <div class="gantt-lane-label"></div>
+        @for (s of semanas; track s) {
+          <div class="gantt-col-head" [class.gantt-col-head--current]="isCurrentWeek(s)" [class.gantt-col-head--future]="isFutureWeek(s)">
+            <span class="gantt-col-head__label">S{{ s }}</span>
+            @if (isCurrentWeek(s)) {
+              <span class="gantt-col-head__today">HOY</span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Lane: Métricas ROAS sparkline -->
+      @if (timeline.metricasLane?.length) {
+        <div class="gantt-lane gantt-lane--metrics">
+          <div class="gantt-lane-label">
+            <span class="gantt-lane-label__text">ROAS</span>
+            <span class="gantt-lane-label__sub">semanal</span>
+          </div>
+          @for (s of semanas; track s) {
+            <div class="gantt-cell gantt-cell--metrics" [class.gantt-cell--current]="isCurrentWeek(s)" [class.gantt-cell--future]="isFutureWeek(s)">
+              @if (getMetricaForWeek(s); as m) {
+                <div class="roas-bar" [style.height.px]="roasBarHeight(s)" [class.roas-bar--ok]="m.roas >= 1.8" [class.roas-bar--warn]="m.roas < 1.8 && m.roas >= 1.2" [class.roas-bar--low]="m.roas < 1.2">
+                  <span class="roas-bar__val">{{ m.roas }}x</span>
+                </div>
+              } @else if (isFutureWeek(s)) {
+                <div class="roas-bar roas-bar--projected" [style.height.px]="24">
+                  <span class="roas-bar__val roas-bar__val--proj">~</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Lane: Agentes -->
+      @if (timeline.agenteLane?.length) {
+        <div class="gantt-lane gantt-lane--agents">
+          <div class="gantt-lane-label">
+            <span class="gantt-lane-label__text">Agentes</span>
+            <span class="gantt-lane-label__sub">acciones</span>
+          </div>
+          @for (s of semanas; track s) {
+            <div class="gantt-cell gantt-cell--agents" [class.gantt-cell--current]="isCurrentWeek(s)" [class.gantt-cell--future]="isFutureWeek(s)">
+              @for (action of getActionsForWeek(s); track action.accion) {
+                <div class="agent-pill"
+                  [style.background]="action.agentColor + '18'"
+                  [style.border-color]="action.agentColor + '55'"
+                  [style.color]="action.agentColor">
+                  <span class="agent-pill__dot" [style.background]="action.agentColor"></span>
+                  <span class="agent-pill__name">{{ action.agentLabel }}</span>
+                  <span class="agent-pill__accion">{{ action.accion }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Lane: Hitos -->
+      @if (timeline.hitoLane?.length) {
+        <div class="gantt-lane gantt-lane--hitos">
+          <div class="gantt-lane-label">
+            <span class="gantt-lane-label__text">Hitos</span>
+            <span class="gantt-lane-label__sub">clave</span>
+          </div>
+          @for (s of semanas; track s) {
+            <div class="gantt-cell gantt-cell--hitos" [class.gantt-cell--current]="isCurrentWeek(s)" [class.gantt-cell--future]="isFutureWeek(s)">
+              @if (getHitoForWeek(s); as hito) {
+                <div class="hito-marker"
+                  (mouseenter)="hoveredHito.set(hito)"
+                  (mouseleave)="hoveredHito.set(null)"
+                  [class.hito-marker--future]="isFutureWeek(s)">
+                  <span class="hito-marker__icon">{{ hito.icon }}</span>
+                  <span class="hito-marker__label">{{ hito.label }}</span>
+                  @if (hoveredHito() === hito && hito.impacto) {
+                    <div class="hito-tooltip">{{ hito.impacto }}</div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+
+  } @else {
+    <!-- ── STRIP VIEW (legacy / simple) ─────────────────── -->
+    <div class="proyecto-timeline__track">
+      @for (evento of timeline.eventos; track evento.id; let i = $index) {
+        <div
+          class="timeline-hito"
+          [class.timeline-hito--pasado]="!evento.esActual && i < currentIndex"
+          [class.timeline-hito--actual]="evento.esActual"
+          [class.timeline-hito--futuro]="!evento.esActual && i > currentIndex">
+
+          <div class="timeline-hito__node">
+            @if (evento.esActual) {
+              <div class="timeline-hito__node-inner timeline-hito__node-inner--pulse"></div>
+            }
+          </div>
+
+          @if (!$last) {
+            <div class="timeline-hito__connector"
+                 [class.timeline-hito__connector--done]="!evento.esActual && i < currentIndex">
+            </div>
+          }
+
+          <div class="timeline-hito__info">
+            <span class="timeline-hito__label">{{ evento.label }}</span>
+            @if (evento.fecha) {
+              <span class="timeline-hito__fecha">{{ evento.fecha | date:'d MMM' }}</span>
+            }
+            @if (evento.esActual) {
+              <span class="timeline-hito__aqui">Estás aquí</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -11,21 +11,197 @@
       </span>
     </div>
     <div class="gali-panel__header-actions">
-      <button
-        class="gali-panel__autopilot"
-        [class.gali-panel__autopilot--on]="ws.autopilot()"
-        type="button"
-        title="Activar autopilot — Gali opera sin preguntar"
-        (click)="toggleAutopilot()"
-        data-proto-skip>
-        <span class="gali-panel__autopilot-dot"></span>
-        {{ ws.autopilot() ? 'Auto ●' : 'Auto' }}
-      </button>
+      <!-- Thread count badge — H1 -->
+      @if (threads().length > 1) {
+        <button type="button" class="gali-panel__thread-badge"
+          (click)="showThreadList.set(!showThreadList())"
+          [class.gali-panel__thread-badge--open]="showThreadList()"
+          data-proto-skip>
+          <span class="gali-panel__thread-badge__count">{{ threads().length }}</span>
+          <span class="gali-panel__thread-badge__label">chats</span>
+          @if (totalUnread() > 0) {
+            <span class="gali-panel__thread-badge__unread">{{ totalUnread() }}</span>
+          }
+          <i class="pi" [class.pi-chevron-down]="!showThreadList()" [class.pi-chevron-up]="showThreadList()"></i>
+        </button>
+      }
       <button class="gali-panel__close" type="button" aria-label="Cerrar panel" (click)="close()" data-proto-skip>
         <i class="pi pi-times"></i>
       </button>
     </div>
   </div>
+
+  <!-- Thread switcher dropdown — C2: secciones Fijados / Por Proyecto / Por Agente / Sin Categoría -->
+  @if (showThreadList()) {
+    <div class="gali-thread-drawer">
+      <div class="gali-thread-drawer__search">
+        <i class="pi pi-search"></i>
+        <input type="text" placeholder="Buscar conversación…"
+          [value]="threadSearch()"
+          (input)="threadSearch.set($any($event.target).value)" />
+      </div>
+
+      <!-- C2: Lista con secciones -->
+      <div class="gali-thread-drawer__list">
+
+        <!-- SECCIÓN: FIJADOS -->
+        @if (filteredPinned().length > 0) {
+          <div class="gali-thread-section">
+            <div class="gali-thread-section__label">
+              <i class="pi pi-bookmark-fill"></i> FIJADOS
+            </div>
+            @for (t of filteredPinned(); track t.id) {
+              <ng-container *ngTemplateOutlet="threadItem; context: { $implicit: t }"></ng-container>
+            }
+          </div>
+        }
+
+        <!-- SECCIÓN: POR PROYECTO -->
+        @if (filteredProjects().length > 0) {
+          <div class="gali-thread-section">
+            <div class="gali-thread-section__label">
+              <i class="pi pi-briefcase"></i> POR PROYECTO
+            </div>
+            @for (t of filteredProjects(); track t.id) {
+              <ng-container *ngTemplateOutlet="threadItem; context: { $implicit: t }"></ng-container>
+            }
+          </div>
+        }
+
+        <!-- SECCIÓN: POR AGENTE -->
+        @if (filteredAgents().length > 0) {
+          <div class="gali-thread-section">
+            <div class="gali-thread-section__label">
+              <i class="pi pi-bolt"></i> POR AGENTE
+            </div>
+            @for (t of filteredAgents(); track t.id) {
+              <ng-container *ngTemplateOutlet="threadItem; context: { $implicit: t }"></ng-container>
+            }
+          </div>
+        }
+
+        <!-- SECCIÓN: SIN CATEGORÍA -->
+        @if (filteredFree().length > 0) {
+          <div class="gali-thread-section">
+            <div class="gali-thread-section__label">SIN CATEGORÍA</div>
+            @for (t of filteredFree(); track t.id) {
+              <ng-container *ngTemplateOutlet="threadItem; context: { $implicit: t }"></ng-container>
+            }
+          </div>
+        }
+
+        @if (threadSearch() && filteredPinned().length === 0 && filteredProjects().length === 0 && filteredAgents().length === 0 && filteredFree().length === 0) {
+          <div class="gali-thread-drawer__empty">Sin resultados</div>
+        }
+      </div>
+
+      <!-- C3: Context selector reemplaza el botón "Nueva conversación" -->
+      @if (showContextSelector()) {
+        <div class="gali-ctx-selector">
+          <div class="gali-ctx-selector__header">Nueva conversación</div>
+
+          @if (!newThreadCategory()) {
+            <div class="gali-ctx-selector__categories">
+              <button type="button" class="gali-ctx-selector__cat"
+                (click)="selectCategory('proyecto')" data-proto-skip>
+                <i class="pi pi-briefcase"></i>
+                <span>Por proyecto</span>
+                <i class="pi pi-chevron-right gali-ctx-selector__chevron"></i>
+              </button>
+              <button type="button" class="gali-ctx-selector__cat"
+                (click)="selectCategory('agente')" data-proto-skip>
+                <i class="pi pi-bolt"></i>
+                <span>Por agente</span>
+                <i class="pi pi-chevron-right gali-ctx-selector__chevron"></i>
+              </button>
+              <button type="button" class="gali-ctx-selector__cat gali-ctx-selector__cat--free"
+                (click)="selectCategory('libre')" data-proto-skip>
+                <i class="pi pi-comments"></i>
+                <span>Libre (sin contexto)</span>
+              </button>
+            </div>
+          }
+
+          @if (newThreadCategory() === 'proyecto') {
+            <div class="gali-ctx-selector__items">
+              @for (p of availableProjects; track p.id) {
+                <button type="button" class="gali-ctx-selector__item"
+                  (click)="selectContext(p.id, p.label)" data-proto-skip>
+                  <span class="gali-ctx-selector__dot" [style.background]="p.agentColor"></span>
+                  {{ p.label }}
+                </button>
+              }
+            </div>
+          }
+
+          @if (newThreadCategory() === 'agente') {
+            <div class="gali-ctx-selector__items">
+              @for (a of availableAgents; track a.id) {
+                <button type="button" class="gali-ctx-selector__item"
+                  (click)="selectContext(a.id, a.label)" data-proto-skip>
+                  <span class="gali-ctx-selector__dot" [style.background]="a.color"></span>
+                  <span class="gali-ctx-selector__item-info">
+                    <span>{{ a.label }}</span>
+                    <span class="gali-ctx-selector__item-desc">{{ a.desc }}</span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
+
+          <button type="button" class="gali-ctx-selector__cancel"
+            (click)="showContextSelector.set(false)" data-proto-skip>
+            Cancelar
+          </button>
+        </div>
+      } @else {
+        <button type="button" class="gali-thread-drawer__new"
+          (click)="openContextSelector()" data-proto-skip>
+          <i class="pi pi-plus"></i>
+          <span>Nueva conversación</span>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Template reutilizable para cada thread item -->
+  <ng-template #threadItem let-t>
+    <button type="button" class="gali-thread-drawer__item"
+      [class.gali-thread-drawer__item--active]="activeThreadId() === t.id"
+      (click)="switchThread(t.id); showThreadList.set(false)"
+      data-proto-skip>
+      <span class="gali-thread-drawer__dot" [style.background]="t.agentColor"></span>
+      <div class="gali-thread-drawer__body">
+        <span class="gali-thread-drawer__title">{{ t.title }}</span>
+        @if (t.contextLabel) {
+          <span class="gali-thread-drawer__context">{{ t.contextLabel }}</span>
+        }
+      </div>
+      <div class="gali-thread-drawer__item-actions">
+        <span class="gali-thread-drawer__pin-btn"
+          (click)="pinThread(t.id); $event.stopPropagation()"
+          [title]="pinnedThreadIds().includes(t.id) ? 'Desfijar' : 'Fijar'">
+          <i class="pi" [class.pi-bookmark-fill]="pinnedThreadIds().includes(t.id)" [class.pi-bookmark]="!pinnedThreadIds().includes(t.id)"></i>
+        </span>
+        @if (t.unread > 0) {
+          <span class="gali-thread-drawer__unread">{{ t.unread }}</span>
+        }
+      </div>
+    </button>
+  </ng-template>
+
+  <!-- Active thread context bar -->
+  @if (activeTab() === 'chat') {
+    <div class="gali-panel__thread-bar">
+      <span class="gali-panel__thread-bar__dot" [style.background]="activeThread().agentColor"></span>
+      <span class="gali-panel__thread-bar__title">{{ activeThread().title }}</span>
+      <button type="button" class="gali-panel__thread-bar__switch"
+        (click)="showThreadList.set(!showThreadList())"
+        data-proto-skip>
+        ↕
+      </button>
+    </div>
+  }
 
   <!-- Contexto activo — agente + tab description -->
   <div class="gali-panel__context-bar">
@@ -49,7 +225,7 @@
     </span>
   </div>
 
-  <!-- Tabs — scrollable, 6 tabs with icons -->
+  <!-- Tabs — 3 primary + overflow for secondary -->
   <div class="gali-panel__tabs" role="tablist" aria-label="Pestañas del panel de Gali">
     <button role="tab" [attr.aria-selected]="activeTab() === 'chat'"
       class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'chat'"
@@ -72,26 +248,49 @@
       <i class="pi pi-bolt" aria-hidden="true"></i>
       Agentes
     </button>
-    <button role="tab" [attr.aria-selected]="activeTab() === 'live'"
-      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'live'"
-      type="button" (click)="setTab('live')" title="Log en vivo del autopilot" data-proto-skip>
-      <i class="pi pi-play-circle" aria-hidden="true"></i>
-      Live
-      @if (ws.autopilot()) {
-        <span class="gali-panel__tab-live-dot"></span>
+
+    <!-- Overflow "···" for secondary tabs (live, memory, files) -->
+    <div class="gali-panel__tab-overflow" data-proto-skip>
+      <button type="button"
+        class="gali-panel__tab gali-panel__tab--overflow"
+        [class.gali-panel__tab--active]="isSecondaryTabActive()"
+        (click)="showOverflowMenu.set(!showOverflowMenu())"
+        title="Más opciones">
+        @if (isSecondaryTabActive()) {
+          <span class="gali-panel__tab-overflow-label">
+            @if (activeTab() === 'live') { <i class="pi pi-play-circle"></i> Live }
+            @else if (activeTab() === 'memory') { ✦ Memoria }
+            @else { <i class="pi pi-folder"></i> Archivos }
+          </span>
+        } @else {
+          ···
+        }
+      </button>
+      @if (showOverflowMenu()) {
+        <div class="gali-panel__overflow-menu" (click)="$event.stopPropagation()">
+          <button type="button" class="gali-panel__overflow-item"
+            [class.gali-panel__overflow-item--active]="activeTab() === 'live'"
+            (click)="setTab('live')">
+            <i class="pi pi-play-circle"></i>
+            Live
+            @if (ws.autopilot()) {
+              <span class="gali-panel__tab-live-dot"></span>
+            }
+          </button>
+          <button type="button" class="gali-panel__overflow-item"
+            [class.gali-panel__overflow-item--active]="activeTab() === 'memory'"
+            (click)="setTab('memory')">
+            ✦ Memoria
+          </button>
+          <button type="button" class="gali-panel__overflow-item"
+            [class.gali-panel__overflow-item--active]="activeTab() === 'files'"
+            (click)="setTab('files')">
+            <i class="pi pi-folder"></i>
+            Archivos
+          </button>
+        </div>
       }
-    </button>
-    <button role="tab" [attr.aria-selected]="activeTab() === 'memory'"
-      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'memory'"
-      type="button" (click)="setTab('memory')" title="Lo que Gali aprendió de tu negocio" data-proto-skip>
-      ✦ Memoria
-    </button>
-    <button role="tab" [attr.aria-selected]="activeTab() === 'files'"
-      class="gali-panel__tab" [class.gali-panel__tab--active]="activeTab() === 'files'"
-      type="button" (click)="setTab('files')" title="Archivos del proyecto" data-proto-skip>
-      <i class="pi pi-folder" aria-hidden="true"></i>
-      Archivos
-    </button>
+    </div>
   </div>
 
   <!-- ── TAB: Chat ── -->
@@ -169,10 +368,109 @@
         />
       }
 
+      <!-- Thread micro-rail — 32px collapsed / 168px expanded on hover -->
+      <nav class="gali-thread-rail"
+           [class.gali-thread-rail--expanded]="railExpanded()"
+           (mouseenter)="isHoveringRail.set(true)"
+           (mouseleave)="isHoveringRail.set(false)"
+           aria-label="Conversaciones">
+
+        @if (railExpanded()) {
+          <div class="gali-thread-rail__search">
+            <i class="pi pi-search"></i>
+            <input type="text"
+              class="gali-thread-rail__search-input"
+              placeholder="Buscar..."
+              [value]="threadSearch()"
+              (input)="threadSearch.set($any($event.target).value)"
+              (focus)="isSearchFocused.set(true)"
+              (blur)="isSearchFocused.set(false)"
+              (click)="$event.stopPropagation()" />
+            @if (threadSearch()) {
+              <span class="gali-thread-rail__search-clear"
+                (click)="threadSearch.set(''); $event.stopPropagation()">×</span>
+            }
+          </div>
+        }
+
+        @for (t of filteredThreads(); track t.id) {
+
+          @if (editingThreadId() === t.id) {
+            <!-- Editing row: div instead of button to allow nested input -->
+            <div class="gali-thread-rail__row gali-thread-rail__row--editing"
+                 [class.gali-thread-rail__row--active]="activeThreadId() === t.id">
+              <span class="gali-thread-rail__dot" [style.background]="t.agentColor"></span>
+              <input class="gali-thread-rail__name-input"
+                type="text"
+                [defaultValue]="t.title"
+                (blur)="saveEditThread(t.id, $any($event.target).value)"
+                (keydown)="onThreadNameKeydown($event, t.id)"
+                autofocus />
+            </div>
+          } @else {
+            <button type="button" class="gali-thread-rail__btn"
+              [class.gali-thread-rail__btn--active]="activeThreadId() === t.id"
+              (click)="switchThread(t.id)"
+              (mouseenter)="hoveredThreadId.set(t.id)"
+              (mouseleave)="hoveredThreadId.set(null)"
+              [title]="railExpanded() ? '' : t.title">
+
+              <span class="gali-thread-rail__dot" [style.background]="t.agentColor"></span>
+
+              @if (!railExpanded() && t.unread > 0) {
+                <span class="gali-thread-rail__badge">{{ t.unread }}</span>
+              }
+
+              @if (railExpanded()) {
+                <span class="gali-thread-rail__name">{{ t.title }}</span>
+                @if (t.unread > 0) {
+                  <span class="gali-thread-rail__unread-pill">{{ t.unread }}</span>
+                }
+                @if (hoveredThreadId() === t.id) {
+                  <span class="gali-thread-rail__row-actions">
+                    <span class="gali-thread-rail__action"
+                      (click)="startEditThread(t.id, $event)"
+                      title="Renombrar">
+                      <i class="pi pi-pencil"></i>
+                    </span>
+                    @if (t.id !== 'gali-main') {
+                      <span class="gali-thread-rail__action gali-thread-rail__action--del"
+                        (click)="archiveThread(t.id); $event.stopPropagation()"
+                        title="Archivar">
+                        <i class="pi pi-times"></i>
+                      </span>
+                    }
+                  </span>
+                }
+              } @else {
+                @if (hoveredThreadId() === t.id && t.id !== 'gali-main') {
+                  <span class="gali-thread-rail__close"
+                    (click)="archiveThread(t.id); $event.stopPropagation()"
+                    title="Archivar" role="button">×</span>
+                }
+              }
+            </button>
+          }
+        }
+
+        @if (railExpanded() && threadSearch() && filteredThreads().length === 0) {
+          <div class="gali-thread-rail__no-results">Sin resultados</div>
+        }
+
+        <button type="button" class="gali-thread-rail__btn gali-thread-rail__btn--add"
+          title="Nueva conversación" (click)="createThread()">
+          <i class="pi pi-plus"></i>
+          @if (railExpanded()) {
+            <span class="gali-thread-rail__name gali-thread-rail__name--muted">Nueva conversación</span>
+          }
+        </button>
+      </nav>
+
       <!-- Hilo de chat -->
       <section class="gali-panel__chat-pane">
       <div class="gali-panel__messages">
 
+        @if (activeThreadId() === 'gali-main') {
         @for (msg of gali.chatHistory(); track msg.id) {
           <!-- Execution card — feedback visual de acciones ejecutadas -->
           @if (msg.executionCard; as exec) {
@@ -258,6 +556,130 @@
             </div>
           </div>
         }
+        } <!-- /activeThreadId gali-main -->
+
+        <!-- C7: Threads secundarios con rich cards -->
+        @if (activeThreadId() !== 'gali-main') {
+          @for (msg of activeThread().messages; track msg.id) {
+            <div class="gali-msg" [class.gali-msg--gali]="msg.from === 'gali'" [class.gali-msg--user]="msg.from === 'user'">
+              @if (msg.from === 'gali') {
+                <span class="gali-msg__avatar" [style.background]="activeThread().agentColor">
+                  {{ activeThread().agente[0] }}
+                </span>
+              }
+              <div class="gali-msg__bubble-wrap">
+                <div class="gali-msg__bubble">
+                  <p class="gali-msg__text">{{ msg.text }}</p>
+                  <span class="gali-msg__time">{{ msg.time }}</span>
+                </div>
+
+                <!-- C7: Rich card render -->
+                @if (msg.richCard; as card) {
+                  <div class="gali-rich-card" [class]="'gali-rich-card--' + card.type">
+
+                    <!-- ROAS Chart -->
+                    @if (card.type === 'roas_chart' && card.roasData) {
+                      <div class="roas-card">
+                        <div class="roas-card__header">
+                          <span class="roas-card__label">ROAS tendencia</span>
+                          <span class="roas-card__current" [class.roas-card__current--low]="(card.roasCurrent ?? 0) < (card.roasTarget ?? 2.5)">
+                            {{ card.roasCurrent }}×
+                          </span>
+                        </div>
+                        <div class="roas-card__chart">
+                          @for (point of card.roasData; track point.label; let i = $index) {
+                            <div class="roas-bar-wrap">
+                              <div class="roas-bar"
+                                [style.height.%]="(point.value / 3.5) * 100"
+                                [class.roas-bar--target]="point.value >= (card.roasTarget ?? 2.5)"
+                                [style.animation-delay.ms]="i * 60">
+                              </div>
+                              <span class="roas-bar__label">{{ point.label }}</span>
+                            </div>
+                          }
+                        </div>
+                        @if (card.roasTarget) {
+                          <div class="roas-card__target">
+                            Objetivo: {{ card.roasTarget }}× ·
+                            <span [class.roas-card__gap--low]="(card.roasCurrent ?? 0) < card.roasTarget"
+                                  [class.roas-card__gap--ok]="(card.roasCurrent ?? 0) >= card.roasTarget">
+                              {{ (card.roasCurrent ?? 0) >= card.roasTarget ? '✓ Alcanzado' : 'Faltan ' + ((card.roasTarget - (card.roasCurrent ?? 0)).toFixed(2)) + '×' }}
+                            </span>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    <!-- Resumen de pedidos -->
+                    @if (card.type === 'pedidos_summary') {
+                      <div class="pedidos-card">
+                        <div class="pedidos-stat">
+                          <span class="pedidos-stat__val">{{ card.pedidosCount }}</span>
+                          <span class="pedidos-stat__label">esta semana</span>
+                        </div>
+                        <div class="pedidos-card__sep"></div>
+                        <div class="pedidos-stat">
+                          <span class="pedidos-stat__val pedidos-stat__val--warn">{{ card.pedidosNovedad }}</span>
+                          <span class="pedidos-stat__label">novedades</span>
+                        </div>
+                        <div class="pedidos-card__sep"></div>
+                        <div class="pedidos-stat">
+                          <span class="pedidos-stat__val">{{ card.pedidosPendientes }}</span>
+                          <span class="pedidos-stat__label">pendientes</span>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Alerta de novedad -->
+                    @if (card.type === 'novedad_alert') {
+                      <div class="novedad-card">
+                        <div class="novedad-card__bar">
+                          <div class="novedad-card__fill" [style.width.%]="card.novedadPct ?? 0"
+                            [class.novedad-card__fill--crit]="(card.novedadPct ?? 0) >= 15"
+                            [class.novedad-card__fill--warn]="(card.novedadPct ?? 0) >= 8 && (card.novedadPct ?? 0) < 15">
+                          </div>
+                        </div>
+                        <div class="novedad-card__meta">
+                          <span class="novedad-card__pct"
+                            [class.novedad-card__pct--crit]="(card.novedadPct ?? 0) >= 15">
+                            {{ card.novedadPct }}% novedad
+                          </span>
+                          <span class="novedad-card__ciudad">{{ card.novedadCiudad }}</span>
+                          @if (card.novedadTransportadora) {
+                            <span class="novedad-card__carrier">{{ card.novedadTransportadora }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Action buttons -->
+                    @if (card.type === 'action_buttons' && card.actions) {
+                      <div class="gali-msg__actions">
+                        @for (action of card.actions; track action.action) {
+                          <button type="button"
+                            class="gali-msg__action-btn"
+                            [class.gali-msg__action-btn--primary]="action.isPrimary"
+                            data-proto-skip
+                            (click)="executeAction(action.action)">
+                            {{ action.label }}
+                          </button>
+                        }
+                      </div>
+                    }
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          @if (activeThread().messages.length === 0) {
+            <div class="gali-thread-empty">
+              <span [style.color]="activeThread().agentColor">{{ activeThread().agente }}</span>
+              está listo. Escribe tu primera instrucción.
+            </div>
+          }
+        }
+
         <div #chatEnd></div>
       </div>
 
@@ -320,28 +742,13 @@
       }
 
       <div class="gali-panel__agent-actions">
-        <button class="gali-panel__agent-btn" type="button" data-proto-skip
-          (click)="gali.setAutopilot(!ws.autopilot())">
-          <i class="pi pi-{{ ws.autopilot() ? 'pause' : 'play' }}"></i>
-          {{ ws.autopilot() ? 'Desactivar autopilot' : 'Activar autopilot' }}
-        </button>
         <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button" data-proto-skip
           (click)="navigateTo('/gali-v5/skills')">
           <i class="pi pi-cog"></i> Gestionar skills
         </button>
-      </div>
-
-      <div class="gali-panel__autopilot-section">
-        <div class="gali-panel__autopilot-info">
-          <span class="gali-panel__autopilot-title">Modo autopilot</span>
-          <span class="gali-panel__autopilot-desc">Gali opera sin preguntar y solo escala al humano decisiones estratégicas</span>
-        </div>
-        <button class="gali-panel__toggle"
-          [class.gali-panel__toggle--on]="ws.autopilot()"
-          type="button"
-          (click)="toggleAutopilot()" data-proto-skip
-          [attr.aria-label]="ws.autopilot() ? 'Desactivar autopilot' : 'Activar autopilot'">
-          <span class="gali-panel__toggle-knob"></span>
+        <button class="gali-panel__agent-btn" type="button"
+          (click)="navigateTo('/gali-v5/agentes')">
+          <i class="pi pi-sliders-h"></i> Configurar autopilot →
         </button>
       </div>
     </div>
@@ -398,12 +805,51 @@
 
       @if (!ws.autopilot()) {
         <div class="live-autopilot-cta">
-          <span class="live-autopilot-cta__text">Autopilot desactivado — Gali espera tus instrucciones</span>
-          <button type="button" class="live-activate-btn" (click)="toggleAutopilot()">
-            Activar autopilot ✦
+          <span class="live-autopilot-cta__text">Autopilot desactivado — configura la autonomía de cada agente por separado.</span>
+          <button type="button" class="live-activate-btn" (click)="navigateTo('/gali-v5/agentes')">
+            Configurar en Agentes →
           </button>
         </div>
       }
+
+      <!-- Qué hizo Gali — Before/After action log -->
+      <div class="baf-section">
+        <div class="baf-section__header">
+          <span class="baf-section__title">Qué hizo Gali hoy</span>
+          <span class="baf-section__count">{{ beforeAfterLog.length }} acciones</span>
+        </div>
+        @for (entry of beforeAfterLog; track entry.id) {
+          <div class="baf-entry">
+            <div class="baf-entry__top">
+              <span class="baf-entry__agent-dot" [style.background]="entry.agentColor"></span>
+              <span class="baf-entry__agent">{{ entry.agente }}</span>
+              <span class="baf-entry__time">{{ entry.hace }}</span>
+            </div>
+            <p class="baf-entry__accion">{{ entry.accion }}</p>
+            <div class="baf-entry__diff">
+              <div class="baf-entry__before">
+                <span class="baf-entry__diff-label">Antes</span>
+                <span class="baf-entry__diff-metric">{{ entry.antesLabel }}</span>
+                <span class="baf-entry__diff-val baf-entry__diff-val--before">{{ entry.antesVal }}</span>
+              </div>
+              <span class="baf-entry__arrow">→</span>
+              <div class="baf-entry__after">
+                <span class="baf-entry__diff-label">Después</span>
+                <span class="baf-entry__diff-metric">{{ entry.despuesLabel }}</span>
+                <span class="baf-entry__diff-val baf-entry__diff-val--after">{{ entry.despuesVal }}</span>
+              </div>
+            </div>
+            <div class="baf-entry__footer">
+              <span class="baf-entry__impact">{{ entry.impact }}</span>
+              <a [routerLink]="entry.route" class="baf-entry__link" (click)="close()">Ver proyecto →</a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="live-separator">
+        <span>Feed en tiempo real</span>
+      </div>
 
       <!-- Feed de eventos -->
       @for (event of ws.liveEvents(); track event.id) {

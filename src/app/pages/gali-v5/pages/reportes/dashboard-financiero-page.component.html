@@ -11,14 +11,17 @@
     <div class="fin-header__left">
       <h1 class="fin-header__title">Dashboard Financiero</h1>
       <span class="fin-header__sub">
-        <abbr title="P&L = Pérdidas y Ganancias. Muestra cuánto dinero real te quedó después de restar todos los costos: producto, pauta, logística, novedades y garantías.">P&amp;L real</abbr>
+        <span galiGlosario="P&L">P&amp;L real</span>
         · <strong class="fin-period-badge fin-period-badge--monthly">Mensual — Mayo 2026</strong>
         · calculado por Gali
       </span>
     </div>
     <div class="fin-header__gali fin-header__gali--kronos">
       <span class="fin-header__gali-dot fin-header__gali-dot--kronos"></span>
-      <span class="fin-header__gali-label"><strong style="color:#60a5fa">Kronos</strong> · Agente Financiero · activo</span>
+      <span class="fin-header__gali-label"
+        title="Kronos: agente financiero. Monitorea P&amp;L, facturación y flujo de caja. Conectado a Siigo.">
+        <strong style="color:#60a5fa">Kronos</strong> · Agente Financiero · activo
+      </span>
     </div>
   </div>
 
@@ -33,6 +36,14 @@
       Después de COGS, flete, pauta ($3.1M), novedades (14%) y comisiones, te quedaron
       <strong>$3.808M netos — 25.7% de margen real</strong>.
       Tu mayor oportunidad de mejora: reducir la tasa de novedad de 14% a 10% sube el margen a ~28%.
+      <span class="fin-kpi-inline-row">
+        <span class="fin-kpi-chip">
+          <span class="term-info" galiInsight="PIL (Precio de Inventario Liquidado): el costo del producto después de descuentos del proveedor. Aparece en tu P&L como COGS ajustado. Un PIL alto = menor margen real." tooltipPosition="top" galiGlosario="PIL">PIL</span>
+          12%
+        </span>
+        <span class="fin-kpi-chip">CPA <strong>$21.4k</strong></span>
+        <span class="fin-kpi-chip">Tasa novedad <strong>14%</strong></span>
+      </span>
     </p>
   </div>
 
@@ -44,15 +55,19 @@
     </summary>
     <div class="fin-glosario__body">
       <div class="fin-glosario__item">
-        <span class="fin-glosario__term">P&amp;L</span>
+        <span class="fin-glosario__term" galiGlosario="PIL">PIL</span>
+        <span class="fin-glosario__def">Precio de Inventario Liquidado: el costo del producto después de descuentos del proveedor. Aparece en tu P&amp;L.</span>
+      </div>
+      <div class="fin-glosario__item">
+        <span class="fin-glosario__term" galiGlosario="P&L">P&amp;L</span>
         <span class="fin-glosario__def">Pérdidas y Ganancias — lo que te queda después de restar todos los costos al ingreso bruto.</span>
       </div>
       <div class="fin-glosario__item">
-        <span class="fin-glosario__term">ROAS</span>
+        <span class="fin-glosario__term" galiGlosario="ROAS">ROAS</span>
         <span class="fin-glosario__def">Retorno sobre inversión en publicidad — si gastas $1 en pauta y vendes $2.9, tu ROAS es 2.9x.</span>
       </div>
       <div class="fin-glosario__item">
-        <span class="fin-glosario__term">CPA</span>
+        <span class="fin-glosario__term" galiGlosario="CPA">CPA</span>
         <span class="fin-glosario__def">Costo por adquisición — cuánto te cuesta en publicidad conseguir un cliente o una venta.</span>
       </div>
       <div class="fin-glosario__item">
@@ -64,7 +79,7 @@
         <span class="fin-glosario__def">% de utilidad real sobre el total vendido. Un negocio sano de dropshipping apunta a 15–30%.</span>
       </div>
       <div class="fin-glosario__item">
-        <span class="fin-glosario__term">LTV</span>
+        <span class="fin-glosario__term" galiGlosario="LTV">LTV</span>
         <span class="fin-glosario__def">Valor de vida del cliente — cuánto te deja un comprador en promedio si repite.</span>
       </div>
       <div class="fin-glosario__item">

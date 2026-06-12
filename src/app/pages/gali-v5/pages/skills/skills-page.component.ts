@@ -2,13 +2,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
-import { GaliSkillBuilderV2Component, SkillRule } from '../../components/gali-skill-builder-v2/gali-skill-builder-v2.component';
+import { GaliSkillBuilderV2Component, SkillRule, SkillRegla } from '../../components/gali-skill-builder-v2/gali-skill-builder-v2.component';
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
+import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
 
 @Component({
   selector: 'app-skills-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent],
+  imports: [CommonModule, RouterModule, GaliSkillBuilderV2Component, GaliNewSkillOverlayComponent, GaliOntologyStripComponent],
   templateUrl: './skills-page.component.html',
   styleUrl: './skills-page.component.scss',
 })
@@ -18,19 +19,23 @@ export class SkillsPageComponent {
 
   readonly selectedSkillId = signal<string>('skill-001');
   readonly selectedAgentId = signal<string | null>(null);
+  readonly mainTab = signal<'mis-skills' | 'marketplace'>('mis-skills');
 
   readonly skills: SkillRule[] = [
     {
       id: 'skill-001',
       nombre: 'Auto-pausa si CTR cae',
-      descripcion: 'Pausa la campaña activa y activa la alternativa cuando el CTR cae bajo umbral por 48h',
-      trigger: { event: 'roax_check', agent: 'roax', interval: 'cada 4h' },
-      condition: { metric: 'CTR', operator: '<', value: 0.8, unit: '%', duration: '48h' },
-      action: { type: 'pause_and_activate', params: { pause: 'active_video', activate: 'backup_video' } },
+      descripcion: 'Pausa la campaña activa y activa la alternativa cuando el CTR cae bajo el umbral configurado por 48h continuas. Libera presupuesto hacia el creativo de mayor rendimiento.',
       notification: { message: 'Cambié Video A → Video B por CTR bajo', cta: 'Ver detalle' },
       status: 'active',
       ultima_ejecucion: 'hace 2h',
       ejecuciones_total: 7,
+      agentesQueLaUsan: [
+        { nombre: 'Roax', color: '#f97316' },
+      ],
+      reglas: [
+        { id: 'r-001-1', texto: 'Si el CTR cae debajo del 0.8% por más de 48h, pausar el creativo activo y activar el backup automáticamente.', agenteAsignado: 'Roax', agenteColor: '#f97316', activa: true },
+      ],
       runHistory: [
         { fecha: '2026-05-29 14:30', resultado: 'ejecutado', detalle: 'CTR Video A fue 0.7% — Pausé, activé Video B', impacto: 'CTR: 1.2% → 1.8%' },
         { fecha: '2026-05-28 10:15', resultado: 'ejecutado', detalle: 'CTR Video C fue 0.6% — Pausé campaña', impacto: 'ROAS estabilizado' },
@@ -42,14 +47,18 @@ export class SkillsPageComponent {
     {
       id: 'skill-002',
       nombre: 'Escalado ROAS automático',
-      descripcion: 'Incrementa el presupuesto cuando el ROAS supera el objetivo durante 48h continuas',
-      trigger: { event: 'roax_check', agent: 'roax', interval: 'cada 6h' },
-      condition: { metric: 'ROAS', operator: '≥', value: 2.8, duration: '48h' },
-      action: { type: 'budget_increase', params: { percent: 15, max_daily: 100000 } },
+      descripcion: 'Incrementa el presupuesto en un porcentaje configurable cuando el ROAS supera el objetivo durante 48h continuas. Incluye rollback automático si el ROAS cae.',
       notification: { message: 'Escalé presupuesto +15% (ROAS ≥ 2.8x por 48h)' },
       status: 'active',
       ultima_ejecucion: 'hace 4h',
       ejecuciones_total: 3,
+      agentesQueLaUsan: [
+        { nombre: 'Roax', color: '#f97316' },
+      ],
+      reglas: [
+        { id: 'r-002-1', texto: 'Escalar presupuesto máximo +15% cada 48h. No superar $100.000 COP diarios sin aprobación manual.', agenteAsignado: 'Roax', agenteColor: '#f97316', activa: true },
+        { id: 'r-002-2', texto: 'Si el ROAS cae debajo de 2.0x después del escalado, hacer rollback al presupuesto anterior.', agenteAsignado: 'Roax', agenteColor: '#f97316', activa: true },
+      ],
       runHistory: [
         { fecha: '2026-05-29 10:00', resultado: 'ejecutado', detalle: 'ROAS Meta 2.9x por 52h (≥ umbral 2.8x) — Budget $57.5k → $66k', impacto: '+$8.500/día' },
         { fecha: '2026-05-22 09:30', resultado: 'ejecutado', detalle: 'ROAS fue 3.1x por 60h — Budget $50k → $57.5k', impacto: '+$7.500/día' },
@@ -59,14 +68,17 @@ export class SkillsPageComponent {
     {
       id: 'skill-003',
       nombre: 'Smart routing novedad',
-      descripcion: 'Cambia transportadora automáticamente cuando la novedad supera el umbral',
-      trigger: { event: 'vigilante_alert', agent: 'vigilante', interval: 'cada 2h' },
-      condition: { metric: 'novedad_pct', operator: '>', value: 8, unit: '%' },
-      action: { type: 'reroute_orders', params: { from: 'coordinadora', to: 'servientrega' } },
+      descripcion: 'Reasigna pedidos automáticamente a la transportadora con menor novedad cuando una supera el umbral configurado. Reduce novedades sin intervención manual.',
       notification: { message: 'Reasigné pedidos por novedad alta en Bogotá' },
       status: 'paused',
       ultima_ejecucion: 'hace 3 días',
       ejecuciones_total: 12,
+      agentesQueLaUsan: [
+        { nombre: 'Vigilante', color: '#fbbf24' },
+      ],
+      reglas: [
+        { id: 'r-003-1', texto: 'Solo reasignar si el pedido tiene menos de 12h de creado. Pedidos más viejos requieren revisión manual.', agenteAsignado: 'Vigilante', agenteColor: '#fbbf24', activa: false },
+      ],
       runHistory: [
         { fecha: '2026-05-26 14:00', resultado: 'ejecutado', detalle: 'Novedad Coordinadora 11% — Reasigné 8 pedidos', impacto: '4 novedades ahorradas' },
         { fecha: '2026-05-20 09:00', resultado: 'ejecutado', detalle: 'Novedad 9% — Reasigné 5 pedidos', impacto: '2 novedades ahorradas' },
@@ -75,9 +87,17 @@ export class SkillsPageComponent {
   ];
 
   readonly marketplaceSkills = [
-    { id: 'mkt-1', nombre: 'P&L real vs ROAS declarado', category: 'Financiero', uses: '1.2k', rating: 4.8, forks: 89, descripcion: 'Detecta discrepancias entre el ROAS reportado y el P&L real.' },
-    { id: 'mkt-2', nombre: 'Alerta saturación de nicho', category: 'Productos', uses: '987', rating: 4.7, forks: 64, descripcion: 'Monitorea cuando 3+ competidores nuevos entran a tu nicho.' },
-    { id: 'mkt-3', nombre: 'Resolución automática novedades', category: 'CAS', uses: '756', rating: 4.6, forks: 41, descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención.' },
+    { id: 'mkt-1', nombre: 'P&L real vs ROAS declarado', category: 'Financiero', uses: '1.2k', rating: 4.8, clonaciones:89, descripcion: 'Detecta discrepancias entre el ROAS reportado y el P&L real.' },
+    { id: 'mkt-2', nombre: 'Alerta saturación de nicho', category: 'Productos', uses: '987', rating: 4.7, clonaciones:64, descripcion: 'Monitorea cuando 3+ competidores nuevos entran a tu nicho.' },
+    { id: 'mkt-3', nombre: 'Resolución automática novedades', category: 'CAS', uses: '756', rating: 4.6, clonaciones:41, descripcion: 'Clasifica y resuelve novedades recurrentes sin intervención.' },
+  ];
+
+  readonly ontologyAgents = [
+    { id: 'roax',      name: 'Roax',       role: 'Marketing',   color: '#f97316' },
+    { id: 'vigilante', name: 'Vigilante',  role: 'Logística',   color: '#fbbf24' },
+    { id: 'chatea',    name: 'Chatea Pro', role: 'CAS',         color: '#34d399' },
+    { id: 'ada',       name: 'ADA Spy',    role: 'Productos',   color: '#818cf8' },
+    { id: 'kronos',    name: 'Kronos',     role: 'Finanzas',    color: '#60a5fa' },
   ];
 
   get selectedSkill(): SkillRule | undefined {
@@ -100,7 +120,7 @@ export class SkillsPageComponent {
   readonly expertosSkills = [
     {
       id: 'ex-1', nombre: 'Scaling vertical — 20% cada 48h', tipo: 'Experto',
-      secciones: ['Marketing'], uses: '847', rating: 4.9, forks: 203,
+      secciones: ['Marketing'], uses: '847', rating: 4.9, clonaciones:203,
       autor: 'Alejandro Torres', handle: '@AlejandroTorres',
       autorBio: 'Dropshipper top · 1.200+ ventas/mes · 3 años en Dropi',
       autorAvatar: 'AT', autorColor: '#f97316',
@@ -109,7 +129,7 @@ export class SkillsPageComponent {
     },
     {
       id: 'ex-2', nombre: 'P&L simplificado para declarar', tipo: 'Experto',
-      secciones: ['Finanzas'], uses: '623', rating: 4.7, forks: 118,
+      secciones: ['Finanzas'], uses: '623', rating: 4.7, clonaciones:118,
       autor: 'Carlos Pérez CPA', handle: '@ContadorDropi',
       autorBio: 'Contador certificado · especialista en dropshipping',
       autorAvatar: 'CP', autorColor: '#3b82f6',
@@ -118,7 +138,7 @@ export class SkillsPageComponent {
     },
     {
       id: 'ex-3', nombre: 'Bundle mascotas: 5 productos ganadores', tipo: 'Experto',
-      secciones: ['Productos'], uses: '412', rating: 4.6, forks: 76,
+      secciones: ['Productos'], uses: '412', rating: 4.6, clonaciones:76,
       autor: 'María Gómez', handle: '@PetDropper',
       autorBio: 'Nicho mascotas · Top seller noviembre 2025',
       autorAvatar: 'MG', autorColor: '#10b981',
@@ -127,7 +147,7 @@ export class SkillsPageComponent {
     },
     {
       id: 'ex-4', nombre: 'CAS → Recuperación carrito abandonado', tipo: 'Experto',
-      secciones: ['CAS', 'Marketing'], uses: '389', rating: 4.8, forks: 91,
+      secciones: ['CAS', 'Marketing'], uses: '389', rating: 4.8, clonaciones:91,
       autor: 'Luis Vargas', handle: '@ChateaProLuis',
       autorBio: 'Chatea Pro power user · tasa recuperación 38%',
       autorAvatar: 'LV', autorColor: '#8b5cf6',

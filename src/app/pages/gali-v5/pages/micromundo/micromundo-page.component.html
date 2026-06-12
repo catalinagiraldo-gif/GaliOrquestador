@@ -7,12 +7,37 @@
       <p class="micromundo-header__sub">El micromundo que Gali construye sobre ti — tu operación, tus datos, tus patrones.</p>
     </div>
     <div class="micromundo-header__right">
-      <div class="micromundo-completeness">
-        <span class="micromundo-completeness__label">Perfil completado</span>
-        <div class="micromundo-completeness__bar">
-          <div class="micromundo-completeness__fill" [style.width.%]="65"></div>
-        </div>
-        <span class="micromundo-completeness__pct">65%</span>
+      <div class="micromundo-completeness" style="position:relative">
+        <button type="button" class="micromundo-completeness__trigger"
+          (click)="showProfileChecklist.set(!showProfileChecklist())"
+          [title]="'Ver qué falta para completar tu perfil'">
+          <span class="micromundo-completeness__label">Perfil completado · {{ profileCompletenessPercent() }}%</span>
+          <div class="micromundo-completeness__bar">
+            <div class="micromundo-completeness__fill" [style.width.%]="profileCompletenessPercent()"></div>
+          </div>
+          <span class="micromundo-completeness__pct">{{ profileCompletenessPercent() }}% ›</span>
+        </button>
+
+        @if (showProfileChecklist()) {
+          <div class="profile-checklist-backdrop" (click)="showProfileChecklist.set(false)"></div>
+          <div class="profile-checklist" (click)="$event.stopPropagation()">
+            <div class="profile-checklist__header">
+              <span class="profile-checklist__title">Para completar tu perfil</span>
+              <button type="button" class="profile-checklist__close" (click)="showProfileChecklist.set(false)">×</button>
+            </div>
+            @for (item of profileChecklist; track item.label) {
+              <a class="profile-checklist__item" [routerLink]="item.ruta"
+                (click)="showProfileChecklist.set(false)"
+                [class.profile-checklist__item--done]="item.done">
+                <span class="profile-checklist__check">{{ item.done ? '✓' : '○' }}</span>
+                <span class="profile-checklist__label">{{ item.label }}</span>
+                @if (!item.done) {
+                  <span class="profile-checklist__cta">→</span>
+                }
+              </a>
+            }
+          </div>
+        }
       </div>
       <div class="micromundo-sources-badge">
         <span class="micromundo-sources-badge__dot"></span>
@@ -127,92 +152,131 @@
 
   <!-- ── TAB: GRAFO DE NEGOCIO ── -->
   @if (activeTab() === 'grafo') {
-    <div class="micromundo-content">
-      <div class="grafo-legend">
-        <span class="grafo-legend-item grafo-legend-item--proyecto">● Proyectos</span>
-        <span class="grafo-legend-item grafo-legend-item--campana">● Campañas</span>
-        <span class="grafo-legend-item grafo-legend-item--pedidos">● Pedidos</span>
-        <span class="grafo-legend-item grafo-legend-item--proveedor">● Proveedores</span>
-        <span class="grafo-legend-item grafo-legend-item--transportadora">● Transportadoras</span>
+    <div class="micromundo-content micromundo-content--grafo">
+
+      <div class="grafo-header">
+        <div class="grafo-legend">
+          <span class="grafo-legend-item" style="--lc:#f49a3d">● Hub</span>
+          <span class="grafo-legend-item" style="--lc:#f97316">● Proyectos</span>
+          <span class="grafo-legend-item" style="--lc:#1877f2">● Campañas</span>
+          <span class="grafo-legend-item" style="--lc:#fbbf24">● Pedidos</span>
+          <span class="grafo-legend-item" style="--lc:#34d399">● Proveedores</span>
+          <span class="grafo-legend-item" style="--lc:#22c55e">● Transportadoras</span>
+        </div>
+        <div class="grafo-header__actions">
+          @if (selectedNodeId()) {
+            <button type="button" class="grafo-clear-btn" (click)="selectedNodeId.set(null)">
+              Cerrar panel ×
+            </button>
+          }
+        </div>
       </div>
 
-      <div class="grafo-layers">
+      <!-- Body: canvas + side panel -->
+      <div class="grafo-body" [class.grafo-body--panel-open]="selectedNodeId()">
 
-        <!-- Proyectos -->
-        <div class="grafo-layer">
-          <span class="grafo-layer__label">Proyectos activos</span>
-          <div class="grafo-nodes">
-            @for (n of businessNodes; track n.id) {
-              @if (n.type === 'proyecto') {
-                <div class="grafo-node grafo-node--proyecto" [style.--node-col]="n.color">
-                  <span class="grafo-node__label">{{ n.label }}</span>
-                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
-                  <div class="grafo-node__kpi">
-                    <strong>{{ n.kpi }}</strong>
-                    <span class="grafo-node__trend grafo-node__trend--{{n.trend}}">{{ trendIcon(n.trend) }}</span>
+        <!-- Canvas del grafo -->
+        <div class="grafo-canvas">
+
+          <!-- SVG aristas + labels en aristas destacadas -->
+          <svg class="grafo-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            @for (edge of graphEdges; track edge[0] + edge[1]) {
+              @if (graphPositions[edge[0]] && graphPositions[edge[1]]) {
+                <line
+                  [attr.x1]="graphPositions[edge[0]].x"
+                  [attr.y1]="graphPositions[edge[0]].y"
+                  [attr.x2]="graphPositions[edge[1]].x"
+                  [attr.y2]="graphPositions[edge[1]].y"
+                  class="grafo-edge"
+                  [class.grafo-edge--highlighted]="isEdgeHighlighted(edge[0], edge[1])"
+                  [class.grafo-edge--dimmed]="selectedNodeId() !== null && !isEdgeHighlighted(edge[0], edge[1])"
+                />
+                @if (isEdgeHighlighted(edge[0], edge[1]) && getEdgeRelation(edge[0], edge[1])) {
+                  <text
+                    [attr.x]="midX(edge[0], edge[1])"
+                    [attr.y]="midY(edge[0], edge[1]) - 1"
+                    class="grafo-edge-label">{{ getEdgeRelation(edge[0], edge[1]) }}</text>
+                }
+              }
+            }
+          </svg>
+
+          <!-- Nodos -->
+          @for (n of businessNodes; track n.id) {
+            @if (graphPositions[n.id]) {
+              <button
+                type="button"
+                class="grafo-obs-node"
+                [class.grafo-obs-node--gali]="n.id === 'gali'"
+                [class.grafo-obs-node--selected]="selectedNodeId() === n.id"
+                [class.grafo-obs-node--connected]="isNodeHighlighted(n.id) && selectedNodeId() !== n.id"
+                [class.grafo-obs-node--dimmed]="selectedNodeId() !== null && !isNodeHighlighted(n.id) && selectedNodeId() !== n.id"
+                [style.left.%]="graphPositions[n.id].x"
+                [style.top.%]="graphPositions[n.id].y"
+                [style.--nc]="n.color"
+                (click)="selectNode(n.id)">
+                <span class="grafo-obs-node__dot"></span>
+                <span class="grafo-obs-node__label">{{ n.label }}</span>
+              </button>
+            }
+          }
+        </div>
+
+        <!-- Panel lateral de detalle (G2-G3: Obsidian-style inspector) -->
+        @if (selectedNode()) {
+          <div class="grafo-panel">
+            <div class="grafo-panel__header" [style.--ag-color]="selectedNode()!.color">
+              <span class="grafo-panel__type-badge">{{ nodeTypeLabel(selectedNode()!.type) }}</span>
+              <h3 class="grafo-panel__title">{{ selectedNode()!.label }}</h3>
+              <p class="grafo-panel__sub">{{ selectedNode()!.sublabel }}</p>
+            </div>
+
+            <div class="grafo-panel__kpi-row">
+              <div class="grafo-panel__kpi-block">
+                <span class="grafo-panel__kpi-val" [style.color]="selectedNode()!.color">{{ selectedNode()!.kpi }}</span>
+                <span class="grafo-panel__kpi-label">{{ selectedNode()!.kpiLabel }}</span>
+              </div>
+              @if (selectedNode()!.trend) {
+                <span class="grafo-panel__trend"
+                  [class.grafo-panel__trend--up]="selectedNode()!.trend === 'up'"
+                  [class.grafo-panel__trend--down]="selectedNode()!.trend === 'down'">
+                  {{ trendIcon(selectedNode()!.trend) }}
+                  {{ selectedNode()!.trend === 'up' ? 'Subiendo' : selectedNode()!.trend === 'down' ? 'Bajando' : 'Estable' }}
+                </span>
+              }
+            </div>
+
+            <div class="grafo-panel__agent-row">
+              <span class="grafo-panel__agent-label">Gestionado por</span>
+              <span class="grafo-panel__agent-name">{{ getNodeAgent(selectedNode()!.type) }}</span>
+            </div>
+
+            <div class="grafo-panel__connections">
+              <p class="grafo-panel__connections-title">
+                Conexiones ({{ getConnectedNodes(selectedNode()!.id).length }})
+              </p>
+              @for (conn of getConnectedNodes(selectedNode()!.id); track conn.node.id) {
+                <div class="grafo-panel__conn-item" (click)="selectNode(conn.node.id)">
+                  <span class="grafo-panel__conn-dot" [style.background]="conn.node.color"></span>
+                  <div class="grafo-panel__conn-body">
+                    <span class="grafo-panel__conn-label">{{ conn.node.label }}</span>
+                    <span class="grafo-panel__conn-rel">{{ conn.relation }}</span>
                   </div>
+                  <span class="grafo-panel__conn-kpi" [style.color]="conn.node.color">{{ conn.node.kpi }}</span>
                 </div>
               }
-            }
-          </div>
-          <div class="grafo-connector" aria-hidden="true"></div>
-        </div>
+            </div>
 
-        <!-- Campañas -->
-        <div class="grafo-layer">
-          <span class="grafo-layer__label">Campañas activas</span>
-          <div class="grafo-nodes">
-            @for (n of businessNodes; track n.id) {
-              @if (n.type === 'campana') {
-                <div class="grafo-node grafo-node--campana" [style.--node-col]="n.color">
-                  <span class="grafo-node__label">{{ n.label }}</span>
-                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
-                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
-                </div>
-              }
-            }
+            <a class="grafo-panel__cta" [routerLink]="getNodeRoute(selectedNode()!.id)">
+              {{ getNodeRouteLabel(selectedNode()!.id) }} →
+            </a>
           </div>
-          <div class="grafo-connector" aria-hidden="true"></div>
-        </div>
-
-        <!-- Pedidos + Proveedores -->
-        <div class="grafo-layer">
-          <span class="grafo-layer__label">Pedidos · Proveedores</span>
-          <div class="grafo-nodes">
-            @for (n of businessNodes; track n.id) {
-              @if (n.type === 'pedidos' || n.type === 'proveedor') {
-                <div class="grafo-node" [class]="'grafo-node--' + n.type" [style.--node-col]="n.color">
-                  <span class="grafo-node__label">{{ n.label }}</span>
-                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
-                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
-                </div>
-              }
-            }
-          </div>
-          <div class="grafo-connector" aria-hidden="true"></div>
-        </div>
-
-        <!-- Transportadoras -->
-        <div class="grafo-layer">
-          <span class="grafo-layer__label">Transportadoras</span>
-          <div class="grafo-nodes">
-            @for (n of businessNodes; track n.id) {
-              @if (n.type === 'transportadora') {
-                <div class="grafo-node grafo-node--transportadora" [style.--node-col]="n.color">
-                  <span class="grafo-node__label">{{ n.label }}</span>
-                  <span class="grafo-node__sub">{{ n.sublabel }}</span>
-                  <div class="grafo-node__kpi"><strong>{{ n.kpi }}</strong></div>
-                </div>
-              }
-            }
-          </div>
-        </div>
-
+        }
       </div>
 
       <div class="grafo-gali-note">
         <span>✦</span>
-        <span>Este grafo se construye automáticamente desde tus datos en Dropi. Conecta fuentes externas (Shopify, Drive, CSV) para enriquecerlo con datos que Dropi no tiene.</span>
+        <span>Clic en un nodo para ver sus conexiones y detalle. Grafo construido automáticamente desde datos Dropi.</span>
         <button type="button" class="grafo-gali-note__cta" (click)="activeTab.set('documentos')">Conectar fuentes →</button>
       </div>
     </div>

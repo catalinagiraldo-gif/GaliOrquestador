@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 type SkillStatus = 'active' | 'paused' | 'executing';
 
@@ -12,24 +12,37 @@ interface RunLog {
   impacto: string;
 }
 
+export interface SkillAgente {
+  nombre: string;
+  color: string;
+}
+
+export interface SkillRegla {
+  id: string;
+  texto: string;
+  agenteAsignado: string;
+  agenteColor: string;
+  activa: boolean;
+}
+
 export interface SkillRule {
   id: string;
   nombre: string;
   descripcion: string;
-  trigger: { event: string; agent: string; interval: string };
-  condition: { metric: string; operator: string; value: number; unit?: string; duration?: string };
-  action: { type: string; params: Record<string, unknown> };
-  notification: { message: string; cta?: string };
+  // trigger/condition/action eliminados — pertenecen al Agente, no a la Skill
+  notification?: { message: string; cta?: string };
   status: SkillStatus;
   ultima_ejecucion: string;
   ejecuciones_total: number;
   runHistory: RunLog[];
+  agentesQueLaUsan?: SkillAgente[];
+  reglas?: SkillRegla[];
 }
 
 @Component({
   selector: 'gali-skill-builder-v2',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './gali-skill-builder-v2.component.html',
   styleUrl: './gali-skill-builder-v2.component.scss',
 })
@@ -44,6 +57,17 @@ export class GaliSkillBuilderV2Component {
 
   readonly isEditing = signal(false);
   readonly localStatus = signal<SkillStatus | null>(null);
+  readonly showNewRule = signal(false);
+  readonly newRuleText = signal('');
+  readonly showAssignDropdown = signal(false);
+
+  readonly availableAgents: SkillAgente[] = [
+    { nombre: 'Roax', color: '#f97316' },
+    { nombre: 'Vigilante', color: '#fbbf24' },
+    { nombre: 'Chatea Pro', color: '#34d399' },
+    { nombre: 'ADA Spy', color: '#818cf8' },
+    { nombre: 'Kronos', color: '#a855f7' },
+  ];
 
   get currentStatus(): SkillStatus {
     return this.localStatus() ?? this.skill.status;
@@ -51,7 +75,7 @@ export class GaliSkillBuilderV2Component {
 
   startEdit(): void {
     this.router.navigate(['/gali-v5/skills/nueva'], {
-      queryParams: { id: this.skill.id, agente: this.skill.trigger.agent },
+      queryParams: { id: this.skill.id },
     });
   }
 
@@ -77,31 +101,46 @@ export class GaliSkillBuilderV2Component {
 
   newFromHistory(): void {
     this.router.navigate(['/gali-v5/skills/nueva'], {
-      queryParams: { agente: this.skill.trigger.agent, basado_en: this.skill.id },
+      queryParams: { basado_en: this.skill.id },
     });
   }
 
   get agentLabel(): string {
-    const labels: Record<string, string> = {
-      roax: 'Roax',
-      vigilante: 'Vigilante',
-      chatea: 'Chatea Pro',
-      ada: 'ADA Spy',
-    };
-    return labels[this.skill.trigger.agent] ?? this.skill.trigger.agent;
-  }
-
-  get actionLabel(): string {
-    const labels: Record<string, string> = {
-      pause_and_activate: 'Pausar + activar alternativo',
-      budget_increase: 'Aumentar presupuesto',
-      reroute_orders: 'Reasignar pedidos',
-      send_notification: 'Enviar notificación',
-    };
-    return labels[this.skill.action.type] ?? this.skill.action.type;
+    return this.skill.agentesQueLaUsan?.[0]?.nombre ?? 'Agente';
   }
 
   trackByFecha(_: number, r: RunLog): string {
     return r.fecha;
+  }
+
+  assignAgentToSkill(agent: SkillAgente): void {
+    if (!this.skill.agentesQueLaUsan) this.skill.agentesQueLaUsan = [];
+    const alreadyAssigned = this.skill.agentesQueLaUsan.some(a => a.nombre === agent.nombre);
+    if (!alreadyAssigned) {
+      this.skill.agentesQueLaUsan = [...this.skill.agentesQueLaUsan, agent];
+      const stored = JSON.parse(localStorage.getItem('gali_skill_agents') ?? '{}');
+      stored[this.skill.id] = this.skill.agentesQueLaUsan.map(a => a.nombre);
+      localStorage.setItem('gali_skill_agents', JSON.stringify(stored));
+    }
+    this.showAssignDropdown.set(false);
+  }
+
+  addRule(): void {
+    const text = this.newRuleText().trim();
+    if (!text) return;
+    if (!this.skill.reglas) this.skill.reglas = [];
+    this.skill.reglas.push({
+      id: `rule-${Date.now()}`,
+      texto: text,
+      agenteAsignado: this.agentLabel,
+      agenteColor: '#f97316',
+      activa: true,
+    });
+    this.newRuleText.set('');
+    this.showNewRule.set(false);
+  }
+
+  prefillRuleExample(): void {
+    this.newRuleText.set(`Si el CTR cae por debajo del 0.8% durante más de 48h, ${this.agentLabel} debe pausar la campaña y notificarme con un resumen del impacto.`);
   }
 }

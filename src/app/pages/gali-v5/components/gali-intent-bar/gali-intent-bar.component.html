@@ -1,4 +1,4 @@
-<div class="intent-bar" [class.intent-bar--active]="isActive()">
+<div class="intent-bar" [class.intent-bar--active]="isActive()" [class.intent-bar--hidden]="ws.primaryAlertActive()">
   <div class="intent-bar__inner">
 
     <div class="intent-bar__field-wrap">
