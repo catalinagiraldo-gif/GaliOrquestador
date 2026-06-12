@@ -64,6 +64,34 @@
     background: none; border: none; cursor: pointer; font-size: $font-lg; color: $gray-600;
   }
 
+  &__gallery {
+    display: inline-flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+    padding: 6px $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    background: $white;
+    color: $gray-600;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+
+    .pi {
+      font-size: 13px;
+      color: $primary-500;
+    }
+
+    &:hover {
+      background: $gray-50;
+      border-color: $primary-300;
+      color: $gray-800;
+    }
+  }
+
   &__brand {
     display: flex; align-items: baseline; gap: $size-2; text-decoration: none; color: $gray-900;
     &-mark { color: $primary-500; font-size: $font-xl; line-height: 1; }
@@ -129,6 +157,8 @@
   }
   .topbar__menu { display: block; }
   .topbar__goal { display: none; }
+  .topbar__gallery span { display: none; }
+  .topbar__gallery { padding: 6px $size-2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
