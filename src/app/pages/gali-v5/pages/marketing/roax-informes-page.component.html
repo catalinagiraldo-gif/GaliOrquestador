@@ -17,31 +17,34 @@
   </div>
 
   <!-- ✦ GALI: ROAS Real vs Declarado — banner principal -->
-  <div class="gali-roas-insight">
-    <div class="gali-roas-insight__header">
-      <span class="gali-roas-insight__label">✦ Gali · Análisis ROAS Real vs ROAS Declarado</span>
-      <span class="gali-roas-insight__cause">{{ galiRoasInsight.causa }}</span>
-    </div>
-    <div class="gali-roas-insight__boxes">
-      <div class="roas-cmp-box roas-cmp-box--declared">
-        <span class="roas-cmp-box__lbl">Meta reporta</span>
-        <span class="roas-cmp-box__val">{{ galiRoasInsight.roasDeclarado }}</span>
-        <span class="roas-cmp-box__note">Atribuye ingresos de usuarios que habrían comprado igual</span>
-      </div>
-      <div class="roas-cmp-box roas-cmp-box--real">
-        <span class="roas-cmp-box__lbl">Gali calcula</span>
-        <span class="roas-cmp-box__val roas-cmp-box__val--accent">{{ galiRoasInsight.roasReal }}</span>
-        <span class="roas-cmp-box__note">Revenue confirmado en Dropi / inversión en pauta</span>
-      </div>
-      <div class="roas-cmp-box roas-cmp-box--gap">
-        <span class="roas-cmp-box__lbl">Diferencia</span>
-        <span class="roas-cmp-box__val roas-cmp-box__val--danger">{{ galiRoasInsight.gap }}</span>
-        <span class="roas-cmp-box__note">Sobreatribución de Meta</span>
-      </div>
-      <div class="roas-cmp-box roas-cmp-box--neto">
-        <span class="roas-cmp-box__lbl">Ganancia neta real</span>
-        <span class="roas-cmp-box__val roas-cmp-box__val--success">{{ galiRoasInsight.gananciaReal }}</span>
-        <span class="roas-cmp-box__note">vs {{ galiRoasInsight.presupuesto }} invertido</span>
+  <div class="g-alert g-alert--decision">
+    <span class="g-alert__icon">✦</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">Gali — Análisis ROAS Real vs ROAS Declarado</span>
+      <span class="g-alert__titulo">{{ galiRoasInsight.causa }}</span>
+      <div class="g-alert__foot">
+        <div class="gali-roas-insight__boxes">
+          <div class="roas-cmp-box roas-cmp-box--declared">
+            <span class="roas-cmp-box__lbl">Meta reporta</span>
+            <span class="roas-cmp-box__val">{{ galiRoasInsight.roasDeclarado }}</span>
+            <span class="roas-cmp-box__note">Atribuye ingresos de usuarios que habrían comprado igual</span>
+          </div>
+          <div class="roas-cmp-box roas-cmp-box--real">
+            <span class="roas-cmp-box__lbl">Gali calcula</span>
+            <span class="roas-cmp-box__val roas-cmp-box__val--accent">{{ galiRoasInsight.roasReal }}</span>
+            <span class="roas-cmp-box__note">Revenue confirmado en Dropi / inversión en pauta</span>
+          </div>
+          <div class="roas-cmp-box roas-cmp-box--gap">
+            <span class="roas-cmp-box__lbl">Diferencia</span>
+            <span class="roas-cmp-box__val roas-cmp-box__val--danger">{{ galiRoasInsight.gap }}</span>
+            <span class="roas-cmp-box__note">Sobreatribución de Meta</span>
+          </div>
+          <div class="roas-cmp-box roas-cmp-box--neto">
+            <span class="roas-cmp-box__lbl">Ganancia neta real</span>
+            <span class="roas-cmp-box__val roas-cmp-box__val--success">{{ galiRoasInsight.gananciaReal }}</span>
+            <span class="roas-cmp-box__note">vs {{ galiRoasInsight.presupuesto }} invertido</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

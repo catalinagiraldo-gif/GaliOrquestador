@@ -162,6 +162,7 @@
           <span class="grafo-legend-item" style="--lc:#fbbf24">● Pedidos</span>
           <span class="grafo-legend-item" style="--lc:#34d399">● Proveedores</span>
           <span class="grafo-legend-item" style="--lc:#22c55e">● Transportadoras</span>
+          <span class="grafo-legend-item" style="--lc:#a855f7">● Fuentes externas</span>
         </div>
         <div class="grafo-header__actions">
           @if (selectedNodeId()) {
@@ -208,6 +209,8 @@
                 type="button"
                 class="grafo-obs-node"
                 [class.grafo-obs-node--gali]="n.id === 'gali'"
+                [class.grafo-obs-node--fuente]="n.type === 'fuente'"
+                [class.grafo-obs-node--fuente-off]="n.type === 'fuente' && !n.connected"
                 [class.grafo-obs-node--selected]="selectedNodeId() === n.id"
                 [class.grafo-obs-node--connected]="isNodeHighlighted(n.id) && selectedNodeId() !== n.id"
                 [class.grafo-obs-node--dimmed]="selectedNodeId() !== null && !isNodeHighlighted(n.id) && selectedNodeId() !== n.id"
@@ -217,6 +220,13 @@
                 (click)="selectNode(n.id)">
                 <span class="grafo-obs-node__dot"></span>
                 <span class="grafo-obs-node__label">{{ n.label }}</span>
+                @if (n.type === 'fuente') {
+                  <span class="grafo-obs-node__status-badge"
+                    [class.grafo-obs-node__status-badge--on]="n.connected"
+                    [class.grafo-obs-node__status-badge--off]="!n.connected">
+                    {{ n.connected ? '✓' : '!' }}
+                  </span>
+                }
               </button>
             }
           }
@@ -226,9 +236,21 @@
         @if (selectedNode()) {
           <div class="grafo-panel">
             <div class="grafo-panel__header" [style.--ag-color]="selectedNode()!.color">
-              <span class="grafo-panel__type-badge">{{ nodeTypeLabel(selectedNode()!.type) }}</span>
+              <div class="grafo-panel__header-top">
+                <span class="grafo-panel__type-badge">{{ nodeTypeLabel(selectedNode()!.type) }}</span>
+                @if (selectedNode()!.type === 'fuente') {
+                  <span class="grafo-panel__conn-badge"
+                    [class.grafo-panel__conn-badge--on]="selectedNode()!.connected"
+                    [class.grafo-panel__conn-badge--off]="!selectedNode()!.connected">
+                    {{ selectedNode()!.connected ? '● Conectado' : '○ Sin conectar' }}
+                  </span>
+                }
+              </div>
               <h3 class="grafo-panel__title">{{ selectedNode()!.label }}</h3>
               <p class="grafo-panel__sub">{{ selectedNode()!.sublabel }}</p>
+              @if (selectedNode()!.type === 'fuente' && !selectedNode()!.connected) {
+                <a routerLink="/gali-v5/conexiones" class="grafo-panel__connect-cta">Conectar →</a>
+              }
             </div>
 
             <div class="grafo-panel__kpi-row">

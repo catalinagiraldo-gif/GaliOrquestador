@@ -105,6 +105,19 @@ export class SkillEditorPageComponent implements OnInit {
 
   readonly saved = signal(false);
   readonly activeEditorTab = signal<'capacidad' | 'pipeline'>('capacidad');
+  readonly showGaliHelp = signal(false);
+  readonly galiSuggestions = [
+    { label: 'Pausa una campaña cuando el CTR baje demasiado', agente: 'roax', descripcion: 'Pausar el adset activo cuando el CTR cae por debajo del umbral definido durante 48h consecutivas.', resultado: 'Evitar gastar presupuesto en creativos saturados' },
+    { label: 'Alerta si el % de novedades supera el 15%', agente: 'vigilante', descripcion: 'Detectar cuando la tasa de novedades supera el umbral y notificar para revisar la transportadora.', resultado: 'Reducir pérdidas por novedades no gestionadas a tiempo' },
+    { label: 'Responde PQRs automáticamente en menos de 2h', agente: 'chatea', descripcion: 'Detectar tickets de PQR entrantes y enviar respuesta inicial con estado del pedido en menos de 2 horas.', resultado: 'Mejorar CSAT y reducir tiempo de resolución' },
+    { label: 'Monitorea nuevos productos en tu nicho', agente: 'ada', descripcion: 'Analizar diariamente nuevos productos publicados en el nicho objetivo y alertar cuando aparezca una oportunidad de alta demanda.', resultado: 'Identificar productos ganadores antes que la competencia' },
+  ];
+
+  applySuggestion(s: { agente: string; descripcion: string; resultado: string }): void {
+    this.capacidadDraft.update(d => ({ ...d, descripcion: s.descripcion, resultadoEsperado: s.resultado }));
+    this.draft.update(d => ({ ...d, agente: s.agente }));
+    this.showGaliHelp.set(false);
+  }
 
   readonly capacidadDraft = signal({
     descripcion: '',

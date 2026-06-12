@@ -41,13 +41,12 @@
   }
 
   @if (ws.hubEntryContext(); as ctx) {
-    <section class="mission__entry-banner">
-      <div class="mission__entry-banner-inner">
-        <p class="mission__entry-banner-text">{{ ctx.message }}</p>
-        <a [routerLink]="ctx.ctaRoute" class="mission__entry-banner-cta" (click)="ws.clearHubEntryContext()">{{ ctx.ctaLabel }} →</a>
-        <button type="button" class="mission__entry-banner-dismiss" (click)="ws.clearHubEntryContext()" aria-label="Cerrar">×</button>
-      </div>
-    </section>
+    <div class="g-alert-bar g-alert-bar--info">
+      <span class="g-alert-bar__nivel">✦ Gali</span>
+      <span class="g-alert-bar__titulo">{{ ctx.message }}</span>
+      <a [routerLink]="ctx.ctaRoute" class="g-alert-bar__cta" (click)="ws.clearHubEntryContext()">{{ ctx.ctaLabel }} →</a>
+      <button type="button" class="g-alert-bar__dismiss" (click)="ws.clearHubEntryContext()" aria-label="Cerrar">×</button>
+    </div>
   }
 
   @if (isZeroState()) {
@@ -88,6 +87,31 @@
     </section>
   } @else {
 
+    <!-- ── NIVEL 1: Alerta Crítica (Fase 1.4) ─────────────────────────── -->
+    @if (criticalAlertBanner(); as ca) {
+      <div class="g-alert-bar g-alert-bar--critica">
+        <span class="g-alert-bar__nivel">● Crítico</span>
+        <div class="g-alert-bar__dot"
+          [style.background]="ca.agente_id === 'vigilante' ? '#f59e0b'
+                            : ca.agente_id === 'roax'      ? '#ff6102'
+                            : '#3b82f6'"></div>
+        <span class="g-alert-bar__agent">{{ ca.agente }}</span>
+        <span class="g-alert-bar__titulo">{{ ca.titulo }}</span>
+        @if (ca.afectados) {
+          <span class="g-alert-bar__meta">· {{ ca.afectados }} afectados</span>
+        }
+        <button type="button" class="g-alert-bar__cta"
+          (click)="scrollToCriticalDecision()">
+          Ver y decidir →
+        </button>
+        <button type="button" class="g-alert-bar__dismiss"
+          (click)="dismissCritical(ca.id)"
+          title="Ignorar alerta (sigue en la cola de señales)">
+          ×
+        </button>
+      </div>
+    }
+
     <!-- Header compacto -->
     @if (hubGoalLabel()) {
       <div class="hub-header-compact">
@@ -108,6 +132,14 @@
           </span>
         }
         <div class="hub-header-compact__right">
+          <button type="button"
+            class="hub-header-compact__mode-toggle"
+            [class.hub-header-compact__mode-toggle--expert]="!isSimpleView()"
+            (click)="ws.setComplexityLevel(isSimpleView() ? 'expert' : 'novice', { notify: true })"
+            [title]="isSimpleView() ? 'Cambiar a vista experto' : 'Cambiar a vista básica'">
+            <i class="pi" [class.pi-gauge]="isSimpleView()" [class.pi-sliders-v]="!isSimpleView()"></i>
+            {{ isSimpleView() ? 'Básico' : 'Experto' }}
+          </button>
           <button type="button" class="hub-header-compact__cta" (click)="router.navigateByUrl('/gali-v5/proyectos/nuevo')">
             + Nuevo proyecto
           </button>
@@ -115,8 +147,12 @@
       </div>
     }
 
-    <!-- MOMENTO 1 — Brief narrativo -->
+    <!-- MOMENTO 1 — Brief narrativo (Nivel 3: informativo) -->
     <section class="hub-momento momento-1 gali-stagger-in">
+      <div class="hub-nivel-label hub-nivel-label--3">
+        <span class="hub-nivel-label__dot"></span>
+        <span>Nivel 3 — Actualizaciones</span>
+      </div>
       <gali-hub-brief
         [data]="hubBriefData()"
         (onVerDecisiones)="scrollToMomento2()"
@@ -124,9 +160,16 @@
       </gali-hub-brief>
     </section>
 
-    <!-- MOMENTO 2 — Decisión o modo calma -->
+    <!-- MOMENTO 2 — Decisión o modo calma (Nivel 2: aprobación pendiente) -->
     <section class="hub-momento momento-2 gali-stagger-in" id="hub-momento-2">
       @if (currentDecision(); as dec) {
+        <div class="hub-nivel-label hub-nivel-label--2">
+          <span class="hub-nivel-label__dot"></span>
+          <span>Nivel 2 — Aprobación pendiente</span>
+          @if (decisionQueueCount() > 1) {
+            <span class="hub-nivel-label__queue">+{{ decisionQueueCount() - 1 }} en cola</span>
+          }
+        </div>
         <gali-decision-theater
           [decision]="dec"
           [isLoading]="isProcessingDecision()"
@@ -138,11 +181,7 @@
         <div class="modo-calma">
           <p class="modo-calma__titulo">Todo está corriendo.</p>
           <p class="modo-calma__subtexto">{{ ultimaAccionGali() }}</p>
-          @if (isSimpleView()) {
-            <button type="button" class="modo-calma__link" (click)="ws.setComplexityLevel('expert', { notify: true })">
-              Ver ciclo del negocio completo →
-            </button>
-          } @else {
+          @if (!isSimpleView()) {
             <button type="button" class="modo-calma__link" (click)="scrollToMomento3()">Ver ciclo del negocio →</button>
           }
         </div>
@@ -165,16 +204,20 @@
         @if (showFabMenu()) {
           <div class="hub-fab-menu" role="menu">
             <button type="button" class="hub-fab-menu__item" role="menuitem"
-              (click)="showFabMenu.set(false); router.navigateByUrl('/gali-v5/proyectos/nuevo')">
-              <i class="pi pi-briefcase"></i><span>Nuevo proyecto</span>
-            </button>
-            <button type="button" class="hub-fab-menu__item" role="menuitem"
               (click)="showFabMenu.set(false); showNewSkill.set(true)">
               <i class="pi pi-bolt"></i><span>Nueva skill</span>
             </button>
             <button type="button" class="hub-fab-menu__item" role="menuitem"
               (click)="showFabMenu.set(false); navigateToSenales()">
               <i class="pi pi-bell"></i><span>Ver señales</span>
+            </button>
+            <button type="button" class="hub-fab-menu__item" role="menuitem"
+              (click)="showFabMenu.set(false); showCustomizer.set(true)">
+              <i class="pi pi-sliders-h"></i><span>Personalizar hub</span>
+            </button>
+            <button type="button" class="hub-fab-menu__item hub-fab-menu__item--reconfig" role="menuitem"
+              (click)="showFabMenu.set(false); showReconfigureModal.set(true)">
+              <i class="pi pi-refresh"></i><span>Reconfigurar Gali</span>
             </button>
           </div>
         }

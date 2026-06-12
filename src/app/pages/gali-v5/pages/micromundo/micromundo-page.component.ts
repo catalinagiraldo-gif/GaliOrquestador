@@ -17,13 +17,14 @@ interface UploadCard {
 
 interface BusinessNode {
   id: string;
-  type: 'proyecto' | 'campana' | 'pedidos' | 'proveedor' | 'transportadora';
+  type: 'proyecto' | 'campana' | 'pedidos' | 'proveedor' | 'transportadora' | 'fuente';
   label: string;
   sublabel: string;
   color: string;
   kpi: string;
   kpiLabel: string;
   trend?: 'up' | 'down' | 'stable';
+  connected?: boolean;
 }
 
 interface BehaviorItem {
@@ -87,17 +88,21 @@ export class MicromundoPageComponent {
   readonly selectedNodeId = signal<string | null>(null);
 
   readonly graphPositions: Record<string, { x: number; y: number }> = {
-    gali:  { x: 50, y: 45 },
-    p1:    { x: 28, y: 22 },
-    p2:    { x: 52, y: 16 },
-    p3:    { x: 75, y: 24 },
-    c1:    { x: 15, y: 45 },
-    c2:    { x: 20, y: 65 },
-    ped:   { x: 68, y: 52 },
-    prov1: { x: 35, y: 72 },
-    prov2: { x: 55, y: 78 },
-    tsp1:  { x: 78, y: 70 },
-    tsp2:  { x: 82, y: 50 },
+    gali:    { x: 50, y: 45 },
+    p1:      { x: 28, y: 22 },
+    p2:      { x: 52, y: 16 },
+    p3:      { x: 75, y: 24 },
+    c1:      { x: 15, y: 45 },
+    c2:      { x: 20, y: 65 },
+    ped:     { x: 68, y: 52 },
+    prov1:   { x: 35, y: 72 },
+    prov2:   { x: 55, y: 78 },
+    tsp1:    { x: 78, y: 70 },
+    tsp2:    { x: 82, y: 50 },
+    meta:    { x: 8,  y: 30 },
+    tiktok:  { x: 8,  y: 58 },
+    drive:   { x: 40, y: 90 },
+    siigo:   { x: 88, y: 35 },
   };
 
   readonly graphEdges: Array<[string, string]> = [
@@ -107,6 +112,7 @@ export class MicromundoPageComponent {
     ['p3', 'ped'],
     ['ped', 'tsp1'], ['ped', 'tsp2'],
     ['p1', 'tsp2'], ['prov1', 'p2'],
+    ['gali', 'meta'], ['gali', 'tiktok'], ['gali', 'drive'], ['gali', 'siigo'],
   ];
 
   readonly selectedNode = computed(() =>
@@ -114,19 +120,23 @@ export class MicromundoPageComponent {
   );
 
   readonly graphEdgeRelations: Record<string, string> = {
-    'gali-p1':  'orquesta',
-    'gali-p2':  'orquesta',
-    'gali-p3':  'orquesta',
-    'p1-c1':    'lanza campaña',
-    'p1-ped':   'genera pedidos',
-    'p1-prov2': 'abastece de',
-    'p2-c2':    'lanza campaña',
-    'p2-ped':   'genera pedidos',
-    'p3-ped':   'genera pedidos',
-    'ped-tsp1': 'envía con',
-    'ped-tsp2': 'envía con',
-    'p1-tsp2':  'novedad ⚠',
-    'prov1-p2': 'provee stock',
+    'gali-p1':    'orquesta',
+    'gali-p2':    'orquesta',
+    'gali-p3':    'orquesta',
+    'p1-c1':      'lanza campaña',
+    'p1-ped':     'genera pedidos',
+    'p1-prov2':   'abastece de',
+    'p2-c2':      'lanza campaña',
+    'p2-ped':     'genera pedidos',
+    'p3-ped':     'genera pedidos',
+    'ped-tsp1':   'envía con',
+    'ped-tsp2':   'envía con',
+    'p1-tsp2':    'novedad ⚠',
+    'prov1-p2':   'provee stock',
+    'gali-meta':  'lee datos',
+    'gali-tiktok':'lee datos',
+    'gali-drive': 'sin conectar',
+    'gali-siigo': 'sin conectar',
   };
 
   selectNode(id: string): void {
@@ -214,6 +224,10 @@ export class MicromundoPageComponent {
     { id: 'prov2', type: 'proveedor', label: 'TechPet Latam', sublabel: 'Stock: Medio', color: '#34d399', kpi: '72%', kpiLabel: 'disponibilidad' },
     { id: 'tsp1', type: 'transportadora', label: 'Servientrega', sublabel: '3.8% novedad', color: '#22c55e', kpi: '3.8%', kpiLabel: 'novedad' },
     { id: 'tsp2', type: 'transportadora', label: 'Coordinadora', sublabel: '15% novedad ⚠', color: '#ef4444', kpi: '15%', kpiLabel: 'novedad' },
+    { id: 'meta', type: 'fuente', label: 'Meta Ads', sublabel: 'Conectado · 2 cuentas', color: '#1877f2', kpi: '2 ctas', kpiLabel: 'activas', connected: true },
+    { id: 'tiktok', type: 'fuente', label: 'TikTok Shop', sublabel: 'Conectado', color: '#010101', kpi: '1 perfil', kpiLabel: 'activo', connected: true },
+    { id: 'drive', type: 'fuente', label: 'Google Drive', sublabel: 'Sin conectar', color: '#ea4335', kpi: '—', kpiLabel: 'creativos', connected: false },
+    { id: 'siigo', type: 'fuente', label: 'Siigo', sublabel: 'Sin conectar — 28 sin facturar', color: '#9ca3af', kpi: '28', kpiLabel: 'sin facturar', connected: false },
   ];
 
   readonly behaviorItems: BehaviorItem[] = [
@@ -255,7 +269,7 @@ export class MicromundoPageComponent {
   }
 
   nodeTypeLabel(type: BusinessNode['type']): string {
-    return { proyecto: 'Proyecto', campana: 'Campaña', pedidos: 'Pedidos', proveedor: 'Proveedor', transportadora: 'Transportadora' }[type];
+    return ({ proyecto: 'Proyecto', campana: 'Campaña', pedidos: 'Pedidos', proveedor: 'Proveedor', transportadora: 'Transportadora', fuente: 'Fuente externa' } as Record<string, string>)[type] ?? type;
   }
 
   trendIcon(t?: 'up' | 'down' | 'stable'): string {

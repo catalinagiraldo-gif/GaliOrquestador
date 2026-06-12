@@ -1,12 +1,11 @@
 <div class="garantias-page" *ngIf="config">
 
-  <gali-agent-alert
-    agent="vigilante"
-    variant="decision"
+  <dropi-gali-bar
+    agent="Vigilante"
+    status="2 decisiones pendientes"
     message="2 garantías listas para cierre automático · 1 posible fraude detectado (P-160606)"
-    primaryCta="Autorizar cierres automáticos"
-    secondaryCta="Ver señales →"
-    secondaryRoute="/gali-v5"
+    ctaLabel="Ver señales"
+    secondaryCta="Autorizar cierres →"
   />
 
   <nav class="garantias-page__breadcrumbs" aria-label="Breadcrumb">

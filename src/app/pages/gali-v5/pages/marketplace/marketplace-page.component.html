@@ -8,7 +8,7 @@
       </a>
       <div>
         <h1 class="mkt-page__title">Marketplace Gali</h1>
-        <span class="mkt-page__sub">Skills · Agentes · Reglas · Plugins · creados por la comunidad Dropi</span>
+        <span class="mkt-page__sub">Skills · Agentes · Reglas · Conexiones · creados por la comunidad Dropi</span>
       </div>
     </div>
     <div class="mkt-page__header-right">
@@ -38,10 +38,10 @@
       <span class="mkt-category-tab__label">Reglas</span>
       <span class="mkt-category-tab__count">5</span>
     </button>
-    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'plugins'" (click)="mainCategory.set('plugins')">
-      <span class="mkt-category-tab__icon">🔌</span>
-      <span class="mkt-category-tab__label">Plugins MCP</span>
-      <span class="mkt-category-tab__count">6</span>
+    <button type="button" class="mkt-category-tab" [class.mkt-category-tab--active]="mainCategory() === 'conexiones'" (click)="mainCategory.set('conexiones')">
+      <span class="mkt-category-tab__icon">🔗</span>
+      <span class="mkt-category-tab__label">Conexiones</span>
+      <span class="mkt-category-tab__count">8</span>
     </button>
   </div>
 
@@ -65,9 +65,14 @@
           @if (isPersonalizedInstalled(skill.id)) {
             <span class="mkt-personalized-card__installed">✓ Activado</span>
           } @else {
-            <button type="button" class="mkt-personalized-card__cta" (click)="installPersonalized(skill.id)" data-proto-skip>
-              {{ skill.cta }}
-            </button>
+            <div class="mkt-personalized-card__actions">
+              <button type="button" class="mkt-personalized-card__preview" (click)="openSkillPreview(skill)">
+                Ver skill →
+              </button>
+              <button type="button" class="mkt-personalized-card__cta" (click)="installPersonalized(skill.id)" data-proto-skip>
+                {{ skill.cta }}
+              </button>
+            </div>
           }
         </div>
       }
@@ -251,12 +256,12 @@
         <!-- Actions -->
         <div class="mkt-card__actions">
           <button type="button" class="mkt-card__btn mkt-card__btn--ghost"
-            (click)="forkSkill(skill.id)">
-            <i class="pi pi-copy"></i> Usar como base
+            (click)="openSkillPreview(skill)">
+            Ver skill →
           </button>
           <button type="button" class="mkt-card__btn mkt-card__btn--primary"
             (click)="activateSkill(skill.id)">
-            Activar →
+            Activar ahora
           </button>
         </div>
 
@@ -339,6 +344,135 @@
   </div>
   } <!-- /agentes -->
 
+  <!-- ══ CONEXIONES ══ -->
+  @if (mainCategory() === 'conexiones') {
+  <div class="mkt-conexiones-section">
+    <p class="mkt-section-intro">Conecta tus canales de venta, datos y herramientas para que Gali y tus agentes tengan todo el contexto de tu negocio.</p>
+
+    <!-- Conectadas -->
+    <div class="mkt-conexiones-group">
+      <div class="mkt-conexiones-group__header">
+        <span class="mkt-conexiones-group__label">Conectadas</span>
+        <span class="mkt-conexiones-group__count">{{ connectedConexionCount }}</span>
+      </div>
+      <div class="mkt-conexiones-grid">
+        @for (cx of mktConexiones; track cx.id) {
+          @if (isConexionConnected(cx.id)) {
+          <div class="mkt-conexion-card mkt-conexion-card--conectada">
+            <div class="mkt-conexion-card__top">
+              <div class="mkt-conexion-card__icon-wrap">
+                <span class="mkt-conexion-card__icon">{{ cx.icono }}</span>
+              </div>
+              <div class="mkt-conexion-card__info">
+                <strong class="mkt-conexion-card__nombre">{{ cx.nombre }}</strong>
+                <span class="mkt-conexion-card__categoria">{{ cx.categoria }}</span>
+              </div>
+              <span class="mkt-conexion-card__status mkt-conexion-card__status--on">● Conectada</span>
+            </div>
+            <p class="mkt-conexion-card__desc">{{ cx.descripcion }}</p>
+            <div class="mkt-conexion-card__agentes">
+              @for (ag of cx.agentesUsando; track ag) {
+                <span class="mkt-conexion-card__agente-chip">{{ ag }}</span>
+              }
+            </div>
+            <div class="mkt-conexion-card__datos">
+              @for (dato of cx.datosQueProvee; track dato) {
+                <span class="mkt-conexion-card__dato">{{ dato }}</span>
+              }
+            </div>
+            <div class="mkt-conexion-card__footer">
+              <span class="mkt-conexion-card__proveedor">{{ cx.proveedor }}</span>
+              <button type="button" class="mkt-conexion-card__btn mkt-conexion-card__btn--config" data-proto-skip>Configurar →</button>
+            </div>
+          </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Disponibles para conectar -->
+    <div class="mkt-conexiones-group">
+      <div class="mkt-conexiones-group__header">
+        <span class="mkt-conexiones-group__label">Disponibles</span>
+      </div>
+      <div class="mkt-conexiones-grid">
+        @for (cx of mktConexiones; track cx.id) {
+          @if (!isConexionConnected(cx.id)) {
+          <div class="mkt-conexion-card">
+            <div class="mkt-conexion-card__top">
+              <div class="mkt-conexion-card__icon-wrap mkt-conexion-card__icon-wrap--off">
+                <span class="mkt-conexion-card__icon">{{ cx.icono }}</span>
+              </div>
+              <div class="mkt-conexion-card__info">
+                <strong class="mkt-conexion-card__nombre">{{ cx.nombre }}</strong>
+                <span class="mkt-conexion-card__categoria">{{ cx.categoria }}</span>
+              </div>
+              <span class="mkt-conexion-card__status mkt-conexion-card__status--off">Sin conectar</span>
+            </div>
+            <p class="mkt-conexion-card__desc">{{ cx.descripcion }}</p>
+            <div class="mkt-conexion-card__agentes">
+              @for (ag of cx.agentesUsando; track ag) {
+                <span class="mkt-conexion-card__agente-chip mkt-conexion-card__agente-chip--inactive">{{ ag }}</span>
+              }
+            </div>
+            <div class="mkt-conexion-card__datos">
+              @for (dato of cx.datosQueProvee; track dato) {
+                <span class="mkt-conexion-card__dato mkt-conexion-card__dato--locked">{{ dato }}</span>
+              }
+            </div>
+            <div class="mkt-conexion-card__footer">
+              <span class="mkt-conexion-card__proveedor">{{ cx.proveedor }}</span>
+              @if (cx.gratis) {
+                <span class="mkt-conexion-card__free">Gratis</span>
+              }
+              <button type="button" class="mkt-conexion-card__btn mkt-conexion-card__btn--connect" (click)="toggleConexion(cx.id)">Conectar →</button>
+            </div>
+          </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Plugins y APIs (MCPs) -->
+    <div class="mkt-conexiones-group">
+      <div class="mkt-conexiones-group__header">
+        <span class="mkt-conexiones-group__label">Plugins y APIs</span>
+        <span class="mkt-conexiones-group__sublabel">MCPs y extensiones para los agentes</span>
+      </div>
+      <div class="mkt-plugins-grid">
+        @for (pl of mktPlugins; track pl.id) {
+          <div class="mkt-plugin-card" [class.mkt-plugin-card--instalado]="pl.instalado">
+            <div class="mkt-plugin-card__top">
+              <span class="mkt-plugin-card__icon">{{ pl.icono }}</span>
+              <div class="mkt-plugin-card__info">
+                <strong class="mkt-plugin-card__nombre">{{ pl.nombre }}</strong>
+                <span class="mkt-plugin-card__tipo">{{ pl.tipo }} · {{ pl.proveedor }}</span>
+              </div>
+              @if (pl.instalado) {
+                <span class="mkt-plugin-card__badge mkt-plugin-card__badge--on">Instalado</span>
+              } @else if (pl.gratis) {
+                <span class="mkt-plugin-card__badge mkt-plugin-card__badge--free">Gratis</span>
+              }
+            </div>
+            <p class="mkt-plugin-card__desc">{{ pl.descripcion }}</p>
+            <div class="mkt-plugin-card__footer">
+              @if (pl.instalado) {
+                <button type="button" class="mkt-plugin-card__btn mkt-plugin-card__btn--config" data-proto-skip>Configurar →</button>
+              } @else {
+                <button type="button" class="mkt-plugin-card__btn mkt-plugin-card__btn--install" data-proto-skip>Instalar →</button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <p class="mkt-conexiones-section__link">
+      <a routerLink="/gali-v5/conexiones">Ver mapa de conexiones activas →</a>
+    </p>
+  </div>
+  } <!-- /conexiones -->
+
   <!-- ══ REGLAS ══ -->
   @if (mainCategory() === 'reglas') {
   <div class="mkt-reglas-section">
@@ -382,13 +516,15 @@
             @if (r.instalada) { <span class="mkt-regla-card__active-badge">● Activa</span> }
           </div>
           <p class="mkt-regla-card__desc">{{ r.descripcion }}</p>
-          <code class="mkt-regla-card__ejemplo">{{ r.ejemplo }}</code>
           <div class="mkt-regla-card__footer">
             <span class="mkt-regla-card__usos">{{ r.usos }} usuarios</span>
             @if (isReglaInstalled(r.id)) {
               <span class="mkt-installed-badge">✓ Activa</span>
             } @else {
-              <button type="button" class="mkt-regla-card__cta" (click)="openReglaPreview(r)">Ver regla →</button>
+              <div class="mkt-regla-card__actions">
+                <button type="button" class="mkt-regla-card__cta mkt-regla-card__cta--ghost" (click)="openReglaPreview(r)">Ver regla →</button>
+                <button type="button" class="mkt-regla-card__cta mkt-regla-card__cta--primary" (click)="activateRegla(r.id)">Activar</button>
+              </div>
             }
           </div>
         </div>
@@ -396,40 +532,6 @@
     </div>
   </div>
   } <!-- /reglas -->
-
-  <!-- ══ PLUGINS MCP ══ -->
-  @if (mainCategory() === 'plugins') {
-  <div class="mkt-plugins-section">
-    <p class="mkt-section-intro">Conexiones y herramientas externas que amplían lo que Gali puede hacer. Actívalas para enriquecer los datos de tus agentes.</p>
-    <div class="mkt-plugins-grid">
-      @for (p of mktPlugins; track p.id) {
-        <div class="mkt-plugin-card" [class.mkt-plugin-card--instalado]="p.instalado">
-          <div class="mkt-plugin-card__header">
-            <span class="mkt-plugin-card__icon">{{ p.icono }}</span>
-            <div class="mkt-plugin-card__info">
-              <strong class="mkt-plugin-card__nombre">{{ p.nombre }}</strong>
-              <span class="mkt-plugin-card__tipo">{{ p.tipo }}</span>
-            </div>
-            @if (p.instalado) { <span class="mkt-plugin-card__badge">✓ Conectado</span> }
-          </div>
-          <p class="mkt-plugin-card__desc">{{ p.descripcion }}</p>
-          <div class="mkt-plugin-card__footer">
-            <span class="mkt-plugin-card__proveedor">{{ p.proveedor }}</span>
-            <span class="mkt-plugin-card__precio" [class.mkt-plugin-card__precio--free]="p.gratis">
-              {{ p.gratis ? 'Gratis' : 'Gali Pro' }}
-            </span>
-            @if (!p.instalado) {
-              <button type="button" class="mkt-plugin-card__cta" data-proto-skip>Conectar →</button>
-            }
-          </div>
-        </div>
-      }
-    </div>
-    <p class="mkt-plugins-section__link">
-      <a routerLink="/gali-v5/conexiones">Ver mapa de conexiones activas →</a>
-    </p>
-  </div>
-  } <!-- /plugins -->
 
 </div><!-- /mkt-page -->
 
@@ -728,6 +830,52 @@
         <button type="button" class="mkt-modal__btn mkt-modal__btn--primary"
           (click)="confirmShare()">
           Publicar en marketplace ✦
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── SKILL PREVIEW MODAL ── -->
+@if (previewSkillItem()) {
+  <div class="mkt-preview-backdrop" (click)="closeSkillPreview()">
+    <div class="mkt-preview-modal" (click)="$event.stopPropagation()">
+      <button type="button" class="mkt-preview-modal__close" (click)="closeSkillPreview()">×</button>
+
+      <div class="mkt-preview-modal__agent-header">
+        <span class="mkt-preview-modal__dot" [style.background]="previewSkillItem()!.agentColor"></span>
+        <div>
+          <h2 class="mkt-preview-modal__title">{{ previewSkillItem()!.title }}</h2>
+          <span class="mkt-preview-modal__meta">Skill de {{ previewSkillItem()!.agent }}</span>
+        </div>
+      </div>
+
+      <p class="mkt-preview-modal__desc">{{ previewSkillItem()!.reason }}</p>
+
+      <div class="mkt-preview-modal__section">
+        <h4>¿Qué hace esta skill?</h4>
+        <p class="mkt-preview-modal__body">
+          Detecta condiciones clave en tu operación y ejecuta la acción definida de forma automática.
+          Genera historial auditable de cada ejecución para que puedas revisar qué hizo y cuándo.
+        </p>
+      </div>
+
+      <div class="mkt-preview-modal__section">
+        <h4>Agente que la ejecuta</h4>
+        <span class="mkt-preview-modal__agent-chip"
+          [style.background]="previewSkillItem()!.agentColor + '22'"
+          [style.color]="previewSkillItem()!.agentColor"
+          [style.border-color]="previewSkillItem()!.agentColor + '44'">
+          ● {{ previewSkillItem()!.agent }}
+        </span>
+      </div>
+
+      <div class="mkt-preview-modal__footer">
+        <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--ghost" (click)="closeSkillPreview()">
+          Cancelar
+        </button>
+        <button type="button" class="mkt-preview-modal__btn mkt-preview-modal__btn--primary" (click)="confirmInstallSkillFromPreview()">
+          Activar skill →
         </button>
       </div>
     </div>

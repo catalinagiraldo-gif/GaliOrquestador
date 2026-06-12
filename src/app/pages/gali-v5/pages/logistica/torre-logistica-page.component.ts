@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DropiTitulosComponent, DropiButtonNewComponent } from '../../components/shared';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
-import { GaliAgentAlertComponent } from '../../components/gali-agent-alert/gali-agent-alert.component';
-
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface CarrierIndicator {
   carrier: string;
@@ -27,7 +26,7 @@ interface SmartRoutingRow {
 @Component({
   selector: 'app-torre-logistica-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiTitulosComponent, DropiButtonNewComponent, GaliInsightDirective, GaliAgentAlertComponent],
+  imports: [CommonModule, FormsModule, DropiTitulosComponent, DropiButtonNewComponent, GaliInsightDirective, DropiGaliBarComponent],
   templateUrl: './torre-logistica-page.component.html',
   styleUrl: './torre-logistica-page.component.scss',
 })

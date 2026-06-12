@@ -4,20 +4,19 @@
   </dropi-titulos>
 
   <!-- ✦ Gali banner: conexión con Skills -->
-  <div class="auto-gali-banner">
-    <div class="auto-gali-banner__left">
-      <span class="auto-gali-banner__icon">✦</span>
-      <div>
-        <strong class="auto-gali-banner__title">Convierte estas automatizaciones en Skills de Gali</strong>
-        <p class="auto-gali-banner__sub">
-          Las Skills de Gali se ejecutan automáticamente con condiciones inteligentes y generan historial auditable.
-          Puedes convertir cualquier automatización en una Skill para que Gali la gestione con contexto de negocio.
-        </p>
+  <div class="g-alert g-alert--info">
+    <span class="g-alert__icon">✦</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">Gali — Sugerencia del sistema</span>
+      <span class="g-alert__titulo">Convierte estas automatizaciones en Skills de Gali</span>
+      <p class="g-alert__desc">
+        Las Skills de Gali se ejecutan automáticamente con condiciones inteligentes y generan historial auditable.
+        Puedes convertir cualquier automatización en una Skill para que Gali la gestione con contexto de negocio.
+      </p>
+      <div class="g-alert__foot">
+        <button type="button" class="g-alert__cta" (click)="goToSkills()">Ver mis Skills →</button>
       </div>
     </div>
-    <button type="button" class="auto-gali-banner__cta" (click)="goToSkills()">
-      Ver mis Skills →
-    </button>
   </div>
 
   <div class="automatizacion-page__table-wrap">

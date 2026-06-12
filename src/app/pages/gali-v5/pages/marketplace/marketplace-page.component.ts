@@ -24,6 +24,7 @@ interface CommunitySkill {
 
 type MktAgente = { id: string; nombre: string; color: string; instalado: boolean; creador: string; rating: number; usos: string; descripcion: string; habilidades: string[] };
 type MktRegla  = { id: string; titulo: string; agente: string; agentColor: string; descripcion: string; ejemplo: string; usos: string; instalada: boolean };
+type MktConexion = { id: string; nombre: string; icono: string; categoria: string; proveedor: string; conectado: boolean; gratis: boolean; agentesUsando: string[]; descripcion: string; datosQueProvee: string[] };
 
 interface PersonalizedSkill {
   id: string;
@@ -45,7 +46,7 @@ interface PersonalizedSkill {
 export class MarketplacePageComponent {
   private router = inject(Router);
 
-  readonly mainCategory = signal<'skills' | 'agentes' | 'reglas' | 'plugins'>('skills');
+  readonly mainCategory = signal<'skills' | 'agentes' | 'reglas' | 'conexiones'>('skills');
   readonly activeTab = signal<'populares' | 'por-seccion' | 'expertos' | 'nuevas'>('populares');
   readonly activeSectionFilter = signal<string | null>(null);
   readonly searchQuery = signal('');
@@ -93,17 +94,17 @@ export class MarketplacePageComponent {
   readonly publishPickId = signal<string | null>(null);
 
   readonly publishBtnLabel = computed(() => ({
-    skills:  'Publicar skill',
-    agentes: 'Publicar agente',
-    reglas:  'Publicar regla',
-    plugins: 'Publicar plugin MCP',
+    skills:     'Publicar skill',
+    agentes:    'Publicar agente',
+    reglas:     'Publicar regla',
+    conexiones: 'Solicitar integración',
   }[this.mainCategory()]));
 
   readonly publishModalTitle = computed(() => ({
-    skills:  'Publicar skill en el Marketplace',
-    agentes: 'Publicar agente en el Marketplace',
-    reglas:  'Publicar regla en el Marketplace',
-    plugins: 'Publicar plugin MCP',
+    skills:     'Publicar skill en el Marketplace',
+    agentes:    'Publicar agente en el Marketplace',
+    reglas:     'Publicar regla en el Marketplace',
+    conexiones: 'Solicitar nueva integración',
   }[this.mainCategory()]));
 
   // ── "Existing" items the user can pick per category ──────────────────────
@@ -124,7 +125,7 @@ export class MarketplacePageComponent {
   ];
 
   get myExistingForCategory() {
-    return { skills: this.myExistingSkills, agentes: this.myExistingAgentes, reglas: this.myExistingReglas, plugins: [] }[this.mainCategory()];
+    return { skills: this.myExistingSkills, agentes: this.myExistingAgentes, reglas: this.myExistingReglas, conexiones: [] }[this.mainCategory()];
   }
 
   // ── Published items (user's contributions visible per tab) ───────────────
@@ -141,7 +142,7 @@ export class MarketplacePageComponent {
   ]);
 
   get myPublishedForCategory() {
-    return { skills: this.myPublishedSkills, agentes: this.myPublishedAgentes, reglas: this.myPublishedReglas, plugins: this.myPublishedSkills }[this.mainCategory()]();
+    return { skills: this.myPublishedSkills, agentes: this.myPublishedAgentes, reglas: this.myPublishedReglas, conexiones: this.myPublishedSkills }[this.mainCategory()]();
   }
 
   openPublishModal(): void {
@@ -171,7 +172,7 @@ export class MarketplacePageComponent {
     } else if (this.publishStep() === 'existing') {
       const pid = this.publishPickId();
       if (!pid) return;
-      const src = this.myExistingForCategory.find(x => x.id === pid);
+      const src = this.myExistingForCategory?.find(x => x.id === pid);
       if (!src) return;
       const newItem = { id: `p${Date.now()}`, nombre: src.nombre, desc: src.desc, usos: '0', rating: 0, pendingReview: true };
       if (cat === 'skills')  this.myPublishedSkills.update(l => [newItem, ...l]);
@@ -186,6 +187,7 @@ export class MarketplacePageComponent {
   // Preview modals
   readonly previewAgent = signal<MktAgente | null>(null);
   readonly previewRegla  = signal<MktRegla  | null>(null);
+  readonly previewSkillItem = signal<any | null>(null);
   readonly installedAgentIds = signal<string[]>([]);
   readonly installedReglaIds = signal<string[]>([]);
 
@@ -202,6 +204,13 @@ export class MarketplacePageComponent {
 
   openAgentPreview(ag: MktAgente): void { this.previewAgent.set(ag); }
   closeAgentPreview(): void { this.previewAgent.set(null); }
+  openSkillPreview(skill: any): void { this.previewSkillItem.set(skill); }
+  closeSkillPreview(): void { this.previewSkillItem.set(null); }
+  confirmInstallSkillFromPreview(): void {
+    const s = this.previewSkillItem();
+    if (s?.id) { this.installPersonalized(s.id); }
+    this.previewSkillItem.set(null);
+  }
   confirmInstallAgent(): void {
     const ag = this.previewAgent();
     if (!ag) return;
@@ -274,19 +283,77 @@ export class MarketplacePageComponent {
       ejemplo: 'IF ctr < 0.008 AND duracion >= 48h THEN solicitar_diagnostico_cruzado', usos: '1.9k', instalada: false },
   ];
 
+  readonly mktConexiones: MktConexion[] = [
+    { id: 'meta-ads', nombre: 'Meta Ads Manager', icono: '📣', categoria: 'Ads',
+      proveedor: 'Meta Business', conectado: true, gratis: false,
+      agentesUsando: ['Roax'],
+      descripcion: 'Roax lee ROAS, CTR y gasto en tiempo real. Pausa y escala presupuestos automáticamente.',
+      datosQueProvee: ['ROAS en tiempo real', 'CTR por creativo', 'Gasto diario', 'Frecuencia de impacto'] },
+    { id: 'whatsapp', nombre: 'WhatsApp Business', icono: '💬', categoria: 'Mensajería',
+      proveedor: 'Meta', conectado: true, gratis: false,
+      agentesUsando: ['Chatea Pro'],
+      descripcion: 'Chatea Pro responde mensajes, recupera carritos abandonados y escala casos complejos.',
+      datosQueProvee: ['Conversaciones activas', 'Tasa de respuesta', 'Carritos recuperados', 'Casos escalados'] },
+    { id: 'gdrive', nombre: 'Google Drive', icono: '📁', categoria: 'Storage',
+      proveedor: 'Google', conectado: true, gratis: true,
+      agentesUsando: ['ADA Spy', 'Kronos'],
+      descripcion: 'Gali lee y escribe reportes en Drive. ADA Spy exporta análisis de competencia automáticamente.',
+      datosQueProvee: ['Reportes semanales', 'CSVs de pedidos', 'Creativos de campaña', 'P&L histórico'] },
+    { id: 'gsheets', nombre: 'Google Sheets', icono: '📊', categoria: 'Storage',
+      proveedor: 'Google', conectado: true, gratis: true,
+      agentesUsando: ['Kronos', 'ADA Spy'],
+      descripcion: 'Kronos actualiza tu P&L y métricas de campañas en tiempo real directamente en Sheets.',
+      datosQueProvee: ['P&L en vivo', 'ROAS histórico', 'Inventario', 'Métricas de campañas'] },
+    { id: 'tiktok', nombre: 'TikTok Shop', icono: '🎵', categoria: 'Ads',
+      proveedor: 'TikTok for Business', conectado: false, gratis: false,
+      agentesUsando: ['Roax'],
+      descripcion: 'Gestiona campañas TikTok y ventas en tienda. Roax unifica métricas junto con Meta Ads.',
+      datosQueProvee: ['Ventas TikTok Shop', 'ROAS TikTok', 'Creativos activos', 'Audiencias similares'] },
+    { id: 'shopify', nombre: 'Shopify', icono: '🛍', categoria: 'Commerce',
+      proveedor: 'Shopify Inc.', conectado: false, gratis: false,
+      agentesUsando: ['Vigilante', 'Kronos'],
+      descripcion: 'Sincroniza inventario bidireccional. Vigilante monitorea stock y Kronos registra ventas.',
+      datosQueProvee: ['Inventario real', 'Órdenes en tiempo real', 'Productos activos', 'Ventas por SKU'] },
+    { id: 'notion', nombre: 'Notion', icono: '📝', categoria: 'Storage',
+      proveedor: 'Notion Labs', conectado: false, gratis: true,
+      agentesUsando: ['Kronos'],
+      descripcion: 'Kronos sincroniza proyectos y tareas. Mantén tu base de conocimiento actualizada con datos reales.',
+      datosQueProvee: ['Bases de datos', 'Páginas de proyecto', 'Calendarios', 'Documentos compartidos'] },
+    { id: 'woocommerce', nombre: 'WooCommerce', icono: '🛒', categoria: 'Commerce',
+      proveedor: 'Automattic', conectado: false, gratis: false,
+      agentesUsando: ['Vigilante', 'Kronos'],
+      descripcion: 'Conecta tu tienda WooCommerce para sincronizar pedidos, inventario y métricas de ventas.',
+      datosQueProvee: ['Pedidos en tiempo real', 'Stock', 'Ingresos', 'Historial de clientes'] },
+  ];
+
+  readonly installedConexionIds = signal<string[]>([]);
+
+  isConexionConnected(id: string): boolean {
+    const cx = this.mktConexiones.find(c => c.id === id);
+    return (cx?.conectado ?? false) || this.installedConexionIds().includes(id);
+  }
+  toggleConexion(id: string): void {
+    this.installedConexionIds.update(ids =>
+      ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]
+    );
+  }
+  get connectedConexionCount(): number {
+    return this.mktConexiones.filter(c => this.isConexionConnected(c.id)).length;
+  }
+
   readonly mktPlugins = [
-    { id: 'meta', nombre: 'Meta Ads MCP', icono: '📣', tipo: 'Ads', proveedor: 'Meta Business', gratis: false, instalado: true,
-      descripcion: 'Conecta Roax directamente con Meta Ads Manager. ROAS en tiempo real, escalado automático de presupuesto.' },
-    { id: 'siigo', nombre: 'Siigo MCP', icono: '📊', tipo: 'Contabilidad', proveedor: 'Siigo SAS', gratis: false, instalado: true,
+    { id: 'siigo', nombre: 'Siigo', icono: '📊', tipo: 'Contabilidad', proveedor: 'Siigo SAS', gratis: false, instalado: true,
       descripcion: 'Kronos registra ventas y costos en Siigo automáticamente. Declaración de renta simplificada.' },
-    { id: 'shopify', nombre: 'Shopify MCP', icono: '🛍', tipo: 'E-commerce', proveedor: 'Shopify Inc.', gratis: false, instalado: false,
-      descripcion: 'Sincroniza inventario bidireccional entre Dropi y tu tienda Shopify. Vigilante monitorea stock.' },
-    { id: 'tiktok', nombre: 'TikTok Shop MCP', icono: '🎵', tipo: 'Ads / Shop', proveedor: 'TikTok for Business', gratis: false, instalado: false,
-      descripcion: 'Publica productos y gestiona campañas TikTok desde Gali. Métricas integradas en el Dashboard.' },
-    { id: 'gdrive', nombre: 'Google Drive MCP', icono: '📁', tipo: 'Storage', proveedor: 'Google', gratis: true, instalado: true,
-      descripcion: 'Sube CSVs de pedidos y reportes a Drive automáticamente. Gali lee archivos para enriquecer el contexto.' },
-    { id: 'wms', nombre: 'WMS / ERP MCP', icono: '🏭', tipo: 'Logística', proveedor: 'Multi-proveedor', gratis: false, instalado: false,
+    { id: 'wms', nombre: 'WMS / ERP', icono: '🏭', tipo: 'Logística', proveedor: 'Multi-proveedor', gratis: false, instalado: false,
       descripcion: 'Conecta tu WMS o ERP para que Vigilante tenga visibilidad de inventario en tiempo real.' },
+    { id: 'openai', nombre: 'OpenAI API', icono: '🧠', tipo: 'IA', proveedor: 'OpenAI', gratis: false, instalado: false,
+      descripcion: 'Extiende las capacidades de análisis de Gali con modelos GPT-4o para tareas especializadas.' },
+    { id: 'sendgrid', nombre: 'SendGrid', icono: '✉', tipo: 'Email', proveedor: 'Twilio', gratis: true, instalado: false,
+      descripcion: 'Envía emails transaccionales automáticos desde las reglas de Chatea Pro y confirmaciones de pedido.' },
+    { id: 'webhook', nombre: 'Webhook MCP', icono: '🔗', tipo: 'Integración', proveedor: 'Custom', gratis: true, instalado: false,
+      descripcion: 'Conecta cualquier sistema externo mediante webhooks. Ideal para integrar tu ERP propio.' },
+    { id: 'stripe', nombre: 'Stripe', icono: '💳', tipo: 'Pagos', proveedor: 'Stripe Inc.', gratis: false, instalado: false,
+      descripcion: 'Kronos registra cobros y reembolsos. Ideal para modelos de suscripción o pagos contra entrega digital.' },
   ];
 
   readonly allSkills: CommunitySkill[] = [
@@ -405,6 +472,10 @@ export class MarketplacePageComponent {
 
   activateSkill(id: string): void {
     this.router.navigate(['/gali-v5/skills/nueva'], { queryParams: { base: id } });
+  }
+
+  activateRegla(id: string): void {
+    this.router.navigate(['/gali-v5/reglas'], { queryParams: { nueva: '1', base: id } });
   }
 
   forkSkill(id: string): void {

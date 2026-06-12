@@ -27,10 +27,49 @@ interface VistaShortcut {
       <div class="gallery__header">
         <h2>Prototype Gallery</h2>
         <p class="gallery__subtitle">
-          <strong>Gali V5</strong> arranca con la recreación fiel de Dropi actual (sin Gali).
-          <strong>Gali V4</strong> queda archivada abajo.
+          <strong>Gali V5 v2 · La Casita</strong> es el norte minimalista (Objetivo → Proyectos → Conexiones).
+          <strong>Gali V5</strong> queda intacta abajo como referencia.
         </p>
       </div>
+
+      <!-- VERSIÓN NORTE: Gali V5 v2 — La Casita -->
+      <article class="featured" routerLink="/gali-v5-v2">
+        <header class="featured__head">
+          <span class="featured__tag">
+            <span aria-hidden="true">✦</span> Gali V5 v2 · La Casita
+          </span>
+          <span class="featured__status" data-status="active">norte minimalista</span>
+        </header>
+
+        <h3 class="featured__title">
+          Gali como <em>Director que reporta</em>
+        </h3>
+
+        <p class="featured__lead">
+          Reset a la "casita en la montaña": espinazo Objetivo → Proyectos → Conexiones, home
+          "Hoy" tipo briefing (1 decisión a la vez), impacto de Gali visible y arquitectura técnica
+          oculta en un Centro de control. Build paralelo — no toca Gali V5.
+        </p>
+
+        <div class="featured__vistas">
+          <strong class="featured__vistas-label">Espinazo</strong>
+          <div class="featured__vistas-grid">
+            <a *ngFor="let v of vistasV5v2" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
+              <span class="featured__vista-badge">{{ v.badge }}</span>
+              <strong>{{ v.label }}</strong>
+              <span class="featured__vista-desc">{{ v.description }}</span>
+            </a>
+          </div>
+        </div>
+
+        <footer class="featured__foot">
+          <a routerLink="/gali-v5-v2" class="featured__cta">
+            <span aria-hidden="true">✦</span> Abrir La Casita
+            <span aria-hidden="true">→</span>
+          </a>
+          <span class="featured__kbd">Spec 17 · GaliMinimal</span>
+        </footer>
+      </article>
 
       <!-- VERSIÓN ACTUAL: Gali V5 — Dropi baseline -->
       <article class="featured" routerLink="/gali-v5">
@@ -147,6 +186,14 @@ export class PrototypeGalleryComponent {
     ev.preventDefault();
     this.v4Open.update(v => !v);
   }
+
+  vistasV5v2: VistaShortcut[] = [
+    { label: 'Hoy', route: '/gali-v5-v2', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
+    { label: 'Proyectos', route: '/gali-v5-v2/proyectos', badge: '◎', description: 'Objetivo editable · salud · Gali recomienda' },
+    { label: 'Conexiones', route: '/gali-v5-v2/conexiones', badge: '⬡', description: '5 MCP core · qué contexto da a Gali' },
+    { label: 'Impacto', route: '/gali-v5-v2/impacto', badge: '↗', description: 'Ledger · $ ahorrados · acciones · horas' },
+    { label: 'Centro de control', route: '/gali-v5-v2/centro-control', badge: '⚙', description: 'Agentes · Skills · Reglas (experto)' },
+  ];
 
   vistasV5: VistaShortcut[] = [
     { label: 'Inicio', route: '/gali-v5', badge: '✓', description: 'Home · saludo · proveedores · banner Colombia' },

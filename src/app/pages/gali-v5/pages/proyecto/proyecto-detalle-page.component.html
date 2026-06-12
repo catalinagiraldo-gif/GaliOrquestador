@@ -47,16 +47,17 @@
       </div>
 
       <!-- Gali Alert Bar -->
-      <div class="proyecto__gali-bar">
-        <span class="proyecto__gali-icon">✦</span>
-        <p class="proyecto__gali-msg">{{ proyecto.galiAlerta }}</p>
-        <div class="proyecto__gali-actions">
-          <div class="btn-alert-group">
-            <button type="button" class="btn-alert btn-alert--primary" (click)="goToSignals()">Ver qué hizo Gali →</button>
-            <span class="btn-alert-summary">Pausó campaña · CTR era 0.7%, umbral 1.2%</span>
+      <div class="g-alert g-alert--decision">
+        <span class="g-alert__icon">✦</span>
+        <div class="g-alert__body">
+          <span class="g-alert__nivel">Gali — Acción pendiente</span>
+          <span class="g-alert__titulo">{{ proyecto.galiAlerta }}</span>
+          <p class="g-alert__desc">Pausó campaña · CTR era 0.7%, umbral 1.2%</p>
+          <div class="g-alert__foot">
+            <button type="button" class="g-alert__cta" (click)="goToSignals()">Ver qué hizo Gali →</button>
+            <button type="button" class="g-alert__cta" (click)="goToSkillEditor()">Crear skill automática</button>
+            <button type="button" class="g-alert__cta" (click)="goToMedir()" title="P&L: Pérdidas y Ganancias — tu rentabilidad real después de todos los costos">Ver P&L</button>
           </div>
-          <button type="button" class="btn-alert btn-alert--ghost" (click)="goToSkillEditor()">Crear skill automática</button>
-          <button type="button" class="btn-alert btn-alert--ghost" (click)="goToMedir()" title="P&amp;L: Pérdidas y Ganancias — tu rentabilidad real después de todos los costos">Ver P&amp;L</button>
         </div>
       </div>
     } @else if (isRecienLanzado()) {
@@ -291,10 +292,14 @@
 
   <!-- ── Alerta activa con deep link a señal (C8) ── -->
   @if ($any(proyectoData())?.alerta_activa) {
-    <div class="proyecto-alerta" (click)="irASenal($any(proyectoData())?.alerta_signal_id || 'sen-001')">
-      <i class="pi pi-exclamation-triangle"></i>
-      <span class="proyecto-alerta__msg">{{ $any(proyectoData())?.alerta_mensaje }}</span>
-      <span class="proyecto-alerta__link">Ver señal →</span>
+    <div class="g-alert g-alert--critica" style="cursor:pointer; margin: 0 0 $size-4"
+      (click)="irASenal($any(proyectoData())?.alerta_signal_id || 'sen-001')">
+      <span class="g-alert__icon">⚡</span>
+      <div class="g-alert__body">
+        <span class="g-alert__nivel">● Crítico — Señal activa</span>
+        <span class="g-alert__titulo">{{ $any(proyectoData())?.alerta_mensaje }}</span>
+      </div>
+      <span class="g-alert__cta">Ver señal →</span>
     </div>
   }
 
@@ -430,7 +435,7 @@
                 </div>
                 <p class="accion-item__accion">{{ entry.accion }}</p>
                 <p class="accion-item__resultado">{{ entry.resultado }}</p>
-                <button *ngIf="entry.cta" type="button" class="loop-cta">{{ entry.cta }}</button>
+                <button *ngIf="entry.cta" type="button" class="accion-cta">{{ entry.cta }}</button>
               </div>
             </div>
           </div>

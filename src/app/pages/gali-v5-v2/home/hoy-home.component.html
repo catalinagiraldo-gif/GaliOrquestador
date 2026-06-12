@@ -1,0 +1,80 @@
+<div class="hoy">
+  <!-- ── 1 · Línea de estado ── -->
+  <header class="status">
+    <div class="status__main">
+      <h1 class="status__title">Hola Cata. Tu negocio va bien.</h1>
+      <p class="status__sub">Semana {{ semana }} · {{ pedidosActual }}/{{ objetivoMeta() }} pedidos hacia tu meta</p>
+    </div>
+    <div class="status__meter">
+      <svg class="status__spark" viewBox="0 0 88 22" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polyline [attr.points]="sparkPoints()" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <span class="status__pct">{{ metaPct() }}%</span>
+    </div>
+  </header>
+
+  <!-- ── 2 · Decisión de hoy (máx 1) ── -->
+  <section class="block">
+    <span class="block__eyebrow">Decisión de hoy</span>
+
+    @if (!decisionResuelta()) {
+      <gali-decision-theater
+        [decision]="decision()"
+        (onOptionSelected)="onOption($event)"
+        (onDecidir)="onDecidirDespues()"
+        (onVerCola)="onVerCola()">
+      </gali-decision-theater>
+
+      <button class="delegar" [class.delegar--on]="delegarProxima()" (click)="toggleDelegar()" data-proto-skip>
+        <span class="delegar__check">{{ delegarProxima() ? '✓' : '' }}</span>
+        Dejar que Gali resuelva esto solo la próxima vez
+        <span class="delegar__hint">— ganas confianza, Gali gana autonomía</span>
+      </button>
+    } @else {
+      <div class="calma">
+        <p class="calma__title">Todo está corriendo.</p>
+        <p class="calma__sub">Última acción de Gali {{ ultimaAccionGali }}.</p>
+      </div>
+    }
+  </section>
+
+  <!-- ── 3 · Gali hizo por ti ── -->
+  <section class="impacto">
+    <div class="impacto__head">
+      <span class="impacto__eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
+      <a routerLink="/gali-v5-v2/impacto" class="impacto__link">Ver historial →</a>
+    </div>
+    <div class="impacto__stats">
+      <div class="impacto__stat">
+        <span class="impacto__val">{{ impacto.acciones_totales }}</span>
+        <span class="impacto__lbl">acciones</span>
+      </div>
+      <div class="impacto__stat impacto__stat--hero">
+        <span class="impacto__val">{{ impacto.pesos_ahorrados_label }}</span>
+        <span class="impacto__lbl">ahorrados</span>
+      </div>
+      <div class="impacto__stat">
+        <span class="impacto__val">{{ impacto.novedades_evitadas }}</span>
+        <span class="impacto__lbl"><span galiGlosario="novedad">novedades</span> evitadas</span>
+      </div>
+      <div class="impacto__stat">
+        <span class="impacto__val">{{ impacto.horas_libradas }}h</span>
+        <span class="impacto__lbl">que no operaste tú</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4 · Tu mayor palanca ── -->
+  <section class="palanca">
+    <div class="palanca__body">
+      <span class="palanca__eyebrow">Tu mayor palanca esta semana</span>
+      <strong class="palanca__title">{{ palanca.titulo }}</strong>
+      <p class="palanca__detail">{{ palanca.detalle }}</p>
+    </div>
+    <div class="palanca__side">
+      <span class="palanca__window">{{ palanca.ventanaDias }} días</span>
+      <button class="palanca__cta" (click)="lanzarPalanca()">Ver proyecto sugerido →</button>
+    </div>
+  </section>
+</div>

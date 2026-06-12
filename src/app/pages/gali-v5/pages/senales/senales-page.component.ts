@@ -28,18 +28,25 @@ export class SenalesPageComponent implements OnInit {
 
   activeFilter = signal<FilterTab>('todas');
   selectedId = signal<string | null>(null);
+  proyectoFiltro = signal<string | null>(null);
 
   // ──────────────────────────────────────────────────────────
-  // Computed: listas visibles según filtro activo
+  // Computed: listas visibles según filtro activo + proyecto
   // ──────────────────────────────────────────────────────────
 
-  senalesActivas = computed(() => this.senales.filter(s => s.tipo !== 'completed'));
+  senalesActivas = computed(() => {
+    const pf = this.proyectoFiltro();
+    const base = this.senales.filter(s => s.tipo !== 'completed');
+    return pf ? base.filter(s => (s as any).proyectoId === pf || !pf) : base;
+  });
   alertasActivas = computed(() => this.alertas);
 
   senalesVisibles = computed(() => {
+    const pf = this.proyectoFiltro();
     if (this.activeFilter() === 'alertas') return [];
     if (this.activeFilter() === 'completadas') return this.senales.filter(s => s.tipo === 'completed');
-    return this.senales.filter(s => s.tipo !== 'completed');
+    const base = this.senales.filter(s => s.tipo !== 'completed');
+    return pf ? base.filter(s => !(s as any).proyectoId || (s as any).proyectoId === pf) : base;
   });
 
   alertasVisibles = computed(() => {
@@ -91,6 +98,11 @@ export class SenalesPageComponent implements OnInit {
     const params = this.route.snapshot.queryParamMap;
     const filtroParam = params.get('filtro') as FilterTab | null;
     const signalId = params.get('signalId');
+    const projectId = params.get('projectId');
+
+    if (projectId) {
+      this.proyectoFiltro.set(projectId);
+    }
 
     if (filtroParam && ['todas', 'senales', 'alertas', 'completadas'].includes(filtroParam)) {
       this.activeFilter.set(filtroParam);
@@ -99,7 +111,6 @@ export class SenalesPageComponent implements OnInit {
     if (signalId) {
       this.selectedId.set(signalId);
       this.highlightId.set(signalId);
-      // Clear highlight after animation completes
       setTimeout(() => this.highlightId.set(null), 3000);
     } else {
       const primeraSenal = this.senalesVisibles()[0];

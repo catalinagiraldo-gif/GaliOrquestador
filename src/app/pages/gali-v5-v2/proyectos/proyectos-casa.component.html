@@ -1,0 +1,82 @@
+<div class="proy">
+  <!-- Objetivo -->
+  <section class="goal" [attr.data-estado]="metaEstado()">
+    <div class="goal__top">
+      <div>
+        <span class="goal__eyebrow">Tu objetivo</span>
+        <h1 class="goal__text">{{ objetivoTexto() }}</h1>
+      </div>
+      <button class="goal__edit" (click)="openEdit()">Editar</button>
+    </div>
+    <div class="goal__progress">
+      <div class="goal__track"><div class="goal__fill" [style.width.%]="metaPct()"></div></div>
+      <span class="goal__num">{{ pedidosActual }}/{{ objetivoMeta() }} pedidos · {{ metaPct() }}%</span>
+      <span class="goal__state" [attr.data-estado]="metaEstado()">
+        {{ metaEstado() === 'cumplida' ? 'Cumplida' : metaEstado() === 'en_camino' ? 'En camino' : 'En riesgo' }}
+      </span>
+    </div>
+  </section>
+
+  <!-- Gali recomienda -->
+  <section class="reco">
+    <span class="reco__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda para tu objetivo</span>
+    <div class="reco__cards">
+      @for (r of recomendaciones; track r.titulo) {
+        <article class="reco__card">
+          <span class="reco__window">{{ r.ventana }}</span>
+          <strong class="reco__title">{{ r.titulo }}</strong>
+          <p class="reco__porque">{{ r.porque }}</p>
+          <button class="reco__cta" (click)="nuevo()">Crear proyecto →</button>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- Salud del portafolio -->
+  <section class="port">
+    <div class="port__head">
+      <span class="port__eyebrow">Salud de tus proyectos</span>
+      <button class="port__new" (click)="nuevo()">+ Nuevo proyecto</button>
+    </div>
+    <div class="port__legend">
+      <span>Estado</span><span>Proyecto</span><span>Pedidos</span><span galiGlosario="ROAS">ROAS</span><span>Salud</span><span></span>
+    </div>
+    <ul class="port__list">
+      @for (p of proyectos; track p.id) {
+        <li class="port__item" (click)="abrir(p.id)">
+          <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+          <span class="port__name">{{ p.nombre }}</span>
+          <span class="port__metric">{{ p.pedidos }}</span>
+          <span class="port__metric">{{ p.roas }}</span>
+          <span class="port__health">
+            <span class="port__health-track">
+              <span class="port__health-fill"
+                    [style.width.%]="p.saludPct"
+                    [class.is-low]="p.saludPct < 45"
+                    [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
+            </span>
+            <span class="port__health-num">{{ p.saludPct }}%</span>
+          </span>
+          <span class="port__go" aria-hidden="true">→</span>
+        </li>
+      }
+    </ul>
+  </section>
+</div>
+
+<!-- Modal editar objetivo (1 paso) -->
+@if (editOpen()) {
+  <div class="modal-bg" (click)="editOpen.set(false)"></div>
+  <div class="modal" role="dialog">
+    <h2 class="modal__title">🎯 Editar objetivo</h2>
+    <label class="modal__label">¿Qué quieres lograr?</label>
+    <input class="modal__input" [value]="draftTexto()" (input)="draftTexto.set($any($event.target).value)" />
+    <label class="modal__label">Meta numérica (pedidos/semana)</label>
+    <input class="modal__input" type="number" [value]="draftMeta()" (input)="draftMeta.set(+$any($event.target).value)" />
+    <p class="modal__hint">Gali usará este objetivo para priorizar señales y recomendarte proyectos.</p>
+    <div class="modal__actions">
+      <button class="modal__cancel" (click)="editOpen.set(false)">Cancelar</button>
+      <button class="modal__save" (click)="saveEdit()">Guardar objetivo →</button>
+    </div>
+  </div>
+}

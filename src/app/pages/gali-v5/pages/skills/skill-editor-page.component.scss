@@ -169,6 +169,13 @@
       color: white;
       &:hover { background: darken(#ff6102, 6%); }
     }
+
+    &--gali {
+      background: rgba($os-accent, 0.08);
+      border: 1px dashed rgba($os-accent, 0.4);
+      color: $os-accent;
+      &:hover { background: rgba($os-accent, 0.14); }
+    }
   }
 
   &__body {
@@ -684,4 +691,99 @@
   font-size: 11px;
   color: #9ca3af;
   margin: 6px 0 0;
+}
+
+// ── Panel de ayuda Gali ──────────────────────────────────────
+.se-gali-panel {
+  background: rgba(255, 97, 2, 0.03);
+  border: 1px dashed rgba(255, 97, 2, 0.25);
+  border-radius: $os-radius-md;
+  padding: $os-4 $os-5;
+  animation: fadeSlideDown 0.2s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $os-2;
+    margin-bottom: $os-2;
+  }
+
+  &__spark {
+    font-size: 16px;
+    color: $os-accent;
+  }
+
+  &__title {
+    font-family: $os-font-body;
+    font-size: 14px;
+    font-weight: 600;
+    color: $os-text-primary;
+    flex: 1;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $os-text-secondary;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    &:hover { background: $os-surface-3; }
+  }
+
+  &__hint {
+    font-family: $os-font-body;
+    font-size: 12px;
+    color: $os-text-secondary;
+    margin: 0 0 $os-3;
+  }
+
+  &__suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: $os-2;
+  }
+}
+
+.se-gali-sugg {
+  display: flex;
+  align-items: center;
+  gap: $os-3;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-sm;
+  padding: $os-3 $os-4;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: rgba($os-accent, 0.4);
+    background: rgba($os-accent, 0.04);
+  }
+
+  &__label {
+    font-family: $os-font-body;
+    font-size: 13px;
+    color: $os-text-primary;
+    flex: 1;
+  }
+
+  &__agente {
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.08);
+    border-radius: 8px;
+    padding: 2px 8px;
+    text-transform: capitalize;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

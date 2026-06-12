@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './common/guards/auth.guard';
 import { GALI_V5_CHILD_ROUTES } from './pages/gali-v5/gali-v5.routes';
+import { GALI_V5_V2_CHILD_ROUTES } from './pages/gali-v5-v2/gali-v5-v2.routes';
 
 export const routes: Routes = [
   {
@@ -139,6 +140,15 @@ export const routes: Routes = [
             m => m.GaliV5ShellComponent,
           ),
         children: GALI_V5_CHILD_ROUTES,
+      },
+      // Gali V5 v2 — "La Casita": acceso paralelo minimalista (no toca /gali-v5)
+      {
+        path: 'gali-v5-v2',
+        loadComponent: () =>
+          import('./pages/gali-v5-v2/gali-v5-v2-shell.component').then(
+            m => m.GaliV5V2ShellComponent,
+          ),
+        children: GALI_V5_V2_CHILD_ROUTES,
       },
       // Alias /gali-v4/** → /gali-v3/** (V4 es la versión actual; v3 es el path interno)
       {

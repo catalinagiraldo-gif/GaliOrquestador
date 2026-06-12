@@ -49,9 +49,12 @@
   </div>
 
   <!-- Gali message -->
-  <div class="project-panel__gali-msg" [class.project-panel__gali-msg--warn]="project.alertaActiva">
-    <span class="project-panel__gali-icon">✦</span>
-    <span class="project-panel__gali-text">{{ project.galiMensaje }}</span>
+  <div class="g-alert" [class.g-alert--decision]="project.alertaActiva" [class.g-alert--info]="!project.alertaActiva">
+    <span class="g-alert__icon">✦</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">{{ project.alertaActiva ? 'Gali — Acción pendiente' : 'Gali' }}</span>
+      <span class="g-alert__titulo">{{ project.galiMensaje }}</span>
+    </div>
   </div>
 
   <!-- Actions -->

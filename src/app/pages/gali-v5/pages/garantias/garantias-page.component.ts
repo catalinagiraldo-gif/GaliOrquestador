@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { GaliAgentAlertComponent } from '../../components/gali-agent-alert/gali-agent-alert.component';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 type GarantiasVariant = 'garantias' | 'ordenes-despacho';
 
@@ -17,7 +17,7 @@ interface GarantiasConfig {
 @Component({
   selector: 'app-garantias-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, GaliAgentAlertComponent],
+  imports: [CommonModule, FormsModule, RouterLink, DropiGaliBarComponent],
   templateUrl: './garantias-page.component.html',
   styleUrl: './garantias-page.component.scss',
 })

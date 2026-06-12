@@ -1,5 +1,13 @@
 <div class="reglas-page">
 
+  <dropi-gali-bar
+    agent="Gali"
+    status="gobernando 3 agentes"
+    [message]="reglas().length + ' reglas activas · Gali interpreta y aplica cada Si → Entonces automáticamente'"
+    ctaLabel="Ver señales"
+    secondaryCta="Ir a Agentes"
+  />
+
   <header class="reglas-page__header">
     <div>
       <span class="reglas-page__eyebrow">Condicionales · Si → Entonces</span>
@@ -47,6 +55,19 @@
         [value]="newRuleText()"
         (input)="newRuleText.set($any($event.target).value)">
       </textarea>
+
+      @if (parsedRulePreview()) {
+        <div class="rule-preview">
+          <span class="rule-preview__label">✦ Gali interpreta esto como:</span>
+          <div class="rule-preview__logic">
+            <span class="rule-preview__si">SI</span>
+            <span class="rule-preview__cond">{{ parsedRulePreview()!.si }}</span>
+            <span class="rule-preview__arrow">→</span>
+            <span class="rule-preview__entonces">ENTONCES</span>
+            <span class="rule-preview__action">{{ parsedRulePreview()!.entonces }}</span>
+          </div>
+        </div>
+      }
 
       <!-- Sección: Agregar a mis agentes -->
       <div class="new-rule-editor__assign-section">

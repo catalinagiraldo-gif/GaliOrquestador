@@ -28,12 +28,34 @@
       </div>
     </div>
     <div class="se__header-actions">
+      <button type="button" class="se__btn se__btn--gali" (click)="showGaliHelp.set(!showGaliHelp())">
+        ✦ Gali, ayúdame
+      </button>
       <button type="button" class="se__btn se__btn--ghost" (click)="cancel()">Cancelar</button>
       <button type="button" class="se__btn se__btn--primary" (click)="activateSkill()">
         ✓ Activar skill
       </button>
     </div>
   </div>
+
+  @if (showGaliHelp()) {
+    <div class="se-gali-panel">
+      <div class="se-gali-panel__header">
+        <span class="se-gali-panel__spark">✦</span>
+        <span class="se-gali-panel__title">¿Qué quieres que haga esta skill?</span>
+        <button type="button" class="se-gali-panel__close" (click)="showGaliHelp.set(false)">✕</button>
+      </div>
+      <p class="se-gali-panel__hint">Elige un punto de partida o describe la automatización:</p>
+      <div class="se-gali-panel__suggestions">
+        @for (s of galiSuggestions; track s.label) {
+          <button type="button" class="se-gali-sugg" (click)="applySuggestion(s)">
+            <span class="se-gali-sugg__label">{{ s.label }}</span>
+            <span class="se-gali-sugg__agente">{{ s.agente }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
 
   <!-- Body: 2 columns -->
   <div class="se__body">

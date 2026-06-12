@@ -1,54 +1,12 @@
 <div class="cas-bandeja">
 
   <header class="cas-page-intro">
-    <div class="cas-page-intro__left">
-      <h1 class="cas-page-intro__title">Centro de Atención · CAS</h1>
-      <p class="cas-page-intro__text">
-        Chatea Pro maneja el 88% de los casos solo. Aquí llegan <strong>solo los que necesitan tu decisión</strong>.
-      </p>
-    </div>
-    <div class="cas-page-intro__flow">
-      <div class="cas-flow-step">
-        <span class="cas-flow-step__icon">💬</span>
-        <span class="cas-flow-step__label">Cliente escribe</span>
-      </div>
-      <span class="cas-flow-arrow">→</span>
-      <div class="cas-flow-step cas-flow-step--agent">
-        <span class="cas-flow-step__icon">✦</span>
-        <span class="cas-flow-step__label">Chatea Pro responde</span>
-        <span class="cas-flow-step__sub">automático · 88% resueltos</span>
-      </div>
-      <span class="cas-flow-arrow">→</span>
-      <div class="cas-flow-step cas-flow-step--human">
-        <span class="cas-flow-step__icon">👤</span>
-        <span class="cas-flow-step__label">Tú decides</span>
-        <span class="cas-flow-step__sub">12% requieren tu criterio</span>
-      </div>
-    </div>
+    <h1 class="cas-page-intro__title">Centro de Atención · CAS</h1>
+    <p class="cas-page-intro__text">
+      Chatea Pro resolvió el <strong>88%</strong> de los tickets esta semana.
+      Aquí llegan <strong>solo los que necesitan tu decisión</strong>.
+    </p>
   </header>
-
-  <!-- Panel conceptual — solo primera visita (intro ya muestra el flujo) -->
-  <div class="cas-explainer" *ngIf="showExplainer" (click)="dismissCasExplainer()" style="cursor:pointer">
-    <div class="cas-explainer__flow">
-      <div class="cas-explainer__node cas-explainer__node--client">
-        <span class="cas-explainer__node-icon">💬</span>
-        <span>Cliente escribe</span>
-      </div>
-      <div class="cas-explainer__arrow">→</div>
-      <div class="cas-explainer__node cas-explainer__node--agent">
-        <span class="cas-explainer__node-icon">🤖</span>
-        <strong>Chatea Pro analiza</strong>
-        <span>Respuesta automática</span>
-      </div>
-      <div class="cas-explainer__arrow">→</div>
-      <div class="cas-explainer__node cas-explainer__node--human">
-        <span class="cas-explainer__node-icon">👤</span>
-        <span>Si no puede resolverlo</span>
-        <strong>Aparece aquí para que tú decidas</strong>
-      </div>
-    </div>
-    <button class="cas-explainer__close" type="button" (click)="dismissCasExplainer(); $event.stopPropagation()">Entendido ×</button>
-  </div>
 
   <dropi-gali-bar
     agent="Chatea Pro"
@@ -212,8 +170,8 @@
 
   <aside class="cas-bandeja__pqr" id="pqr-panel">
     <header class="pqr-panel__head">
-      <h4>Inteligencia PQR · Esta semana</h4>
-      <p>Basado en {{ galiStats.total }} tickets clasificados por Gali</p>
+      <h4>Patrones detectados</h4>
+      <span class="pqr-panel__count">{{ galiStats.total }} tickets · esta semana</span>
     </header>
 
     <div class="pqr-panel__list">
@@ -234,9 +192,7 @@
               <span class="pqr-card__trend pqr-card__trend--down">↓ bajando</span>
             }
           </div>
-          <p class="pqr-card__motivo">{{ patron.motivo }}</p>
           <p class="pqr-card__insight">{{ patron.galiInsight }}</p>
-          <p class="pqr-card__impacto">{{ patron.impacto }}</p>
           <button
             type="button"
             class="pqr-card__cta"

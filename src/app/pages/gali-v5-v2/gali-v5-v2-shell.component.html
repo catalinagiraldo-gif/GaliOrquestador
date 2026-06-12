@@ -1,0 +1,63 @@
+<div class="v2shell" [class.v2shell--nav-open]="navOpen()" [class.v2shell--panel-open]="gali.galiMode() > 0">
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="topbar__menu" (click)="toggleNav()" aria-label="Menú">☰</button>
+
+    <a class="topbar__brand" routerLink="/gali-v5-v2">
+      <span class="topbar__brand-mark">✦</span>
+      <span class="topbar__brand-name">Gali</span>
+      <span class="topbar__brand-tag">v2 · Casita</span>
+    </a>
+
+    <a class="topbar__goal" routerLink="/gali-v5-v2/proyectos">
+      <span class="topbar__goal-label">Meta</span>
+      <span class="topbar__goal-track"><span class="topbar__goal-fill" [style.width.%]="objetivoPct()"></span></span>
+      <span class="topbar__goal-val">{{ objetivoActual }}/{{ objetivoMeta() }} ped · {{ objetivoPct() }}%</span>
+    </a>
+
+    <div class="topbar__right">
+      <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()">
+        {{ modo() === 'basico' ? 'Modo básico' : 'Modo experto' }}
+      </button>
+      <button class="topbar__wallet" (click)="walletHidden.set(!walletHidden())">
+        <span class="topbar__wallet-ico" aria-hidden="true">▮</span>
+        <span class="topbar__wallet-val">{{ walletHidden() ? '••••••' : walletLabel }}</span>
+      </button>
+      <button class="topbar__gali" [class.is-on]="gali.galiMode() > 0" (click)="gali.togglePanel()">
+        <span aria-hidden="true">✦</span> Gali
+      </button>
+      <span class="topbar__avatar" aria-hidden="true">CG</span>
+    </div>
+  </header>
+
+  <!-- Cuerpo: rail + section-nav + contenido -->
+  <div class="v2shell__body" [class.v2shell__body--no-section]="!hasSectionPanel()">
+    <app-gali-v5-v2-icon-rail />
+
+    @if (hasSectionPanel() && modo() === 'experto') {
+      <dropi-section-nav
+        [panel]="sectionPanel()"
+        [collapsed]="sectionCollapsed()"
+        (collapseRequested)="toggleSection()"
+        (expandRequested)="toggleSection()" />
+    } @else if (hasSectionPanel()) {
+      <dropi-section-nav [panel]="sectionPanel()" [collapsed]="false" />
+    }
+
+    <main class="v2shell__content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Backdrop nav móvil -->
+  @if (navOpen()) {
+    <div class="v2shell__backdrop" (click)="navOpen.set(false)"></div>
+  }
+
+  <!-- Chat lateral de Gali (recuperado de v1) -->
+  @if (gali.galiMode() > 0) {
+    <div class="v2shell__panel gali-panel-slide-in" [style.width.px]="gali.panelWidth()">
+      <gali-right-panel (closed)="gali.togglePanel()" />
+    </div>
+  }
+</div>

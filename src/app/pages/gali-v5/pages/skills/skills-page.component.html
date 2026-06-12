@@ -46,10 +46,25 @@
       <!-- Mis Skills grouped by agent -->
       <div class="skills-os__sidebar-header">
         <span class="skills-os__sidebar-label">MIS SKILLS</span>
-        <span class="skills-os__sidebar-count">{{ skills.length }}</span>
+        <span class="skills-os__sidebar-count">{{ filteredSkills().length }}</span>
       </div>
 
-      @for (skill of skills; track skill.id) {
+      <!-- Agent filter chips -->
+      <div class="skills-filter-chips">
+        <button type="button" class="skills-filter-chip"
+          [class.skills-filter-chip--active]="skillAgentFilter() === null"
+          (click)="skillAgentFilter.set(null)">Todos</button>
+        @for (agent of ontologyAgents; track agent.id) {
+          <button type="button" class="skills-filter-chip"
+            [class.skills-filter-chip--active]="skillAgentFilter() === agent.name"
+            [style.--chip-color]="agent.color"
+            (click)="skillAgentFilter.set(skillAgentFilter() === agent.name ? null : agent.name)">
+            {{ agent.name }}
+          </button>
+        }
+      </div>
+
+      @for (skill of filteredSkills(); track skill.id) {
         <button
           type="button"
           class="skill-item"

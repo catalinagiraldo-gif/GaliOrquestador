@@ -11,17 +11,16 @@
   />
 
   <!-- Gali insight: proveedor contextual -->
-  <div class="providers-gali-insight">
-    <div class="providers-gali-insight__gali">
-      <span class="providers-gali-insight__icon">✦</span>
-      <div class="providers-gali-insight__text">
-        <strong>Para tu proyecto activo (Collar GPS),</strong> PetStore Colombia tiene 847 unidades disponibles y 98% de calidad histórica.
-        Precio proveedor: $28.500 · Margen estimado: $18.500/u después de flete y novedad.
+  <div class="g-alert g-alert--info">
+    <span class="g-alert__icon">✦</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">Gali — Contexto de tu proyecto activo</span>
+      <span class="g-alert__titulo">Para tu proyecto activo (Collar GPS), PetStore Colombia tiene 847 unidades disponibles y 98% de calidad histórica.</span>
+      <p class="g-alert__desc">Precio proveedor: $28.500 · Margen estimado: $18.500/u después de flete y novedad.</p>
+      <div class="g-alert__foot">
+        <button type="button" class="g-alert__cta" (click)="goToLanzar()">Contactar proveedor →</button>
+        <button type="button" class="g-alert__cta" data-proto-skip>Ver historial calidad</button>
       </div>
-    </div>
-    <div class="providers-gali-insight__actions">
-      <button type="button" class="providers-gali-insight__cta" (click)="goToLanzar()">Contactar proveedor →</button>
-      <button type="button" class="providers-gali-insight__secondary" data-proto-skip>Ver historial calidad</button>
     </div>
   </div>
 

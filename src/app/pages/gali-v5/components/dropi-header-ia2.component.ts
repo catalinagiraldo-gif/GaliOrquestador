@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { DropiPrototypeFeedbackService } from '../services/dropi-prototype-feedback.service';
 import { GaliStateService } from '../services/gali-state.service';
+import { GaliWorkspaceService } from '../services/gali-workspace.service';
 import { GALI_V5_DROPI_LOGO } from '../gali-v5.constants';
 import { MOCK_ALERTAS, MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
 
@@ -141,6 +142,16 @@ function resolveBreadcrumbs(path: string): BreadcrumbItem[] {
           </div>
           <span class="header-ia2__health-label">salud</span>
         </button>
+
+        <!-- Meta global — visible en todos los módulos (Fase 5.3) -->
+        <a routerLink="/gali-v5" class="header-ia2__goal-strip" title="Meta global · clic para ver en el hub">
+          <span class="header-ia2__goal-label">Meta</span>
+          <span class="header-ia2__goal-text">{{ goalText() }}</span>
+          <div class="header-ia2__goal-bar">
+            <div class="header-ia2__goal-fill" [style.width.%]="goalPct()"></div>
+          </div>
+          <span class="header-ia2__goal-pct">{{ goalPct() }}%</span>
+        </a>
 
         <!-- Agente activo en la sección actual -->
         <button
@@ -294,6 +305,20 @@ export class DropiHeaderIa2Component implements OnInit {
   private feedback = inject(DropiPrototypeFeedbackService);
   private router = inject(Router);
   readonly galiState = inject(GaliStateService);
+  private ws = inject(GaliWorkspaceService);
+
+  readonly goalText = computed(() => {
+    const dna = this.ws.businessDNA();
+    if (dna.goalLabel) return dna.goalLabel;
+    const target = dna.pedidosTarget;
+    return target > 0 ? `${target} ped/mes` : '500 ped/mes';
+  });
+
+  readonly goalPct = computed(() => {
+    const target = this.ws.businessDNA().pedidosTarget || 500;
+    const current = Math.round(target * 0.67);
+    return Math.round((current / target) * 100);
+  });
 
   readonly logoSrc = GALI_V5_DROPI_LOGO;
 

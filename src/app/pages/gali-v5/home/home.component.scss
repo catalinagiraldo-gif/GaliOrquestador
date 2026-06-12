@@ -2606,6 +2606,22 @@
     box-shadow: 0 6px 20px rgba($primary-500, 0.5);
   }
   &--open { transform: rotate(45deg); background: $gray-700; box-shadow: none; }
+
+  &--basic {
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+    box-shadow: 0 6px 24px rgba($primary-500, 0.5);
+
+    &:hover { box-shadow: 0 8px 28px rgba($primary-500, 0.6); }
+  }
+}
+
+.hub-fab-menu__item--reconfig {
+  color: $gray-500;
+  border-top: 1px solid $gray-100;
+  margin-top: 2px;
+  padding-top: 8px;
 }
 
 .hub-fab-menu {
@@ -3354,6 +3370,155 @@
 
 // ── Spec 9 — 3 Momentos ──────────────────────────────────────────────────
 
+// ── Nivel 1: Alerta Crítica (Fase 1.4) ───────────────────────────────────
+.hub-alerta-critica {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-2 $size-6;
+  background: rgba(#dc2626, 0.04);
+  border-bottom: 1px solid rgba(#dc2626, 0.2);
+  border-left: 3px solid #dc2626;
+  animation: slideInDown 0.25s $ease-spring;
+
+  &__inner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  &__nivel {
+    font-family: $font-primary;
+    font-size: 10px;
+    font-weight: $font-bold;
+    color: #dc2626;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__agent-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__agent {
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-semibold;
+    color: $gray-700;
+    flex-shrink: 0;
+  }
+
+  &__titulo {
+    font-family: $font-primary;
+    font-size: 12px;
+    font-weight: $font-medium;
+    color: $gray-900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__afectados {
+    font-family: $font-primary;
+    font-size: 11px;
+    color: #dc2626;
+    font-weight: $font-semibold;
+    flex-shrink: 0;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border: 1px solid rgba(#dc2626, 0.4);
+    border-radius: $radius-sm;
+    background: rgba(#dc2626, 0.06);
+    color: #dc2626;
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:hover { background: rgba(#dc2626, 0.12); }
+  }
+
+  &__dismiss {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: $gray-400;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border-radius: $radius-xs;
+    transition: color 0.15s, background 0.15s;
+
+    &:hover { color: $gray-600; background: $gray-100; }
+  }
+}
+
+@keyframes slideInDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);      opacity: 1; }
+}
+
+// ── Labels de nivel de alerta (Fase 1.4) ─────────────────────────────────
+.hub-nivel-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: $size-1 $size-6 0;
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: $font-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: -$size-1;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__queue {
+    font-size: 10px;
+    font-weight: $font-bold;
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+
+  &--2 {
+    color: $primary-600;
+    .hub-nivel-label__dot  { background: $primary-500; }
+    .hub-nivel-label__queue {
+      background: rgba($primary-500, 0.12);
+      color: $primary-600;
+    }
+  }
+
+  &--3 {
+    color: $gray-400;
+    .hub-nivel-label__dot { background: $gray-300; }
+  }
+}
+
 // ── Header compacto (Spec 9) ─────────────────────────────────────────────
 .hub-header-compact {
   display: flex;
@@ -3417,7 +3582,7 @@
 .hub-header-compact__goal-edit {
   font-size: 11px;
   color: $gray-400;
-  opacity: 0;
+  opacity: 0.7;
   transition: opacity 0.15s;
 }
 
@@ -3440,20 +3605,60 @@
 }
 
 .hub-header-compact__cta {
-  padding: 6px 14px;
-  border: 1px solid var(--primary-200);
+  padding: 7px 16px;
+  border: none;
   border-radius: $radius-md;
-  background: var(--orange-50);
-  color: var(--primary-700);
+  background: $primary-500;
+  color: #fff;
   font-family: $font-primary;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background $motion-fast $ease-standard, border-color $motion-fast $ease-standard;
+  letter-spacing: 0.01em;
+  transition: background $motion-fast $ease-standard, transform $motion-fast $ease-standard;
 
   &:hover {
-    background: var(--primary-50);
-    border-color: var(--primary-300);
+    background: $primary-600;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.hub-header-compact__mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  background: transparent;
+  color: $gray-500;
+  font-family: $font-primary;
+  font-size: 11px;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $motion-fast $ease-standard;
+
+  .pi { font-size: 10px; }
+
+  &:hover {
+    background: $gray-50;
+    border-color: $gray-300;
+    color: $gray-700;
+  }
+
+  &--expert {
+    border-color: rgba($primary-500, 0.3);
+    color: $primary-600;
+    background: rgba($primary-500, 0.04);
+
+    &:hover {
+      background: rgba($primary-500, 0.08);
+      border-color: $primary-400;
+    }
   }
 }
 

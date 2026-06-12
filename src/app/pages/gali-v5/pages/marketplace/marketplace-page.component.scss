@@ -1084,8 +1084,13 @@
     color: $os-text-secondary;
   }
 
-  &__cta {
+  &__actions {
+    display: flex;
+    gap: 6px;
     margin-left: auto;
+  }
+
+  &__cta {
     font-family: $os-font-body;
     font-size: 13px;
     font-weight: 600;
@@ -1095,8 +1100,23 @@
     border-radius: $os-radius-sm;
     padding: $size-2 $size-4;
     cursor: pointer;
+    white-space: nowrap;
 
     &:hover { background: rgba($os-accent, 0.15); }
+
+    &--ghost {
+      color: $os-text-secondary;
+      background: transparent;
+      border-color: $os-border;
+      &:hover { background: $os-surface-3; color: $os-text-primary; }
+    }
+
+    &--primary {
+      color: #fff;
+      background: $os-accent;
+      border-color: $os-accent;
+      &:hover { filter: brightness(0.92); }
+    }
 
     &--installed {
       color: #16a34a;
@@ -2292,6 +2312,30 @@
     color: $os-ok;
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__preview {
+    padding: 5px 10px;
+    border: 1px solid $os-border;
+    border-radius: $os-radius-sm;
+    background: transparent;
+    color: $os-text-secondary;
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+
+    &:hover {
+      border-color: $os-accent;
+      color: $os-accent;
+    }
+  }
+
   &__cta {
     align-self: flex-start;
     padding: 6px 12px;
@@ -2306,5 +2350,347 @@
     transition: opacity 0.15s;
 
     &:hover { opacity: 0.9; }
+  }
+}
+
+// ── Conexiones section ────────────────────────────────────────────────────
+.mkt-conexiones-section {
+  padding: 0 $size-6 $size-8;
+  display: flex;
+  flex-direction: column;
+  gap: $size-6;
+}
+
+.mkt-conexiones-group {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-4;
+  }
+
+  &__label {
+    font-family: $os-font-display;
+    font-size: 12px;
+    font-weight: 600;
+    color: $os-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: rgba($primary-500, 0.12);
+    color: $primary-600;
+    font-size: 11px;
+    font-weight: 700;
+  }
+}
+
+.mkt-conexiones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $size-4;
+}
+
+.mkt-conexion-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  padding: $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  transition: box-shadow 0.15s, border-color 0.15s;
+
+  &:hover { box-shadow: $shadow-small; }
+
+  &--conectada {
+    border-color: rgba(22, 163, 74, 0.25);
+    background: linear-gradient(135deg, rgba(22,163,74,0.02) 0%, $os-surface 100%);
+  }
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-md;
+    background: $gray-50;
+    border: 1px solid $gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+
+    &--off { opacity: 0.55; filter: grayscale(0.3); }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__nombre {
+    display: block;
+    font-family: $os-font-display;
+    font-size: 14px;
+    font-weight: 600;
+    color: $os-text-primary;
+    line-height: 1.2;
+  }
+
+  &__categoria {
+    font-family: $os-font-body;
+    font-size: 10px;
+    color: $os-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__status {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--on { color: #16a34a; }
+    &--off { color: $gray-400; }
+  }
+
+  &__desc {
+    font-family: $os-font-body;
+    font-size: 12px;
+    line-height: 1.5;
+    color: $os-text-secondary;
+    margin: 0;
+  }
+
+  &__agentes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__agente-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 10px;
+    background: rgba($primary-500, 0.1);
+    color: $primary-600;
+    font-family: $os-font-body;
+    font-size: 10px;
+    font-weight: 600;
+
+    &--inactive {
+      background: $gray-100;
+      color: $gray-400;
+    }
+  }
+
+  &__datos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__dato {
+    font-family: $os-font-body;
+    font-size: 10px;
+    color: $os-text-secondary;
+    background: $gray-100;
+    border: 1px solid $gray-200;
+    border-radius: $radius-xs;
+    padding: 2px 6px;
+
+    &--locked {
+      opacity: 0.5;
+      filter: blur(0.3px);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-top: auto;
+  }
+
+  &__proveedor {
+    font-family: $os-font-body;
+    font-size: 10px;
+    color: $os-text-muted;
+    flex: 1;
+  }
+
+  &__free {
+    font-size: 10px;
+    font-weight: 600;
+    color: #16a34a;
+    background: rgba(22,163,74,0.08);
+    border: 1px solid rgba(22,163,74,0.2);
+    border-radius: 10px;
+    padding: 2px 7px;
+  }
+
+  &__btn {
+    padding: 5px 12px;
+    border: none;
+    border-radius: $os-radius-sm;
+    font-family: $os-font-body;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &--connect {
+      background: $os-accent;
+      color: #fff;
+      &:hover { opacity: 0.9; }
+    }
+
+    &--config {
+      background: transparent;
+      color: $os-text-secondary;
+      border: 1px solid $os-border;
+      &:hover { background: $gray-50; color: $os-text-primary; }
+    }
+  }
+}
+
+.mkt-conexiones-section__link {
+  text-align: center;
+  font-size: 12px;
+  color: $os-text-secondary;
+
+  a {
+    color: $os-accent;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── PLUGINS GRID ─────────────────────────────────────────────────────────────
+.mkt-conexiones-group__sublabel {
+  font-size: 11px;
+  color: $os-text-secondary;
+  margin-left: 6px;
+}
+
+.mkt-plugins-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: $size-3;
+}
+
+.mkt-plugin-card {
+  background: $os-surface-2;
+  border: 1px solid $os-border;
+  border-radius: $radius-md;
+  padding: $size-4;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+  transition: box-shadow 0.15s;
+
+  &:hover { box-shadow: $shadow-small; }
+
+  &--instalado {
+    border-color: $os-accent + '44';
+    background: $os-surface-3;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__nombre {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
+  &__tipo {
+    font-size: 11px;
+    color: $os-text-secondary;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: $radius-full;
+    flex-shrink: 0;
+
+    &--on {
+      background: #{$os-accent}18;
+      color: $os-accent;
+    }
+
+    &--free {
+      background: #{$success}18;
+      color: $success;
+    }
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: $os-text-secondary;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: $radius-sm;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &--install {
+      background: $os-accent;
+      color: #fff;
+      &:hover { opacity: 0.9; }
+    }
+
+    &--config {
+      background: transparent;
+      border: 1px solid $os-border;
+      color: $os-text-secondary;
+      &:hover { background: $gray-50; }
+    }
   }
 }

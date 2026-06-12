@@ -805,3 +805,67 @@
     color: #fff;
   }
 }
+
+// ── Preview de regla en tiempo real ─────────────────────────────────────────
+.rule-preview {
+  background: rgba($primary-500, 0.04);
+  border: 1px dashed rgba($primary-500, 0.3);
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+  animation: rulePreviewIn 0.2s ease;
+
+  &__label {
+    display: block;
+    font-family: $font-primary;
+    font-size: 11px;
+    font-weight: 600;
+    color: $primary-500;
+    margin-bottom: $size-2;
+    letter-spacing: 0.02em;
+  }
+
+  &__logic {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    flex-wrap: wrap;
+  }
+
+  &__si,
+  &__entonces {
+    font-family: $font-mono;
+    font-size: 11px;
+    font-weight: 700;
+    color: $primary-500;
+    background: rgba($primary-500, 0.1);
+    border-radius: 4px;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  &__cond {
+    font-family: $font-primary;
+    font-size: 13px;
+    color: $gray-700;
+    font-style: italic;
+  }
+
+  &__arrow {
+    color: $primary-500;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  &__action {
+    font-family: $font-primary;
+    font-size: 13px;
+    color: $gray-700;
+    font-weight: 500;
+  }
+}
+
+@keyframes rulePreviewIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

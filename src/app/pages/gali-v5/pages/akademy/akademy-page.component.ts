@@ -1,8 +1,8 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliStateService } from '../../services/gali-state.service';
-import { inject } from '@angular/core';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 interface Course {
   id: string;
@@ -24,7 +24,7 @@ const AKADEMY_PROGRESS_KEY = 'gali_akademy_progress';
 @Component({
   selector: 'app-akademy-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DropiGaliBarComponent],
   templateUrl: './akademy-page.component.html',
   styleUrl: './akademy-page.component.scss',
 })

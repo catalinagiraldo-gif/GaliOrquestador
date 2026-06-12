@@ -1,5 +1,16 @@
 <div class="senales-page">
 
+  <!-- Filtro de proyecto activo -->
+  @if (proyectoFiltro()) {
+    <div class="g-alert-bar g-alert-bar--info" style="margin-bottom: 12px;">
+      <span class="g-alert-bar__nivel">🎯 Proyecto</span>
+      <span class="g-alert-bar__titulo">Señales de <strong>{{ proyectoFiltro() }}</strong></span>
+      <button type="button" class="g-alert-bar__cta" (click)="proyectoFiltro.set(null)">
+        Ver todas ×
+      </button>
+    </div>
+  }
+
   <!-- HEADER -->
   <div class="senales-header">
     <div class="senales-header__top">

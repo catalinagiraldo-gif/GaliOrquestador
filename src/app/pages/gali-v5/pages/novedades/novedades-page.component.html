@@ -1,16 +1,17 @@
 <div class="novedades-page">
   <dropi-titulos title="Novedades" [breadcrumbs="breadcrumbs" />
 
-  <!-- ✦ GALI CLASSIFICATION BANNER -->
-  <div class="gali-nov-banner">
-    <span class="gali-nov-banner__icon">✦</span>
-    <div class="gali-nov-banner__text">
-      <strong>Gali clasificó {{ rows.length }} novedades</strong>
-      <span>{{ galiSummary.recuperables }} recuperables · {{ galiSummary.irreversibles }} irreversibles · puede resolver {{ galiSummary.puedeResolver }} sin tu intervención</span>
+  <!-- ✦ VIGILANTE SUMMARY BANNER -->
+  <div class="g-alert g-alert--decision">
+    <span class="g-alert__icon">🛡</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">Vigilante — Clasificación automática</span>
+      <span class="g-alert__titulo">{{ rows.length }} novedades clasificadas · {{ galiSummary.puedeResolver }} resueltas sin tu intervención</span>
+      <p class="g-alert__desc">{{ galiSummary.recuperables }} recuperables · {{ galiSummary.irreversibles }} irreversibles · revisa las que requieren tu decisión</p>
     </div>
-    <button type="button" class="gali-nov-banner__cta" (click)="goToOperar()">
-      Ver qué hizo Vigilante →
-    </button>
+    <div class="g-alert__foot">
+      <button type="button" class="g-alert__cta" (click)="goToOperar()">Ver acciones de Vigilante →</button>
+    </div>
   </div>
 
   <div class="novedades-page__toolbar">

@@ -26,22 +26,21 @@
     </button>
   </div>
 
-  <!-- Error card Siigo — estructura fija -->
-  <div class="siigo-error-card">
-    <div class="siigo-error-card__icon">
-      <i class="pi pi-exclamation-triangle"></i>
-    </div>
-    <div class="siigo-error-card__body">
-      <span class="siigo-error-card__title">Facturación sin sincronizar</span>
-      <span class="siigo-error-card__detail">
+  <!-- Error card Siigo -->
+  <div class="g-alert g-alert--critica">
+    <span class="g-alert__icon">!</span>
+    <div class="g-alert__body">
+      <span class="g-alert__nivel">● Crítico — Facturación</span>
+      <span class="g-alert__titulo">Facturación sin sincronizar</span>
+      <p class="g-alert__desc">
         {{ siigo.sin_facturar_label }} sin facturar
         · {{ siigo.facturas_pendientes }} facturas pendientes
         · {{ siigo.dias_sin_sincronizar }} días sin sincronizar
-      </span>
+      </p>
+      <div class="g-alert__foot">
+        <button type="button" class="g-alert__cta" (click)="openSiigoDrawer()">Conectar Siigo →</button>
+      </div>
     </div>
-    <button type="button" class="siigo-error-card__cta" (click)="openSiigoDrawer()">
-      Conectar Siigo →
-    </button>
   </div>
 
   <!-- ── SIIGO DRAWER (3 pasos) ── -->
@@ -204,7 +203,9 @@
       <div class="fin-summary__card fin-summary__card--costos">
         <span class="fin-summary__card-label">Costos operativos reales</span>
         <span class="fin-summary__card-value fin-summary__card-value--neg">−{{ summary.costos_operativos.label }}</span>
-        <span class="fin-summary__card-sub">COGS + flete + pauta + novedades + comisiones</span>
+        <span class="fin-summary__card-sub">
+          <span galiGlosario="COGS">COGS</span> + <span galiGlosario="flete">flete</span> + pauta + <span galiGlosario="novedad">novedades</span> + comisiones
+        </span>
       </div>
 
       <div class="fin-summary__separator">
@@ -228,30 +229,21 @@
         @for (fuga of fugas; track fuga.id) {
           <div class="fuga-card" [class.fuga-card--alta]="fuga.severidad === 'alta'" [class.fuga-card--media]="fuga.severidad === 'media'">
             <div class="fuga-card__severity">
-              <i class="pi" [class.pi-exclamation-triangle]="fuga.severidad === 'alta'" [class.pi-info-circle]="fuga.severidad === 'media'"></i>
+              <i class="pi" [class.pi-exclamation-circle]="fuga.severidad === 'alta'" [class.pi-arrow-right]="fuga.severidad === 'media'"></i>
             </div>
             <div class="fuga-card__body">
               <span class="fuga-card__titulo">{{ fuga.titulo }}</span>
-              <span class="fuga-card__impacto">{{ fuga.impacto }}</span>
-              <span class="fuga-card__canal">{{ fuga.canal }}</span>
+              <span class="fuga-card__impacto">{{ fuga.impacto }} <span class="fuga-card__canal">· {{ fuga.canal }}</span></span>
             </div>
-            <a class="fuga-card__accion" [routerLink]="fuga.accion_ruta">
-              {{ fuga.accion }} →
-            </a>
+            <a class="fuga-card__accion" [routerLink]="fuga.accion_ruta">{{ fuga.accion }} →</a>
           </div>
         }
       </div>
     </div>
   </div>
 
-  <!-- Lo que Gali hizo por ti este mes — widget reutilizable (Spec 15 CA-11) -->
-  <app-gali-impact-widget mode="wallet"></app-gali-impact-widget>
-
   <!-- Nota operativa -->
-  <div class="wallet-page__alert">
-    <i class="pi pi-info-circle"></i>
-    <span>{{ alertMessage }}</span>
-  </div>
+  <p class="wallet-nota">{{ alertMessage }}</p>
 
   <div class="wallet-page__filters">
     <div class="wallet-page__date">

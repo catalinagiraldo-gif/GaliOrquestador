@@ -20,6 +20,15 @@ export class SkillsPageComponent {
   readonly selectedSkillId = signal<string>('skill-001');
   readonly selectedAgentId = signal<string | null>(null);
   readonly mainTab = signal<'mis-skills' | 'marketplace'>('mis-skills');
+  readonly skillAgentFilter = signal<string | null>(null);
+
+  readonly filteredSkills = computed(() => {
+    const f = this.skillAgentFilter();
+    if (!f) return this.skills;
+    return this.skills.filter(s =>
+      s.agentesQueLaUsan?.some((a: any) => a.nombre.toLowerCase().includes(f.toLowerCase()))
+    );
+  });
 
   readonly skills: SkillRule[] = [
     {

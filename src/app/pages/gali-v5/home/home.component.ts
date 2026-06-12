@@ -757,6 +757,25 @@ export class DropiHomeComponent implements AfterViewChecked {
     return this.signals.filter(s => s.estado === 'pending_decision');
   }
 
+  // ── Nivel 1: alerta crítica (Fase 1.4) ────────────────────────────────
+  readonly dismissedCriticalIds = signal<string[]>([]);
+
+  readonly criticalAlertBanner = computed(() =>
+    this.signals.find(s =>
+      s.tipo === 'critica' &&
+      s.estado === 'pending_decision' &&
+      !this.dismissedCriticalIds().includes(s.id)
+    ) ?? null
+  );
+
+  dismissCritical(id: string): void {
+    this.dismissedCriticalIds.update(ids => [...ids, id]);
+  }
+
+  scrollToCriticalDecision(): void {
+    this.scrollToMomento2();
+  }
+
   goToProject(id: string): void {
     this.router.navigate(['/gali-v5/proyecto', id]);
   }

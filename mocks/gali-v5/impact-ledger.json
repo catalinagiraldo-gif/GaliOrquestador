@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "descripcion": "Ledger de impacto acumulado de Gali — fuente única del bloque 'Gali hizo por ti' (home Hoy) y la vista /impacto. Materializa la relación que compone valor (agentic-ux).",
+    "periodo_principal": "semanal",
+    "semana_iso": 23,
+    "anio": 2026,
+    "fuentes": ["projects.json (agent_actions)", "wallet-transactions.json"]
+  },
+  "summary_semana": {
+    "semana_iso": 23,
+    "label_periodo": "Semana 23",
+    "acciones_totales": 127,
+    "acciones_autonomas": 58,
+    "pct_acciones_gali": 46,
+    "pct_loops_con_resultado": 83,
+    "pesos_ahorrados": 420000,
+    "pesos_ahorrados_label": "$420k",
+    "campanas_escaladas": 2,
+    "novedades_evitadas": 11,
+    "senales_detectadas": 3,
+    "horas_libradas": 41,
+    "delta_vs_semana_anterior_pct": 12,
+    "delta_ok": true
+  },
+  "summary_acumulado": {
+    "label_periodo": "Acumulado · 3 meses con Gali",
+    "acciones_totales": 1340,
+    "pesos_ahorrados": 4180000,
+    "pesos_ahorrados_label": "$4.18M",
+    "campanas_escaladas": 14,
+    "novedades_evitadas": 96,
+    "horas_libradas": 312,
+    "hito_alcanzado": false,
+    "hito_proximo_label": "Próximo hito: $5M ahorrados"
+  },
+  "actions": [
+    { "id": "imp-001", "timestamp": "2026-06-12T06:40:00Z", "agente": "Roax", "agente_color": "#f97316", "tipo": "escalo_campana", "descripcion": "Escaló presupuesto de Collar GPS +15% ($57k→$66k/día)", "impacto_cop": 0, "impacto_label": "ROAS +0.3x estimado", "requirio_aprobacion": false, "proyecto_id": "collar-gps-2026" },
+    { "id": "imp-002", "timestamp": "2026-06-12T03:15:00Z", "agente": "Vigilante", "agente_color": "#fbbf24", "tipo": "evito_novedad", "descripcion": "Cambió 8 pedidos de Coordinadora a Servientrega en Bogotá", "impacto_cop": 240000, "impacto_label": "$240k en novedades evitadas", "requirio_aprobacion": false, "proyecto_id": "collar-gps-2026" },
+    { "id": "imp-003", "timestamp": "2026-06-11T22:05:00Z", "agente": "Chatea Pro", "agente_color": "#34d399", "tipo": "genero_diagnostico", "descripcion": "Confirmó 18 pedidos por WhatsApp y recuperó 4 carritos", "impacto_cop": 110000, "impacto_label": "$110k recuperados", "requirio_aprobacion": false },
+    { "id": "imp-004", "timestamp": "2026-06-11T16:30:00Z", "agente": "ADA Spy", "agente_color": "#818cf8", "tipo": "detecto_senal_predictiva", "descripcion": "Detectó ventana de mercado en Cali — búsquedas de 'collar mascotas' +34%", "impacto_cop": 0, "impacto_label": "Oportunidad · ventana 7 días", "requirio_aprobacion": false },
+    { "id": "imp-005", "timestamp": "2026-06-11T09:12:00Z", "agente": "Roax", "agente_color": "#f97316", "tipo": "escalo_presupuesto", "descripcion": "Pausó automáticamente Licuadora Portátil al caer ROAS < 1.5x por 72h", "impacto_cop": 85000, "impacto_label": "$85k de pérdida evitada", "requirio_aprobacion": false, "proyecto_id": "licuadora-portatil-2026" },
+    { "id": "imp-006", "timestamp": "2026-06-10T18:45:00Z", "agente": "Vigilante", "agente_color": "#fbbf24", "tipo": "optimizo_ruta_logistica", "descripcion": "Aplicó smart routing en 3 ciudades con novedad sobre umbral", "impacto_cop": 180000, "impacto_label": "$180k protegidos", "requirio_aprobacion": false },
+    { "id": "imp-007", "timestamp": "2026-06-10T11:20:00Z", "agente": "Kronos", "agente_color": "#60a5fa", "tipo": "genero_diagnostico", "descripcion": "Detectó 2 fugas de dinero en el P&L semanal (flete + comisión)", "impacto_cop": 0, "impacto_label": "2 fugas señaladas", "requirio_aprobacion": false },
+    { "id": "imp-008", "timestamp": "2026-06-09T20:00:00Z", "agente": "Gali", "agente_color": "#ff6102", "tipo": "genero_diagnostico", "descripcion": "Recomendó abrir proyecto Difusor Aromaterapia para acercarte a tu meta", "impacto_cop": 0, "impacto_label": "Recomendación estratégica", "requirio_aprobacion": false }
+  ]
+}

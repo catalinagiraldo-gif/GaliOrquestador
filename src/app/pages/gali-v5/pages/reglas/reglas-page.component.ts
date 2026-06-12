@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
+import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 
 export interface EscalamientoRegla {
   id: string;
@@ -39,7 +40,7 @@ const STORAGE_KEY = 'gali_reglas_state';
 @Component({
   selector: 'app-reglas-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliOntologyStripComponent],
+  imports: [CommonModule, RouterModule, GaliOntologyStripComponent, DropiGaliBarComponent],
   templateUrl: './reglas-page.component.html',
   styleUrl: './reglas-page.component.scss',
 })
@@ -166,6 +167,28 @@ export class ReglasPageComponent {
   readonly newRuleText = signal('');
   readonly newRuleAgent = signal<'Chatea Pro' | 'Roax' | 'Vigilante'>('Chatea Pro');
   readonly newRuleSaved = signal(false);
+
+  readonly parsedRulePreview = computed(() => {
+    const text = this.newRuleText().trim();
+    if (text.length < 10) return null;
+    const arrowIdx = text.indexOf('→');
+    if (arrowIdx > 0) {
+      return {
+        si: text.slice(0, arrowIdx).replace(/^(Si|Cuando|si|cuando)\s+/i, '').trim(),
+        entonces: text.slice(arrowIdx + 1).trim(),
+      };
+    }
+    // Heuristic: look for action verbs
+    const actionVerbs = /\b(pausar|enviar|cambiar|notificar|escalar|activar|desactivar|registrar|alertar|bloquear|asignar)\b/i;
+    const match = text.match(actionVerbs);
+    if (match?.index) {
+      return {
+        si: text.slice(0, match.index).replace(/^(Si|Cuando|si|cuando)\s+/i, '').trim().replace(/[,.]$/, ''),
+        entonces: text.slice(match.index).trim(),
+      };
+    }
+    return null;
+  });
 
   readonly agentOptions: Array<{ name: 'Chatea Pro' | 'Roax' | 'Vigilante'; color: string }> = [
     { name: 'Chatea Pro', color: '#34d399' },

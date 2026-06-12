@@ -1566,3 +1566,35 @@
     &:hover { text-decoration: underline; }
   }
 }
+
+// ── AGENT FILTER CHIPS ──────────────────────────────────────────────────────
+.skills-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 $size-3 $size-2;
+}
+
+.skills-filter-chip {
+  font-size: 11px;
+  font-family: $font-primary;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: $radius-full;
+  border: 1px solid $os-border;
+  background: transparent;
+  color: $os-text-secondary;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &--active {
+    background: var(--chip-color, #{$os-accent});
+    border-color: var(--chip-color, #{$os-accent});
+    color: #fff;
+  }
+
+  &:not(&--active):hover {
+    background: $os-surface-3;
+    border-color: $os-text-secondary;
+  }
+}

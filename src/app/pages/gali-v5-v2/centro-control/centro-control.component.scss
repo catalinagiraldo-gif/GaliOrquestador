@@ -1,0 +1,44 @@
+@import 'styles/variables';
+
+:host { display: block; width: 100%; }
+
+.cc {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: $size-8 $size-6 $size-10;
+
+  &__head { margin-bottom: $size-5; }
+  &__badge { font-size: 10px; font-weight: $font-semibold; text-transform: uppercase; letter-spacing: 0.06em; color: $gray-500; background: $gray-100; padding: 3px 10px; border-radius: $radius-full; }
+  &__title { margin: $size-3 0 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; letter-spacing: -0.02em; }
+  &__sub { margin: 6px 0 0; font-size: $font-sm; color: $gray-500; max-width: 580px; line-height: 1.5; }
+
+  &__grid { display: grid; grid-template-columns: 1fr 1fr; gap: $size-4; }
+}
+
+.onto {
+  display: flex; align-items: center; gap: $size-3; flex-wrap: wrap;
+  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
+  padding: $size-4 $size-5; margin-bottom: $size-5; box-shadow: $shadow-small;
+
+  &__node {
+    display: flex; flex-direction: column;
+    strong { font-size: $font-sm; color: $gray-800; font-weight: $font-bold; }
+    span { font-size: 11px; color: $gray-400; }
+    &--gali strong { color: $primary-600; }
+  }
+  &__arrow, &__plus { color: $gray-300; font-size: $font-sm; }
+}
+
+.ctrl {
+  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
+  padding: $size-5; text-decoration: none; display: flex; flex-direction: column; gap: $size-2;
+  box-shadow: $shadow-small; transition: border-color 120ms ease, transform 120ms ease;
+  &:hover { border-color: $primary-300; transform: translateY(-2px); }
+
+  &__glyph { font-size: $font-xl; color: $primary-500; }
+  &__title { font-size: $font-md; font-weight: $font-bold; color: $gray-900; }
+  &__desc { margin: 0; font-size: $font-xs; color: $gray-600; line-height: 1.5; }
+  &__cta { font-size: $font-xs; color: $primary-600; font-weight: $font-semibold; margin-top: $size-2; }
+}
+
+@media (max-width: 720px) { .cc__grid { grid-template-columns: 1fr; } }
