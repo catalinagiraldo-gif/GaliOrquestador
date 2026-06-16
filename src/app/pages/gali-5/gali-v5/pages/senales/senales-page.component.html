@@ -1,0 +1,174 @@
+<div class="senales-page">
+
+  <!-- Filtro de proyecto activo -->
+  @if (proyectoFiltro()) {
+    <div class="g-alert-bar g-alert-bar--info" style="margin-bottom: 12px;">
+      <span class="g-alert-bar__nivel">🎯 Proyecto</span>
+      <span class="g-alert-bar__titulo">Señales de <strong>{{ proyectoFiltro() }}</strong></span>
+      <button type="button" class="g-alert-bar__cta" (click)="proyectoFiltro.set(null)">
+        Ver todas ×
+      </button>
+    </div>
+  }
+
+  <!-- HEADER -->
+  <div class="senales-header">
+    <div class="senales-header__top">
+      <h1 class="senales-title">
+        <span class="gali-spark">✦</span> Señales
+      </h1>
+      <div class="senales-pills">
+        <span class="pill pill--senales">{{ senalesActivas().length }} señales</span>
+        <span class="pill pill--alertas">{{ alertasActivas().length }} alertas</span>
+      </div>
+    </div>
+    <p class="senales-subtitle">Lo que Gali detectó antes de que lo vieras tú</p>
+
+    <!-- BOTONES DE MODO -->
+    <div class="senales-mode-actions">
+      <button class="mode-action-btn mode-action-btn--operar" (click)="onOperar()">
+        <img src="assets/icons/sidebar/operar.svg" alt="" width="16" height="16" />
+        Operar
+      </button>
+      <button class="mode-action-btn mode-action-btn--lanzar" (click)="onLanzar()">
+        <img src="assets/icons/sidebar/lanzar.svg" alt="" width="16" height="16" />
+        Lanzar
+      </button>
+      <button class="mode-action-btn mode-action-btn--medir" (click)="onMedir()">
+        <img src="assets/icons/sidebar/medir.svg" alt="" width="16" height="16" />
+        Medir
+      </button>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="senales-filters">
+    @for (f of filterTabs; track f.value) {
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter() === f.value"
+        (click)="setFilter(f.value)">
+        {{ f.label }}
+        @if (f.count() > 0) {
+          <span class="filter-count">{{ f.count() }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- LAYOUT MAESTRO-DETALLE -->
+  <div class="signal-center">
+
+    <!-- LISTA IZQUIERDA -->
+    <div class="signal-list-panel">
+
+      <!-- SECCIÓN SEÑALES PREDICTIVAS -->
+      @if (senalesVisibles().length > 0) {
+        <div class="list-section list-section--senales">
+          <div class="list-section__header">
+            <span class="section-icon">🔮</span>
+            <span class="section-title">Señales</span>
+            <span class="section-badge section-badge--senales">{{ senalesVisibles().length }}</span>
+          </div>
+          <div class="signal-items">
+            @for (s of senalesVisibles(); track s.id; let i = $index) {
+              <button
+                class="signal-item signal-item--{{ s.tipo }}"
+                [class.signal-item--selected]="selectedId() === s.id"
+                (click)="selectSignal(s.id)"
+                [style.animation-delay]="(i * 60) + 'ms'">
+                <div class="signal-item__top">
+                  <span class="item-type-icon">{{ getTipoIcon(s.tipo) }}</span>
+                  <span class="item-agent">{{ s.agente | titlecase }}</span>
+                  <span
+                    class="item-window"
+                    [class.item-window--urgent]="s.ventanaDias <= 6"
+                    [class.item-window--soon]="s.ventanaDias >= 7 && s.ventanaDias <= 9"
+                    [class.item-window--ok]="s.ventanaDias >= 10">
+                    {{ s.ventanaDias }}d
+                  </span>
+                </div>
+                <p class="item-titulo">{{ s.titulo }}</p>
+                @if (s.metrica) {
+                  <span class="item-metrica">{{ s.metrica }}</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- SECCIÓN ALERTAS REACTIVAS -->
+      @if (alertasVisibles().length > 0) {
+        <div class="list-section list-section--alertas">
+          <div class="list-section__header">
+            <span class="section-icon">🚨</span>
+            <span class="section-title">Alertas</span>
+            <span class="section-badge section-badge--alertas">{{ alertasVisibles().length }}</span>
+          </div>
+          <div class="alert-items">
+            @for (a of alertasVisibles(); track a.id; let i = $index) {
+              <button
+                class="alert-item alert-item--{{ a.tipo }}"
+                [class.alert-item--selected]="selectedId() === a.id"
+                [class.alert-item--highlighted]="highlightId() === a.id"
+                (click)="selectAlert(a.id)"
+                [style.animation-delay]="(i * 60) + 'ms'">
+                <div class="alert-item__top">
+                  <span class="item-urgency-dot item-urgency-dot--{{ a.tipo }}"></span>
+                  <span class="item-type-label">{{ a.tipo === 'critical' ? '🔴 Crítico' : '🟡 Advertencia' }}</span>
+                  <span class="item-agent">{{ a.agente | titlecase }}</span>
+                </div>
+                <p class="item-titulo">{{ a.titulo }}</p>
+                @if (a.pedidosAfectados && a.pedidosAfectados > 0) {
+                  <span class="item-affected">{{ a.pedidosAfectados }} pedidos</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ESTADO VACÍO DE LISTA -->
+      @if (senalesVisibles().length === 0 && alertasVisibles().length === 0) {
+        <div class="list-empty">
+          <span class="list-empty__icon">✦</span>
+          <p class="list-empty__title">Todo bajo control</p>
+          <p class="list-empty__sub">Gali monitoreó tu negocio en las últimas 24h · 0 riesgos detectados</p>
+        </div>
+      }
+
+    </div>
+
+    <!-- PANEL DETALLE DERECHO -->
+    <div class="signal-detail-panel" [class.signal-detail-panel--empty]="!selectedItem()">
+      @if (selectedItem(); as item) {
+        <app-senal-detalle
+          [item]="item"
+          [isAlerta]="isAlertSelected()"
+          (ctaPrimario)="onCtaPrimario(item)"
+          (ctaSecundario)="onCtaSecundario(item)"
+          (ignorar)="onIgnorar(item)"
+          (guardarDespues)="onGuardarDespues(item)"
+          (opcionElegida)="onOpcionElegida($event)">
+        </app-senal-detalle>
+      } @else {
+        <div class="detail-empty">
+          <div class="detail-empty__icon">🔭</div>
+          <p class="detail-empty__title">Selecciona una señal</p>
+          <p class="detail-empty__sub">Ve el análisis completo, los datos de la red Dropi y la acción recomendada.</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+@if (showConfirmModal() && confirmConfig()) {
+  <confirm-action-modal
+    [config]="confirmConfig()!"
+    (confirm)="onConfirmAlerta()"
+    (cancel)="onCancelAlerta()" />
+}

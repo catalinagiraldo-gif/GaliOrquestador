@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { GaliTopbarComponent } from '../../components/gali-v3/shell/gali-topbar.component';
@@ -66,6 +66,16 @@ export class GaliV3ShellComponent implements OnInit {
     // → auto-colapsar el right panel para evitar competencia visual.
     if (url.includes('/bloque-builder')) {
       this.rpanelSvc.setOpen(false);
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(e: KeyboardEvent): void {
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault();
+      localStorage.removeItem('gali_v2_perfil');
+      localStorage.removeItem('gali_v3_onboarding_hallazgos');
+      this.router.navigate(['/gali-v3/onboarding']);
     }
   }
 

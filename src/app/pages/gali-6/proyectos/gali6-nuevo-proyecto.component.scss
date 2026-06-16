@@ -1,0 +1,540 @@
+@import 'styles/gali-v5-tokens';
+
+:host { display: block; width: 100%; }
+
+.wizard {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: $size-6 $size-6 $size-10;
+  display: flex;
+  flex-direction: column;
+  gap: $size-6;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $size-4;
+    flex-wrap: wrap;
+  }
+
+  &__back {
+    background: none; border: none; cursor: pointer;
+    font-size: $font-sm; color: $gray-500; font-weight: $font-semibold;
+    padding: 0; white-space: nowrap;
+    &:hover { color: $gray-800; }
+  }
+
+  &__steps {
+    display: flex; align-items: center; gap: $size-1;
+    flex: 1; justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &__step {
+    display: flex; align-items: center; gap: 4px;
+    &.is-active .wizard__step-num {
+      background: $primary-500; color: #fff; border-color: $primary-500;
+    }
+    &.is-done .wizard__step-num { background: #16a34a; color: #fff; border-color: #16a34a; }
+  }
+  &__step-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid $gray-200; background: $gray-50;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: $font-bold; color: $gray-400;
+    flex-shrink: 0;
+  }
+  &__step-label { font-size: 10px; color: $gray-400; font-weight: $font-medium; white-space: nowrap; }
+  &__step.is-active &__step-label { color: $gray-800; font-weight: $font-semibold; }
+  &__step.is-done &__step-label { color: #16a34a; }
+  &__step-sep { color: $gray-200; font-size: 10px; }
+
+  &__body { display: flex; flex-direction: column; gap: $size-5; position: relative; }
+
+  &__title { margin: 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; letter-spacing: -0.01em; }
+  &__sub { margin: 0; font-size: $font-sm; color: $gray-500; line-height: 1.55; }
+
+  &__next {
+    align-self: flex-start;
+    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    padding: 12px $size-6; border-radius: $radius-md; font-size: $font-sm;
+    font-weight: $font-semibold; font-family: $font-primary;
+    &:hover { background: $primary-600; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &--success { margin-top: $size-4; }
+  }
+
+  &__launch {
+    align-self: stretch;
+    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    padding: 14px $size-6; border-radius: $radius-md; font-size: $font-md;
+    font-weight: $font-bold; font-family: $font-primary; text-align: center;
+    transition: background 120ms ease;
+    &:hover { background: $primary-600; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}
+
+// ── Objetivo card (Paso 1) ────────────────────────────────────────────────
+
+.obj-card {
+  background: #fff;
+  border: 1px solid $gray-100;
+  border-left: 4px solid $primary-500;
+  border-radius: $radius-lg;
+  padding: $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+
+  &__top { display: flex; align-items: center; justify-content: space-between; }
+  &__tipo {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: $font-semibold; color: $primary-600;
+    background: rgba($primary-500, 0.1); padding: 2px 10px; border-radius: $radius-full;
+  }
+  &__estado {
+    font-size: 11px; font-weight: $font-semibold; padding: 2px 10px; border-radius: $radius-full;
+    &[data-pct='ok'] { background: #f0fdf4; color: #16a34a; }
+    &[data-pct='mid'] { background: #fff7ed; color: #c2410c; }
+    &[data-pct='low'] { background: #fef2f2; color: #dc2626; }
+  }
+  &__texto { margin: 0; font-size: $font-md; font-weight: $font-semibold; color: $gray-900; line-height: 1.4; }
+  &__progress-row { display: flex; align-items: center; gap: $size-2; }
+  &__track {
+    flex: 1; height: 12px; background: $gray-100; border-radius: $radius-full;
+    overflow: hidden; position: relative;
+  }
+  &__fill--actual {
+    position: absolute; top: 0; left: 0; height: 100%;
+    background: $primary-500; border-radius: $radius-full;
+    transition: width 400ms ease;
+  }
+  &__fill--nuevo {
+    position: absolute; top: 0; height: 100%;
+    background: rgba($primary-500, 0.3); border-radius: $radius-full;
+    transition: all 300ms ease;
+  }
+  &__num { font-size: $font-xs; font-weight: $font-semibold; color: $gray-600; white-space: nowrap; }
+  &__legend {
+    display: flex; align-items: center; gap: $size-3;
+    font-size: 11px; color: $gray-500;
+  }
+  &__legend-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    &--actual { background: $primary-500; }
+    &--nuevo { background: rgba($primary-500, 0.35); border: 1px solid $primary-500; }
+  }
+}
+
+// ── Input de contribución ─────────────────────────────────────────────────
+
+.contrib-input {
+  display: flex; flex-direction: column; gap: $size-2;
+
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+  &__row { display: flex; align-items: center; gap: $size-3; }
+  &__num {
+    width: 80px; border: 1px solid $gray-200; border-radius: $radius-md;
+    padding: $size-2 $size-3; font-size: $font-lg; font-weight: $font-bold; color: $primary-600;
+    font-family: $font-primary; text-align: center;
+    &:focus { outline: none; border-color: $primary-500; }
+  }
+  &__unit { font-size: $font-sm; color: $gray-500; }
+  &__slider { width: 100%; accent-color: $primary-500; margin-top: 4px; cursor: pointer; }
+}
+
+// ── Mensaje Gali ──────────────────────────────────────────────────────────
+
+.gali-msg {
+  display: flex; align-items: flex-start; gap: $size-3;
+  background: linear-gradient(135deg, #fff, #fffaf4);
+  border: 1px solid rgba($primary-500, 0.2); border-radius: $radius-md;
+  padding: $size-4;
+
+  &--launch { border-color: rgba($primary-500, 0.3); }
+
+  &__icon { color: $primary-500; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  &__text { font-size: $font-sm; color: $gray-700; line-height: 1.55; margin: 0; }
+}
+
+// ── Lista de productos (Paso 2) ───────────────────────────────────────────
+
+.productos-list { display: flex; flex-direction: column; gap: $size-3; }
+
+.producto-card {
+  background: #fff; border: 2px solid $gray-100; border-radius: $radius-md;
+  padding: $size-4; cursor: pointer;
+  transition: border-color 120ms ease, transform 100ms ease;
+
+  &:hover { border-color: $primary-300; }
+  &.is-selected { border-color: $primary-500; background: rgba($primary-500, 0.03); }
+
+  &__top { display: flex; align-items: flex-start; justify-content: space-between; gap: $size-3; margin-bottom: $size-2; }
+  &__nombre { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; display: block; }
+  &__cat { font-size: 11px; color: $gray-500; margin-top: 2px; display: block; }
+  &__score {
+    font-size: 11px; font-weight: $font-bold; padding: 3px 10px; border-radius: $radius-full; white-space: nowrap;
+    &.hot  { background: #fef9c3; color: #a16207; }
+    &.warm { background: #eff6ff; color: #1d4ed8; }
+    &.cool { background: $gray-100; color: $gray-600; }
+  }
+  &__metas { display: flex; flex-wrap: wrap; gap: $size-2; }
+  &__meta {
+    font-size: 11px; color: $gray-600; background: $gray-50; padding: 2px 8px; border-radius: $radius-full;
+    &--contrib { color: $primary-600; background: rgba($primary-500, 0.08); font-weight: $font-semibold; }
+  }
+}
+
+// ── Calculadora Brújula (Paso 3) ──────────────────────────────────────────
+
+.brujula-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-4;
+}
+
+.brujula-field {
+  display: flex; flex-direction: column; gap: $size-2;
+
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+  &__row {
+    display: flex; align-items: center;
+    border: 1px solid $gray-200; border-radius: $radius-md;
+    overflow: hidden;
+    &:focus-within { border-color: $primary-500; }
+  }
+  &__prefix {
+    padding: 0 $size-3; font-size: $font-sm; color: $gray-500;
+    background: $gray-50; border-right: 1px solid $gray-200;
+    height: 40px; display: flex; align-items: center;
+  }
+  &__input {
+    flex: 1; border: none; padding: 0 $size-3; height: 40px;
+    font-size: $font-md; font-weight: $font-semibold; color: $gray-900;
+    font-family: $font-primary; background: white;
+    &:focus { outline: none; }
+  }
+}
+
+.brujula-outputs {
+  background: $gray-50;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  padding: $size-4;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+}
+
+.brujula-metric {
+  display: flex; align-items: center; gap: $size-3;
+  padding-bottom: $size-3;
+  border-bottom: 1px solid $gray-100;
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+
+  &--recomendado {
+    background: rgba($primary-500, 0.04);
+    margin: -$size-1 -$size-2;
+    padding: $size-3 $size-2;
+    border-radius: $radius-md;
+    border: 1px solid rgba($primary-500, 0.15);
+  }
+
+  &__label {
+    flex: 1; font-size: $font-sm; color: $gray-600;
+    display: flex; align-items: center; gap: $size-2;
+  }
+  &__hint { font-size: 10px; color: $gray-400; }
+  &__tag {
+    font-size: 10px; font-weight: $font-bold;
+    background: rgba($primary-500, 0.12); color: $primary-700;
+    padding: 1px 6px; border-radius: $radius-full;
+  }
+  &__val {
+    font-size: $font-lg; font-weight: $font-bold; white-space: nowrap;
+    &--neutral { color: $gray-700; }
+    &--warn { color: #d97706; }
+    &--primary { color: $primary-600; }
+  }
+}
+
+.brujula-slider-section {
+  display: flex; flex-direction: column; gap: $size-2;
+}
+
+.brujula-slider-header {
+  display: flex; align-items: center; justify-content: space-between;
+
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+}
+
+.brujula-price-final {
+  font-size: $font-xl; font-weight: $font-bold; color: $gray-900;
+}
+
+.brujula-slider {
+  width: 100%; accent-color: $primary-500; cursor: pointer; margin: 2px 0;
+}
+
+.brujula-slider-labels {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: $gray-400;
+}
+
+.brujula-btn-rec {
+  align-self: flex-start;
+  background: none; border: 1px solid $primary-300; color: $primary-600;
+  padding: 6px 14px; border-radius: $radius-full;
+  font-size: 12px; font-weight: $font-semibold; font-family: $font-primary;
+  cursor: pointer; transition: all 120ms ease;
+  &:hover { background: rgba($primary-500, 0.06); }
+}
+
+.brujula-margen {
+  display: flex; align-items: center; gap: $size-3;
+  border-radius: $radius-md; padding: $size-4;
+  border: 2px solid;
+
+  &[data-semaforo='verde'] { background: #f0fdf4; border-color: #86efac; }
+  &[data-semaforo='ambar'] { background: #fffbeb; border-color: #fde68a; }
+  &[data-semaforo='rojo']  { background: #fef2f2; border-color: #fca5a5; }
+
+  &__label { font-size: $font-xs; font-weight: $font-semibold; color: $gray-600; text-transform: uppercase; letter-spacing: 0.05em; }
+  &__val {
+    font-size: $font-2xl; font-weight: $font-bold; white-space: nowrap;
+
+    [data-semaforo='verde'] & { color: #16a34a; }
+    [data-semaforo='ambar'] & { color: #d97706; }
+    [data-semaforo='rojo']  & { color: #dc2626; }
+  }
+  &__desc { font-size: $font-xs; color: $gray-600; line-height: 1.4; flex: 1; }
+}
+
+// ── Presupuesto con badge Gali (Paso 4) ──────────────────────────────────
+
+.gali-budget-badge {
+  background: linear-gradient(135deg, #fff8f0, #fff);
+  border: 2px solid rgba($primary-500, 0.3);
+  border-radius: $radius-lg;
+  padding: $size-4 $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__top {
+    display: flex; align-items: center; gap: $size-2;
+  }
+  &__spark { color: $primary-500; font-size: 16px; }
+  &__label { font-size: $font-xs; font-weight: $font-bold; color: $primary-600; text-transform: uppercase; letter-spacing: 0.06em; flex: 1; }
+  &__val { font-size: $font-xl; font-weight: $font-bold; color: $gray-900; }
+  &__ctx { font-size: 12px; color: $gray-600; line-height: 1.5; margin: 0; }
+  &__cta {
+    align-self: flex-start;
+    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    padding: 8px 18px; border-radius: $radius-full;
+    font-size: 12px; font-weight: $font-semibold; font-family: $font-primary;
+    transition: background 120ms ease;
+    &:hover { background: $primary-600; }
+  }
+}
+
+.config-section { display: flex; flex-direction: column; gap: $size-3; }
+
+.config {
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+  &__budget-row { display: flex; align-items: baseline; gap: $size-3; }
+  &__budget-val { font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; }
+  &__budget-est { font-size: $font-xs; color: $gray-500; }
+  &__slider { width: 100%; accent-color: $primary-500; cursor: pointer; }
+  &__slider-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: $gray-400;
+  }
+}
+
+// ── Agentes (Paso 5) ──────────────────────────────────────────────────────
+
+.agentes-list { display: flex; flex-direction: column; gap: $size-3; }
+
+.agente-card {
+  background: #fff;
+  border: 2px solid $gray-100;
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: border-color 150ms ease;
+
+  &--active { border-color: $primary-300; background: rgba($primary-500, 0.015); }
+  &--locked { border-color: rgba($primary-500, 0.4); background: rgba($primary-500, 0.02); }
+
+  &__row {
+    display: flex; align-items: center; gap: $size-3;
+    padding: $size-3 $size-4; cursor: pointer;
+  }
+  &__icon { font-size: 20px; flex-shrink: 0; }
+  &__info { flex: 1; display: flex; align-items: center; gap: $size-2; }
+  &__nombre { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
+  &__badge {
+    font-size: 10px; font-weight: $font-bold;
+    padding: 1px 8px; border-radius: $radius-full;
+    background: rgba($primary-500, 0.1); color: $primary-700;
+  }
+  &__toggle {
+    background: none; border: 1px solid $gray-200; border-radius: $radius-full;
+    padding: 4px 12px; font-size: 11px; font-weight: $font-semibold;
+    cursor: pointer; font-family: $font-primary; white-space: nowrap;
+    transition: all 120ms ease;
+    &:disabled { cursor: default; opacity: 1; }
+
+    &--on { color: #16a34a; }
+    &--off { color: $gray-500; }
+
+    .agente-card--active & { border-color: $primary-300; }
+    .agente-card--locked & { border-color: rgba($primary-500, 0.3); }
+    &:not(:disabled):hover { background: $gray-50; }
+  }
+  &__desc {
+    padding: 0 $size-4 $size-3;
+    font-size: 12px; color: $gray-600; line-height: 1.5;
+    border-top: 1px solid $gray-50;
+    animation: gali-fade-up 150ms ease-out both;
+  }
+  &__razon {
+    display: block; margin-top: 4px; font-size: 11px; color: $primary-600; font-style: normal;
+  }
+}
+
+// ── Resumen (Paso 6) ──────────────────────────────────────────────────────
+
+.resumen {
+  background: $gray-50; border-radius: $radius-md; padding: $size-5;
+  display: flex; flex-direction: column; gap: $size-3;
+
+  &__item {
+    display: flex; flex-direction: column; gap: 2px;
+    padding-bottom: $size-3;
+    border-bottom: 1px solid $gray-100;
+    &:last-child { border-bottom: none; padding-bottom: 0; }
+  }
+  &__label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: $gray-400; font-weight: $font-semibold; }
+  &__val { font-size: $font-sm; font-weight: $font-semibold; color: $gray-900; }
+}
+
+// ── Overlay de lanzamiento animado ────────────────────────────────────────
+
+.launch-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 30, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: gali-fade-up 200ms ease-out both;
+
+  &__content {
+    background: white;
+    border-radius: $radius-xl;
+    padding: $size-8 $size-8 $size-6;
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $size-5;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+  }
+
+  &__rocket {
+    font-size: 48px;
+    animation: gali-breathe 1s ease-in-out infinite;
+  }
+
+  &__bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: $gray-100;
+    border-radius: $radius-full;
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    background: $primary-500;
+    border-radius: $radius-full;
+    transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__pct {
+    font-size: $font-2xl;
+    font-weight: $font-bold;
+    color: $gray-900;
+    font-family: $font-primary;
+  }
+
+  &__steps {
+    list-style: none;
+    padding: 0; margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+  }
+
+  &__step {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    font-size: $font-sm;
+    color: $gray-400;
+    transition: color 300ms ease;
+    padding: $size-2 0;
+
+    &.done {
+      color: #16a34a;
+      font-weight: $font-semibold;
+    }
+    &.active {
+      color: $gray-800;
+      font-weight: $font-semibold;
+    }
+  }
+
+  &__step-icon {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    color: inherit;
+
+    .done & { color: #16a34a; }
+    .active & { color: $primary-500; animation: gali-pulse-dot 1s ease-in-out infinite; }
+  }
+}
+
+// ── Success ───────────────────────────────────────────────────────────────
+
+.launch-success {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: $size-4; padding: $size-6 0;
+
+  &__icon { font-size: 56px; }
+  &__title { margin: 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; }
+  &__sub { margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.6; max-width: 440px; }
+  &__contrib {
+    background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
+    border-radius: $radius-md; padding: $size-4 $size-5;
+    font-size: $font-sm; color: $gray-700;
+    strong { color: $primary-600; display: block; margin-top: 4px; font-size: $font-md; }
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────
+
+@media (max-width: 600px) {
+  .wizard { padding: $size-4; }
+  .wizard__steps { gap: $size-1; }
+  .wizard__step-label { display: none; }
+  .brujula-inputs { grid-template-columns: 1fr; }
+  .launch-overlay__content { width: 92vw; padding: $size-6 $size-5; }
+}

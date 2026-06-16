@@ -1,0 +1,377 @@
+<div class="wizard">
+
+  <!-- Header -->
+  <div class="wizard__header">
+    <button class="wizard__back" (click)="goBack()">← Atrás</button>
+    <div class="wizard__steps">
+      @for (s of STEPS; track s.id; let i = $index) {
+        <div class="wizard__step"
+             [class.is-active]="step() === s.id"
+             [class.is-done]="stepIndex(step()) > i">
+          <span class="wizard__step-num">{{ stepIndex(step()) > i ? '✓' : (i + 1) }}</span>
+          <span class="wizard__step-label">{{ s.label }}</span>
+        </div>
+        @if (i < STEPS.length - 1) { <span class="wizard__step-sep">—</span> }
+      }
+    </div>
+  </div>
+
+  <!-- ── PASO 1: Objetivo ── -->
+  @if (step() === 'objetivo') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">Nuevo proyecto vinculado a tu objetivo</h1>
+      <p class="wizard__sub">Gali usará la contribución esperada para medir el progreso de este proyecto hacia tu meta.</p>
+
+      <div class="obj-card">
+        <div class="obj-card__top">
+          <span class="obj-card__tipo">{{ tipoLabel }}</span>
+          <span class="obj-card__estado" [attr.data-pct]="pctActual >= 90 ? 'ok' : pctActual >= 55 ? 'mid' : 'low'">
+            {{ pctActual }}% cumplido
+          </span>
+        </div>
+        <p class="obj-card__texto">{{ objetivo.texto }}</p>
+        <div class="obj-card__progress-row">
+          <div class="obj-card__track">
+            <div class="obj-card__fill--actual" [style.width.%]="pctActual"></div>
+            <div class="obj-card__fill--nuevo" [style.left.%]="pctActual" [style.width.%]="(nuevoPct() - pctActual)"></div>
+          </div>
+          <span class="obj-card__num">{{ pedidosActuales }}/{{ objetivo.meta_pedidos_sem }}</span>
+        </div>
+        <div class="obj-card__legend">
+          <span class="obj-card__legend-dot obj-card__legend-dot--actual"></span> Actual
+          <span class="obj-card__legend-dot obj-card__legend-dot--nuevo"></span> Con este proyecto
+        </div>
+      </div>
+
+      <div class="contrib-input">
+        <label class="contrib-input__label">
+          ¿Cuántos pedidos/semana esperas de este proyecto?
+        </label>
+        <div class="contrib-input__row">
+          <input class="contrib-input__num" type="number" min="1" max="200"
+                 [value]="pedidosEsperadosSem()"
+                 (input)="pedidosEsperadosSem.set(+$any($event.target).value)">
+          <span class="contrib-input__unit">pedidos/sem</span>
+        </div>
+        <input class="contrib-input__slider" type="range" min="1" max="80"
+               [value]="pedidosEsperadosSem()"
+               (input)="pedidosEsperadosSem.set(+$any($event.target).value)">
+      </div>
+
+      <div class="gali-msg">
+        <span class="gali-msg__icon">✦</span>
+        <p class="gali-msg__text">{{ galiMensajeObjetivo() }}</p>
+      </div>
+
+      <button class="wizard__next" (click)="goTo('producto')">
+        Continuar → Elegir producto
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 2: Producto ── -->
+  @if (step() === 'producto') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">Elige un producto</h1>
+      <p class="wizard__sub">ADA Spy analizó {{ productos.length * 240 | number }} productos esta semana. Estas son las mejores oportunidades para tu objetivo.</p>
+
+      <div class="productos-list">
+        @for (p of productos; track p.id) {
+          <div class="producto-card"
+               [class.is-selected]="selectedProducto()?.id === p.id"
+               (click)="selectProducto(p)">
+            <div class="producto-card__top">
+              <div>
+                <strong class="producto-card__nombre">{{ p.nombre }}</strong>
+                <span class="producto-card__cat">{{ p.categoria }}</span>
+              </div>
+              <span class="producto-card__score" [class]="getScoreClass(p.adaScore)">
+                ADA {{ p.adaScore }}/100
+              </span>
+            </div>
+            <div class="producto-card__metas">
+              <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
+              <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
+              <span class="producto-card__meta">{{ p.tendencia }}</span>
+              <span class="producto-card__meta producto-card__meta--contrib">
+                ~{{ p.pedidosEstSem }} ped/sem
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <button class="wizard__next" [disabled]="!selectedProducto()" (click)="goTo('brujula')">
+        Continuar → Calculadora de precio
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 3: Brújula ── -->
+  @if (step() === 'brujula') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">🧭 Calculadora Brújula</h1>
+      <p class="wizard__sub">Ingresa el costo del producto y el flete estimado. Gali te muestra el precio mínimo para no perder dinero y el precio recomendado para tu margen objetivo.</p>
+
+      <div class="brujula-inputs">
+        <div class="brujula-field">
+          <label class="brujula-field__label">Costo del producto</label>
+          <div class="brujula-field__row">
+            <span class="brujula-field__prefix">$</span>
+            <input class="brujula-field__input" type="number" min="1000" step="500"
+                   [value]="costoProd()"
+                   (input)="costoProd.set(+$any($event.target).value)">
+          </div>
+        </div>
+        <div class="brujula-field">
+          <label class="brujula-field__label">Flete estimado</label>
+          <div class="brujula-field__row">
+            <span class="brujula-field__prefix">$</span>
+            <input class="brujula-field__input" type="number" min="0" step="500"
+                   [value]="fleteEst()"
+                   (input)="fleteEst.set(+$any($event.target).value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Outputs de la Brújula -->
+      <div class="brujula-outputs">
+        <div class="brujula-metric">
+          <span class="brujula-metric__label">Costo total</span>
+          <span class="brujula-metric__val brujula-metric__val--neutral">${{ costoTotal() | number }}</span>
+        </div>
+        <div class="brujula-metric">
+          <span class="brujula-metric__label">Precio mínimo <span class="brujula-metric__hint">(break-even)</span></span>
+          <span class="brujula-metric__val brujula-metric__val--warn">${{ precioMinimo() | number }}</span>
+        </div>
+        <div class="brujula-metric brujula-metric--recomendado">
+          <span class="brujula-metric__label">
+            ✦ Precio recomendado
+            <span class="brujula-metric__tag">{{ margenObjetivo }}% margen</span>
+          </span>
+          <span class="brujula-metric__val brujula-metric__val--primary">${{ precioRecomendado() | number }}</span>
+        </div>
+      </div>
+
+      <!-- Ajuste de precio con slider -->
+      <div class="brujula-slider-section">
+        <div class="brujula-slider-header">
+          <label class="brujula-slider-header__label">Ajustar precio de venta</label>
+          <span class="brujula-price-final">${{ precioFinal() | number }}</span>
+        </div>
+        <input class="brujula-slider" type="range"
+               [min]="precioMinimo()"
+               [max]="precioRecomendado() * 1.5"
+               [step]="500"
+               [value]="precioFinal()"
+               (input)="precioSlider.set(+$any($event.target).value)">
+        <div class="brujula-slider-labels">
+          <span>Mínimo ${{ (precioMinimo() / 1000).toFixed(0) }}k</span>
+          <span>Recomendado ${{ (precioRecomendado() / 1000).toFixed(0) }}k</span>
+        </div>
+        <button class="brujula-btn-rec" (click)="usarPrecioRecomendado()">
+          Usar precio recomendado →
+        </button>
+      </div>
+
+      <!-- Margen proyectado con semáforo -->
+      <div class="brujula-margen" [attr.data-semaforo]="margenSemaforo()">
+        <span class="brujula-margen__label">Margen proyectado</span>
+        <span class="brujula-margen__val">{{ margenFinal() }}%</span>
+        <span class="brujula-margen__desc">
+          @if (margenSemaforo() === 'verde') { Excelente — por encima del objetivo }
+          @else if (margenSemaforo() === 'ambar') { Aceptable — ajusta el precio si puedes }
+          @else { Bajo — considera subir el precio o negociar el costo }
+        </span>
+      </div>
+
+      <button class="wizard__next" (click)="goTo('presupuesto')">
+        Continuar → Presupuesto de pauta
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 4: Presupuesto ── -->
+  @if (step() === 'presupuesto') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">Presupuesto de pauta</h1>
+      <p class="wizard__sub">Define cuánto invertirás por día. Gali calcula la sugerencia basándose en tu objetivo y tu ROAS histórico.</p>
+
+      <!-- Badge Gali sugiere -->
+      <div class="gali-budget-badge">
+        <div class="gali-budget-badge__top">
+          <span class="gali-budget-badge__spark">✦</span>
+          <span class="gali-budget-badge__label">Gali sugiere</span>
+          <span class="gali-budget-badge__val">${{ galiSugerenciaPresupuesto().valor | number }}/día</span>
+        </div>
+        <p class="gali-budget-badge__ctx">{{ galiSugerenciaPresupuesto().contexto }}</p>
+        <button class="gali-budget-badge__cta" (click)="usarSugerenciaGali()">
+          Usar este →
+        </button>
+      </div>
+
+      <div class="config-section">
+        <label class="config__label">Tu presupuesto diario</label>
+        <div class="config__budget-row">
+          <span class="config__budget-val">${{ presupuestoDiario() | number }}/día</span>
+          <span class="config__budget-est">≈ {{ presupuestoPedidosEst() }}</span>
+        </div>
+        <input class="config__slider" type="range" min="10000" max="100000" step="5000"
+               [value]="presupuestoDiario()"
+               (input)="presupuestoDiario.set(+$any($event.target).value)">
+        <div class="config__slider-labels">
+          <span>$10k/día</span>
+          <span>$55k/día</span>
+          <span>$100k/día</span>
+        </div>
+      </div>
+
+      <button class="wizard__next" (click)="goTo('agentes')">
+        Continuar → Asignar agentes
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 5: Agentes ── -->
+  @if (step() === 'agentes') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">Agentes de Gali</h1>
+      <p class="wizard__sub">Elige qué agentes monitoran este proyecto. Roax es obligatorio para proyectos de pauta.</p>
+
+      <div class="agentes-list">
+        @for (ag of AGENTES_INFO; track ag.id) {
+          <div class="agente-card" [class.agente-card--active]="agentes()[ag.id]" [class.agente-card--locked]="ag.id === 'roax'">
+            <div class="agente-card__row" (click)="ag.id !== 'roax' ? toggleAgente(ag.id) : expandAgente(ag.id)">
+              <span class="agente-card__icon">{{ ag.icon }}</span>
+              <div class="agente-card__info">
+                <span class="agente-card__nombre">{{ ag.nombre }}</span>
+                @if (ag.recomendado) {
+                  <span class="agente-card__badge">{{ ag.id === 'roax' ? 'Siempre activo' : 'Recomendado' }}</span>
+                }
+              </div>
+              <button class="agente-card__toggle"
+                      [disabled]="ag.id === 'roax'"
+                      (click)="$event.stopPropagation(); ag.id !== 'roax' ? toggleAgente(ag.id) : null">
+                @if (agentes()[ag.id]) { <span class="agente-card__toggle--on">✓ Activo</span> }
+                @else { <span class="agente-card__toggle--off">Activar</span> }
+              </button>
+            </div>
+            @if (agenteExpandido() === ag.id || agentes()[ag.id]) {
+              <div class="agente-card__desc">
+                {{ ag.desc }}
+                @if (ag.razon) { <em class="agente-card__razon">↳ {{ ag.razon }}</em> }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="gali-msg">
+        <span class="gali-msg__icon">✦</span>
+        <p class="gali-msg__text">
+          Con Roax y Vigilante activos, Gali monitorea el ROAS en tiempo real y te avisa si algo requiere tu atención.
+          Los {{ agentesActivos.length }} agentes elegidos están listos para este proyecto.
+        </p>
+      </div>
+
+      <button class="wizard__next" (click)="goTo('lanzar')">
+        Continuar → Revisar y lanzar
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 6: Lanzar ── -->
+  @if (step() === 'lanzar') {
+    <div class="wizard__body gali-stagger-in">
+
+      @if (!launched()) {
+        <h1 class="wizard__title">Listo para lanzar</h1>
+
+        <div class="resumen">
+          <div class="resumen__item">
+            <span class="resumen__label">Objetivo vinculado</span>
+            <span class="resumen__val">{{ objetivo.texto }}</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Producto</span>
+            <span class="resumen__val">{{ selectedProducto()?.nombre ?? '—' }}</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Precio de venta</span>
+            <span class="resumen__val">${{ precioFinal() | number }} · margen {{ margenFinal() }}%</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Presupuesto inicial</span>
+            <span class="resumen__val">${{ presupuestoDiario() | number }}/día</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Contribución esperada</span>
+            <span class="resumen__val">~{{ pedidosEsperadosSem() }} pedidos/sem</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Agentes activados</span>
+            <span class="resumen__val">{{ agentesActivos.join(', ') }}</span>
+          </div>
+        </div>
+
+        <div class="gali-msg gali-msg--launch">
+          <span class="gali-msg__icon">✦</span>
+          <div class="gali-msg__text">
+            Con este proyecto y ${{ presupuestoDiario() | number }}/día, tu objetivo subiría del {{ pctActual }}% al {{ nuevoPct() }}%.
+            Si en 2 semanas no alcanza el 70% de la meta, Roax ajustará la estrategia automáticamente.
+          </div>
+        </div>
+
+        <button class="wizard__launch" [disabled]="isLaunching()" (click)="launch()">
+          @if (isLaunching()) { Lanzando… } @else { 🚀 Lanzar proyecto }
+        </button>
+
+        <!-- Overlay de lanzamiento animado -->
+        @if (isLaunching()) {
+          <div class="launch-overlay">
+            <div class="launch-overlay__content">
+              <div class="launch-overlay__rocket">🚀</div>
+              <div class="launch-overlay__bar-wrap">
+                <div class="launch-overlay__bar" [style.width.%]="launchProgress()"></div>
+              </div>
+              <div class="launch-overlay__pct">{{ launchProgress() }}%</div>
+              <ul class="launch-overlay__steps">
+                @for (ls of LAUNCH_STEPS; track ls.label; let i = $index) {
+                  <li class="launch-overlay__step"
+                      [class.done]="launchProgress() >= ls.pct"
+                      [class.active]="launchStepActive() === i + 1">
+                    <span class="launch-overlay__step-icon">
+                      @if (launchProgress() >= ls.pct) { ✓ } @else if (launchStepActive() === i + 1) { ◉ } @else { ○ }
+                    </span>
+                    {{ ls.label }}
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+
+      } @else {
+        <!-- Estado de éxito -->
+        <div class="launch-success gali-stagger-in">
+          <div class="launch-success__icon">🚀</div>
+          <h2 class="launch-success__title">¡Proyecto lanzado!</h2>
+          <p class="launch-success__sub">
+            <strong>{{ selectedProducto()?.nombre }}</strong> está activo.
+            Roax comenzó la campaña con ${{ presupuestoDiario() | number }}/día.
+            Gali te notificará los primeros datos en 24–48h.
+          </p>
+          <div class="launch-success__contrib">
+            <span>Contribución esperada al objetivo:</span>
+            <strong>+{{ pedidosEsperadosSem() }} pedidos/sem → {{ nuevoPct() }}% del objetivo</strong>
+          </div>
+          <button class="wizard__next wizard__next--success" (click)="volverAProyectos()">
+            Ver mis proyectos →
+          </button>
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

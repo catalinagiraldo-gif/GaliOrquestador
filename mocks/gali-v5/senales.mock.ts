@@ -31,6 +31,16 @@ export interface GaliSignal {
   galiFlowDesc?: string;
   /** Si true, la acción Lanzar lleva a nuevo-proyecto pre-cargado */
   canLaunch?: boolean;
+  /** Pedidos semanales estimados si se lanza este proyecto */
+  pedidosEstimados?: number;
+}
+
+export interface AlertaOpcion {
+  id: string;
+  label: string;
+  description: string;
+  impactoEstimado: string;
+  isPrimary: boolean;
 }
 
 export interface GaliAlerta {
@@ -39,9 +49,12 @@ export interface GaliAlerta {
   titulo: string;
   descripcion: string;
   impacto: string;
+  impactoSiActua?: string;
   ctaPrincipal: string;
   ctaSecundario: string;
   agente: string;
+  agenteColor?: string;
+  opciones?: AlertaOpcion[];
   proyectoId?: string;
   pedidosAfectados?: number;
   fechaDeteccion: string;
@@ -116,6 +129,7 @@ export const MOCK_SENALES: GaliSignal[] = [
       { label: 'Stock proveedor', val: '2.400 uds disponibles' },
     ],
     canLaunch: true,
+    pedidosEstimados: 18,
   },
   {
     id: 'sen-003',
@@ -234,6 +248,7 @@ export const MOCK_SENALES: GaliSignal[] = [
     metrica: 'CTR est. +0.5pp · Ventana 7 días',
     fechaDeteccion: '2026-06-09T09:00:00Z',
     canLaunch: true,
+    pedidosEstimados: 12,
   },
   {
     id: 'sen-007',
@@ -267,9 +282,27 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
       'Coordinadora lleva 3 días consecutivos con novedad > 12% en rutas de Bogotá. ' +
       'Hoy 15.3%. 12 de tus pedidos activos tienen destino Bogotá con esta transportadora.',
     impacto: '~3 novedades estimadas si no se actúa · ~$51k en riesgo',
+    impactoSiActua: '~$51k protegidos si cambias ahora',
     ctaPrincipal: 'Cambiar 12 pedidos a Servientrega',
     ctaSecundario: 'Ver detalle por pedido',
     agente: 'vigilante',
+    agenteColor: '#fbbf24',
+    opciones: [
+      {
+        id: 'a',
+        label: 'Cambiar 12 pedidos a Servientrega',
+        description: 'Tasa actual de Servientrega: 3.8%',
+        impactoEstimado: '~$51k protegidos',
+        isPrimary: true,
+      },
+      {
+        id: 'b',
+        label: 'Cambiar solo los pedidos de hoy',
+        description: 'Esperar datos de mañana antes de mover el resto',
+        impactoEstimado: 'Menor alcance',
+        isPrimary: false,
+      },
+    ],
     proyectoId: 'collar-gps-2026',
     pedidosAfectados: 12,
     fechaDeteccion: '2026-06-04T06:00:00Z',
@@ -300,9 +333,27 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
       'Tu anuncio de Skincare está perdiendo efectividad — el clic de cada 100 usuarios bajó de 1.8 a 1.1 en las últimas 48h. ' +
       'Roax detectó que el creative lleva 18 días activo (límite recomendado: 14 días) y la audiencia se está saturando.',
     impacto: 'Las ventas de Skincare en riesgo de caer esta semana si no se cambia el anuncio',
+    impactoSiActua: 'CTR puede volver a 1.8%+ con creative fresco — ~$12k adicionales esta semana',
     ctaPrincipal: 'Activar creative alternativo',
     ctaSecundario: 'Ver diagnóstico de Roax',
     agente: 'roax',
+    agenteColor: '#f97316',
+    opciones: [
+      {
+        id: 'a',
+        label: 'Activar creative alternativo B (ya preparado)',
+        description: 'Roax detectó que el creative B tiene +22% CTR histórico en la misma audiencia',
+        impactoEstimado: '~$12k adicionales esta semana',
+        isPrimary: true,
+      },
+      {
+        id: 'b',
+        label: 'Pausar 24h y esperar datos frescos',
+        description: 'Detener gasto mientras el equipo prepara creative nuevo',
+        impactoEstimado: 'Menor riesgo, sin ventas hoy',
+        isPrimary: false,
+      },
+    ],
     proyectoId: 'skincare-kbeauty',
     pedidosAfectados: 0,
     fechaDeteccion: '2026-06-04T10:00:00Z',
@@ -331,9 +382,34 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
       'Tu margen mínimo para no perder dinero con este producto es 1.4x. ' +
       'Roax identificó que el creative activo lleva 21 días y está saturado.',
     impacto: 'Estás perdiendo dinero en cada peso de pauta invertido · $18k/día en riesgo',
+    impactoSiActua: 'Detener el sangrado hoy — recuperación posible en 4-5 días con nuevo creative',
     ctaPrincipal: 'Pausar campaña inmediatamente',
     ctaSecundario: 'Ver diagnóstico de Roax',
     agente: 'roax',
+    agenteColor: '#f97316',
+    opciones: [
+      {
+        id: 'a',
+        label: 'Pausar campaña y lanzar creative nuevo en 48h',
+        description: 'Roax preparó un brief de creative basado en los últimos 3 ganadores de esta categoría',
+        impactoEstimado: 'Parar pérdida de $18k/día',
+        isPrimary: true,
+      },
+      {
+        id: 'b',
+        label: 'Reducir presupuesto al 30% y monitorear 24h',
+        description: 'Reducir exposición mientras el ROAS se estabiliza',
+        impactoEstimado: 'Pérdida parcial limitada a ~$5k/día',
+        isPrimary: false,
+      },
+      {
+        id: 'c',
+        label: 'Pausar solo los ad sets con ROAS < 1x',
+        description: 'Mantener los que aún son rentables, cortar solo los que pierden',
+        impactoEstimado: 'Pérdida selectiva — optimización quirúrgica',
+        isPrimary: false,
+      },
+    ],
     proyectoId: 'fitness-bands',
     pedidosAfectados: 0,
     fechaDeteccion: '2026-06-10T07:30:00Z',

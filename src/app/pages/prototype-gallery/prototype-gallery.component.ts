@@ -32,27 +32,66 @@ interface VistaShortcut {
         </p>
       </div>
 
-      <!-- VERSIÓN NORTE: Gali V5 v2 — La Casita -->
-      <article class="featured" routerLink="/gali-v5-v2">
+      <!-- VERSIÓN DEFINITIVA: Gali 6 — La Casita -->
+      <article class="featured" routerLink="/gali-6">
         <header class="featured__head">
           <span class="featured__tag">
-            <span aria-hidden="true">✦</span> Gali V5 v2 · La Casita
+            <span aria-hidden="true">✦</span> Gali 6 · La Casita
           </span>
-          <span class="featured__status" data-status="active">norte minimalista</span>
+          <span class="featured__status" data-status="active">versión definitiva</span>
         </header>
 
         <h3 class="featured__title">
-          Gali como <em>Director que reporta</em>
+          El Director de E-commerce que <em>el dropshipper nunca pudo pagar</em>
         </h3>
 
         <p class="featured__lead">
-          Reset a la "casita en la montaña": espinazo Objetivo → Proyectos → Conexiones, home
-          "Hoy" tipo briefing (1 decisión a la vez), impacto de Gali visible y arquitectura técnica
-          oculta en un Centro de control. Build paralelo — no toca Gali V5.
+          Shell limpio sin herencia de v5. Espinazo Hoy → Proyectos → Conexiones → Señales.
+          Modo básico/experto. FAB único para chat. Todas las páginas operativas de Gali 5
+          accesibles como lazy routes. Cero <code>data-proto-skip</code>.
         </p>
 
         <div class="featured__vistas">
-          <strong class="featured__vistas-label">Espinazo</strong>
+          <strong class="featured__vistas-label">La Casita</strong>
+          <div class="featured__vistas-grid">
+            <a *ngFor="let v of vistasG6" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
+              <span class="featured__vista-badge">{{ v.badge }}</span>
+              <strong>{{ v.label }}</strong>
+              <span class="featured__vista-desc">{{ v.description }}</span>
+            </a>
+          </div>
+        </div>
+
+        <footer class="featured__foot">
+          <a routerLink="/gali-6" class="featured__cta">
+            <span aria-hidden="true">✦</span> Abrir Gali 6
+            <span aria-hidden="true">→</span>
+          </a>
+          <span class="featured__kbd">Ultimate Plan · Jun 15 2026</span>
+        </footer>
+      </article>
+
+      <!-- ARCHIVO: Gali 5 (V5 + V5v2) -->
+      <article class="featured" routerLink="/gali-5">
+        <header class="featured__head">
+          <span class="featured__tag">
+            <span aria-hidden="true">◆</span> Gali 5 · Archivo
+          </span>
+          <span class="featured__status" data-status="active">v5 + v5-v2</span>
+        </header>
+
+        <h3 class="featured__title">
+          Gali V5 + La Casita v1 — <em>archivo de desarrollo</em>
+        </h3>
+
+        <p class="featured__lead">
+          Las versiones anteriores del prototipo. Gali V5 tiene 38 rutas operativas completas.
+          Gali V5 v2 ("La Casita v1") es el prototipo de validación del concepto casita
+          del que nació Gali 6.
+        </p>
+
+        <div class="featured__vistas">
+          <strong class="featured__vistas-label">Acceso rápido</strong>
           <div class="featured__vistas-grid">
             <a *ngFor="let v of vistasV5v2" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
               <span class="featured__vista-badge">{{ v.badge }}</span>
@@ -63,11 +102,12 @@ interface VistaShortcut {
         </div>
 
         <footer class="featured__foot">
-          <a routerLink="/gali-v5-v2" class="featured__cta">
-            <span aria-hidden="true">✦</span> Abrir La Casita
-            <span aria-hidden="true">→</span>
+          <a routerLink="/gali-5" class="featured__cta featured__cta--secondary">
+            Abrir Gali 5 → V5 shell
           </a>
-          <span class="featured__kbd">Spec 17 · GaliMinimal</span>
+          <a routerLink="/gali-v5-v2" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
+            Abrir La Casita v1 →
+          </a>
         </footer>
       </article>
 
@@ -187,12 +227,21 @@ export class PrototypeGalleryComponent {
     this.v4Open.update(v => !v);
   }
 
+  vistasG6: VistaShortcut[] = [
+    { label: 'Hoy', route: '/gali-6', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
+    { label: 'Proyectos', route: '/gali-6/proyectos', badge: '◎', description: 'Objetivo editable · salud · Gali recomienda' },
+    { label: 'Conexiones', route: '/gali-6/conexiones', badge: '⬡', description: '5 MCP core · qué contexto da a Gali' },
+    { label: 'Impacto', route: '/gali-6/impacto', badge: '↗', description: 'Ledger · $ ahorrados · acciones · horas' },
+    { label: 'Catálogo', route: '/gali-6/productos/catalogo', badge: '◆', description: 'Página operativa heredada de Gali 5' },
+    { label: 'Wallet', route: '/gali-6/financiero/historial-de-cartera', badge: '◆', description: 'Kronos · ledger financiero' },
+  ];
+
   vistasV5v2: VistaShortcut[] = [
-    { label: 'Hoy', route: '/gali-v5-v2', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
+    { label: 'Hoy (v5-v2)', route: '/gali-v5-v2', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
     { label: 'Proyectos', route: '/gali-v5-v2/proyectos', badge: '◎', description: 'Objetivo editable · salud · Gali recomienda' },
     { label: 'Conexiones', route: '/gali-v5-v2/conexiones', badge: '⬡', description: '5 MCP core · qué contexto da a Gali' },
     { label: 'Impacto', route: '/gali-v5-v2/impacto', badge: '↗', description: 'Ledger · $ ahorrados · acciones · horas' },
-    { label: 'Centro de control', route: '/gali-v5-v2/centro-control', badge: '⚙', description: 'Agentes · Skills · Reglas (experto)' },
+    { label: 'V5 baseline', route: '/gali-5', badge: '◆', description: 'Gali V5 · 38 rutas operativas' },
   ];
 
   vistasV5: VistaShortcut[] = [

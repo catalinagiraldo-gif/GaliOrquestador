@@ -4,6 +4,15 @@
   padding: $size-8;
   max-width: 1280px;
   margin: 0 auto;
+  min-width: 0;
+
+  @media (max-width: 1023px) {
+    padding: $size-5;
+  }
+
+  @media (max-width: 599px) {
+    padding: $size-4;
+  }
 
   &__header {
     margin-bottom: $size-6;
@@ -146,7 +155,7 @@
 
   &__vistas-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: $size-3;
   }
 
@@ -237,6 +246,7 @@
     gap: $size-4;
     padding-top: $size-4;
     border-top: 1px solid rgba(0, 0, 0, 0.06);
+    flex-wrap: wrap;
   }
 
   &__cta {
@@ -346,9 +356,17 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: $size-4;
     padding: 0 $size-5 $size-5;
+
+    @media (max-width: 799px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 479px) {
+      grid-template-columns: 1fr;
+    }
   }
 }
 

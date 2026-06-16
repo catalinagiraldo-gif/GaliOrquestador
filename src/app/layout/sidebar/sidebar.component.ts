@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -26,7 +26,7 @@ import { NavItem, UserRole, SIDEBAR_NAV } from '../../config/sidebar-nav.config'
             class="sidebar__logo-icon"
           />
         </div>
-        <button class="sidebar__toggle" (click)="collapsed = !collapsed">
+        <button class="sidebar__toggle" (click)="toggleCollapsed()">
           <i class="pi pi-bars"></i>
         </button>
       </div>
@@ -79,6 +79,7 @@ import { NavItem, UserRole, SIDEBAR_NAV } from '../../config/sidebar-nav.config'
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   @Input() collapsed = false;
+  @Output() collapsedChange = new EventEmitter<boolean>();
   expandedItem: string | null = null;
   menuItems: NavItem[] = [];
 
@@ -96,6 +97,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+  }
+
+  toggleCollapsed() {
+    this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
   }
 
   toggleExpand(label: string) {

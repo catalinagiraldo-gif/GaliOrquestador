@@ -1,0 +1,162 @@
+<div class="g6shell"
+  [class.g6shell--nav-open]="navOpen()"
+  [class.g6shell--panel-open]="gali.galiMode() > 0"
+  [class.g6shell--section-collapsed]="sectionCollapsed()">
+  <!-- Topbar — misma estructura que V5v1 (brand-section: gallery + logo) -->
+  <header class="topbar">
+    <button class="topbar__menu" (click)="toggleNav()" aria-label="Menú">☰</button>
+
+    <!-- Brand section igual a V5v1: botón galería + logo imagen -->
+    <div class="topbar__brand-section">
+      <a routerLink="/home" class="topbar__gallery" title="Volver a la galería">
+        <i class="pi pi-th-large" aria-hidden="true"></i>
+        <span>Galería</span>
+      </a>
+      <a class="topbar__logo-link" routerLink="/gali-6" title="Inicio Gali 6">
+        <img src="assets/images/gali-v5/dropi-logo.svg" alt="dropi" class="topbar__logo" />
+        <span class="topbar__version-tag">Gali 6</span>
+      </a>
+    </div>
+
+    <!-- Meta global -->
+    <a class="topbar__goal" routerLink="/gali-6/proyectos">
+      <span class="topbar__goal-label">Meta</span>
+      <span class="topbar__goal-track"><span class="topbar__goal-fill" [style.width.%]="objetivoPct()"></span></span>
+      <span class="topbar__goal-val">{{ objetivoActual }}/{{ objetivoMeta() }} ped · {{ objetivoPct() }}%</span>
+    </a>
+
+    <div class="topbar__right">
+      <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()">
+        {{ modo() === 'basico' ? 'Modo básico' : 'Modo experto' }}
+      </button>
+      <button class="topbar__wallet" (click)="walletHidden.set(!walletHidden())">
+        <span class="topbar__wallet-ico" aria-hidden="true">▮</span>
+        <span class="topbar__wallet-val">{{ walletHidden() ? '••••••' : walletLabel }}</span>
+      </button>
+      <span class="topbar__avatar" aria-hidden="true">CG</span>
+    </div>
+  </header>
+
+  <!-- Cuerpo: rail + section-nav + contenido -->
+  <div class="g6shell__body" [class.g6shell__body--no-section]="!hasSectionPanel()">
+    <app-gali6-icon-rail />
+
+    @if (hasSectionPanel() && modo() === 'experto') {
+      <dropi-section-nav
+        [panel]="filteredPanel()"
+        [collapsed]="sectionCollapsed()"
+        (collapseRequested)="toggleSection()"
+        (expandRequested)="toggleSection()" />
+    } @else if (hasSectionPanel()) {
+      <dropi-section-nav [panel]="filteredPanel()" [collapsed]="false" />
+    }
+
+    <main class="g6shell__content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Backdrop nav móvil -->
+  @if (navOpen()) {
+    <div class="g6shell__backdrop" (click)="navOpen.set(false)"></div>
+  }
+
+  <!-- Chat lateral de Gali -->
+  @if (gali.galiMode() > 0) {
+    <div class="g6shell__panel gali-panel-slide-in" [style.width.px]="gali.panelWidth()">
+      <gali-right-panel (closed)="gali.togglePanel()" />
+    </div>
+  }
+</div>
+
+<!-- ── FAB flotante de Gali (único punto de entrada al chat) ── -->
+<app-gali6-fab />
+
+<!-- ── ZeroState Onboarding Modal ── -->
+@if (zeroOpen() && zeroStep() < 3) {
+  <div class="zero-bg" (click)="zeroClose()"></div>
+  <div class="zero" role="dialog" aria-modal="true" aria-label="Configura tu Gali">
+
+    <!-- Paso 0 — Meta en pedidos/sem (omitido si ya tiene pedidos) -->
+    @if (zeroStep() === 0) {
+      <div class="zero__body">
+        <span class="zero__step">1 de 3</span>
+        <span class="zero__gali" aria-hidden="true">✦</span>
+        <h2 class="zero__title">¿Cuál es tu meta para los próximos 30 días?</h2>
+        <p class="zero__sub">Gali usará este número para priorizar señales y recomendarte proyectos.</p>
+        <div class="zero__slider">
+          <input type="range" class="zero__range" min="20" max="500" step="10"
+            [value]="zeroPedidos()" (input)="zeroPedidos.set(+$any($event.target).value)" />
+          <div class="zero__slider-val">
+            <span class="zero__big">{{ zeroPedidos() }}</span>
+            <span class="zero__unit">pedidos / semana</span>
+          </div>
+        </div>
+        <button class="zero__cta" (click)="zeroNext()">Continuar →</button>
+      </div>
+    }
+
+    <!-- Paso 1 — Mayor fricción -->
+    @if (zeroStep() === 1) {
+      <div class="zero__body">
+        <span class="zero__step">2 de 3</span>
+        <span class="zero__gali" aria-hidden="true">✦</span>
+        <h2 class="zero__title">¿Cuál es tu mayor fricción hoy?</h2>
+        <p class="zero__sub">Gali ajusta qué señales te muestra primero según tu respuesta.</p>
+        <div class="zero__options">
+          @for (f of fricciones; track f.id) {
+            <button class="zero__opt" [class.zero__opt--sel]="zeroFriccion() === f.id"
+              (click)="zeroFriccion.set(f.id)">{{ f.label }}</button>
+          }
+        </div>
+        <button class="zero__cta" [disabled]="!zeroFriccion()" (click)="zeroNext()">Continuar →</button>
+      </div>
+    }
+
+    <!-- Paso 2 — Canal principal -->
+    @if (zeroStep() === 2) {
+      <div class="zero__body">
+        <span class="zero__step">3 de 3</span>
+        <span class="zero__gali" aria-hidden="true">✦</span>
+        <h2 class="zero__title">¿Cuál es tu canal principal de pauta?</h2>
+        <p class="zero__sub">Esto ayuda a Gali a leer tus métricas de anuncios en contexto.</p>
+        <div class="zero__options">
+          @for (c of canales; track c.id) {
+            <button class="zero__opt" [class.zero__opt--sel]="zeroCanal() === c.id"
+              (click)="zeroCanal.set(c.id)">{{ c.label }}</button>
+          }
+        </div>
+        <button class="zero__cta" [disabled]="!zeroCanal()" (click)="zeroNext()">Ver mi Gali →</button>
+      </div>
+    }
+  </div>
+}
+
+<!-- Paso 3 — Confirmación de Gali -->
+@if (zeroOpen() && zeroStep() === 3) {
+  <div class="zero-bg"></div>
+  <div class="zero zero--confirm" role="dialog">
+    <div class="zero__body">
+      <span class="zero__gali zero__gali--lg" aria-hidden="true">✦</span>
+      <h2 class="zero__title">Gali ya sabe lo que necesitas.</h2>
+      <p class="zero__respuesta">{{ zeroRespuesta() }}</p>
+      <p class="zero__hint">Empezás en <strong>modo básico</strong> — las señales y recomendaciones más importantes, sin ruido. Podés activar el modo experto cuando quieras.</p>
+      <button class="zero__cta zero__cta--confirm" (click)="zeroClose()">Entrar a Gali 6 →</button>
+    </div>
+  </div>
+}
+
+<!-- ── Micro-onboarding modo experto (1 slide) ── -->
+@if (expertoOnboarding()) {
+  <div class="experto-bg" (click)="cerrarExpertoOnboarding()"></div>
+  <div class="experto-slide" role="dialog" aria-modal="true">
+    <span class="experto-slide__icon" aria-hidden="true">⚙</span>
+    <h3 class="experto-slide__title">Modo experto activado</h3>
+    <p class="experto-slide__body">
+      Ahora ves <strong>Agentes, Skills, Reglas y Marketplace</strong> — la maquinaria que opera tu negocio.<br>
+      Gali la usa de fondo. Entrás a ajustar cuando quieras.
+    </p>
+    <p class="experto-slide__hint">Podés volver a modo básico en cualquier momento desde la barra superior.</p>
+    <button class="experto-slide__cta" (click)="cerrarExpertoOnboarding()">Entendido →</button>
+  </div>
+}

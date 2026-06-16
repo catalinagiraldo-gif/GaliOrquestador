@@ -1,0 +1,156 @@
+@use 'styles/variables' as *;
+
+.agent-card {
+  display: flex;
+  gap: $size-3;
+  padding: $size-3 $size-4;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $motion-fast $ease-standard;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: var(--surface-100);
+  }
+
+  &--selected {
+    background: var(--orange-50);
+    border-color: var(--primary-200);
+  }
+
+  &--configurando {
+    opacity: 0.85;
+  }
+
+  &__avatar {
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__initial {
+    font-family: $font-primary;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  &__dot {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 2px solid white;
+
+    &--activo    { background: var(--green-500); }
+    &--esperando { background: var(--amber-400); }
+    &--pausa     { background: var(--gray-400); }
+    &--configurando { background: var(--primary-400); }
+
+    &--pulse {
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+      animation: gali-pulse-dot 1.5s ease-in-out infinite;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__header-row {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+  }
+
+  &__name {
+    font-family: $font-primary;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__autopilot-badge {
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary-700);
+    background: var(--orange-100);
+    padding: 1px 6px;
+    border-radius: $radius-full;
+    border: 1px solid var(--primary-200);
+  }
+
+  &__role {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-family: $font-primary;
+  }
+
+  &__last-action {
+    display: flex;
+    gap: $size-1;
+    align-items: baseline;
+    margin-top: 2px;
+  }
+
+  &__action-text {
+    font-size: 11px;
+    color: var(--gray-600);
+    font-family: $font-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  &__action-time {
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--gray-400);
+  }
+
+  &__impact {
+    font-size: 10px;
+    color: var(--green-700);
+    font-weight: 600;
+    background: var(--green-50);
+    padding: 1px 6px;
+    border-radius: $radius-full;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  &__configuring-label {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    font-size: 10px;
+    color: var(--primary-500);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  &__configuring-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-400);
+    border-radius: 50%;
+    animation: gali-pulse-dot 1s infinite;
+  }
+}

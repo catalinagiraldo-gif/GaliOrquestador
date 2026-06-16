@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, HostListener, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { GaliDockComponent } from '../../components/gali-v2/gali-dock/gali-dock.component';
 
 @Component({
@@ -17,4 +17,15 @@ import { GaliDockComponent } from '../../components/gali-v2/gali-dock/gali-dock.
   `,
   styleUrls: ['./gali-v2-shell.component.scss'],
 })
-export class GaliV2ShellComponent {}
+export class GaliV2ShellComponent {
+  private router = inject(Router);
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(e: KeyboardEvent): void {
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault();
+      localStorage.removeItem('gali_v2_perfil');
+      this.router.navigate(['/gali-v2/onboarding']);
+    }
+  }
+}

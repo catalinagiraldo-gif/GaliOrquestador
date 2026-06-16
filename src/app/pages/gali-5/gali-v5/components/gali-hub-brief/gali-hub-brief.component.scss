@@ -1,0 +1,122 @@
+@use 'styles/variables' as *;
+
+.hub-brief {
+  display: flex;
+  align-items: flex-start;
+  gap: $size-4;
+  padding: $size-6;
+  margin: 0 $size-6;
+  background: $white;
+  border: 1px solid var(--surface-200);
+  border-radius: $radius-md;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  animation: gali-fade-up $motion-medium $ease-entrance both;
+
+  &[data-estado='critico'] {
+    border-left: 3px solid var(--red-400);
+    background: rgba(239, 68, 68, 0.03);
+  }
+
+  &[data-estado='atencion'] {
+    border-left: 3px solid var(--amber-400);
+  }
+
+  &[data-estado='bien'] {
+    border-left: 3px solid var(--green-400);
+  }
+}
+
+.hub-brief__gali-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.gali-star {
+  font-size: 20px;
+  color: var(--primary-500);
+  line-height: 1;
+}
+
+.gali-label {
+  font-family: $font-primary;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-500);
+}
+
+.hub-brief__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.hub-brief__titulo {
+  font-family: $font-primary;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 $size-1;
+  line-height: 1.35;
+}
+
+.hub-brief__subtexto {
+  font-family: $font-primary;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--gray-600);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.hub-brief__impact {
+  font-family: $font-primary;
+  font-size: 12px;
+  color: var(--gray-500);
+  margin: $size-2 0 0;
+}
+
+.hub-brief__actions {
+  display: flex;
+  gap: $size-2;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.hub-brief__btn {
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px $size-4;
+  border-radius: $radius-sm;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background $motion-fast $ease-standard,
+              transform $motion-fast $ease-standard;
+
+  &:active { transform: scale(0.97); }
+
+  &--primary {
+    background: var(--primary-500);
+    color: white;
+
+    &:hover { background: var(--primary-600); }
+  }
+
+  &--secondary {
+    background: transparent;
+    color: var(--gray-700);
+    border: 1px solid var(--surface-300);
+
+    &:hover { background: var(--surface-100); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-brief { animation-duration: 1ms !important; }
+}

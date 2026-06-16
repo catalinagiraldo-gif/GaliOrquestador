@@ -19,8 +19,8 @@ import { AuthService } from './services/auth.service';
     <!-- App shell with sidebar + header (oculto en /gali* y /gali-v5*) -->
     <ng-template #appShell>
       <div class="app-shell" [class.app-shell--gali]="isGaliWorkspace">
-        <app-sidebar *ngIf="!isStandaloneShell" [collapsed]="isGaliWorkspace && sidebarCollapsed" />
-        <div class="app-shell__main" [class.app-shell__main--standalone]="isStandaloneShell">
+        <app-sidebar *ngIf="!isStandaloneShell" [collapsed]="isGaliWorkspace && sidebarCollapsed" (collapsedChange)="sidebarActuallyCollapsed = $event" />
+        <div class="app-shell__main" [class.app-shell__main--standalone]="isStandaloneShell" [class.app-shell__main--collapsed]="!isGaliWorkspace && sidebarActuallyCollapsed">
           <app-header
             *ngIf="!isStandaloneShell"
             [userName]="(auth.user$ | async)?.name ?? 'Usuario'"
@@ -40,6 +40,7 @@ export class AppComponent {
   isGaliWorkspace = false;
   isStandaloneShell = false;
   sidebarCollapsed = true;
+  sidebarActuallyCollapsed = false;
 
   constructor(
     public auth: AuthService,
@@ -61,6 +62,8 @@ export class AppComponent {
       path.startsWith('/gali-v5')
       || path.startsWith('/gali-v3')
       || path.startsWith('/gali-v4')
+      || path.startsWith('/gali-6')
+      || path.startsWith('/gali-5')
       || path === '/gali'
       || path.startsWith('/gali/');
     this.isGaliWorkspace =

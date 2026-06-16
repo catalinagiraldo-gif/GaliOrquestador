@@ -56,8 +56,15 @@
     "garantias_pct": 1,
     "semana_delta": "+$89k vs sem anterior",
     "semana_delta_ok": true,
-    "agentes_activos": ["roax", "vigilante", "chatea"],
-    "skills_activas": ["auto-pausa-ctr", "escalado-roas"],
+    "agentes_activos": [
+      "roax",
+      "vigilante",
+      "chatea"
+    ],
+    "skills_activas": [
+      "auto-pausa-ctr",
+      "escalado-roas"
+    ],
     "alerta_activa": true,
     "alerta_mensaje": "Novedad alta en Cali — Roax detectó oportunidad de escala",
     "alerta_signal_id": "sen-001",
@@ -68,42 +75,165 @@
     "kronos_riesgo_fiscal": true,
     "trend": "up",
     "agent_actions": [
-      { "id": "aa-1", "agente": "Roax", "agente_color": "orange", "status": "verde", "tiempo_label": "hace 2h", "accion": "Escaló presupuesto 15% ($57k→$66k/día)", "impacto": "ROAS mejoró 0.3x estimado" },
-      { "id": "aa-2", "agente": "Vigilante", "agente_color": "green", "status": "amarillo", "tiempo_label": "hace 4h", "accion": "Alertó: novedad en Cali subió a 9%", "impacto": "Esperando decisión" },
-      { "id": "aa-3", "agente": "Vigilante", "agente_color": "green", "status": "check", "tiempo_label": "ayer", "accion": "Cambió 8 pedidos de Coordinadora a Servientrega", "impacto": "0 novedades registradas" }
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "verde",
+        "tiempo_label": "hace 2h",
+        "accion": "Escaló presupuesto 15% ($57k→$66k/día)",
+        "impacto": "ROAS mejoró 0.3x estimado"
+      },
+      {
+        "id": "aa-2",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "amarillo",
+        "tiempo_label": "hace 4h",
+        "accion": "Alertó: novedad en Cali subió a 9%",
+        "impacto": "Esperando decisión"
+      },
+      {
+        "id": "aa-3",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "check",
+        "tiempo_label": "ayer",
+        "accion": "Cambió 8 pedidos de Coordinadora a Servientrega",
+        "impacto": "0 novedades registradas"
+      }
     ],
     "timeline": {
       "estadoActual": "en_escala",
       "semanaActual": 3,
       "totalSemanas": 6,
       "eventos": [
-        { "id": "t1", "fecha": "2026-05-24", "label": "Lanzado", "esActual": false },
-        { "id": "t2", "fecha": "2026-05-28", "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": "2026-06-04", "label": "Escalando", "esActual": true }
+        {
+          "id": "t1",
+          "fecha": "2026-05-24",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-28",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-06-04",
+          "label": "Escalando",
+          "esActual": true
+        }
       ],
       "metricasLane": [
-        { "semana": 1, "roas": 1.2, "pedidos": 14 },
-        { "semana": 2, "roas": 1.65, "pedidos": 22 },
-        { "semana": 3, "roas": 1.93, "pedidos": 31 },
-        { "semana": 4, "roas": 2.1, "pedidos": 38 },
-        { "semana": 5, "roas": 2.3, "pedidos": 44 },
-        { "semana": 6, "roas": 2.5, "pedidos": 52 }
+        {
+          "semana": 1,
+          "roas": 1.2,
+          "pedidos": 14
+        },
+        {
+          "semana": 2,
+          "roas": 1.65,
+          "pedidos": 22
+        },
+        {
+          "semana": 3,
+          "roas": 1.93,
+          "pedidos": 31
+        },
+        {
+          "semana": 4,
+          "roas": 2.1,
+          "pedidos": 38
+        },
+        {
+          "semana": 5,
+          "roas": 2.3,
+          "pedidos": 44
+        },
+        {
+          "semana": 6,
+          "roas": 2.5,
+          "pedidos": 52
+        }
       ],
       "agenteLane": [
-        { "semana": 1, "agentLabel": "Roax", "agentColor": "#f59e0b", "accion": "Lanzó campaña" },
-        { "semana": 2, "agentLabel": "Roax", "agentColor": "#f59e0b", "accion": "Ajustó targeting" },
-        { "semana": 2, "agentLabel": "Vigilante", "agentColor": "#3b82f6", "accion": "Alerta novedad" },
-        { "semana": 3, "agentLabel": "Roax", "agentColor": "#f59e0b", "accion": "Escaló $120k/día" },
-        { "semana": 4, "agentLabel": "Kronos", "agentColor": "#60a5fa", "accion": "Proyectó P&L" },
-        { "semana": 5, "agentLabel": "Roax", "agentColor": "#f59e0b", "accion": "Escala 2x" },
-        { "semana": 6, "agentLabel": "ADA Spy", "agentColor": "#8b5cf6", "accion": "Nuevo ángulo" }
+        {
+          "semana": 1,
+          "agentLabel": "Roax",
+          "agentColor": "#f59e0b",
+          "accion": "Lanzó campaña"
+        },
+        {
+          "semana": 2,
+          "agentLabel": "Roax",
+          "agentColor": "#f59e0b",
+          "accion": "Ajustó targeting"
+        },
+        {
+          "semana": 2,
+          "agentLabel": "Vigilante",
+          "agentColor": "#3b82f6",
+          "accion": "Alerta novedad"
+        },
+        {
+          "semana": 3,
+          "agentLabel": "Roax",
+          "agentColor": "#f59e0b",
+          "accion": "Escaló $120k/día"
+        },
+        {
+          "semana": 4,
+          "agentLabel": "Kronos",
+          "agentColor": "#60a5fa",
+          "accion": "Proyectó P&L"
+        },
+        {
+          "semana": 5,
+          "agentLabel": "Roax",
+          "agentColor": "#f59e0b",
+          "accion": "Escala 2x"
+        },
+        {
+          "semana": 6,
+          "agentLabel": "ADA Spy",
+          "agentColor": "#8b5cf6",
+          "accion": "Nuevo ángulo"
+        }
       ],
       "hitoLane": [
-        { "semana": 1, "label": "Lanzamiento", "icon": "🚀", "impacto": "Primera campaña activa — ROAS inicial 1.2x, validando ángulo" },
-        { "semana": 2, "label": "Primer dato", "icon": "📊", "impacto": "Suficiente data para decisiones — algoritmo de Meta aprendiendo" },
-        { "semana": 3, "label": "Escala ↑", "icon": "⚡", "impacto": "ROAS 1.93x supera umbral 1.8x — Roax escala $120k/día automáticamente" },
-        { "semana": 5, "label": "Meta 40/sem", "icon": "🎯", "impacto": "Proyección: 44 pedidos/semana — meta mensual alcanzada" },
-        { "semana": 6, "label": "Nuevo ángulo", "icon": "🔬", "impacto": "ADA Spy detectó oportunidad en segmento mascota adulta — test programado" }
+        {
+          "semana": 1,
+          "label": "Lanzamiento",
+          "icon": "🚀",
+          "impacto": "Primera campaña activa — ROAS inicial 1.2x, validando ángulo"
+        },
+        {
+          "semana": 2,
+          "label": "Primer dato",
+          "icon": "📊",
+          "impacto": "Suficiente data para decisiones — algoritmo de Meta aprendiendo"
+        },
+        {
+          "semana": 3,
+          "label": "Escala ↑",
+          "icon": "⚡",
+          "impacto": "ROAS 1.93x supera umbral 1.8x — Roax escala $120k/día automáticamente"
+        },
+        {
+          "semana": 5,
+          "label": "Meta 40/sem",
+          "icon": "🎯",
+          "impacto": "Proyección: 44 pedidos/semana — meta mensual alcanzada"
+        },
+        {
+          "semana": 6,
+          "label": "Nuevo ángulo",
+          "icon": "🔬",
+          "impacto": "ADA Spy detectó oportunidad en segmento mascota adulta — test programado"
+        }
       ]
     }
   },
@@ -163,24 +293,64 @@
     "garantias_pct": 1,
     "semana_delta": "-$12k vs sem anterior",
     "semana_delta_ok": false,
-    "agentes_activos": ["roax"],
-    "skills_activas": ["auto-pausa-ctr"],
+    "agentes_activos": [
+      "roax"
+    ],
+    "skills_activas": [
+      "auto-pausa-ctr"
+    ],
     "alerta_activa": false,
     "alerta_mensaje": null,
     "gali_nota": "Tendencia levemente negativa — CTR bajó a 1.1%. Roax evaluando cambio de creativo. Margen aún por encima del umbral.",
     "trend": "down",
     "agent_actions": [
-      { "id": "aa-1", "agente": "Roax", "agente_color": "orange", "status": "amarillo", "tiempo_label": "hace 5h", "accion": "Detectó CTR 1.1% — por debajo del benchmark 1.5%", "impacto": "Evaluando nuevo creativo" },
-      { "id": "aa-2", "agente": "ADA Spy", "agente_color": "purple", "status": "verde", "tiempo_label": "ayer", "accion": "Analizó 3 competidores en nicho K-Beauty", "impacto": "Oportunidad de ángulo: precio/bundle" }
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "amarillo",
+        "tiempo_label": "hace 5h",
+        "accion": "Detectó CTR 1.1% — por debajo del benchmark 1.5%",
+        "impacto": "Evaluando nuevo creativo"
+      },
+      {
+        "id": "aa-2",
+        "agente": "ADA Spy",
+        "agente_color": "purple",
+        "status": "verde",
+        "tiempo_label": "ayer",
+        "accion": "Analizó 3 competidores en nicho K-Beauty",
+        "impacto": "Oportunidad de ángulo: precio/bundle"
+      }
     ],
     "timeline": {
       "estadoActual": "activo",
       "semanaActual": 2,
       "eventos": [
-        { "id": "t1", "fecha": "2026-05-28", "label": "Lanzado", "esActual": false },
-        { "id": "t2", "fecha": "2026-06-02", "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": "2026-06-09", "label": "Activo", "esActual": true },
-        { "id": "t4", "fecha": null, "label": "Escalar", "esActual": false }
+        {
+          "id": "t1",
+          "fecha": "2026-05-28",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-06-02",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-06-09",
+          "label": "Activo",
+          "esActual": true
+        },
+        {
+          "id": "t4",
+          "fecha": null,
+          "label": "Escalar",
+          "esActual": false
+        }
       ]
     }
   },
@@ -246,12 +416,80 @@
     "alerta_activa": false,
     "alerta_mensaje": null,
     "gali_nota": "Pausado hace 5 días. CTR se recuperó a 1.4%. Roax sugiere reanudar con presupuesto reducido ($20k/día).",
-    "trend": "stable"
+    "trend": "stable",
+    "pausa_razon": "CTR cayó a 0.6% por debajo del umbral de 0.8% — creativos saturados",
+    "fecha_pausa": "2026-06-08",
+    "diagnostico_roax": {
+      "factores": [
+        "Creativo principal lleva 21 días sin rotación. CTR cayó de 2.8% → 0.6% en 7 días",
+        "Audiencia saturada en Bogotá: frecuencia promedio 9.1x — mismo usuario ve el anuncio 9 veces",
+        "Competidores lanzaron packs de 3 bandas al mismo precio. Percepción de valor cayó"
+      ],
+      "recomendacion": "Pausa activa. Roax recomienda crear 2 creativos nuevos con ángulo \"progresión visible\" y reactivar con audiencia Look-alike de compradores recientes."
+    },
+    "timeline": {
+      "estadoActual": "pausado",
+      "eventos": [
+        {
+          "id": "t1",
+          "fecha": "2026-05-18",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-23",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-06-01",
+          "label": "En campaña",
+          "esActual": false
+        },
+        {
+          "id": "t4",
+          "fecha": "2026-06-08",
+          "label": "Pausado",
+          "esActual": true
+        }
+      ]
+    },
+    "agent_actions": [
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "amarillo",
+        "tiempo_label": "hace 2 días",
+        "accion": "Pausó campaña automáticamente al detectar CTR < 0.8% por 72h",
+        "impacto": "Evitó pérdida adicional estimada de $62.000"
+      },
+      {
+        "id": "aa-2",
+        "agente": "ADA Spy",
+        "agente_color": "purple",
+        "status": "check",
+        "tiempo_label": "hace 3 días",
+        "accion": "Analizó 4 competidores con packs de 3 bandas — mismo precio",
+        "impacto": "Reporte de saturación disponible"
+      },
+      {
+        "id": "aa-3",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "check",
+        "tiempo_label": "hace 5 días",
+        "accion": "Detectó bajada de CTR y alertó a Roax para preparar pausa",
+        "impacto": "Coordinación preventiva exitosa"
+      }
+    ]
   },
   {
     "id": "difusor-aromaterapia",
     "nombre": "Difusor Aromaterapia Ultra",
-    "estado": "lanzando",
+    "estado": "recien_lanzado",
     "pedidos_sem": 3,
     "pedidos_sem_label": "3/sem",
     "roas_real": 0,
@@ -283,14 +521,68 @@
     "garantias_pct": 0,
     "semana_delta": "Lanzado hace 18h",
     "semana_delta_ok": true,
-    "agentes_activos": ["roax", "vigilante"],
+    "agentes_activos": [
+      "roax",
+      "vigilante"
+    ],
     "skills_activas": [],
     "alerta_activa": false,
     "alerta_mensaje": null,
     "gali_nota": "Campaña iniciada hace 2h — primeros datos en 24h. Roax está en fase de aprendizaje y aún no tiene ROAS calculable.",
     "trend": "stable",
     "lanzado_hace_horas": 2,
-    "mensaje_estado": "Campaña iniciada hace 2h — primeros datos en 24h"
+    "mensaje_estado": "Campaña iniciada hace 2h — primeros datos en 24h",
+    "aprendizaje_pct": 35,
+    "timeline": {
+      "estadoActual": "recien_lanzado",
+      "semanaActual": 1,
+      "eventos": [
+        {
+          "id": "t1",
+          "fecha": "2026-06-13",
+          "label": "Lanzado",
+          "esActual": true
+        },
+        {
+          "id": "t2",
+          "fecha": null,
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": null,
+          "label": "En campaña",
+          "esActual": false
+        },
+        {
+          "id": "t4",
+          "fecha": null,
+          "label": "En escala",
+          "esActual": false
+        }
+      ]
+    },
+    "agent_actions": [
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "verde",
+        "tiempo_label": "hace 2h",
+        "accion": "Configuró campaña inicial $30k/día en Meta — fase de aprendizaje activa",
+        "impacto": "Primeros datos en ~6h"
+      },
+      {
+        "id": "aa-2",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "check",
+        "tiempo_label": "hace 1h",
+        "accion": "Verificó stock disponible (312 unidades) con proveedor",
+        "impacto": "Stock asegurado para 10 días"
+      }
+    ]
   },
   {
     "id": "mini-proyector-fallo",
@@ -337,12 +629,92 @@
       "completado": true,
       "fecha": "2026-06-05",
       "factores": [
-        { "titulo": "Ángulo creativo errado", "detalle": "El ángulo aspiracional no conectó con la audiencia objetivo. CTR promedió 0.4% vs benchmark 1.2%." },
-        { "titulo": "CPA insostenible", "detalle": "CPA de $72k superó el precio de venta unitario. El margen negativo se confirmó en los primeros 3 días." },
-        { "titulo": "Alta tasa de novedad", "detalle": "35% de novedades logísticas — el producto frágil no sobrevivió el transporte estándar. Requiere empaque reforzado." }
+        {
+          "titulo": "Ángulo creativo errado",
+          "detalle": "El ángulo aspiracional no conectó con la audiencia objetivo. CTR promedió 0.4% vs benchmark 1.2%."
+        },
+        {
+          "titulo": "CPA insostenible",
+          "detalle": "CPA de $72k superó el precio de venta unitario. El margen negativo se confirmó en los primeros 3 días."
+        },
+        {
+          "titulo": "Alta tasa de novedad",
+          "detalle": "35% de novedades logísticas — el producto frágil no sobrevivió el transporte estándar. Requiere empaque reforzado."
+        }
       ],
       "aprendizaje": "Para relanzar: usar ángulo de 'dolor', precio mínimo de $220k y empaque reforzado con costo adicional de $8k/unidad."
-    }
+    },
+    "fecha_cierre": "2026-06-05",
+    "postmortem": {
+      "queFunciono": [
+        "El precio inicial ($180k) generó interés en primeras 48h — CTR de 1.1%",
+        "Vigilante logró contener novedades a 35% cuando el benchmark era 42%"
+      ],
+      "queNoFunciono": [
+        "Ángulo \"calidad HD\" no conectó con la audiencia objetivo — creativos saturaron rápido",
+        "CPA de $72k insostenible: supera el margen por unidad disponible",
+        "Producto frágil: embalaje estándar causó 35% de novedades por daño en tránsito"
+      ],
+      "leccion": "Para relanzar: cambiar ángulo a \"experiencia cine en casa\", añadir empaque reforzado ($8k/ud) y subir precio mínimo a $220k para mantener margen positivo."
+    },
+    "timeline": {
+      "estadoActual": "cerrado",
+      "eventos": [
+        {
+          "id": "t1",
+          "fecha": "2026-05-24",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-26",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-05-28",
+          "label": "Problema detectado",
+          "esActual": false
+        },
+        {
+          "id": "t4",
+          "fecha": "2026-06-05",
+          "label": "Cerrado",
+          "esActual": true
+        }
+      ]
+    },
+    "agent_actions": [
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "amarillo",
+        "tiempo_label": "hace 10 días",
+        "accion": "Pausó campaña automáticamente por ROAS < 1.0x durante 72h",
+        "impacto": "Limitó la pérdida total a -$32k"
+      },
+      {
+        "id": "aa-2",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "check",
+        "tiempo_label": "hace 12 días",
+        "accion": "Documentó 35% de novedades por daño en tránsito",
+        "impacto": "Dato clave para el postmortem"
+      },
+      {
+        "id": "aa-3",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "check",
+        "tiempo_label": "hace 10 días",
+        "accion": "Generó postmortem completo con 3 factores de falla",
+        "impacto": "Aprendizaje guardado en memoria Gali"
+      }
+    ]
   },
   {
     "id": "rodillo-jade-borrador",
@@ -385,52 +757,66 @@
     "alerta_mensaje": null,
     "gali_nota": "Proyecto incompleto — falta configurar la campaña. ADA Spy identificó oportunidad: margen estimado 51%, tendencia creciendo en Colombia.",
     "trend": "stable",
-    "pasos_completos": ["producto", "estrategia"],
-    "pasos_pendientes": ["landing", "campana"]
-  },
-  {
-    "id": "difusor-aromaterapia",
-    "nombre": "Difusor de aromaterapia portátil",
-    "estado": "lanzando",
-    "pedidos_sem": 0,
-    "pedidos_sem_label": "—",
-    "roas_real": 0,
-    "roas_real_label": "—",
-    "roas_meta": 0,
-    "roas_meta_label": "—",
-    "margen_neto_pct": 0,
-    "margen_neto_pct_label": "—",
-    "margen_neto_objetivo_pct": 25,
-    "pauta_diaria": 25000,
-    "pauta_diaria_label": "$25k/día",
-    "pauta_escala_propuesta": null,
-    "pauta_escala_propuesta_label": null,
-    "revenue_semanal": 0,
-    "revenue_semanal_label": "—",
-    "ganancia_neta_semanal": 0,
-    "ganancia_neta_semanal_label": "—",
-    "cpa": 0,
-    "cpa_label": "—",
-    "ctr_activo": 0,
-    "ctr_activo_label": "—",
-    "tasa_novedad_pct": 0,
-    "tasa_novedad_label": "—",
-    "tasa_novedad_ciudad": null,
-    "cogs_pct": 0,
-    "flete_pct": 0,
-    "pauta_pct": 0,
-    "novedades_pct": 0,
-    "garantias_pct": 0,
-    "semana_delta": "Campaña iniciada hace 2h — primeros datos en 24h",
-    "semana_delta_ok": true,
-    "agentes_activos": ["roax", "ada"],
-    "skills_activas": ["auto-pausa-ctr"],
-    "alerta_activa": false,
-    "alerta_mensaje": null,
-    "gali_nota": "Roax está aprendiendo el comportamiento del anuncio. Los primeros datos de CTR y CPA llegarán en las próximas horas. ADA Spy monitorea competencia.",
-    "gali_status_message": "Campaña iniciada hace 2h — primeros datos en 24h",
-    "trend": "stable",
-    "fecha_lanzamiento": "2026-06-10T08:30:00Z"
+    "pasos_completos": [
+      "producto",
+      "estrategia"
+    ],
+    "pasos_pendientes": [
+      "landing",
+      "campana"
+    ],
+    "borrador_completado_pct": 50,
+    "borrador_steps": [
+      {
+        "id": "producto",
+        "label": "Producto seleccionado",
+        "done": true
+      },
+      {
+        "id": "estrategia",
+        "label": "Estrategia de venta definida",
+        "done": true
+      },
+      {
+        "id": "landing",
+        "label": "Landing page creada",
+        "done": false
+      },
+      {
+        "id": "campana",
+        "label": "Campaña Meta Ads configurada",
+        "done": false
+      }
+    ],
+    "timeline": {
+      "estadoActual": "borrador",
+      "eventos": [
+        {
+          "id": "t1",
+          "fecha": "2026-06-10",
+          "label": "Borrador creado",
+          "esActual": true
+        },
+        {
+          "id": "t2",
+          "fecha": null,
+          "label": "Landing",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": null,
+          "label": "Campaña",
+          "esActual": false
+        },
+        {
+          "id": "t4",
+          "fecha": null,
+          "label": "Lanzado",
+          "esActual": false
+        }
+      ]
+    }
   },
   {
     "id": "silla-gamer-rgb",
@@ -438,9 +824,12 @@
     "estado": "pausado",
     "causa_pausa": "CTR bajo (<0.8%)",
     "diagnostico_roax": {
-      "factor_1": "Creativo saturado: el anuncio lleva 18 días sin rotación. CTR cayó de 2.1% → 0.6% en 5 días.",
-      "factor_2": "Audiencia agotada: la segmentación actual (hombres 18-34, tecnología) tiene frecuencia de 7.2x — demasiado alta.",
-      "factor_3": "Precio fuera de mercado: competidores bajaron $20k en la última semana. Nuestro precio ($349k) está 12% por encima del promedio."
+      "factores": [
+        "Creativo saturado: anuncio lleva 18 días sin rotación. CTR cayó de 2.1% → 0.6% en 5 días",
+        "Audiencia agotada: frecuencia de 7.2x — usuarios ya vieron el anuncio demasiadas veces",
+        "Precio fuera de mercado: competidores bajaron $20k. Nuestro precio ($349k) está 12% por encima"
+      ],
+      "recomendacion": "Pausar pauta hasta tener 3 creativos nuevos + revisar precio. Gali sugiere precio $319k para recuperar competitividad sin sacrificar margen."
     },
     "recomendacion_roax": "Pausar pauta hasta tener 3 creativos nuevos + revisar precio. Gali sugiere precio $319k para recuperar competitividad sin sacrificar margen.",
     "pedidos_sem": 3,
@@ -474,12 +863,77 @@
     "garantias_pct": 0,
     "semana_delta": "-$76k esta semana · pauta pausada por Roax",
     "semana_delta_ok": false,
-    "agentes_activos": ["roax", "vigilante"],
-    "skills_activas": ["auto-pausa-ctr"],
+    "agentes_activos": [
+      "roax",
+      "vigilante"
+    ],
+    "skills_activas": [
+      "auto-pausa-ctr"
+    ],
     "alerta_activa": true,
     "alerta_mensaje": "CTR bajo 0.8% — Roax pausó pauta automáticamente. Acción requerida.",
     "gali_nota": "Campaña pausada por Roax. CTR 0.6% por debajo del umbral de 0.8%. Diagnóstico: creativo saturado + audiencia agotada. Recomendación: rotar creativos antes de reactivar.",
-    "trend": "down"
+    "trend": "down",
+    "pausa_razon": "CTR cayó a 0.6% — creativo saturado después de 18 días sin rotación",
+    "fecha_pausa": "2026-06-09",
+    "timeline": {
+      "estadoActual": "pausado",
+      "eventos": [
+        {
+          "id": "t1",
+          "fecha": "2026-05-22",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-27",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-06-03",
+          "label": "En campaña",
+          "esActual": false
+        },
+        {
+          "id": "t4",
+          "fecha": "2026-06-09",
+          "label": "Pausado",
+          "esActual": true
+        }
+      ]
+    },
+    "agent_actions": [
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "amarillo",
+        "tiempo_label": "hace 6 días",
+        "accion": "Pausó campaña automáticamente por CTR < 0.8% sostenido 5 días",
+        "impacto": "Evitó pérdida adicional de $120.000"
+      },
+      {
+        "id": "aa-2",
+        "agente": "ADA Spy",
+        "agente_color": "purple",
+        "status": "amarillo",
+        "tiempo_label": "hace 5 días",
+        "accion": "Detectó 3 competidores bajando precios $20k — reportó a Roax",
+        "impacto": "Análisis de precio disponible"
+      },
+      {
+        "id": "aa-3",
+        "agente": "Vigilante",
+        "agente_color": "green",
+        "status": "check",
+        "tiempo_label": "hace 3 días",
+        "accion": "Confirmó 22% de novedades en Bogotá por tamaño del producto",
+        "impacto": "Recomendación: empaque premium"
+      }
+    ]
   },
   {
     "id": "termo-acero-inoxidable",
@@ -548,9 +1002,24 @@
     "timeline": {
       "estadoActual": "cerrado",
       "eventos": [
-        { "id": "t1", "fecha": "2026-04-16", "label": "Lanzado", "esActual": false },
-        { "id": "t2", "fecha": "2026-04-22", "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": "2026-05-28", "label": "Cerrado", "esActual": true }
+        {
+          "id": "t1",
+          "fecha": "2026-04-16",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-04-22",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-05-28",
+          "label": "Cerrado",
+          "esActual": true
+        }
       ]
     }
   },
@@ -571,14 +1040,37 @@
     "margen_neto_pct_label": "—",
     "gali_nota": "Tu campaña acaba de lanzar. Gali necesita 24-48h para aprender el patrón de conversión de este producto.",
     "agent_actions": [
-      { "id": "aa-1", "agente": "Roax", "agente_color": "orange", "status": "verde", "tiempo_label": "hace 3h", "accion": "Campaña de lanzamiento activada con $22.000/día", "impacto": "Esperando primeros datos" }
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "verde",
+        "tiempo_label": "hace 3h",
+        "accion": "Campaña de lanzamiento activada con $22.000/día",
+        "impacto": "Esperando primeros datos"
+      }
     ],
     "timeline": {
       "estadoActual": "recien_lanzado",
       "eventos": [
-        { "id": "t1", "fecha": "2026-06-09", "label": "Lanzado", "esActual": true },
-        { "id": "t2", "fecha": null, "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": null, "label": "Escalar", "esActual": false }
+        {
+          "id": "t1",
+          "fecha": "2026-06-09",
+          "label": "Lanzado",
+          "esActual": true
+        },
+        {
+          "id": "t2",
+          "fecha": null,
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": null,
+          "label": "Escalar",
+          "esActual": false
+        }
       ]
     },
     "alerta_activa": false,
@@ -586,7 +1078,9 @@
     "trend": "up",
     "semana_delta": "",
     "semana_delta_ok": true,
-    "agentes_activos": ["roax"],
+    "agentes_activos": [
+      "roax"
+    ],
     "skills_activas": []
   },
   {
@@ -616,14 +1110,37 @@
     },
     "gali_nota": "Este proyecto puede reactivarse con cambio de creatividad. El producto tiene demanda — el problema es la comunicación, no el producto.",
     "agent_actions": [
-      { "id": "aa-1", "agente": "Roax", "agente_color": "orange", "status": "amarillo", "tiempo_label": "hace 2 días", "accion": "Pausó campaña automáticamente al detectar ROAS < 1.5x por 72h", "impacto": "Evitó pérdida adicional estimada de $85.000" }
+      {
+        "id": "aa-1",
+        "agente": "Roax",
+        "agente_color": "orange",
+        "status": "amarillo",
+        "tiempo_label": "hace 2 días",
+        "accion": "Pausó campaña automáticamente al detectar ROAS < 1.5x por 72h",
+        "impacto": "Evitó pérdida adicional estimada de $85.000"
+      }
     ],
     "timeline": {
       "estadoActual": "pausado",
       "eventos": [
-        { "id": "t1", "fecha": "2026-05-20", "label": "Lanzado", "esActual": false },
-        { "id": "t2", "fecha": "2026-05-25", "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": "2026-06-07", "label": "Pausado", "esActual": true }
+        {
+          "id": "t1",
+          "fecha": "2026-05-20",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-25",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-06-07",
+          "label": "Pausado",
+          "esActual": true
+        }
       ]
     },
     "alerta_activa": true,
@@ -632,7 +1149,9 @@
     "trend": "down",
     "semana_delta": "-$42k vs sem anterior",
     "semana_delta_ok": false,
-    "agentes_activos": ["roax"],
+    "agentes_activos": [
+      "roax"
+    ],
     "skills_activas": []
   },
   {
@@ -666,9 +1185,24 @@
     "timeline": {
       "estadoActual": "cerrado",
       "eventos": [
-        { "id": "t1", "fecha": "2026-05-01", "label": "Lanzado", "esActual": false },
-        { "id": "t2", "fecha": "2026-05-08", "label": "Primeros datos", "esActual": false },
-        { "id": "t3", "fecha": "2026-05-30", "label": "Cerrado", "esActual": true }
+        {
+          "id": "t1",
+          "fecha": "2026-05-01",
+          "label": "Lanzado",
+          "esActual": false
+        },
+        {
+          "id": "t2",
+          "fecha": "2026-05-08",
+          "label": "Primeros datos",
+          "esActual": false
+        },
+        {
+          "id": "t3",
+          "fecha": "2026-05-30",
+          "label": "Cerrado",
+          "esActual": true
+        }
       ]
     },
     "alerta_activa": false,
@@ -685,19 +1219,49 @@
     "estado": "borrador",
     "borrador_completado_pct": 60,
     "borrador_steps": [
-      { "id": "producto",    "label": "Producto seleccionado",     "done": true  },
-      { "id": "estrategia",  "label": "Ángulo de venta definido",  "done": true  },
-      { "id": "agentes",     "label": "Agentes asignados",         "done": true  },
-      { "id": "presupuesto", "label": "Presupuesto configurado",   "done": false },
-      { "id": "revision",    "label": "Revisión y confirmación",   "done": false }
+      {
+        "id": "producto",
+        "label": "Producto seleccionado",
+        "done": true
+      },
+      {
+        "id": "estrategia",
+        "label": "Ángulo de venta definido",
+        "done": true
+      },
+      {
+        "id": "agentes",
+        "label": "Agentes asignados",
+        "done": true
+      },
+      {
+        "id": "presupuesto",
+        "label": "Presupuesto configurado",
+        "done": false
+      },
+      {
+        "id": "revision",
+        "label": "Revisión y confirmación",
+        "done": false
+      }
     ],
     "gali_nota": "Te falta configurar el presupuesto para lanzar. Usa la Calculadora Brújula para asegurarte de que el margen cubre la pauta.",
     "agent_actions": [],
     "timeline": {
       "estadoActual": "borrador",
       "eventos": [
-        { "id": "t1", "fecha": null, "label": "Borrador", "esActual": true },
-        { "id": "t2", "fecha": null, "label": "Lanzar",   "esActual": false }
+        {
+          "id": "t1",
+          "fecha": null,
+          "label": "Borrador",
+          "esActual": true
+        },
+        {
+          "id": "t2",
+          "fecha": null,
+          "label": "Lanzar",
+          "esActual": false
+        }
       ]
     },
     "pauta_diaria": 0,
@@ -714,7 +1278,11 @@
     "trend": "up",
     "semana_delta": "",
     "semana_delta_ok": true,
-    "agentes_activos": ["roax", "vigilante", "kronos"],
+    "agentes_activos": [
+      "roax",
+      "vigilante",
+      "kronos"
+    ],
     "skills_activas": []
   }
 ]

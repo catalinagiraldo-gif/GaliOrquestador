@@ -1,0 +1,214 @@
+@use 'styles/variables' as *;
+
+.decision-theater {
+  width: 100%;
+  background: white;
+  border-radius: $radius-md;
+  border-left: 3px solid var(--primary-500);
+  box-shadow: 0 2px 12px rgba(244, 154, 61, 0.12),
+              0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: $size-5 $size-6;
+  animation: gali-fade-up $motion-medium $ease-entrance 80ms both;
+
+  &[data-urgency='critical'] {
+    border-left-color: var(--red-500);
+    box-shadow: 0 2px 12px rgba(239, 68, 68, 0.10),
+                0 1px 3px rgba(0, 0, 0, 0.06);
+    animation-name: gali-pulse-border;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+  }
+}
+
+.decision-theater__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $size-3;
+}
+
+.decision-theater__agent {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+}
+
+.decision-theater__agent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.decision-theater__agent-name {
+  font-family: $font-primary;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.decision-theater__urgency-badge {
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary-700);
+  background: var(--orange-50);
+  border: 1px solid var(--primary-200);
+  border-radius: $radius-full;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.decision-theater__queue {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+}
+
+.queue-count {
+  font-family: $font-primary;
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.queue-link {
+  font-family: $font-primary;
+  font-size: 12px;
+  color: var(--primary-500);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover { color: var(--primary-700); }
+}
+
+.decision-theater__titulo {
+  font-family: $font-primary;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 $size-4;
+  line-height: 1.3;
+}
+
+.decision-theater__context-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: $size-3;
+  margin-bottom: $size-5;
+}
+
+.context-block {
+  padding: $size-3;
+  background: var(--surface-50);
+  border-radius: $radius-sm;
+  border: 1px solid var(--surface-200);
+}
+
+.context-block--risk {
+  background: var(--red-50);
+  border-color: var(--red-100);
+}
+
+.context-block--impact {
+  background: var(--green-50);
+  border-color: var(--green-100);
+}
+
+.context-block__label {
+  font-family: $font-primary;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gray-500);
+  margin: 0 0 $size-1;
+}
+
+.context-block__text {
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--gray-700);
+  margin: 0;
+  line-height: 1.4;
+
+  &--highlight {
+    font-weight: 600;
+    color: var(--green-700);
+    font-size: 14px;
+  }
+}
+
+.decision-theater__options {
+  display: flex;
+  gap: $size-3;
+  flex-wrap: wrap;
+}
+
+.decision-option {
+  font-family: $font-primary;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: $radius-sm;
+  padding: $size-2 $size-4;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  transition: background $motion-fast $ease-standard,
+              transform $motion-fast $ease-standard;
+
+  &:active { transform: scale(0.97); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &--primary {
+    background: var(--primary-500);
+    color: white;
+
+    &:hover:not(:disabled) { background: var(--primary-600); }
+
+    .decision-option__impact { color: rgba(255, 255, 255, 0.8); }
+  }
+
+  &:not(.decision-option--primary):not(.decision-option--ghost) {
+    background: var(--surface-100);
+    color: var(--gray-800);
+    border: 1px solid var(--surface-300);
+
+    &:hover:not(:disabled) { background: var(--surface-200); }
+
+    .decision-option__impact { color: var(--gray-500); }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--gray-500);
+    border: none;
+    padding: $size-2 0;
+
+    &:hover:not(:disabled) { color: var(--gray-700); }
+  }
+}
+
+.decision-option__label {
+  font-weight: 600;
+}
+
+.decision-option__impact {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decision-theater,
+  .decision-theater[data-urgency='critical'] {
+    animation-duration: 1ms !important;
+  }
+}

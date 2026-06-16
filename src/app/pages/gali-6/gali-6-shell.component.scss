@@ -1,0 +1,396 @@
+@import 'styles/gali-v5-tokens';
+
+:host {
+  --dropi-rail-width: 72px;
+  --dropi-section-width: 200px;
+  --gali-panel-width: 520px;
+  // Primary scale de Gali V5 para consistencia con sección nav e icon rail
+  --primary-50:  #{$primary-50};
+  --primary-100: #{$primary-100};
+  --primary-200: #{$primary-200};
+  --primary-300: #{$primary-300};
+  --primary-400: #{$primary-400};
+  --primary-500: #{$primary-500};
+  --primary-600: #{$primary-600};
+  --primary-700: #{$primary-700};
+  --primary-800: #{$primary-800};
+  --primary-900: #{$primary-900};
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  font-family: $font-primary;
+  color: $gray-800;
+}
+
+.g6shell--section-collapsed {
+  --dropi-section-width: 48px;
+}
+
+.g6shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: $white;
+
+  &__body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    position: relative;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  &__backdrop { display: none; }
+
+  &__panel {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    max-width: 92vw;
+    background: #fff;
+    box-shadow: -8px 0 28px rgba(0, 0, 0, 0.12);
+    z-index: 40;
+    animation: g6-panel-in 240ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* ── Topbar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: $size-4;
+  height: 56px;
+  padding: 0 $size-5;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid $gray-100;
+  flex-shrink: 0;
+  z-index: 30;
+
+  &__menu {
+    display: none;
+    background: none; border: none; cursor: pointer; font-size: $font-lg; color: $gray-600;
+    padding: 6px;
+    border-radius: $radius-sm;
+    &:hover { background: $gray-100; }
+  }
+
+  /* Brand section — igual a V5v1: gallery button + logo imagen */
+  &__brand-section {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex-shrink: 0;
+  }
+
+  &__gallery {
+    display: inline-flex;
+    align-items: center;
+    gap: $size-2;
+    flex-shrink: 0;
+    padding: 6px $size-3;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    background: $white;
+    color: $gray-600;
+    font-family: $font-primary;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    line-height: 1;
+    text-decoration: none;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+
+    .pi {
+      font-size: 13px;
+      color: $primary-500;
+    }
+
+    &:hover {
+      background: $gray-50;
+      border-color: $primary-500;
+      color: $gray-800;
+    }
+  }
+
+  &__logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $size-2;
+    text-decoration: none;
+    line-height: 0;
+  }
+
+  &__logo {
+    width: 108px;
+    height: 37px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  &__version-tag {
+    font-size: 10px;
+    font-weight: $font-semibold;
+    color: $primary-500;
+    background: rgba($primary-500, 0.1);
+    border-radius: $radius-pill;
+    padding: 2px 7px;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+  }
+
+  &__goal {
+    display: flex; align-items: center; gap: $size-2; text-decoration: none;
+    color: $gray-600; margin-left: $size-2;
+    &-label { font-size: $font-xs; color: $gray-400; font-weight: $font-semibold;
+               text-transform: uppercase; letter-spacing: 0.04em; }
+    &-track { width: 110px; height: 6px; border-radius: $radius-full;
+               background: $gray-100; overflow: hidden; }
+    &-fill { display: block; height: 100%; border-radius: $radius-full;
+              background: $primary-500; transition: width 300ms ease; }
+    &-val { font-size: $font-xs; color: $gray-600; font-weight: $font-semibold; }
+  }
+
+  &__right { margin-left: auto; display: flex; align-items: center; gap: $size-3; }
+
+  &__modo {
+    background: none; border: 1px solid $gray-200; border-radius: $radius-full; cursor: pointer;
+    padding: 5px $size-3; font-size: $font-xs; font-weight: $font-semibold; color: $gray-600;
+    transition: all 120ms ease;
+    &[data-modo='experto'] { border-color: $primary-300; color: $primary-600;
+                              background: rgba($primary-500, 0.06); }
+    &:hover { border-color: $primary-300; }
+  }
+
+  &__wallet {
+    display: flex; align-items: center; gap: $size-2; background: none; border: none;
+    cursor: pointer; color: $gray-700; font-size: $font-sm; font-weight: $font-semibold;
+    &-ico { color: $primary-500; }
+  }
+
+  &__gali {
+    display: flex; align-items: center; gap: 6px;
+    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    padding: $size-2 $size-4; border-radius: $radius-full;
+    font-size: $font-sm; font-weight: $font-semibold;
+    transition: background 120ms ease;
+    &:hover { background: $primary-600; }
+    &.is-on { background: $gray-900; }
+  }
+
+  &__avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: $gray-800; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: $font-bold; font-family: 'Montserrat', $font-primary;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes g6-panel-in {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ── Responsive — igual a V5v1 ── */
+@media (max-width: 1023px) {
+  .g6shell__body { position: relative; }
+
+  app-gali6-icon-rail,
+  dropi-section-nav {
+    position: fixed; top: 56px; bottom: 0; z-index: 25;
+    transform: translateX(-100%); transition: transform 240ms ease;
+  }
+  app-gali6-icon-rail { left: 0; }
+  // Offset propio (left=72px) debe sumarse al translateX para que quede off-screen
+  dropi-section-nav {
+    left: var(--dropi-rail-width);
+    transform: translateX(calc(-100% - var(--dropi-rail-width)));
+  }
+
+  .g6shell--nav-open {
+    app-gali6-icon-rail, dropi-section-nav { transform: translateX(0); }
+    .g6shell__backdrop {
+      display: block; position: fixed; inset: 56px 0 0;
+      background: rgba(21, 25, 33, 0.3); z-index: 20;
+    }
+  }
+
+  .topbar {
+    &__menu { display: flex; }
+    &__goal { display: none; }
+    &__logo { width: 80px; height: 28px; }
+    &__version-tag { display: none; }
+    /* Galería: ocultar texto, solo icono */
+    &__gallery span { display: none; }
+    &__gallery { padding: 6px $size-2; }
+  }
+}
+
+@media (max-width: 599px) {
+  .topbar {
+    padding: 0 $size-3;
+    gap: $size-2;
+    &__modo { display: none; }
+    &__wallet { display: none; }
+    &__logo { width: 68px; height: 23px; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+/* ── ZeroState Modal ── */
+.zero-bg {
+  position: fixed; inset: 0; background: rgba(21, 25, 33, 0.55);
+  backdrop-filter: blur(4px); z-index: 200;
+  animation: zero-bg-in 280ms ease;
+}
+
+.zero {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(480px, calc(100vw - 32px));
+  background: #fff; border-radius: $radius-xl;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+  z-index: 201;
+  animation: zero-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &__body {
+    display: flex; flex-direction: column; align-items: center;
+    padding: $size-8 $size-6; gap: $size-4; text-align: center;
+  }
+
+  &__step {
+    font-family: $font-secondary; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: $gray-400; font-weight: $font-semibold;
+  }
+
+  &__gali {
+    font-size: 28px; color: $primary-500;
+    animation: gali-breathe 2.8s ease-in-out infinite;
+    &--lg { font-size: 40px; }
+  }
+
+  &__title {
+    margin: 0; font-size: $font-xl; font-weight: $font-bold;
+    color: $gray-900; letter-spacing: -0.02em; line-height: 1.25;
+  }
+
+  &__sub {
+    margin: 0; font-size: $font-sm; color: $gray-500; max-width: 38ch; line-height: 1.55;
+  }
+
+  &__slider { width: 100%; display: flex; flex-direction: column; gap: $size-3; }
+
+  &__range {
+    width: 100%; accent-color: $primary-500; cursor: pointer;
+  }
+
+  &__slider-val {
+    display: flex; align-items: baseline; justify-content: center; gap: $size-2;
+  }
+
+  &__big { font-size: 48px; font-weight: $font-bold; color: $gray-900; line-height: 1; }
+  &__unit { font-size: $font-sm; color: $gray-500; }
+
+  &__options {
+    display: grid; grid-template-columns: 1fr 1fr; gap: $size-2; width: 100%;
+  }
+
+  &__opt {
+    padding: $size-3 $size-4; border: 1px solid $gray-200; border-radius: $radius-md;
+    background: #fff; cursor: pointer; font-size: $font-sm; font-weight: $font-medium;
+    color: $gray-700; transition: all 120ms ease;
+    &:hover { border-color: $primary-300; color: $primary-600; background: rgba($primary-500, 0.04); }
+    &--sel { border-color: $primary-500; background: rgba($primary-500, 0.08); color: $primary-600; }
+  }
+
+  &__cta {
+    width: 100%; padding: $size-3 $size-5; background: $primary-500; color: #fff;
+    border: none; border-radius: $radius-md; cursor: pointer; font-size: $font-md;
+    font-weight: $font-semibold; transition: background 120ms ease; margin-top: $size-2;
+    &:hover:not(:disabled) { background: $primary-600; }
+    &:disabled { opacity: 0.45; cursor: default; }
+    &--confirm { font-size: $font-lg; padding: $size-4 $size-6; }
+  }
+
+  &__respuesta {
+    font-size: $font-md; color: $gray-700; line-height: 1.6;
+    background: rgba($primary-500, 0.06); border: 1px solid rgba($primary-500, 0.2);
+    border-radius: $radius-md; padding: $size-4 $size-5; margin: 0; text-align: left;
+  }
+
+  &__hint {
+    font-size: $font-sm; color: $gray-500; line-height: 1.55; margin: 0;
+    strong { color: $gray-800; }
+  }
+
+  &--confirm .zero__body { gap: $size-5; }
+}
+
+@keyframes zero-bg-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zero-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 12px)); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* ── Micro-onboarding modo experto ── */
+.experto-bg {
+  position: fixed; inset: 0; z-index: 210;
+  background: rgba(21, 25, 33, 0.4); backdrop-filter: blur(3px);
+  animation: zero-bg-in 200ms ease;
+}
+
+.experto-slide {
+  position: fixed; right: $size-6; top: 72px;
+  width: min(360px, calc(100vw - 32px));
+  background: $gray-900; color: #fff;
+  border-radius: $radius-xl; padding: $size-6;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+  z-index: 211;
+  display: flex; flex-direction: column; gap: $size-4;
+  animation: experto-slide-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  &__icon {
+    font-size: 24px; color: $primary-400;
+    animation: gali-breathe 2.8s ease-in-out infinite;
+    line-height: 1;
+  }
+
+  &__title {
+    margin: 0; font-size: $font-lg; font-weight: $font-bold;
+    letter-spacing: -0.02em; line-height: 1.2;
+  }
+
+  &__body {
+    margin: 0; font-size: $font-sm; color: rgba(255, 255, 255, 0.75);
+    line-height: 1.6;
+    strong { color: #fff; font-weight: $font-semibold; }
+  }
+
+  &__hint {
+    margin: 0; font-size: 12px;
+    color: rgba(255, 255, 255, 0.45); line-height: 1.5;
+  }
+
+  &__cta {
+    align-self: flex-end; background: $primary-500; color: #fff;
+    border: none; cursor: pointer; padding: $size-2 $size-5;
+    border-radius: $radius-md; font-size: $font-sm; font-weight: $font-semibold;
+    transition: background 120ms ease;
+    &:hover { background: $primary-600; }
+  }
+}
+
+@keyframes experto-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
