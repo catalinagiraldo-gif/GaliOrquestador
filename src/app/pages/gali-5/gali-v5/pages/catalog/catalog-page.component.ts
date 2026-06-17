@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
+import { GaliStateService } from '../../services/gali-state.service';
 import { GaliAdaSpyDetailComponent } from '../../components/gali-ada-spy-detail/gali-ada-spy-detail.component';
 
 type ProductBadge = 'Variable' | 'Combo';
@@ -41,6 +42,9 @@ export class CatalogPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private ws = inject(GaliWorkspaceService);
+  readonly gali = inject(GaliStateService);
+
+  abrirGaliPanel(): void { this.gali.openCatalogPanel(); }
 
   goToLanzar(productId?: string): void {
     const id = productId ?? 'difusor';

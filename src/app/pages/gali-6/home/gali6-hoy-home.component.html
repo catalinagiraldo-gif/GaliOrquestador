@@ -4,12 +4,15 @@
   <!-- ── 1 · Línea de estado ── -->
   <header class="status">
     <div class="status__main">
-      <h1 class="status__title">Hola Cata. Tu negocio va bien.</h1>
+      <h1 class="status__title">Hola Cata. Gali tiene el timón.</h1>
       <p class="status__sub">
         Semana {{ semana }} ·
         <span class="status__kpi">{{ pedidosActual }}/{{ objetivoMeta() }} pedidos</span>
         <span class="status__period-badge">Semanal</span>
         hacia tu meta
+        @if (verImpactoGali()) {
+          <span class="status__gali-delta" title="Pedidos atribuibles a acciones de Gali esta semana">✦ +{{ galiDelta.pedidos }} por Gali</span>
+        }
       </p>
     </div>
     <div class="status__meter">
@@ -22,12 +25,12 @@
   </header>
 
   <!-- ── 2 · Decisión de hoy (máx 1) ── -->
-  <section class="block">
-    <span class="block__eyebrow">Decisión de hoy</span>
+  <section class="block" aria-label="Decisión de hoy">
+    <span class="block__eyebrow" aria-hidden="true">Decisión de hoy</span>
 
     <!-- Toast de feedback al tomar decisión -->
     @if (decisionToast()) {
-      <div class="decision-toast" role="status">
+      <div class="decision-toast" role="status" aria-live="polite" aria-atomic="true">
         <span class="decision-toast__icon">✦</span>
         {{ decisionToast() }}
       </div>
@@ -55,10 +58,20 @@
   </section>
 
   <!-- ── 3 · Gali hizo por ti ── -->
-  <section class="impacto">
+  <section class="impacto" [class.impacto--gali-on]="verImpactoGali()" aria-label="Impacto de Gali esta semana">
     <div class="impacto__head">
       <span class="impacto__eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
       <div class="impacto__head-right">
+        <button class="impacto__switch" type="button"
+          [class.impacto__switch--on]="verImpactoGali()"
+          (click)="toggleImpactoGali()"
+          [attr.aria-pressed]="verImpactoGali()"
+          title="Ver qué ha movido Gali vs operación base">
+          <span class="impacto__switch-track" aria-hidden="true">
+            <span class="impacto__switch-thumb"></span>
+          </span>
+          {{ verImpactoGali() ? '✦ Aporte de Gali' : 'Ver aporte de Gali' }}
+        </button>
         <span class="impacto__period">{{ impacto.label_periodo }}</span>
         <a routerLink="/gali-6/impacto" class="impacto__link">Ver historial →</a>
       </div>
@@ -67,24 +80,43 @@
       <div class="impacto__stat">
         <span class="impacto__val">{{ impacto.acciones_totales }}</span>
         <span class="impacto__lbl">acciones<span class="impacto__auto"> · {{ impacto.acciones_autonomas }} autónomas</span></span>
+        @if (verImpactoGali()) {
+          <span class="impacto__delta-chip">✦ todas por Gali</span>
+        }
       </div>
       <div class="impacto__stat impacto__stat--hero">
         <span class="impacto__val">{{ impacto.pesos_ahorrados_label }}</span>
         <span class="impacto__lbl">ahorrados</span>
+        @if (verImpactoGali()) {
+          <span class="impacto__delta-chip">✦ atribuibles a Gali</span>
+        }
       </div>
       <div class="impacto__stat">
         <span class="impacto__val">{{ impacto.novedades_evitadas }}</span>
         <span class="impacto__lbl"><span galiGlosario="novedad">novedades</span> evitadas</span>
+        @if (verImpactoGali()) {
+          <span class="impacto__delta-chip">✦ Gali las interceptó</span>
+        }
       </div>
       <div class="impacto__stat">
         <span class="impacto__val">{{ impacto.horas_libradas }}h</span>
         <span class="impacto__lbl">que no operaste tú</span>
+        @if (verImpactoGali()) {
+          <span class="impacto__delta-chip">✦ Gali operó por ti</span>
+        }
       </div>
     </div>
+
+    @if (verImpactoGali()) {
+      <div class="impacto__gali-banner">
+        <span class="impacto__gali-banner-icon" aria-hidden="true">✦</span>
+        <span>Sin Gali esta semana, habrías tenido <strong>{{ pedidosActual - galiDelta.pedidos }} pedidos</strong> en lugar de {{ pedidosActual }}. Diferencia: <strong>+{{ galiDelta.pedidos }} pedidos</strong> que Gali facilitó.</span>
+      </div>
+    }
   </section>
 
   <!-- ── 4 · Tu mayor palanca ── -->
-  <section class="palanca">
+  <section class="palanca" aria-label="Próxima acción recomendada por Gali">
     <div class="palanca__body">
       <span class="palanca__eyebrow"><span class="palanca__spark" aria-hidden="true">✦</span> Tu próximo paso</span>
       <strong class="palanca__title">{{ palanca.titulo }}</strong>
@@ -93,6 +125,59 @@
     <div class="palanca__side">
       <span class="palanca__window">{{ palanca.ventanaDias }} días</span>
       <button class="palanca__cta" (click)="lanzarPalanca()">Ver proyecto sugerido →</button>
+    </div>
+  </section>
+
+  <!-- ── 5 · Cola de señales pendientes ── -->
+  @if (colaDecisiones().length > 0) {
+    <section class="cola" aria-label="Otras señales pendientes">
+      <button class="cola__toggle" type="button"
+              [attr.aria-expanded]="colaExpanded()"
+              (click)="toggleCola()">
+        <span class="cola__eyebrow">
+          <span aria-hidden="true">◎</span>
+          {{ colaDecisiones().length }} señal{{ colaDecisiones().length !== 1 ? 'es' : '' }} pendiente{{ colaDecisiones().length !== 1 ? 's' : '' }}
+        </span>
+        <span class="cola__chevron" [class.cola__chevron--open]="colaExpanded()" aria-hidden="true">▾</span>
+      </button>
+      @if (colaExpanded()) {
+        <ul class="cola__list" role="list">
+          @for (s of colaDecisiones(); track s.id) {
+            <li class="cola__item" [attr.data-tipo]="s.tipo">
+              <span class="cola__dot" [style.background]="s.agenteColor"></span>
+              <div class="cola__body">
+                <span class="cola__agente">{{ s.agente | titlecase }}</span>
+                <span class="cola__titulo">{{ s.titulo }}</span>
+              </div>
+              <span class="cola__urgencia" [attr.data-tipo]="s.tipo">
+                {{ s.tipo === 'critical' ? 'Urgente' : 'Pendiente' }}
+              </span>
+            </li>
+          }
+        </ul>
+        <a routerLink="/gali-6/senales" class="cola__ver-todas">Ver todas en Señales →</a>
+      }
+    </section>
+  }
+
+  <!-- ── 6 · Progresión modular ── -->
+  <section class="modulos" aria-label="Progresión de módulos de Gali">
+    <span class="modulos__eyebrow">Tu recorrido con Gali</span>
+    <div class="modulos__track">
+      @for (m of modulosProgresion; track m.id; let i = $index) {
+        <div class="modulos__step" [attr.data-estado]="m.estado">
+          <div class="modulos__node" [attr.data-estado]="m.estado">
+            <span class="modulos__glyph" aria-hidden="true">{{ m.glyph }}</span>
+          </div>
+          @if (i < modulosProgresion.length - 1) {
+            <div class="modulos__connector" [class.modulos__connector--done]="m.estado === 'activo'"></div>
+          }
+          <div class="modulos__label">
+            <strong>{{ m.nombre }}</strong>
+            <span>{{ m.sub }}</span>
+          </div>
+        </div>
+      }
     </div>
   </section>
 </div>

@@ -23,10 +23,10 @@
   &__node {
     display: flex; flex-direction: column;
     strong { font-size: $font-sm; color: $gray-800; font-weight: $font-bold; }
-    span { font-size: 11px; color: $gray-400; }
+    span { font-size: 11px; color: $gray-500; }
     &--gali strong { color: $primary-600; }
   }
-  &__arrow, &__plus { color: $gray-300; font-size: $font-sm; }
+  &__arrow, &__plus { color: $gray-400; font-size: $font-sm; }
 }
 
 /* Tab nav */
@@ -47,9 +47,9 @@
   &--active { color: $primary-600; border-bottom-color: $primary-500; font-weight: $font-semibold; }
 
   &__badge {
-    font-size: 11px; font-weight: $font-semibold; color: $gray-400;
+    font-size: 11px; font-weight: $font-semibold; color: $gray-500;
     background: $gray-100; padding: 0 6px; border-radius: $radius-full; line-height: 18px;
-    .cc-tab--active & { background: rgba($primary-500, 0.12); color: $primary-600; }
+    .cc-tab--active & { background: rgba($primary-500, 0.12); color: $gray-700; }
   }
 }
 
@@ -60,7 +60,7 @@
   position: relative;
 
   &__tasa-hint {
-    color: $gray-400; font-size: 12px; cursor: default; position: relative;
+    color: $gray-500; font-size: 12px; cursor: default; position: relative;
     &:hover .cc-intro__tooltip { opacity: 1; pointer-events: auto; }
   }
   &__tooltip {
@@ -78,7 +78,7 @@
   width: 100%; margin-top: $size-3;
   padding: $size-3 $size-4; border: 1.5px dashed $gray-200;
   border-radius: $radius-md; background: transparent;
-  font-family: $font-primary; font-size: $font-sm; color: $gray-400;
+  font-family: $font-primary; font-size: $font-sm; color: $gray-500;
   cursor: pointer; transition: border-color 120ms ease, color 120ms ease;
   &:hover { border-color: $primary-300; color: $primary-600; }
 }
@@ -118,20 +118,20 @@
 
   &__meta { flex: 1; }
   &__nombre { display: block; font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
-  &__sub { font-size: 11px; color: $gray-400; }
+  &__sub { font-size: 11px; color: $gray-500; }
 
   &__toggle {
     flex-shrink: 0; padding: 3px 10px; border-radius: $radius-full; border: none;
     font-family: $font-primary; font-size: 11px; font-weight: $font-bold;
     cursor: pointer; transition: background 120ms ease, color 120ms ease;
-    background: $gray-100; color: $gray-400;
+    background: $gray-100; color: $gray-500;
     &--on { background: #dcfce7; color: #16a34a; }
   }
 
   &__desc { margin: 0; font-size: 12px; color: $gray-600; line-height: 1.5; }
 
   &__accion {
-    margin: 0; font-size: 11px; color: $gray-400; line-height: 1.4;
+    margin: 0; font-size: 11px; color: $gray-500; line-height: 1.4;
     &--warn { color: #ef4444; }
   }
 
@@ -173,7 +173,7 @@
   &__desc { margin: 0 0 $size-2; font-size: $font-xs; color: $gray-600; line-height: 1.5; }
   &__meta {
     display: flex; gap: $size-4; flex-wrap: wrap;
-    span { font-size: 11px; color: $gray-400; }
+    span { font-size: 11px; color: $gray-500; }
   }
 }
 
@@ -196,7 +196,7 @@
     margin: 0 0 4px; font-size: $font-sm; color: $gray-800; line-height: 1.5;
     font-style: italic;
   }
-  &__agente { font-size: 11px; color: $gray-400; }
+  &__agente { font-size: 11px; color: $gray-500; }
 }
 
 /* ── MARKETPLACE ── */
@@ -216,7 +216,7 @@
   &__glyph { font-size: $font-xl; color: $primary-500; }
   &__name { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
   &__desc { margin: 0; font-size: $font-xs; color: $gray-600; line-height: 1.5; flex: 1; }
-  &__footer { display: flex; justify-content: space-between; font-size: 11px; color: $gray-400; }
+  &__footer { display: flex; justify-content: space-between; font-size: 11px; color: $gray-500; }
   &__cta {
     margin-top: $size-2; width: 100%;
     padding: $size-2 $size-4; background: $primary-500; color: #fff;

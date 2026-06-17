@@ -1,5 +1,5 @@
 <div class="proy gali-stagger-in">
-  <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" sub="Tu portafolio de productos orientado a tu objetivo." />
+  <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" sub="Proyectos organizados alrededor de tu meta de negocio." />
 
   <!-- ── BLOQUE 4: Objetivo con contribuciones ── -->
   <section class="goal" [attr.data-estado]="metaEstado()">
@@ -17,7 +17,12 @@
 
     <!-- Barra de progreso global -->
     <div class="goal__progress">
-      <div class="goal__track">
+      <div class="goal__track"
+           role="progressbar"
+           [attr.aria-valuenow]="pedidosActual"
+           [attr.aria-valuemin]="0"
+           [attr.aria-valuemax]="objetivo().meta_pedidos_sem"
+           [attr.aria-label]="pedidosActual + ' de ' + objetivo().meta_pedidos_sem + ' pedidos — ' + metaPct() + '%'">
         <div class="goal__fill" [style.width.%]="metaPct()"></div>
       </div>
       <span class="goal__num">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} pedidos · {{ metaPct() }}%</span>
@@ -88,7 +93,7 @@
     <div class="gali-toast">
       <span class="gali-toast__icon">✦</span>
       <p class="gali-toast__text">{{ galiCambioMensaje() }}</p>
-      <button class="gali-toast__close" (click)="galiCambioMensaje.set(null)">×</button>
+      <button class="gali-toast__close" (click)="galiCambioMensaje.set(null)" aria-label="Cerrar notificación">×</button>
     </div>
   }
 
@@ -120,7 +125,7 @@
   <!-- Gali recomienda para tu objetivo -->
   @if (recomendaciones().length > 0) {
     <section class="reco">
-      <span class="reco__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda para tu objetivo</span>
+      <span class="reco__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda para cerrar tu objetivo</span>
       <div class="reco__cards">
         @for (r of recomendaciones(); track r.titulo) {
           <article class="reco__card">
@@ -143,27 +148,32 @@
     </div>
 
     <!-- Filtros de estado -->
-    <div class="port__filters">
+    <div class="port__filters" role="group" aria-label="Filtrar proyectos por estado">
       <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'todos'"
+              [attr.aria-pressed]="activeFilter() === 'todos'"
               (click)="setFilter('todos')">
-        Todos <span class="pf-count">{{ filterCounts().todos }}</span>
+        Todos <span class="pf-count" [attr.aria-label]="filterCounts().todos + ' proyectos'">{{ filterCounts().todos }}</span>
       </button>
       <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'activos'"
+              [attr.aria-pressed]="activeFilter() === 'activos'"
               (click)="setFilter('activos')">
-        Activos <span class="pf-count">{{ filterCounts().activos }}</span>
+        Activos <span class="pf-count" [attr.aria-label]="filterCounts().activos + ' proyectos'">{{ filterCounts().activos }}</span>
       </button>
       <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'pausados'"
+              [attr.aria-pressed]="activeFilter() === 'pausados'"
               (click)="setFilter('pausados')">
-        Pausados <span class="pf-count">{{ filterCounts().pausados }}</span>
+        Pausados <span class="pf-count" [attr.aria-label]="filterCounts().pausados + ' proyectos'">{{ filterCounts().pausados }}</span>
       </button>
       <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'borradores'"
+              [attr.aria-pressed]="activeFilter() === 'borradores'"
               (click)="setFilter('borradores')">
-        Borradores <span class="pf-count">{{ filterCounts().borradores }}</span>
+        Borradores <span class="pf-count" [attr.aria-label]="filterCounts().borradores + ' proyectos'">{{ filterCounts().borradores }}</span>
       </button>
       @if (filterCounts().cerrados > 0) {
         <button class="pf-tab pf-tab--cerrados" [class.pf-tab--active]="activeFilter() === 'cerrados'"
+                [attr.aria-pressed]="activeFilter() === 'cerrados'"
                 (click)="setFilter('cerrados')">
-          Cerrados <span class="pf-count">{{ filterCounts().cerrados }}</span>
+          Cerrados <span class="pf-count" [attr.aria-label]="filterCounts().cerrados + ' proyectos'">{{ filterCounts().cerrados }}</span>
         </button>
       }
     </div>
@@ -182,8 +192,13 @@
         <li class="port__item"
             [class.port__item--cerrado]="p.estado === 'cerrado'"
             [class.port__item--borrador]="p.estado === 'borrador'"
+            [class.port__item--recien]="p.estado === 'recien_lanzado'"
             [style.animationDelay]="(i * 55) + 'ms'"
-            (click)="abrir(p.id)">
+            tabindex="0"
+            [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
+            (click)="abrir(p.id)"
+            (keydown.enter)="abrir(p.id)"
+            (keydown.space)="abrir(p.id); $event.preventDefault()">
           <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
           <span class="port__name">{{ p.nombre }}</span>
 
@@ -213,7 +228,8 @@
 
           <div class="port__actions" (click)="$event.stopPropagation()">
             @if (p.estado !== 'cerrado') {
-              <button class="port__edit-btn" (click)="openEditProyecto(p, $event)" title="Editar proyecto">✎</button>
+              <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
+                      [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
             }
             <span class="port__go">
               @if (p.estado === 'cerrado') { Ver postmortem → }
@@ -257,7 +273,7 @@
       }
     </div>
 
-    <label class="modal__label" for="modal-objetivo-texto">¿Qué quieres lograr?</label>
+    <label class="modal__label" for="modal-objetivo-texto">¿Cuál es tu meta de negocio?</label>
     <textarea id="modal-objetivo-texto" class="modal__input modal__textarea"
               [value]="draftTexto()"
               (input)="draftTexto.set($any($event.target).value)"
@@ -294,12 +310,54 @@
                  [value]="sm.label" placeholder="Describe el paso…"
                  (input)="updateDraftSubMetaLabel(sm.id, $any($event.target).value)">
           <button class="modal__submeta-del" type="button"
+                  [attr.aria-label]="'Eliminar paso: ' + sm.label"
                   (click)="removeDraftSubMeta(sm.id)">×</button>
         </div>
       }
     </div>
 
-    <p class="modal__hint">Gali usará este objetivo para priorizar señales y recomendarte proyectos.</p>
+    <!-- ── Mejorar con Gali ── -->
+    <div class="gali-mejorar">
+      <label class="modal__label" for="gali-mejorar-input">Cuéntale a Gali qué quieres lograr</label>
+      <div class="gali-mejorar__row">
+        <textarea id="gali-mejorar-input"
+                  class="modal__input modal__textarea gali-mejorar__input"
+                  placeholder="Cuéntale a Gali qué quieres lograr con tu negocio…"
+                  rows="2"
+                  [value]="galiMejorarInput()"
+                  (input)="galiMejorarInput.set($any($event.target).value)"></textarea>
+        <button class="gali-mejorar__cta"
+                [disabled]="!galiMejorarInput().trim() || galiMejorarEstado() === 'procesando'"
+                (click)="mejorarConGali()">
+          @if (galiMejorarEstado() === 'procesando') {
+            <span class="gali-mejorar__spinner" aria-hidden="true"></span>
+            Analizando…
+          } @else {
+            ✦ Mejorar con Gali →
+          }
+        </button>
+      </div>
+
+      @if (galiMejorarEstado() === 'propuesta') {
+        <div class="gali-propuesta" role="status" aria-live="polite">
+          <div class="gali-propuesta__head">
+            <span class="gali-propuesta__icon" aria-hidden="true">✦</span>
+            <span class="gali-propuesta__eyebrow">Gali propone</span>
+          </div>
+          <p class="gali-propuesta__texto">{{ galiPropuestaTexto() }}</p>
+          <div class="gali-propuesta__meta-row">
+            <span class="gali-propuesta__meta-label">Meta sugerida</span>
+            <strong class="gali-propuesta__meta-val">{{ galiPropuestaMeta() }} pedidos/sem</strong>
+          </div>
+          <div class="gali-propuesta__actions">
+            <button class="gali-propuesta__accept" (click)="aceptarPropuestaGali()">Usar propuesta →</button>
+            <button class="gali-propuesta__discard" (click)="descartarPropuestaGali()">Descartar</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <p class="modal__hint">Gali usará este objetivo para facilitar tus proyectos y priorizarte las señales más relevantes.</p>
     <div class="modal__actions">
       <button class="modal__cancel" (click)="editOpen.set(false)">Cancelar</button>
       <button class="modal__save" (click)="saveEdit()">Guardar objetivo →</button>
@@ -371,5 +429,97 @@
       <button class="modal__cancel" (click)="editProyectoOpen.set(false)">Cancelar</button>
       <button class="modal__save" (click)="saveEditProyecto()">Guardar cambios →</button>
     </div>
+  </div>
+}
+
+<!-- ── Modal nuevo proyecto: Correr con Gali vs. Crear de cero (Cambio A) ── -->
+@if (nuevoModalOpen()) {
+  <div class="modal-bg" (click)="cerrarNuevoModal()" aria-hidden="true"></div>
+  <div class="modal modal--nuevo" role="dialog" aria-modal="true"
+       aria-labelledby="modal-nuevo-title" cdkTrapFocus cdkTrapFocusAutoCapture>
+
+    <!-- Estado: Gali analizando -->
+    @if (nuevoAutoEstado() === 'cargando') {
+      <div class="nuevo-carga">
+        <span class="nuevo-carga__spinner" aria-hidden="true"></span>
+        <p class="nuevo-carga__text">Gali está analizando tu negocio…</p>
+        <p class="nuevo-carga__sub">Buscando la mejor oportunidad para tu objetivo de {{ objetivo().meta_pedidos_sem }} pedidos/sem</p>
+      </div>
+    }
+
+    <!-- Estado: Propuesta lista — dos caminos -->
+    @if (nuevoAutoEstado() === 'listo') {
+      <div class="modal__header">
+        <h2 id="modal-nuevo-title" class="modal__title">¿Cómo quieres crear el proyecto?</h2>
+        <button class="modal__close-btn" type="button" aria-label="Cerrar modal"
+                (click)="cerrarNuevoModal()">×</button>
+      </div>
+
+      <div class="nuevo-cards">
+        <!-- Camino Auto -->
+        <article class="nuevo-card nuevo-card--auto" aria-label="Proyecto propuesto por Gali">
+          <div class="nuevo-card__badge">✦ Recomendado por Gali</div>
+          <h3 class="nuevo-card__title">{{ galiPropuestaAuto()?.producto }}</h3>
+          <p class="nuevo-card__porque">{{ galiPropuestaAuto()?.por }}</p>
+          <div class="nuevo-card__stats">
+            <div class="nuevo-card__stat">
+              <span class="nuevo-card__stat-val">~{{ galiPropuestaAuto()?.pedidosEstimados }}</span>
+              <span class="nuevo-card__stat-lbl">pedidos/sem estimados</span>
+            </div>
+            <div class="nuevo-card__stat">
+              <span class="nuevo-card__stat-val">{{ galiPropuestaAuto()?.presupuestoSugerido }}/día</span>
+              <span class="nuevo-card__stat-lbl">presupuesto sugerido</span>
+            </div>
+            <div class="nuevo-card__stat">
+              <span class="nuevo-card__stat-val">{{ galiPropuestaAuto()?.ventana }} días</span>
+              <span class="nuevo-card__stat-lbl">ventana de mercado</span>
+            </div>
+          </div>
+          <p class="nuevo-card__objetivo-tag">
+            ✦ Con este proyecto llegarías al {{ galiPropuestaAuto()?.pctDespues }}% de tu objetivo.
+          </p>
+          <button class="nuevo-card__cta" (click)="confirmarAutoProyecto()">
+            Correr este proyecto →
+          </button>
+        </article>
+
+        <!-- Camino Manual -->
+        <article class="nuevo-card nuevo-card--manual" aria-label="Crear proyecto de cero">
+          <h3 class="nuevo-card__title">Crear de cero</h3>
+          <p class="nuevo-card__porque">Define tú cada paso: producto, ángulo, presupuesto y agentes. Para quien quiere control total.</p>
+          <ul class="nuevo-card__features" aria-label="Incluye">
+            <li>Calculadora Brújula</li>
+            <li>Ángulo de venta</li>
+            <li>Agentes a medida</li>
+          </ul>
+          <button class="nuevo-card__cta nuevo-card__cta--sec" (click)="irWizard()">
+            Crear de cero →
+          </button>
+        </article>
+      </div>
+    }
+
+    <!-- Estado: Lanzando -->
+    @if (nuevoAutoEstado() === 'lanzando') {
+      <div class="nuevo-launch" role="status" aria-live="polite" aria-atomic="false">
+        <span class="nuevo-launch__icon" aria-hidden="true">✦</span>
+        <h3 class="nuevo-launch__title">Lanzando proyecto</h3>
+        <div class="nuevo-launch__steps" aria-label="Progreso de lanzamiento">
+          @for (step of lanzamientoSteps(); track step.label) {
+            <div class="nuevo-launch__step" [class.is-done]="step.done">
+              <span class="nuevo-launch__step-dot" [class.is-done]="step.done" aria-hidden="true">
+                {{ step.done ? '✓' : '' }}
+              </span>
+              <span class="nuevo-launch__step-label">{{ step.label }}</span>
+            </div>
+          }
+        </div>
+        <div class="nuevo-launch__bar" role="progressbar"
+             [attr.aria-valuenow]="lanzamientoPct()" aria-valuemin="0" aria-valuemax="100">
+          <div class="nuevo-launch__fill" [style.width.%]="lanzamientoPct()"></div>
+        </div>
+        <p class="nuevo-launch__pct">{{ lanzamientoPct() }}%</p>
+      </div>
+    }
   </div>
 }

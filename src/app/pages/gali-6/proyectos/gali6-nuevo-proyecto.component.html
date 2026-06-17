@@ -3,17 +3,11 @@
   <!-- Header -->
   <div class="wizard__header">
     <button class="wizard__back" (click)="goBack()">← Atrás</button>
-    <div class="wizard__steps">
-      @for (s of STEPS; track s.id; let i = $index) {
-        <div class="wizard__step"
-             [class.is-active]="step() === s.id"
-             [class.is-done]="stepIndex(step()) > i">
-          <span class="wizard__step-num">{{ stepIndex(step()) > i ? '✓' : (i + 1) }}</span>
-          <span class="wizard__step-label">{{ s.label }}</span>
-        </div>
-        @if (i < STEPS.length - 1) { <span class="wizard__step-sep">—</span> }
-      }
+    <div class="wizard__progress">
+      <div class="wizard__progress-fill"
+           [style.width.%]="((stepIndex(step()) + 1) / STEPS.length) * 100"></div>
     </div>
+    <span class="wizard__step-hint">{{ STEPS[stepIndex(step())].label }}</span>
   </div>
 
   <!-- ── PASO 1: Objetivo ── -->

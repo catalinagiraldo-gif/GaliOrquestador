@@ -24,30 +24,29 @@
     &:hover { color: $gray-800; }
   }
 
-  &__steps {
-    display: flex; align-items: center; gap: $size-1;
-    flex: 1; justify-content: center;
-    flex-wrap: wrap;
+  &__progress {
+    flex: 1;
+    height: 3px;
+    background: $gray-100;
+    border-radius: $radius-full;
+    overflow: hidden;
   }
 
-  &__step {
-    display: flex; align-items: center; gap: 4px;
-    &.is-active .wizard__step-num {
-      background: $primary-500; color: #fff; border-color: $primary-500;
-    }
-    &.is-done .wizard__step-num { background: #16a34a; color: #fff; border-color: #16a34a; }
+  &__progress-fill {
+    height: 100%;
+    background: $primary-500;
+    border-radius: $radius-full;
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  &__step-num {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2px solid $gray-200; background: $gray-50;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: $font-bold; color: $gray-400;
-    flex-shrink: 0;
+
+  &__step-hint {
+    font-size: 11px;
+    font-weight: $font-semibold;
+    color: $gray-400;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
   }
-  &__step-label { font-size: 10px; color: $gray-400; font-weight: $font-medium; white-space: nowrap; }
-  &__step.is-active &__step-label { color: $gray-800; font-weight: $font-semibold; }
-  &__step.is-done &__step-label { color: #16a34a; }
-  &__step-sep { color: $gray-200; font-size: 10px; }
 
   &__body { display: flex; flex-direction: column; gap: $size-5; position: relative; }
 
@@ -533,8 +532,7 @@
 
 @media (max-width: 600px) {
   .wizard { padding: $size-4; }
-  .wizard__steps { gap: $size-1; }
-  .wizard__step-label { display: none; }
+  .wizard__step-hint { display: none; }
   .brujula-inputs { grid-template-columns: 1fr; }
   .launch-overlay__content { width: 92vw; padding: $size-6 $size-5; }
 }

@@ -35,13 +35,13 @@
 
   &__tipo-pill {
     font-size: 10px; font-weight: $font-semibold; text-transform: uppercase; letter-spacing: 0.06em;
-    background: rgba($primary-500, 0.12); color: $primary-600;
+    background: rgba($primary-500, 0.12); color: $gray-700;
     padding: 2px 10px; border-radius: $radius-full;
   }
 
-  &__plazo { font-size: 11px; color: $gray-400; font-weight: $font-medium; }
+  &__plazo { font-size: 11px; color: $gray-500; font-weight: $font-medium; }
 
-  &__eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: $gray-400; font-weight: $font-semibold; }
+  &__eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: $gray-500; font-weight: $font-semibold; }
 
   &__text { margin: 2px 0 0; font-size: $font-xl; font-weight: $font-bold; color: $gray-900; letter-spacing: -0.01em; line-height: 1.3; }
 
@@ -77,7 +77,7 @@
   // Contribución por proyecto
   &__breakdown { margin-top: $size-2; }
   &__breakdown-title {
-    display: block; font-size: 11px; font-weight: $font-semibold; color: $gray-400;
+    display: block; font-size: 11px; font-weight: $font-semibold; color: $gray-500;
     text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: $size-2;
   }
   &__contrib-list { display: flex; flex-direction: column; gap: 6px; }
@@ -97,7 +97,7 @@
   &__contrib-name {
     font-size: $font-xs; color: $gray-700; font-weight: $font-medium;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    &--gap { color: $gray-400; font-style: italic; }
+    &--gap { color: $gray-500; font-style: italic; }
   }
   &__contrib-track {
     height: 5px; background: $gray-100; border-radius: $radius-full; overflow: hidden;
@@ -112,8 +112,8 @@
   }
   &__contrib-num { font-size: 11px; color: $gray-500; font-weight: $font-semibold; text-align: right; white-space: nowrap; }
   &__contrib-pct {
-    font-size: 11px; color: $gray-400; text-align: right; white-space: nowrap;
-    &--gap { color: $gray-300; }
+    font-size: 11px; color: $gray-500; text-align: right; white-space: nowrap;
+    &--gap { color: $gray-400; }
   }
 
   // Sub-metas
@@ -123,7 +123,7 @@
   }
   &__submetas-title {
     display: flex; align-items: center; gap: $size-2;
-    font-size: 11px; font-weight: $font-semibold; color: $gray-400;
+    font-size: 11px; font-weight: $font-semibold; color: $gray-500;
     text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: $size-2;
   }
   &__submetas-count {
@@ -134,7 +134,7 @@
   &__submeta {
     display: flex; align-items: center; gap: $size-2; cursor: pointer;
     padding: 4px 0;
-    &.is-done .goal__submeta-label { text-decoration: line-through; color: $gray-400; }
+    &.is-done .goal__submeta-label { text-decoration: line-through; color: $gray-500; }
     &.is-done .goal__submeta-check { color: #16a34a; }
   }
   &__submeta-check {
@@ -307,7 +307,7 @@
   &__legend {
     display: grid; grid-template-columns: 96px 1fr 120px 56px 140px 56px; gap: $size-3;
     padding: 0 $size-4 $size-2;
-    span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: $gray-400; font-weight: $font-semibold; }
+    span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: $gray-500; font-weight: $font-semibold; }
   }
 
   &__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: $size-2; }
@@ -321,6 +321,7 @@
     animation: port-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
     transition: border-color 120ms ease, transform 120ms ease;
     &:hover { border-color: $primary-300; transform: translateX(2px); }
+    &:focus-visible { outline: 2px solid $primary-500; outline-offset: 1px; border-color: $primary-300; }
   }
 
   &__estado {
@@ -350,7 +351,7 @@
     &[data-estado='borrador'] { background: $gray-200; }
   }
   &__contrib-val { font-size: 11px; color: $gray-500; font-weight: $font-semibold; white-space: nowrap; }
-  &__contrib-none { font-size: 11px; color: $gray-300; }
+  &__contrib-none { font-size: 11px; color: $gray-400; }
 
   &__metric { font-size: $font-xs; color: $gray-500; font-weight: $font-medium; }
 
@@ -390,6 +391,17 @@
     border-color: rgba($primary-300, 0.4);
     border-style: dashed;
   }
+
+  &__item--recien {
+    border-left: 3px solid $primary-400;
+    background: linear-gradient(90deg, rgba($primary-50, 0.6) 0%, transparent 40%);
+    animation: recien-pulse 2.4s ease-in-out infinite;
+  }
+
+@keyframes recien-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($primary-400, 0.15); }
+  50%       { box-shadow: 0 0 0 4px rgba($primary-400, 0.08); }
+}
 
   &__estado {
     &[data-estado='cerrado'] { background: $gray-100; color: $gray-400; }
@@ -441,8 +453,8 @@
   &__textarea { resize: vertical; min-height: 64px; }
   &__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: $size-4; }
   &__field { display: flex; flex-direction: column; }
-  &__hint { font-size: $font-xs; color: $gray-400; margin: $size-3 0 $size-5; line-height: 1.5; }
-  &__hint-sm { font-size: 11px; color: $gray-400; margin: 4px 0 $size-3; line-height: 1.5; }
+  &__hint { font-size: $font-xs; color: $gray-500; margin: $size-3 0 $size-5; line-height: 1.5; }
+  &__hint-sm { font-size: 11px; color: $gray-500; margin: 4px 0 $size-3; line-height: 1.5; }
   &__add-btn {
     background: none; border: none; cursor: pointer; font-size: $font-xs;
     color: $primary-600; font-weight: $font-semibold; padding: 0;
@@ -540,7 +552,7 @@
   }
   &__agente-info { flex: 1; display: flex; flex-direction: column; gap: 1px; }
   &__agente-label { font-size: $font-xs; font-weight: $font-semibold; color: $gray-800; }
-  &__agente-desc  { font-size: 11px; color: $gray-400; }
+  &__agente-desc  { font-size: 11px; color: $gray-500; }
   &__agente-toggle {
     font-size: 10px; font-weight: $font-bold; letter-spacing: 0.04em;
     color: $gray-300; flex-shrink: 0;
@@ -571,4 +583,406 @@
 @media (prefers-reduced-motion: reduce) {
   .goal__fill, .goal__contrib-fill, .port__health-fill, .port__item { transition: none; }
   .port__item:hover { transform: none; }
+}
+
+// ── Gali "Mejorar con Gali" — sección en modal de objetivo ───────────────
+
+.gali-mejorar {
+  margin-top: $size-4;
+  border-top: 1px dashed $gray-100;
+  padding-top: $size-4;
+
+  &__row {
+    display: flex;
+    gap: $size-2;
+    align-items: flex-start;
+  }
+
+  &__input {
+    flex: 1;
+    min-height: 54px;
+    font-size: $font-xs;
+  }
+
+  &__cta {
+    flex-shrink: 0;
+    background: rgba($primary-500, 0.08);
+    border: 1px solid rgba($primary-500, 0.25);
+    border-radius: $radius-md;
+    color: $primary-600;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    padding: $size-2 $size-3;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    line-height: 1.4;
+    transition: background 150ms ease;
+
+    &:hover:not(:disabled) { background: rgba($primary-500, 0.15); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba($primary-500, 0.3);
+    border-top-color: $primary-500;
+    border-radius: 50%;
+    animation: gali-spin 0.7s linear infinite;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes gali-spin { to { transform: rotate(360deg); } }
+
+.gali-propuesta {
+  margin-top: $size-3;
+  background: rgba($primary-500, 0.05);
+  border: 1px solid rgba($primary-500, 0.18);
+  border-radius: $radius-md;
+  padding: $size-4;
+  animation: gali-fade-in 220ms ease;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $size-1;
+    margin-bottom: $size-2;
+  }
+
+  &__icon { color: $primary-500; font-size: 13px; }
+
+  &__eyebrow {
+    font-size: 10px;
+    font-weight: $font-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $primary-600;
+  }
+
+  &__texto {
+    font-size: $font-sm;
+    color: $gray-800;
+    line-height: 1.55;
+    margin: 0 0 $size-3;
+    font-weight: $font-medium;
+  }
+
+  &__meta-row {
+    display: flex;
+    align-items: center;
+    gap: $size-2;
+    margin-bottom: $size-3;
+  }
+
+  &__meta-label {
+    font-size: $font-xs;
+    color: $gray-500;
+  }
+
+  &__meta-val {
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $primary-600;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $size-2;
+  }
+
+  &__accept {
+    background: $primary-500;
+    color: #fff;
+    border: none;
+    border-radius: $radius-md;
+    padding: $size-1 $size-3;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    &:hover { background: $primary-600; }
+  }
+
+  &__discard {
+    background: none;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    padding: $size-1 $size-3;
+    font-size: $font-xs;
+    color: $gray-500;
+    cursor: pointer;
+    &:hover { border-color: $gray-300; color: $gray-700; }
+  }
+}
+
+@keyframes gali-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Modal nuevo proyecto: selector caminos (Cambio A) ─────────────────────
+
+.modal--nuevo { width: 700px; min-height: 300px; }
+
+// Estado cargando
+.nuevo-carga {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $size-10 $size-6;
+  gap: $size-3;
+  text-align: center;
+
+  &__spinner {
+    width: 36px; height: 36px;
+    border: 3px solid rgba($primary-500, 0.2);
+    border-top-color: $primary-500;
+    border-radius: 50%;
+    animation: gali-spin 0.8s linear infinite;
+  }
+
+  &__text {
+    font-size: $font-base; font-weight: $font-semibold;
+    color: $gray-800; margin: 0;
+  }
+
+  &__sub {
+    font-size: $font-sm; color: $gray-500; margin: 0;
+  }
+}
+
+// Dos cards lado a lado
+.nuevo-cards {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: $size-4;
+  margin-top: $size-4;
+}
+
+.nuevo-card {
+  border-radius: $radius-lg;
+  padding: $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+
+  &--auto {
+    background: #fff;
+    border: 2px solid $primary-500;
+    box-shadow: 0 4px 16px rgba($primary-500, 0.12);
+  }
+
+  &--manual {
+    background: $gray-50;
+    border: 1px solid $gray-200;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: $font-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $primary-600;
+    background: rgba($primary-500, 0.1);
+    padding: 3px 10px;
+    border-radius: $radius-full;
+    width: fit-content;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $font-base;
+    font-weight: $font-bold;
+    color: $gray-900;
+    line-height: 1.3;
+  }
+
+  &__porque {
+    font-size: $font-sm;
+    color: $gray-600;
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+  }
+
+  &__stats {
+    display: flex;
+    gap: $size-3;
+    padding: $size-3 0;
+    border-top: 1px solid $gray-100;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  &__stat-val {
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $gray-900;
+  }
+
+  &__stat-lbl {
+    font-size: 10px;
+    color: $gray-500;
+  }
+
+  &__objetivo-tag {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $primary-600;
+    background: rgba($primary-500, 0.06);
+    border-radius: $radius-sm;
+    padding: $size-2 $size-3;
+    margin: 0;
+  }
+
+  &__features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $size-1;
+    flex: 1;
+
+    li {
+      font-size: $font-xs;
+      color: $gray-500;
+      padding-left: $size-3;
+      position: relative;
+
+      &::before {
+        content: '·';
+        position: absolute;
+        left: 0;
+        color: $gray-400;
+      }
+    }
+  }
+
+  &__cta {
+    background: $primary-500;
+    color: #fff;
+    border: none;
+    border-radius: $radius-md;
+    padding: $size-2 $size-4;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    width: 100%;
+    margin-top: auto;
+    transition: background 150ms ease;
+
+    &:hover { background: $primary-600; }
+
+    &--sec {
+      background: none;
+      border: 1px solid $gray-300;
+      color: $gray-700;
+
+      &:hover { background: $gray-100; border-color: $gray-400; }
+    }
+  }
+}
+
+// Estado lanzando
+.nuevo-launch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $size-8 $size-6;
+  gap: $size-4;
+  text-align: center;
+
+  &__icon {
+    font-size: 28px;
+    color: $primary-500;
+    animation: gali-pulse 1s ease-in-out infinite;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    color: $gray-900;
+  }
+
+  &__steps {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+    width: 100%;
+    max-width: 340px;
+    text-align: left;
+  }
+
+  &__step {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    opacity: 0.4;
+    transition: opacity 300ms ease;
+
+    &.is-done { opacity: 1; }
+  }
+
+  &__step-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: $gray-200;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: background 300ms ease;
+
+    &.is-done { background: $primary-500; color: #fff; font-weight: $font-bold; }
+  }
+
+  &__step-label { font-size: $font-sm; color: $gray-700; }
+
+  &__bar {
+    width: 100%;
+    max-width: 340px;
+    height: 6px;
+    background: $gray-100;
+    border-radius: $radius-full;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: $primary-500;
+    border-radius: $radius-full;
+    transition: width 500ms ease;
+  }
+
+  &__pct {
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $primary-600;
+    margin: 0;
+  }
+}
+
+@keyframes gali-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.75; }
+}
+
+@media (max-width: 640px) {
+  .modal--nuevo { width: 100%; }
+  .nuevo-cards { grid-template-columns: 1fr; }
 }

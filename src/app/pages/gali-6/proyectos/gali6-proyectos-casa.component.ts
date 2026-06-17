@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { A11yModule } from '@angular/cdk/a11y';
 import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
 import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
@@ -88,6 +88,7 @@ const AGENTES_DEFAULT: Record<string, { label: string; desc: string; default: bo
 })
 export class Gali6ProyectosCasaComponent implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // ── Objetivo (Bloque 1) ──────────────────────────────────────────────
   readonly objetivo = signal<G6Objetivo>(getObjetivo());
@@ -256,14 +257,81 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       });
     }
 
+    // Check-in 5: progreso hacia desbloqueo de Órdenes (D2)
+    const exitosos = todos.filter(p => ['en_escala', 'activo'].includes(p.estado) && (p.pedidosSem ?? 0) >= 10);
+    if (exitosos.length > 0 && checkins.length < 3) {
+      const totalExitosos = exitosos.reduce((a, p) => a + (p.pedidosSem ?? 0), 0);
+      checkins.push({
+        tipo: 'positivo',
+        titulo: `¡Casi desbloqueas Gestión de Pedidos!`,
+        cuerpo: `Tus proyectos activos ya generan ${totalExitosos} pedidos/sem. Cuando consolides 2 semanas seguidas con resultados estables, Órdenes se desbloquea automáticamente.`,
+        cta: 'Ver progreso →',
+        accion: 'ver',
+      });
+    }
+
     return checkins;
   });
+
+  // ── Gali "Mejorar con Gali" — campo de texto libre en modal objetivo ──
+  readonly galiMejorarInput = signal('');
+  readonly galiMejorarEstado = signal<'idle' | 'procesando' | 'propuesta'>('idle');
+  readonly galiPropuestaTexto = signal('');
+  readonly galiPropuestaMeta = signal(100);
+
+  mejorarConGali(): void {
+    const texto = this.galiMejorarInput().toLowerCase();
+    if (!texto.trim()) return;
+    this.galiMejorarEstado.set('procesando');
+
+    setTimeout(() => {
+      let meta = this.draftMeta();
+      const numMatch = texto.match(/(\d+)\s*(?:pedidos?|ventas?|órdenes?|orders?)?/);
+      if (numMatch && parseInt(numMatch[1]) > 5) {
+        meta = parseInt(numMatch[1]);
+      } else if (/doblar|doble/.test(texto)) {
+        meta = Math.round(this.pedidosActual * 2);
+      } else if (/escalar|crecer|más/.test(texto)) {
+        meta = Math.round(this.pedidosActual * 1.5);
+      }
+
+      let textoGenerado: string;
+      if (/automatizar|automati/.test(texto)) {
+        textoGenerado = `Automatizar la operación y sostener ${meta} pedidos/semana con proyectos activos que Gali monitorea en tiempo real.`;
+      } else if (/escalar|crecer/.test(texto)) {
+        textoGenerado = `Escalar el negocio a ${meta} pedidos/semana lanzando proyectos nuevos y optimizando los que ya corren.`;
+      } else if (/primer|empezar|iniciar|comenzar/.test(texto)) {
+        textoGenerado = `Generar los primeros ${meta} pedidos/semana con un proyecto en productos de alta conversión guiado por Gali.`;
+      } else if (/marca/.test(texto)) {
+        textoGenerado = `Construir una marca con volumen de ${meta} pedidos/semana, con Gali facilitando pauta, stock y logística.`;
+      } else {
+        textoGenerado = `Hacer crecer el negocio hasta ${meta} pedidos/semana de forma sostenida, con Gali facilitando los proyectos para llegar ahí.`;
+      }
+
+      this.galiPropuestaTexto.set(textoGenerado);
+      this.galiPropuestaMeta.set(meta);
+      this.galiMejorarEstado.set('propuesta');
+    }, 800);
+  }
+
+  aceptarPropuestaGali(): void {
+    this.draftTexto.set(this.galiPropuestaTexto());
+    this.draftMeta.set(this.galiPropuestaMeta());
+    this.descartarPropuestaGali();
+  }
+
+  descartarPropuestaGali(): void {
+    this.galiMejorarEstado.set('idle');
+    this.galiMejorarInput.set('');
+    this.galiPropuestaTexto.set('');
+  }
 
   // ── Escape para cerrar cualquier modal abierto ────────────────────────
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.editProyectoOpen()) { this.editProyectoOpen.set(false); return; }
-    if (this.editOpen()) { this.editOpen.set(false); }
+    if (this.editOpen()) { this.editOpen.set(false); return; }
+    if (this.nuevoModalOpen()) { this.cerrarNuevoModal(); }
   }
 
   // ── Check-in post-cambio de objetivo (Bloque 5) ───────────────────────
@@ -298,6 +366,9 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.draftTipo.set(obj.tipo);
     this.draftPlazo.set(obj.plazo_semanas);
     this.draftSubMetas.set(obj.sub_metas.map(s => ({ ...s })));
+    this.galiMejorarEstado.set('idle');
+    this.galiMejorarInput.set('');
+    this.galiPropuestaTexto.set('');
     this.editOpen.set(true);
   }
 
@@ -433,9 +504,78 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.editProyectoOpen.set(false);
   }
 
+  // ── Nuevo proyecto: modal selector (Cambio A) ─────────────────────────
+  readonly nuevoModalOpen = signal(false);
+  readonly nuevoAutoEstado = signal<'cargando' | 'listo' | 'lanzando'>('cargando');
+  readonly lanzamientoPct = signal(0);
+  readonly lanzamientoSteps = signal([
+    { label: 'Proyecto creado en Dropi', done: false },
+    { label: 'Agentes asignados al proyecto', done: false },
+    { label: 'Señales de monitoreo configuradas', done: false },
+  ]);
+
+  readonly galiPropuestaAuto = computed(() => {
+    const senal = MOCK_SENALES.find(s => s.canLaunch && s.tipo === 'trend');
+    if (!senal) return null;
+    const meta = this.objetivo().meta_pedidos_sem;
+    const est = (senal as any).pedidosEstimados ?? 15;
+    const pctDespues = Math.min(100, Math.round(((this.pedidosActual + est) / meta) * 100));
+    return {
+      producto: senal.titulo.split(':')[0].trim(),
+      por: (senal as any).recomendacion ?? senal.contextoMacromundo,
+      ventana: (senal as any).ventanaDias ?? 7,
+      pedidosEstimados: est,
+      presupuestoSugerido: '$35.000',
+      metrica: (senal as any).metrica ?? '',
+      pctDespues,
+    };
+  });
+
+  abrirNuevoModal(): void {
+    this.nuevoAutoEstado.set('cargando');
+    this.nuevoModalOpen.set(true);
+    setTimeout(() => this.nuevoAutoEstado.set('listo'), 1400);
+  }
+
+  cerrarNuevoModal(): void {
+    this.nuevoModalOpen.set(false);
+  }
+
+  confirmarAutoProyecto(): void {
+    this.nuevoAutoEstado.set('lanzando');
+    this.lanzamientoPct.set(0);
+    this.lanzamientoSteps.set([
+      { label: 'Proyecto creado en Dropi', done: false },
+      { label: 'Agentes asignados al proyecto', done: false },
+      { label: 'Señales de monitoreo configuradas', done: false },
+    ]);
+    setTimeout(() => {
+      this.lanzamientoPct.set(33);
+      this.lanzamientoSteps.update(s => s.map((st, i) => i === 0 ? { ...st, done: true } : st));
+    }, 600);
+    setTimeout(() => {
+      this.lanzamientoPct.set(66);
+      this.lanzamientoSteps.update(s => s.map((st, i) => i === 1 ? { ...st, done: true } : st));
+    }, 1200);
+    setTimeout(() => {
+      this.lanzamientoPct.set(100);
+      this.lanzamientoSteps.update(s => s.map((st, i) => i === 2 ? { ...st, done: true } : st));
+    }, 1800);
+    setTimeout(() => {
+      this.cerrarNuevoModal();
+      const p = this.proyectos().find(pr => ['en_escala', 'activo'].includes(pr.estado));
+      this.router.navigate(p ? ['/gali-6/proyecto', p.id] : ['/gali-6/proyectos']);
+    }, 2500);
+  }
+
+  irWizard(): void {
+    this.cerrarNuevoModal();
+    this.router.navigate(['/gali-6/proyectos/nuevo']);
+  }
+
   // ── Navegación ────────────────────────────────────────────────────────
   abrir(id: string): void { this.router.navigate(['/gali-6/proyecto', id]); }
-  nuevo(): void { this.router.navigate(['/gali-6/proyectos/nuevo']); }
+  nuevo(): void { this.abrirNuevoModal(); }
 
   handleCheckinCta(ci: GaliCheckin): void {
     if (ci.accion === 'nuevo') { this.nuevo(); return; }
@@ -444,6 +584,11 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Auto-abrir modal selector si viene del panel de Gali en catálogo (Cambio B)
+    if (this.route.snapshot.queryParamMap.has('autoNuevo')) {
+      setTimeout(() => this.abrirNuevoModal(), 250);
+    }
+
     // Seed objetivo from legacy keys if v2 key not yet present
     if (!localStorage.getItem('gali-6-objetivo-v2')) {
       const legacyTexto = localStorage.getItem('gali-6-objetivo-texto');

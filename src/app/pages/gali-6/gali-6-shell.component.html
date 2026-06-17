@@ -26,20 +26,24 @@
     </a>
 
     <div class="topbar__right">
-      <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()">
+      <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()"
+              [attr.aria-label]="modo() === 'basico' ? 'Cambiar a modo experto' : 'Cambiar a modo básico'">
         {{ modo() === 'basico' ? 'Modo básico' : 'Modo experto' }}
       </button>
-      <button class="topbar__wallet" (click)="walletHidden.set(!walletHidden())">
+      <button class="topbar__wallet"
+              (click)="walletHidden.set(!walletHidden())"
+              [attr.aria-label]="walletHidden() ? 'Mostrar balance de billetera' : 'Ocultar balance de billetera'"
+              [attr.aria-expanded]="!walletHidden()">
         <span class="topbar__wallet-ico" aria-hidden="true">▮</span>
         <span class="topbar__wallet-val">{{ walletHidden() ? '••••••' : walletLabel }}</span>
       </button>
-      <span class="topbar__avatar" aria-hidden="true">CG</span>
+      <span class="topbar__avatar" role="img" aria-label="Avatar de Catalina Giraldo">CG</span>
     </div>
   </header>
 
   <!-- Cuerpo: rail + section-nav + contenido -->
   <div class="g6shell__body" [class.g6shell__body--no-section]="!hasSectionPanel()">
-    <app-gali6-icon-rail />
+    <app-gali6-icon-rail [esBasico]="modo() === 'basico'" />
 
     @if (hasSectionPanel() && modo() === 'experto') {
       <dropi-section-nav
@@ -53,12 +57,76 @@
 
     <main class="g6shell__content">
       <router-outlet />
+
+      <!-- Strip contextual de Gali en Negociaciones -->
+      @if (isOnNego() && !gali.galiNegoPanelOpen()) {
+        <div class="g6-prov-strip g6-prov-strip--nego" role="complementary" aria-label="Gali detectó oportunidad de negociación">
+          <span class="g6-prov-strip__icon" aria-hidden="true">⚡</span>
+          <div class="g6-prov-strip__text">
+            <strong>Gali detectó margen de negociación con 2 proveedores</strong>
+            <span>Pedido consolidado posible · ahorro estimado $180.000 en costos flete</span>
+          </div>
+          <button class="g6-prov-strip__cta" type="button" (click)="gali.openNegoPanel()">
+            Ver oportunidad →
+          </button>
+          <button class="g6-prov-strip__dismiss" type="button"
+            aria-label="Cerrar sugerencia" (click)="gali.closeNegoPanel()">×</button>
+        </div>
+      }
+
+      <!-- Strip contextual de ADA Spy en Caza Productos -->
+      @if (isOnCaza() && !gali.galiCazaPanelOpen()) {
+        <div class="g6-prov-strip g6-prov-strip--ada" role="complementary" aria-label="ADA Spy encontró una oportunidad">
+          <span class="g6-prov-strip__icon" aria-hidden="true">◎</span>
+          <div class="g6-prov-strip__text">
+            <strong>ADA Spy encontró una oportunidad · Score 87/100</strong>
+            <span>Difusor de aromaterapia · ventana de 10 días · margen est. 28%</span>
+          </div>
+          <button class="g6-prov-strip__cta" type="button" (click)="gali.openCazaPanel()">
+            Ver análisis de ADA →
+          </button>
+          <button class="g6-prov-strip__dismiss" type="button"
+            aria-label="Cerrar sugerencia" (click)="gali.closeCazaPanel()">×</button>
+        </div>
+      }
+
+      <!-- Strip contextual de Gali en Señales -->
+      @if (isOnSenales() && !gali.galiSenalesPanelOpen() && alertasCriticasCount > 0) {
+        <div class="g6-prov-strip g6-prov-strip--senales" role="complementary" aria-label="Decisiones pendientes en Señales">
+          <span class="g6-prov-strip__icon" aria-hidden="true">⚠</span>
+          <div class="g6-prov-strip__text">
+            <strong>{{ alertasCriticasCount }} señal{{ alertasCriticasCount > 1 ? 'es' : '' }} que necesitan tu decisión</strong>
+            <span>Gali las interceptó y filtró las más urgentes para ti</span>
+          </div>
+          <button class="g6-prov-strip__cta" type="button" (click)="gali.openSenalesPanel()">
+            Ver decisión de Gali →
+          </button>
+          <button class="g6-prov-strip__dismiss" type="button"
+            aria-label="Cerrar sugerencia" (click)="gali.closeSenalesPanel()">×</button>
+        </div>
+      }
+
+      <!-- Strip contextual de Gali en Proveedores -->
+      @if (isOnProveedores() && !gali.galiProveedoresPanelOpen()) {
+        <div class="g6-prov-strip" role="complementary" aria-label="Recomendación de Gali en Proveedores">
+          <span class="g6-prov-strip__icon" aria-hidden="true">✦</span>
+          <div class="g6-prov-strip__text">
+            <strong>Gali analizó tu catálogo</strong>
+            <span>Encontró 3 proveedores con margen de negociación. ¿Quieres ver la estrategia?</span>
+          </div>
+          <button class="g6-prov-strip__cta" type="button" (click)="gali.openProveedoresPanel()">
+            Ver estrategia de Gali →
+          </button>
+          <button class="g6-prov-strip__dismiss" type="button"
+            aria-label="Cerrar sugerencia" (click)="gali.closeProveedoresPanel()">×</button>
+        </div>
+      }
     </main>
   </div>
 
   <!-- Backdrop nav móvil -->
   @if (navOpen()) {
-    <div class="g6shell__backdrop" (click)="navOpen.set(false)"></div>
+    <div class="g6shell__backdrop" (click)="navOpen.set(false)" aria-hidden="true"></div>
   }
 
   <!-- Chat lateral de Gali -->
@@ -74,20 +142,23 @@
 
 <!-- ── ZeroState Onboarding Modal ── -->
 @if (zeroOpen() && zeroStep() < 3) {
-  <div class="zero-bg" (click)="zeroClose()"></div>
-  <div class="zero" role="dialog" aria-modal="true" aria-label="Configura tu Gali">
+  <div class="zero-bg" (click)="zeroClose()" aria-hidden="true"></div>
+  <div class="zero" role="dialog" aria-modal="true"
+       [attr.aria-labelledby]="'zero-title-' + zeroStep()"
+       cdkTrapFocus cdkTrapFocusAutoCapture>
 
     <!-- Paso 0 — Meta en pedidos/sem (omitido si ya tiene pedidos) -->
     @if (zeroStep() === 0) {
       <div class="zero__body">
-        <span class="zero__step">1 de 3</span>
+        <span class="zero__step" aria-label="Paso 1 de 3">1 de 3</span>
         <span class="zero__gali" aria-hidden="true">✦</span>
-        <h2 class="zero__title">¿Cuál es tu meta para los próximos 30 días?</h2>
-        <p class="zero__sub">Gali usará este número para priorizar señales y recomendarte proyectos.</p>
+        <h2 id="zero-title-0" class="zero__title">¿Cuál es tu próxima meta de negocio?</h2>
+        <p class="zero__sub">Tú decides adónde va tu negocio. Gali facilita el resto para llegar ahí.</p>
         <div class="zero__slider">
           <input type="range" class="zero__range" min="20" max="500" step="10"
-            [value]="zeroPedidos()" (input)="zeroPedidos.set(+$any($event.target).value)" />
-          <div class="zero__slider-val">
+            [value]="zeroPedidos()" (input)="zeroPedidos.set(+$any($event.target).value)"
+            [attr.aria-label]="'Meta semanal: ' + zeroPedidos() + ' pedidos'" />
+          <div class="zero__slider-val" aria-live="polite" aria-atomic="true">
             <span class="zero__big">{{ zeroPedidos() }}</span>
             <span class="zero__unit">pedidos / semana</span>
           </div>
@@ -99,13 +170,14 @@
     <!-- Paso 1 — Mayor fricción -->
     @if (zeroStep() === 1) {
       <div class="zero__body">
-        <span class="zero__step">2 de 3</span>
+        <span class="zero__step" aria-label="Paso 2 de 3">2 de 3</span>
         <span class="zero__gali" aria-hidden="true">✦</span>
-        <h2 class="zero__title">¿Cuál es tu mayor fricción hoy?</h2>
-        <p class="zero__sub">Gali ajusta qué señales te muestra primero según tu respuesta.</p>
-        <div class="zero__options">
+        <h2 id="zero-title-1" class="zero__title">¿Dónde se traba tu operación hoy?</h2>
+        <p class="zero__sub">Gali prioriza lo que necesitás resolver primero.</p>
+        <div class="zero__options" role="group" aria-labelledby="zero-title-1">
           @for (f of fricciones; track f.id) {
             <button class="zero__opt" [class.zero__opt--sel]="zeroFriccion() === f.id"
+              [attr.aria-pressed]="zeroFriccion() === f.id"
               (click)="zeroFriccion.set(f.id)">{{ f.label }}</button>
           }
         </div>
@@ -116,17 +188,18 @@
     <!-- Paso 2 — Canal principal -->
     @if (zeroStep() === 2) {
       <div class="zero__body">
-        <span class="zero__step">3 de 3</span>
+        <span class="zero__step" aria-label="Paso 3 de 3">3 de 3</span>
         <span class="zero__gali" aria-hidden="true">✦</span>
-        <h2 class="zero__title">¿Cuál es tu canal principal de pauta?</h2>
-        <p class="zero__sub">Esto ayuda a Gali a leer tus métricas de anuncios en contexto.</p>
-        <div class="zero__options">
+        <h2 id="zero-title-2" class="zero__title">¿Cuál es tu canal principal de pauta?</h2>
+        <p class="zero__sub">Gali conecta tus métricas de pauta para que cada peso cuente más.</p>
+        <div class="zero__options" role="group" aria-labelledby="zero-title-2">
           @for (c of canales; track c.id) {
             <button class="zero__opt" [class.zero__opt--sel]="zeroCanal() === c.id"
+              [attr.aria-pressed]="zeroCanal() === c.id"
               (click)="zeroCanal.set(c.id)">{{ c.label }}</button>
           }
         </div>
-        <button class="zero__cta" [disabled]="!zeroCanal()" (click)="zeroNext()">Ver mi Gali →</button>
+        <button class="zero__cta" [disabled]="!zeroCanal()" (click)="zeroNext()">Empezar →</button>
       </div>
     }
   </div>
@@ -134,24 +207,277 @@
 
 <!-- Paso 3 — Confirmación de Gali -->
 @if (zeroOpen() && zeroStep() === 3) {
-  <div class="zero-bg"></div>
-  <div class="zero zero--confirm" role="dialog">
+  <div class="zero-bg" aria-hidden="true"></div>
+  <div class="zero zero--confirm" role="dialog" aria-modal="true"
+       aria-labelledby="zero-confirm-title" cdkTrapFocus cdkTrapFocusAutoCapture>
     <div class="zero__body">
       <span class="zero__gali zero__gali--lg" aria-hidden="true">✦</span>
-      <h2 class="zero__title">Gali ya sabe lo que necesitas.</h2>
+      <h2 id="zero-confirm-title" class="zero__title">Tú pusiste la meta. Gali se encarga del resto.</h2>
       <p class="zero__respuesta">{{ zeroRespuesta() }}</p>
-      <p class="zero__hint">Empezás en <strong>modo básico</strong> — las señales y recomendaciones más importantes, sin ruido. Podés activar el modo experto cuando quieras.</p>
-      <button class="zero__cta zero__cta--confirm" (click)="zeroClose()">Entrar a Gali 6 →</button>
+      <p class="zero__hint">Empezás en <strong>modo básico</strong> — lo que necesitás, sin ruido. Activá modo experto cuando quieras ver la maquinaria completa.</p>
+      <button class="zero__cta zero__cta--confirm" (click)="zeroClose()">Empezar con Gali →</button>
     </div>
   </div>
 }
 
+<!-- ── Panel contextual de Gali desde catálogo (Cambio B) ── -->
+@if (gali.galiCatalogPanelOpen()) {
+  <div class="g6-cat-panel-bg" (click)="gali.closeCatalogPanel()" aria-hidden="true"></div>
+  <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
+         aria-labelledby="cat-panel-title">
+    <div class="g6-cat-panel__head">
+      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda</span>
+      <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
+              (click)="gali.closeCatalogPanel()">×</button>
+    </div>
+    <div class="g6-cat-panel__body">
+      <p class="g6-cat-panel__context">Estás en Catálogo de productos · tu objetivo: {{ objetivoActual }}/{{ objetivoMeta() }} pedidos/sem</p>
+      <h3 id="cat-panel-title" class="g6-cat-panel__title">Gali encontró una oportunidad para cerrar tu objetivo</h3>
+
+      <div class="g6-cat-card">
+        <div class="g6-cat-card__badge">✦ Tendencia ahora</div>
+        <strong class="g6-cat-card__product">Difusor de aromaterapia</strong>
+        <p class="g6-cat-card__why">Búsquedas +67% en Bogotá esta semana. 3 dropshippers del top-10 ya lo lanzaron. Score ADA Spy: 87/100, margen estimado 28%.</p>
+        <div class="g6-cat-card__stats">
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">~18</span>
+            <span class="g6-cat-card__lbl">pedidos/sem estimados</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">$35k/día</span>
+            <span class="g6-cat-card__lbl">presupuesto sugerido</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">10 días</span>
+            <span class="g6-cat-card__lbl">ventana de mercado</span>
+          </div>
+        </div>
+        <p class="g6-cat-card__objetivo">
+          Con este proyecto tu objetivo pasaría del {{ objetivoPct() }}% al {{ catalogPanelPctDespues() }}%
+        </p>
+      </div>
+
+      <button class="g6-cat-panel__cta" type="button" (click)="irAProyectos()">
+        Correr este proyecto →
+      </button>
+      <button class="g6-cat-panel__sec" type="button" (click)="irAProyectosLista()">
+        Ver todos mis proyectos
+      </button>
+    </div>
+  </aside>
+}
+
+<!-- ── Panel contextual de ADA Spy desde Caza Productos ── -->
+@if (gali.galiCazaPanelOpen()) {
+  <div class="g6-cat-panel-bg" (click)="gali.closeCazaPanel()" aria-hidden="true"></div>
+  <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
+         aria-labelledby="caza-panel-title">
+    <div class="g6-cat-panel__head">
+      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">◎</span> ADA Spy encontró</span>
+      <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
+              (click)="gali.closeCazaPanel()">×</button>
+    </div>
+    <div class="g6-cat-panel__body">
+      <p class="g6-cat-panel__context">
+        Caza Productos · ADA Spy analizó 1.240 productos esta semana · score &gt; 80
+      </p>
+      <h3 id="caza-panel-title" class="g6-cat-panel__title">
+        Ventana de 10 días para lanzar Difusor de Aromaterapia
+      </h3>
+
+      <div class="g6-cat-card">
+        <div class="g6-cat-card__badge g6-cat-card__badge--ada">◎ Score 87/100 · Riesgo bajo</div>
+        <strong class="g6-cat-card__product">Difusor de aromaterapia · Hogar y bienestar</strong>
+        <p class="g6-cat-card__why">
+          Búsquedas +67% en Bogotá esta semana. 3 dropshippers del top-10 ya lo lanzaron.
+          ADA Spy validó proveedor con stock 2.400 uds y margen estimado 28%.
+        </p>
+        <div class="g6-cat-card__stats">
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">+67%</span>
+            <span class="g6-cat-card__lbl">búsquedas esta semana</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">28%</span>
+            <span class="g6-cat-card__lbl">margen estimado</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">10 días</span>
+            <span class="g6-cat-card__lbl">ventana antes de saturación</span>
+          </div>
+        </div>
+        <p class="g6-cat-card__objetivo">
+          Con este proyecto tu objetivo pasaría del {{ objetivoPct() }}% al {{ catalogPanelPctDespues() }}%
+        </p>
+      </div>
+
+      <button class="g6-cat-panel__cta" type="button" (click)="lanzarProyectoDesdeADA()">
+        Lanzar como proyecto automático →
+      </button>
+      <button class="g6-cat-panel__sec" type="button" (click)="verCatalogoDesdeCaza()">
+        Ver producto en Catálogo primero
+      </button>
+    </div>
+  </aside>
+}
+
+<!-- ── Panel contextual de Gali desde Señales ── -->
+@if (gali.galiSenalesPanelOpen() && alertaTopSenales) {
+  <div class="g6-cat-panel-bg" (click)="gali.closeSenalesPanel()" aria-hidden="true"></div>
+  <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
+         aria-labelledby="sen-panel-title">
+    <div class="g6-cat-panel__head">
+      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">⚠</span> Decisión urgente</span>
+      <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
+              (click)="gali.closeSenalesPanel()">×</button>
+    </div>
+    <div class="g6-cat-panel__body">
+      <p class="g6-cat-panel__context">
+        Señales activas · {{ alertasCriticasCount }} con prioridad alta entre {{ alertasCriticasCount + 4 }} detectadas
+      </p>
+      <h3 id="sen-panel-title" class="g6-cat-panel__title">
+        {{ alertaTopSenales.agente | titlecase }} necesita tu decisión ahora
+      </h3>
+
+      <div class="g6-cat-card g6-cat-card--senales">
+        <div class="g6-cat-card__badge g6-cat-card__badge--urgente">
+          <span class="g6-cat-card__badge-dot"
+                [style.background]="alertaTopSenales.agenteColor ?? '#f49a3d'"></span>
+          {{ alertaTopSenales.tipo === 'critical' ? 'Urgente' : 'Pendiente' }}
+        </div>
+        <strong class="g6-cat-card__product">{{ alertaTopSenales.titulo }}</strong>
+        @if (alertaTopSenales.opciones?.length) {
+          <div class="g6-cat-card__stats g6-cat-card__stats--options">
+            @for (op of alertaTopSenales.opciones!; track op.id) {
+              <div class="g6-cat-card__stat" [class.g6-cat-card__stat--primary]="op.isPrimary">
+                <span class="g6-cat-card__val">{{ op.label }}</span>
+                @if (op.description) {
+                  <span class="g6-cat-card__lbl">{{ op.description }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <button class="g6-cat-panel__cta" type="button" (click)="irAHomeDesdeSenales()">
+        Decidir en el inicio →
+      </button>
+      <button class="g6-cat-panel__sec" type="button" (click)="gali.closeSenalesPanel()">
+        Ver todas las señales aquí
+      </button>
+    </div>
+  </aside>
+}
+
+<!-- ── Panel contextual de Gali desde Proveedores ── -->
+@if (gali.galiProveedoresPanelOpen()) {
+  <div class="g6-cat-panel-bg" (click)="gali.closeProveedoresPanel()" aria-hidden="true"></div>
+  <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
+         aria-labelledby="prov-panel-title">
+    <div class="g6-cat-panel__head">
+      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda</span>
+      <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
+              (click)="gali.closeProveedoresPanel()">×</button>
+    </div>
+    <div class="g6-cat-panel__body">
+      <p class="g6-cat-panel__context">Estás en Proveedores · tu catálogo tiene 24 productos activos</p>
+      <h3 id="prov-panel-title" class="g6-cat-panel__title">Gali identificó 3 proveedores con margen de negociación</h3>
+
+      <div class="g6-cat-card">
+        <div class="g6-cat-card__badge">✦ Mayor oportunidad</div>
+        <strong class="g6-cat-card__product">Proveedor Aromaterapia · SkinCare Natural</strong>
+        <p class="g6-cat-card__why">8 de tus 24 productos vienen de este proveedor. Volumen actual: $4.2M/mes. Con negociación de exclusividad podrías bajar el costo unitario un 12% y mejorar margen de 28% a 38%.</p>
+        <div class="g6-cat-card__stats">
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">+12%</span>
+            <span class="g6-cat-card__lbl">mejora de margen estimada</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">3</span>
+            <span class="g6-cat-card__lbl">proveedores a negociar</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">+$504k</span>
+            <span class="g6-cat-card__lbl">ganancia mensual adicional</span>
+          </div>
+        </div>
+        <p class="g6-cat-card__objetivo">
+          Con esta negociación tu objetivo pasaría del {{ objetivoPct() }}% al {{ proveedoresPanelPctDespues() }}% de meta
+        </p>
+      </div>
+
+      <button class="g6-cat-panel__cta" type="button" (click)="irANegociaciones()">
+        Crear proyecto de negociación →
+      </button>
+      <button class="g6-cat-panel__sec" type="button" (click)="irACazaDesdeProveedores()">
+        Buscar nuevos proveedores en Caza-productos
+      </button>
+    </div>
+  </aside>
+}
+
+<!-- ── Panel contextual de Gali desde Negociaciones ── -->
+@if (gali.galiNegoPanelOpen()) {
+  <div class="g6-cat-panel-bg" (click)="gali.closeNegoPanel()" aria-hidden="true"></div>
+  <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
+         aria-labelledby="nego-panel-title">
+    <div class="g6-cat-panel__head">
+      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">⚡</span> Gali detectó</span>
+      <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
+              (click)="gali.closeNegoPanel()">×</button>
+    </div>
+    <div class="g6-cat-panel__body">
+      <p class="g6-cat-panel__context">
+        Negociaciones · Gali comparó tus proveedores activos · optimización de costos disponible
+      </p>
+      <h3 id="nego-panel-title" class="g6-cat-panel__title">
+        Pedido consolidado podría ahorrarte $180.000 esta semana
+      </h3>
+
+      <div class="g6-cat-card g6-cat-card--nego">
+        <div class="g6-cat-card__badge g6-cat-card__badge--nego">⚡ Oportunidad detectada</div>
+        <strong class="g6-cat-card__product">Consolidar envíos con Proveedor A y B</strong>
+        <p class="g6-cat-card__why">
+          Tienes 2 pedidos separados esta semana a proveedores en la misma zona. Si los consolidas en uno,
+          el flete baja de $90.000 a $45.000 por pedido. Gali ya tiene el borrador listo para negociar.
+        </p>
+        <div class="g6-cat-card__stats">
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">$180.000</span>
+            <span class="g6-cat-card__lbl">ahorro estimado flete</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">2 proveedores</span>
+            <span class="g6-cat-card__lbl">zona norte Bogotá</span>
+          </div>
+          <div class="g6-cat-card__stat">
+            <span class="g6-cat-card__val">+3,2%</span>
+            <span class="g6-cat-card__lbl">mejora de margen neto</span>
+          </div>
+        </div>
+        <p class="g6-cat-card__objetivo">
+          Este ahorro equivale a {{ proveedoresPanelPctDespues() - objetivoPct() }}% más de margen sobre tu objetivo actual
+        </p>
+      </div>
+
+      <button class="g6-cat-panel__cta" type="button" (click)="negociarConProveedor()">
+        Crear proyecto con esta negociación →
+      </button>
+      <button class="g6-cat-panel__sec" type="button" (click)="verProveedoresDesdeNego()">
+        Ver todos los proveedores primero
+      </button>
+    </div>
+  </aside>
+}
+
 <!-- ── Micro-onboarding modo experto (1 slide) ── -->
 @if (expertoOnboarding()) {
-  <div class="experto-bg" (click)="cerrarExpertoOnboarding()"></div>
-  <div class="experto-slide" role="dialog" aria-modal="true">
+  <div class="experto-bg" (click)="cerrarExpertoOnboarding()" aria-hidden="true"></div>
+  <div class="experto-slide" role="dialog" aria-modal="true"
+       aria-labelledby="experto-slide-title" cdkTrapFocus cdkTrapFocusAutoCapture>
     <span class="experto-slide__icon" aria-hidden="true">⚙</span>
-    <h3 class="experto-slide__title">Modo experto activado</h3>
+    <h3 id="experto-slide-title" class="experto-slide__title">Modo experto activado</h3>
     <p class="experto-slide__body">
       Ahora ves <strong>Agentes, Skills, Reglas y Marketplace</strong> — la maquinaria que opera tu negocio.<br>
       Gali la usa de fondo. Entrás a ajustar cuando quieras.

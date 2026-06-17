@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { NavigationEnd, NavigationStart, Router, RouterOutlet, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { A11yModule } from '@angular/cdk/a11y';
 import { Gali6IconRailComponent } from './gali-6-icon-rail.component';
 import { Gali6FabComponent } from './components/gali6-fab.component';
 import { DropiSectionNavComponent } from '../gali-5/gali-v5/components/dropi-section-nav.component';
@@ -11,6 +12,7 @@ import { GaliStateService } from '../gali-5/gali-v5/services/gali-state.service'
 import { SectionPanel } from '../gali-5/gali-v5/dropi-sections.config';
 import { resolveG6SectionPanel, GALI_6_MISSION_PANEL } from './gali-6-sections.config';
 import KPIS from '../../../../mocks/gali-v5/kpis-global.json';
+import { MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mock';
 
 type Friccion = 'stock' | 'ads' | 'pedidos' | 'otro';
 type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
@@ -25,8 +27,10 @@ type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
   standalone: true,
   imports: [
     CommonModule,
+    TitleCasePipe,
     RouterOutlet,
     RouterModule,
+    A11yModule,
     Gali6IconRailComponent,
     Gali6FabComponent,
     DropiSectionNavComponent,
@@ -41,6 +45,19 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
 
   readonly navOpen = signal(false);
   readonly walletHidden = signal(false);
+  readonly currentUrl = signal(this.router.url);
+  readonly isOnProveedores = computed(() =>
+    this.currentUrl().includes('/gali-6/productos/proveedores')
+  );
+  readonly isOnSenales = computed(() =>
+    this.currentUrl().includes('/gali-6/senales')
+  );
+  readonly isOnCaza = computed(() =>
+    this.currentUrl().includes('/gali-6/productos/caza-productos')
+  );
+  readonly isOnNego = computed(() =>
+    this.currentUrl().includes('/gali-6/productos/negociaciones')
+  );
 
   readonly sectionPanel = signal<SectionPanel>(GALI_6_MISSION_PANEL);
   readonly hasSectionPanel = signal(true);
@@ -64,6 +81,14 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
     Math.min(100, Math.round((this.objetivoActual / this.objetivoMeta()) * 100)),
   );
   readonly walletLabel = '$2.717.360';
+  readonly alertaTopSenales = MOCK_ALERTAS.find(a => a.tipo === 'critical' || a.tipo === 'warning');
+  readonly alertasCriticasCount = MOCK_ALERTAS.filter(a => a.tipo === 'critical' || a.tipo === 'warning').length;
+  readonly catalogPanelPctDespues = computed(() =>
+    Math.min(100, this.objetivoPct() + 18)
+  );
+  readonly proveedoresPanelPctDespues = computed(() =>
+    Math.min(100, this.objetivoPct() + 14)
+  );
 
   // ── ZeroState (onboarding de 3 preguntas) ──
   private readonly hasOrders = ((KPIS as any).pedidos_sem_total?.valor ?? 0) > 0;
@@ -104,6 +129,7 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   }
 
   private syncNav(url: string): void {
+    this.currentUrl.set(url);
     const panel = resolveG6SectionPanel(url);
     if (panel) {
       this.sectionPanel.set(panel);
@@ -112,6 +138,19 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
       this.hasSectionPanel.set(false);
     }
     this.navOpen.set(false);
+    // Cerrar paneles contextuales al salir de sus rutas
+    if (!url.includes('/gali-6/productos/proveedores')) {
+      this.gali.closeProveedoresPanel();
+    }
+    if (!url.includes('/gali-6/senales')) {
+      this.gali.closeSenalesPanel();
+    }
+    if (!url.includes('/gali-6/productos/caza-productos')) {
+      this.gali.closeCazaPanel();
+    }
+    if (!url.includes('/gali-6/productos/negociaciones')) {
+      this.gali.closeNegoPanel();
+    }
   }
 
   toggleSection(): void {
@@ -170,10 +209,60 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      if (this.expertoOnboarding()) { this.cerrarExpertoOnboarding(); return; }
+      if (this.zeroOpen()) { this.zeroClose(); return; }
+      if (this.navOpen()) { this.navOpen.set(false); return; }
+    }
     if (e.ctrlKey && e.key === 'l') {
       e.preventDefault();
       this.reopenOnboarding();
     }
+  }
+
+  irAProyectos(): void {
+    this.gali.closeCatalogPanel();
+    this.router.navigate(['/gali-6/proyectos'], { queryParams: { autoNuevo: 'true' } });
+  }
+
+  irAProyectosLista(): void {
+    this.gali.closeCatalogPanel();
+    this.router.navigate(['/gali-6/proyectos']);
+  }
+
+  irANegociaciones(): void {
+    this.gali.closeProveedoresPanel();
+    this.router.navigate(['/gali-6/proyectos'], { queryParams: { autoNuevo: 'true' } });
+  }
+
+  irACazaDesdeProveedores(): void {
+    this.gali.closeProveedoresPanel();
+    this.router.navigate(['/gali-6/productos/caza-productos']);
+  }
+
+  irAHomeDesdeSenales(): void {
+    this.gali.closeSenalesPanel();
+    this.router.navigate(['/gali-6']);
+  }
+
+  lanzarProyectoDesdeADA(): void {
+    this.gali.closeCazaPanel();
+    this.router.navigate(['/gali-6/proyectos'], { queryParams: { autoNuevo: 'true' } });
+  }
+
+  verCatalogoDesdeCaza(): void {
+    this.gali.closeCazaPanel();
+    this.router.navigate(['/gali-6/productos/catalogo']);
+  }
+
+  negociarConProveedor(): void {
+    this.gali.closeNegoPanel();
+    this.router.navigate(['/gali-6/proyectos'], { queryParams: { autoNuevo: 'true' } });
+  }
+
+  verProveedoresDesdeNego(): void {
+    this.gali.closeNegoPanel();
+    this.router.navigate(['/gali-6/productos/proveedores']);
   }
 
   reopenOnboarding(): void {
@@ -226,8 +315,8 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
     const pedidos = this.zeroPedidos();
     const canal = this.zeroCanal();
     if (canal === 'meta' || canal === 'ambos') {
-      return `Para tu meta de ${pedidos} pedidos/sem, Gali recomienda empezar por estabilizar tu ROAS en Meta y luego lanzar 2 productos nuevos. Tus primeras señales llegarán hoy.`;
+      return `Para llegar a ${pedidos} pedidos/sem, Gali empieza por estabilizar tu ROAS en Meta y ya tiene 2 proyectos listos para recomendarte. Tus primeras señales llegan hoy.`;
     }
-    return `Para tu meta de ${pedidos} pedidos/sem, Gali te va a sugerir los 2 proyectos con más potencial. Tus primeras señales llegarán hoy.`;
+    return `Para llegar a ${pedidos} pedidos/sem, Gali ya tiene los primeros proyectos para proponerte. Tus primeras señales llegan hoy.`;
   }
 }

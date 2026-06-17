@@ -41,19 +41,29 @@ export const G6_SECTION_PANELS: Record<string, SectionPanel> = Object.fromEntrie
 );
 
 /**
- * Panel del home de La Casita — espinazo:
- * Hoy · Mi Negocio · Proyectos · Conexiones · Señales · [Centro de Gali accordion]
+ * Panel de Gali 6 — Cambio D: simplificado a 2 módulos principales.
+ * Básico: Mi Negocio (con sub-items) + Proyectos.
+ * Experto: + Centro de Gali accordion (filtrado por modo en shell).
  */
 export const GALI_6_MISSION_PANEL: SectionPanel = {
   railKey: 'home',
   title: 'Gali 6',
   items: [
-    { id: 'hoy',        label: 'Hoy',        route: '/gali-6',             icon: 'assets/icons/sidebar/home.svg' },
-    { id: 'proyectos',  label: 'Proyectos',   route: '/gali-6/proyectos',   icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
-    { id: 'mi-negocio', label: 'Mi Negocio',  route: '/gali-6/mi-negocio',  icon: 'assets/icons/sidebar/gali-v5/user-circle.svg' },
-    { id: 'conexiones', label: 'Conexiones',  route: '/gali-6/conexiones',  icon: 'assets/icons/sidebar/gali-v5/apps-add.svg' },
-    { id: 'senales',    label: 'Señales',      route: '/gali-6/senales',     icon: 'assets/icons/sidebar/signal.svg' },
-    { id: 'impacto',    label: 'Impacto Gali', route: '/gali-6/impacto',    icon: 'assets/icons/sidebar/gali-v5/trophy.svg' },
+    {
+      id: 'mi-negocio',
+      label: 'Mi Negocio',
+      type: 'accordion' as const,
+      icon: 'assets/icons/sidebar/gali-v5/user-circle.svg',
+      defaultExpanded: true,
+      children: [
+        { label: 'Hoy',         route: '/gali-6' },
+        { label: 'Señales',     route: '/gali-6/senales' },
+        { label: 'Conexiones',  route: '/gali-6/conexiones' },
+        { label: 'Impacto',     route: '/gali-6/impacto' },
+        { label: 'Mi Contexto', route: '/gali-6/mi-negocio' },
+      ],
+    },
+    { id: 'proyectos', label: 'Proyectos', route: '/gali-6/proyectos', icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
     {
       id: 'centro-gali',
       label: 'Centro de Gali',
@@ -61,11 +71,11 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
       icon: 'assets/icons/sidebar/gali-v5/apps-add.svg',
       defaultExpanded: false,
       children: [
-        { label: 'Agentes',      route: '/gali-6/agentes' },
-        { label: 'Skills',       route: '/gali-6/skills' },
-        { label: 'Reglas',       route: '/gali-6/reglas' },
-        { label: 'Marketplace',  route: '/gali-6/marketplace' },
-        { label: 'Academy',      route: '/gali-6/academy' },
+        { label: 'Agentes',     route: '/gali-6/agentes' },
+        { label: 'Skills',      route: '/gali-6/skills' },
+        { label: 'Reglas',      route: '/gali-6/reglas' },
+        { label: 'Marketplace', route: '/gali-6/marketplace' },
+        { label: 'Academy',     route: '/gali-6/academy' },
       ],
     },
   ],
@@ -73,7 +83,7 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
     agentId: 'gali',
     label: 'Gali 6',
     color: '#f49a3d',
-    statusLabel: 'La Casita · orquestador activo',
+    statusLabel: 'La Casita · facilitador activo',
     contextKey: 'home',
   },
 };

@@ -1474,3 +1474,68 @@
   &--high { background: #f97316; }
   &--mid  { background: #f59e0b; }
 }
+
+// ── Gali CTA contextual (Cambio B) ──────────────────────────────────────────
+
+.catalog-gali-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-4;
+  background: linear-gradient(135deg, rgba($primary-500, 0.07) 0%, rgba($primary-500, 0.03) 100%);
+  border: 1px solid rgba($primary-500, 0.22);
+  border-left: 3px solid $primary-500;
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: $size-3;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__icon {
+    color: $primary-500;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    strong {
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-900;
+    }
+
+    span {
+      font-size: $font-xs;
+      color: $gray-500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__btn {
+    flex-shrink: 0;
+    background: $primary-500;
+    color: #fff;
+    border: none;
+    border-radius: $radius-md;
+    padding: $size-2 $size-4;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 150ms ease;
+
+    &:hover { background: $primary-600; }
+  }
+}

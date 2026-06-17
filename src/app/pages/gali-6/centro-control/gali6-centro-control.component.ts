@@ -37,21 +37,23 @@ interface Agente {
       </section>
 
       <!-- Nav de tabs -->
-      <nav class="cc-tabs" role="tablist">
+      <nav class="cc-tabs" role="tablist" aria-label="Secciones del Centro de Gali">
         @for (t of tabs; track t.id) {
           <button class="cc-tab" role="tab"
+                  [id]="'cc-tab-' + t.id"
                   [class.cc-tab--active]="activeTab() === t.id"
                   [attr.aria-selected]="activeTab() === t.id"
+                  [attr.aria-controls]="'cc-panel-' + t.id"
                   (click)="activeTab.set(t.id)">
             {{ t.label }}
-            @if (t.count) { <span class="cc-tab__badge">{{ t.count }}</span> }
+            @if (t.count) { <span class="cc-tab__badge" [attr.aria-label]="t.count + ' items'">{{ t.count }}</span> }
           </button>
         }
       </nav>
 
       <!-- ── AGENTES ── -->
       @if (activeTab() === 'agentes') {
-        <div class="agents" role="tabpanel">
+        <div class="agents" role="tabpanel" id="cc-panel-agentes" aria-labelledby="cc-tab-agentes">
           <p class="cc-intro">
             Cada agente se especializa en un dominio. Gali los activa según las señales de tu negocio.
             <span class="cc-intro__tasa-hint">
@@ -96,7 +98,7 @@ interface Agente {
 
       <!-- ── SKILLS ── -->
       @if (activeTab() === 'skills') {
-        <div class="skills" role="tabpanel">
+        <div class="skills" role="tabpanel" id="cc-panel-skills" aria-labelledby="cc-tab-skills">
           <p class="cc-intro">Las skills son automatizaciones que Gali activa según condiciones que defines. Cada skill tiene un trigger, una condición y una acción.</p>
           @for (sk of skills; track sk['id']) {
             <article class="skill">
@@ -121,7 +123,7 @@ interface Agente {
 
       <!-- ── REGLAS ── -->
       @if (activeTab() === 'reglas') {
-        <div class="rules" role="tabpanel">
+        <div class="rules" role="tabpanel" id="cc-panel-reglas" aria-labelledby="cc-tab-reglas">
           <p class="cc-intro">Las reglas son instrucciones en lenguaje natural que limitan cómo actúa Gali. Escríbelas como le hablarías a un asistente.</p>
           @for (r of reglas; track r.id) {
             <article class="rule">
@@ -138,7 +140,7 @@ interface Agente {
 
       <!-- ── MARKETPLACE ── -->
       @if (activeTab() === 'marketplace') {
-        <div class="mkt" role="tabpanel">
+        <div class="mkt" role="tabpanel" id="cc-panel-marketplace" aria-labelledby="cc-tab-marketplace">
           <p class="cc-intro">Extensions de la comunidad de dropshippers y Dropi Labs. Instala lo que ya le funciona a otros.</p>
           <div class="mkt__grid">
             @for (m of marketplace; track m.nombre) {

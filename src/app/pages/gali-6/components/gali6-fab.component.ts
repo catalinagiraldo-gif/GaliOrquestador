@@ -25,6 +25,43 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
   template: `
     <div class="g6-fab" aria-label="Acciones rápidas de Gali">
 
+      <!-- Backdrop para cerrar mini-card al click fuera -->
+      @if (decisionPreviewOpen()) {
+        <div class="g6-fab__decision-bg" (click)="dismissDecisionPreview()" aria-hidden="true"></div>
+      }
+
+      <!-- Mini-card de decisión pendiente (aparece sobre el FAB) -->
+      @if (decisionPreviewOpen() && gali.firstPendingDecision(); as dec) {
+        <div class="g6-fab__decision" role="dialog" aria-label="Decisión pendiente de Gali">
+          <button class="g6-fab__decision-close" type="button"
+                  (click)="dismissDecisionPreview()" aria-label="Cerrar">×</button>
+          <div class="g6-fab__decision-agente">
+            <span class="g6-fab__decision-dot" [style.background]="dec.agenteColor"></span>
+            {{ dec.agente }}
+            <span class="g6-fab__decision-urgencia" [attr.data-urgencia]="dec.urgencia">
+              {{ dec.urgencia === 'critical' ? 'Urgente' : 'Pendiente' }}
+            </span>
+          </div>
+          <p class="g6-fab__decision-titulo">{{ dec.titulo }}</p>
+          <div class="g6-fab__decision-actions">
+            <button class="g6-fab__decision-primary" type="button" (click)="goToDecisions()">
+              {{ dec.primaryOption }}
+            </button>
+            <button class="g6-fab__decision-secondary" type="button" (click)="goToDecisions()">
+              {{ dec.secondaryOption }}
+            </button>
+          </div>
+          <div class="g6-fab__decision-footer">
+            <button class="g6-fab__decision-chat" type="button" (click)="openChat()">
+              💬 Hablar con Gali
+            </button>
+            <button class="g6-fab__decision-link" type="button" (click)="goToDecisions()">
+              Ver inicio →
+            </button>
+          </div>
+        </div>
+      }
+
       <!-- Botón contextual de ruta (opcional) -->
       @if (contextBtn()) {
         <div class="g6-fab__mini-wrap">
@@ -63,20 +100,21 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
           type="button"
           class="g6-fab__gali"
           [class.g6-fab__gali--open]="gali.galiMode() > 0"
-          [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : 'Hablar con Gali'"
-          (click)="gali.togglePanel()"
+          [class.g6-fab__gali--preview]="decisionPreviewOpen()"
+          [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : (decisionPreviewOpen() ? 'Abrir chat con Gali' : (gali.criticalCount() > 0 ? 'Ver decisión pendiente' : 'Hablar con Gali'))"
+          (click)="onFabClick()"
           data-proto-skip>
-          @if (gali.galiMode() === 0 && gali.criticalCount() > 0) {
-            <span class="g6-fab__badge" [attr.aria-label]="gali.criticalCount() + ' señales críticas'">
+          @if (gali.galiMode() === 0 && gali.criticalCount() > 0 && !decisionPreviewOpen()) {
+            <span class="g6-fab__badge" [attr.aria-label]="gali.criticalCount() + ' decisiones pendientes'">
               {{ gali.criticalCount() }}
             </span>
           }
           <span class="g6-fab__icon" aria-hidden="true">
-            {{ gali.galiMode() > 0 ? '✕' : '✦' }}
+            {{ gali.galiMode() > 0 ? '✕' : (decisionPreviewOpen() ? '✕' : '✦') }}
           </span>
         </button>
         <span class="g6-fab__label">
-          {{ gali.galiMode() > 0 ? 'Cerrar Gali' : 'Panel Gali' }}
+          {{ gali.galiMode() > 0 ? 'Cerrar Gali' : (decisionPreviewOpen() ? 'Abrir chat →' : (gali.criticalCount() > 0 ? 'Decisión pendiente' : 'Panel Gali')) }}
         </span>
       </div>
     </div>
@@ -213,6 +251,171 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
     @media (max-width: 599px) {
       .g6-fab { right: $size-4; bottom: $size-4; }
     }
+
+    /* ── Mini-card de decisión ── */
+    @keyframes fabDecisionIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .g6-fab {
+      &__decision-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 398;
+      }
+
+      &__decision {
+        position: absolute;
+        bottom: calc(100% + $size-3);
+        right: 0;
+        width: 288px;
+        background: #fff;
+        border-radius: $radius-md;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
+        padding: $size-4;
+        z-index: 399;
+        animation: fabDecisionIn 0.18s ease-out;
+
+        &-close {
+          position: absolute;
+          top: $size-2;
+          right: $size-2;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: $gray-400;
+          font-size: 18px;
+          line-height: 1;
+          padding: $size-1;
+          border-radius: $radius-xs;
+          transition: color 0.12s ease;
+          &:hover { color: $gray-700; }
+        }
+
+        &-agente {
+          display: flex;
+          align-items: center;
+          gap: $size-2;
+          font-size: 11px;
+          color: $gray-500;
+          font-family: $font-primary;
+          margin-bottom: $size-2;
+          padding-right: $size-5;
+        }
+
+        &-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        &-urgencia {
+          margin-left: auto;
+          font-size: 10px;
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: $radius-xs;
+          &[data-urgencia="critical"] { background: #fef2f2; color: #dc2626; }
+          &[data-urgencia="warning"]  { background: #fffbeb; color: #d97706; }
+        }
+
+        &-titulo {
+          font-size: $font-sm;
+          font-weight: 600;
+          color: $gray-900;
+          font-family: $font-primary;
+          margin: 0 0 $size-3;
+          line-height: 1.4;
+        }
+
+        &-actions {
+          display: flex;
+          gap: $size-2;
+          margin-bottom: $size-3;
+        }
+
+        &-primary {
+          flex: 1;
+          background: $primary-500;
+          color: #fff;
+          border: none;
+          border-radius: $radius-sm;
+          padding: $size-2 $size-2;
+          font-size: 12px;
+          font-weight: 600;
+          font-family: $font-primary;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          &:hover { background: $primary-600; }
+        }
+
+        &-secondary {
+          flex: 1;
+          background: $gray-100;
+          color: $gray-700;
+          border: none;
+          border-radius: $radius-sm;
+          padding: $size-2 $size-2;
+          font-size: 12px;
+          font-family: $font-primary;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          &:hover { background: $gray-200; }
+        }
+
+        &-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: $size-2;
+          border-top: 1px solid $gray-100;
+          gap: $size-2;
+        }
+
+        &-chat {
+          background: none;
+          border: none;
+          color: $gray-500;
+          font-size: 11px;
+          font-weight: 500;
+          font-family: $font-primary;
+          cursor: pointer;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          transition: color 0.12s ease;
+          &:hover { color: $gray-800; }
+        }
+
+        &-link {
+          background: none;
+          border: none;
+          color: $primary-500;
+          font-size: 11px;
+          font-weight: 500;
+          font-family: $font-primary;
+          cursor: pointer;
+          padding: 0;
+          white-space: nowrap;
+          &:hover { text-decoration: underline; }
+        }
+      }
+
+      &__gali--preview {
+        background: #1c1c1e !important;
+        animation: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      }
+    }
   `],
 })
 export class Gali6FabComponent {
@@ -220,6 +423,8 @@ export class Gali6FabComponent {
   private router = inject(Router);
   private feedback = inject(DropiPrototypeFeedbackService);
   private readonly url = signal(this.router.url);
+
+  readonly decisionPreviewOpen = signal(false);
 
   readonly contextBtn = computed<ContextBtn | null>(() => {
     const url = this.url();
@@ -230,7 +435,39 @@ export class Gali6FabComponent {
   constructor() {
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(e => this.url.set(e.urlAfterRedirects));
+      .subscribe(e => {
+        this.url.set(e.urlAfterRedirects);
+        this.decisionPreviewOpen.set(false);
+      });
+  }
+
+  onFabClick(): void {
+    if (this.decisionPreviewOpen()) {
+      // 2do click con mini-card abierta → cierra mini-card y abre chat
+      this.decisionPreviewOpen.set(false);
+      this.gali.togglePanel();
+    } else if (this.gali.criticalCount() > 0 && this.gali.galiMode() === 0) {
+      // 1er click con decisiones pendientes → muestra mini-card
+      this.decisionPreviewOpen.set(true);
+    } else {
+      // Sin decisiones pendientes o panel ya abierto → toggle chat
+      this.decisionPreviewOpen.set(false);
+      this.gali.togglePanel();
+    }
+  }
+
+  openChat(): void {
+    this.decisionPreviewOpen.set(false);
+    this.gali.togglePanel();
+  }
+
+  goToDecisions(): void {
+    this.decisionPreviewOpen.set(false);
+    this.router.navigate(['/gali-6']);
+  }
+
+  dismissDecisionPreview(): void {
+    this.decisionPreviewOpen.set(false);
   }
 
   goContext(): void {

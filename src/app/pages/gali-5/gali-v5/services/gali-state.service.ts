@@ -1,6 +1,7 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { GaliWorkspaceService } from './gali-workspace.service';
+import { MOCK_ALERTAS, GaliAlerta, AlertaOpcion } from '../../../../../../mocks/gali-v5/senales.mock';
 
 export type GaliMode = 0 | 1 | 2;
 
@@ -264,6 +265,54 @@ export class GaliStateService {
     this.galiMode.set(1);
   }
 
+  /** Panel contextual de Gali desde módulos operativos (Cambio B) */
+  readonly galiCatalogPanelOpen = signal(false);
+
+  openCatalogPanel(): void { this.galiCatalogPanelOpen.set(true); }
+  closeCatalogPanel(): void { this.galiCatalogPanelOpen.set(false); }
+
+  /** Panel contextual de Gali desde Proveedores */
+  readonly galiProveedoresPanelOpen = signal(false);
+
+  openProveedoresPanel(): void {
+    this.galiCatalogPanelOpen.set(false);
+    this.galiProveedoresPanelOpen.set(true);
+  }
+  closeProveedoresPanel(): void { this.galiProveedoresPanelOpen.set(false); }
+
+  /** Panel contextual de Gali desde Señales */
+  readonly galiSenalesPanelOpen = signal(false);
+
+  openSenalesPanel(): void {
+    this.galiCatalogPanelOpen.set(false);
+    this.galiProveedoresPanelOpen.set(false);
+    this.galiSenalesPanelOpen.set(true);
+  }
+  closeSenalesPanel(): void { this.galiSenalesPanelOpen.set(false); }
+
+  /** Panel contextual de Gali desde Caza-Productos */
+  readonly galiCazaPanelOpen = signal(false);
+
+  openCazaPanel(): void {
+    this.galiCatalogPanelOpen.set(false);
+    this.galiProveedoresPanelOpen.set(false);
+    this.galiSenalesPanelOpen.set(false);
+    this.galiCazaPanelOpen.set(true);
+  }
+  closeCazaPanel(): void { this.galiCazaPanelOpen.set(false); }
+
+  /** Panel contextual de Gali desde Negociaciones */
+  readonly galiNegoPanelOpen = signal(false);
+
+  openNegoPanel(): void {
+    this.galiCatalogPanelOpen.set(false);
+    this.galiProveedoresPanelOpen.set(false);
+    this.galiSenalesPanelOpen.set(false);
+    this.galiCazaPanelOpen.set(false);
+    this.galiNegoPanelOpen.set(true);
+  }
+  closeNegoPanel(): void { this.galiNegoPanelOpen.set(false); }
+
   readonly agents = signal<AgentStatus[]>([
     { id: 'roax', name: 'Roax', color: '#f97316', status: 'activo', action: 'ROAS real 1.93x · Meta 2.9x · pauta $66k/día', skills: ['Auto-pausa CTR', 'Escalado ROAS'] },
     { id: 'vigilante', name: 'Vigilante', color: '#fbbf24', status: 'activo', action: 'Detectó novedad 15% Coordinadora Bogotá', skills: ['Smart routing novedad'] },
@@ -302,7 +351,23 @@ export class GaliStateService {
     },
   ]);
 
-  readonly criticalCount = signal(1);
+  readonly criticalCount = computed(() =>
+    MOCK_ALERTAS.filter((a: GaliAlerta) => a.tipo === 'critical' || a.tipo === 'warning').length
+  );
+
+  readonly firstPendingDecision = computed(() => {
+    const alerta = MOCK_ALERTAS.find((a: GaliAlerta) => a.tipo === 'critical' || a.tipo === 'warning');
+    if (!alerta) return null;
+    const nombre = alerta.agente.charAt(0).toUpperCase() + alerta.agente.slice(1);
+    return {
+      agente: nombre,
+      agenteColor: alerta.agenteColor ?? '#f49a3d',
+      titulo: alerta.titulo,
+      urgencia: alerta.tipo as string,
+      primaryOption: alerta.opciones?.find((o: AlertaOpcion) => o.isPrimary)?.label ?? 'Ver decisión',
+      secondaryOption: alerta.opciones?.find((o: AlertaOpcion) => !o.isPrimary)?.label ?? 'Posponer',
+    };
+  });
   readonly isTyping = signal(false);
 
   /** Ancho del panel derecho — redimensionable estilo editor */

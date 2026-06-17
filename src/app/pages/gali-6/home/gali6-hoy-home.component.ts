@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
   GaliDecisionTheaterComponent,
@@ -17,7 +17,7 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales
 @Component({
   selector: 'app-gali6-hoy-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliDecisionTheaterComponent, GaliGlosarioDirective, Gali6PageHeaderComponent],
+  imports: [CommonModule, TitleCasePipe, RouterModule, GaliDecisionTheaterComponent, GaliGlosarioDirective, Gali6PageHeaderComponent],
   templateUrl: './gali6-hoy-home.component.html',
   styleUrl: './gali6-hoy-home.component.scss',
 })
@@ -52,7 +52,7 @@ export class Gali6HoyHomeComponent {
       .join(' ');
   });
 
-  private readonly alertaTop = MOCK_ALERTAS.find(a => a.tipo === 'critical' && a.opciones?.length);
+  readonly alertaTop = MOCK_ALERTAS.find(a => a.tipo === 'critical' && a.opciones?.length);
   readonly decisionResuelta = signal(false);
   readonly decisionToast = signal<string | null>(null);
 
@@ -93,9 +93,30 @@ export class Gali6HoyHomeComponent {
   readonly delegarProxima = signal(localStorage.getItem('gali-6-delegar-vigilante') === 'true');
   readonly ultimaAccionGali = 'hace 12 min · escaló campaña +15%';
 
+  // Cola de decisiones pendientes (todas menos la que se muestra en el theater)
+  readonly colaDecisiones = computed(() =>
+    MOCK_ALERTAS.filter(a => a.id !== this.alertaTop?.id && (a.tipo === 'critical' || a.tipo === 'warning'))
+  );
+  readonly colaExpanded = signal(false);
+
+  // Progresión modular (D2/D3/D4)
+  readonly modulosProgresion = [
+    { id: 'productos', glyph: '◈', nombre: 'Productos', sub: 'Activo — 3 proyectos corriendo', estado: 'activo' },
+    { id: 'ordenes', glyph: '◌', nombre: 'Órdenes', sub: 'Próximamente · completa 2 semanas exitosas', estado: 'proximo' },
+    { id: 'logistica', glyph: '▦', nombre: 'Logística', sub: 'Se desbloquea después de Órdenes', estado: 'bloqueado' },
+  ];
+
+  readonly verImpactoGali = signal(false);
+  readonly galiDelta = {
+    pedidos: 18,
+    pesos_ahorrados: '$380.000',
+    novedades_evitadas: 12,
+    horas_libradas: 6,
+  };
+
   readonly impacto = (LEDGER as any).summary_semana;
 
-  private readonly senalPalanca =
+  readonly senalPalanca =
     MOCK_SENALES.find(s => s.id === 'sen-006') ??
     MOCK_SENALES.find(s => s.canLaunch && (s.tipo === 'opportunity' || s.tipo === 'trend'));
   readonly palanca = {
@@ -121,6 +142,12 @@ export class Gali6HoyHomeComponent {
   onVerCola(): void {
     this.router.navigate(['/gali-6/proyectos']);
   }
+
+  toggleImpactoGali(): void {
+    this.verImpactoGali.update(v => !v);
+  }
+
+  toggleCola(): void { this.colaExpanded.update(v => !v); }
 
   toggleDelegar(): void {
     const next = !this.delegarProxima();

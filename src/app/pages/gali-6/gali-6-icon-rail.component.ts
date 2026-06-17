@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -26,13 +26,25 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mo
       <div class="icon-rail__main">
         <div class="icon-rail__group">
           @for (item of mainItems(); track item.key) {
-            <a [routerLink]="item.route" class="icon-rail__item"
-               [class.icon-rail__item--active]="activeKey() === item.key"
-               [title]="item.label" [attr.aria-label]="item.label">
-              <span class="icon-rail__item-inner">
-                <span class="icon-rail__svg" [style.--icon-url]="'url(' + item.icon + ')'" aria-hidden="true"></span>
-              </span>
-            </a>
+            @if (esBasico && STANDBY_KEYS.has(item.key)) {
+              <div class="icon-rail__item icon-rail__item--standby"
+                   [title]="item.label + ' · Disponible cuando tengas proyectos activos generando pedidos'"
+                   [attr.aria-label]="item.label + ' (próximamente)'"
+                   role="img">
+                <span class="icon-rail__item-inner">
+                  <span class="icon-rail__svg" [style.--icon-url]="'url(' + item.icon + ')'" aria-hidden="true"></span>
+                  <span class="icon-rail__standby-lock" aria-hidden="true">🔒</span>
+                </span>
+              </div>
+            } @else {
+              <a [routerLink]="item.route" class="icon-rail__item"
+                 [class.icon-rail__item--active]="activeKey() === item.key"
+                 [title]="item.label" [attr.aria-label]="item.label">
+                <span class="icon-rail__item-inner">
+                  <span class="icon-rail__svg" [style.--icon-url]="'url(' + item.icon + ')'" aria-hidden="true"></span>
+                </span>
+              </a>
+            }
           }
         </div>
 
@@ -86,10 +98,15 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mo
   styleUrl: '../gali-5/gali-v5/components/dropi-icon-rail.component.scss',
 })
 export class Gali6IconRailComponent {
+  @Input() esBasico = true;
+
   private router = inject(Router);
 
   activeKey = signal(resolveG6RailKey(inject(Router).url));
   readonly showHelpDrawer = signal(false);
+
+  /** Módulos en standby para MVP (solo visible en modo básico) */
+  readonly STANDBY_KEYS = new Set(['pedidos', 'logistica']);
 
   readonly mainItems = computed(() => G6_ICON_RAIL.filter(i => i.group === 'main'));
   readonly utilityItems = computed(() => G6_ICON_RAIL.filter(i => i.group === 'utility'));
