@@ -72,6 +72,44 @@ export class CatalogPageComponent implements OnInit {
     this.adaDetailProductId.set(id);
   }
 
+  // ── Panel Gali contextual H1 ──────────────────────────────────────────
+  readonly galiPanelOpen = signal(false);
+  readonly selectedProducto = signal<CatalogProduct | null>(null);
+  readonly galiLanzado = signal(false);
+
+  openGaliPanel(): void { this.galiPanelOpen.set(true); }
+
+  closeGaliPanel(): void {
+    this.galiPanelOpen.set(false);
+    this.selectedProducto.set(null);
+    this.galiLanzado.set(false);
+  }
+
+  selectGaliProducto(p: CatalogProduct, event: Event): void {
+    event.stopPropagation();
+    this.galiPanelOpen.set(true);
+    this.selectedProducto.set(p);
+    this.galiLanzado.set(false);
+  }
+
+  galiInsight(p: CatalogProduct): string {
+    const score = p.adaScore ?? 0;
+    if (score >= 80) return `${p.name} tiene buena tracción esta semana. Los datos apuntan a una ventana activa. ¿Lo lanzamos?`;
+    if (score >= 60) return `${p.name} muestra señales moderadas. Con el ángulo adecuado puede convertir bien.`;
+    return `${p.name} no muestra tendencia clara ahora. Considera esperar o diferenciarte con la oferta.`;
+  }
+
+  galiMargenPct(p: CatalogProduct): number {
+    return Math.round(((p.suggestedPrice - p.price) / p.suggestedPrice) * 100);
+  }
+
+  crearProyectoDesdePanel(): void {
+    this.galiLanzado.set(true);
+    setTimeout(() => {
+      this.router.navigate(['/gali-6/proyectos'], { queryParams: { autoNuevo: 'true' } });
+    }, 700);
+  }
+
   showAiBanner = signal(true);
   searchQuery = '';
   semanticQuery = signal('');

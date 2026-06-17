@@ -393,3 +393,290 @@
     &:hover { border-color: $gray-400; }
   }
 }
+
+// ── Selected state on provider cards ────────────────────────────────────────
+.provider-card--gali-selected {
+  outline: 2px solid $primary-500;
+  outline-offset: 2px;
+  cursor: pointer;
+}
+
+.provider-card { cursor: pointer; transition: box-shadow 0.15s; &:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.10); } }
+
+// ── Layout: grid + panel side by side ────────────────────────────────────────
+.prov-gali-layout {
+  display: flex;
+  gap: $size-5;
+  align-items: flex-start;
+  position: relative;
+
+  .providers-page__grid {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// ── Edge button (panel closed) ────────────────────────────────────────────────
+.prov-g6-edge {
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 40px;
+  padding: 14px 0;
+  background: $white;
+  border: 1.5px solid $primary-500;
+  border-radius: 20px;
+  color: $primary-500;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba($primary-500, 0.15);
+  transition: box-shadow 0.2s;
+  &:hover { box-shadow: 0 4px 16px rgba($primary-500, 0.25); }
+}
+
+// ── Panel aside ───────────────────────────────────────────────────────────────
+.prov-g6-panel {
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+  width: 280px;
+  flex-shrink: 0;
+  background: $white;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  overflow: hidden;
+  animation: prov-panel-in 0.22s ease;
+
+  @keyframes prov-panel-in {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid $gray-100;
+    background: linear-gradient(135deg, rgba($primary-500, 0.06) 0%, $white 100%);
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: $primary-500;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: $gray-400;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    &:hover { color: $gray-700; background: $gray-100; }
+  }
+
+  // H3 — tipo selector
+  &__tipo-selector {
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__tipo-pregunta {
+    font-size: 12px;
+    font-weight: 600;
+    color: $gray-700;
+    margin: 0 0 4px;
+  }
+
+  &__tipo-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid $gray-100;
+    border-radius: $radius-sm;
+    background: $white;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    &:hover { border-color: $primary-500; background: rgba($primary-500, 0.04); }
+  }
+
+  &__tipo-icon { font-size: 20px; flex-shrink: 0; }
+
+  &__tipo-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: $gray-800;
+  }
+
+  &__tipo-hint {
+    display: block;
+    font-size: 10px;
+    color: $gray-400;
+    margin-top: 1px;
+  }
+
+  // H3 — guía de tipo
+  &__tipo-guia {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__tipo-back {
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: $gray-400;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    &:hover { color: $primary-500; }
+  }
+
+  &__tipo-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0;
+  }
+
+  &__tipo-desc {
+    font-size: 11px;
+    color: $gray-600;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  &__tipo-nota {
+    background: rgba($primary-500, 0.06);
+    border-left: 2px solid $primary-500;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 10px;
+    color: $gray-600;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  // H2 — contenido de proveedor
+  &__content {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__prov-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: $gray-800;
+    margin: 0;
+  }
+
+  &__insight {
+    font-size: 11px;
+    color: $gray-600;
+    line-height: 1.55;
+    margin: 0;
+    font-style: italic;
+  }
+
+  &__metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__metric {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &-icon { font-size: 14px; flex-shrink: 0; }
+
+    &-body {
+      display: flex;
+      justify-content: space-between;
+      flex: 1;
+      gap: 4px;
+    }
+
+    &-lbl {
+      font-size: 11px;
+      color: $gray-500;
+    }
+
+    &-val {
+      font-size: 11px;
+      font-weight: 700;
+      color: $gray-800;
+    }
+  }
+
+  &__sugerencias {
+    background: rgba($primary-500, 0.05);
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+  }
+
+  &__sug-titulo {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: $primary-500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  &__sug-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      font-size: 11px;
+      color: $gray-700;
+      line-height: 1.4;
+    }
+  }
+
+  // Shared CTA button
+  &__btn-launch {
+    width: 100%;
+    padding: 10px;
+    background: $primary-500;
+    color: $white;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s;
+    &:hover { filter: brightness(0.9); }
+  }
+}

@@ -60,4 +60,58 @@ export class ProvidersPageComponent {
   toggleFavorite(provider: ProviderCard): void {
     provider.favorite = !provider.favorite;
   }
+
+  // ── Panel Gali H2 + H3 ───────────────────────────────────────────────
+  readonly galiPanelOpen = signal(false);
+  readonly selectedProvider = signal<ProviderCard | null>(null);
+  readonly proveedorTipo = signal<'fabricante' | 'importador' | 'marca' | null>(null);
+
+  openGaliPanel(): void { this.galiPanelOpen.set(true); }
+
+  closeGaliPanel(): void {
+    this.galiPanelOpen.set(false);
+    this.selectedProvider.set(null);
+    this.proveedorTipo.set(null);
+  }
+
+  selectGaliProvider(p: ProviderCard, event: Event): void {
+    event.stopPropagation();
+    this.galiPanelOpen.set(true);
+    this.selectedProvider.set(p);
+    this.proveedorTipo.set(null);
+  }
+
+  selectTipo(tipo: 'fabricante' | 'importador' | 'marca'): void {
+    this.proveedorTipo.set(tipo);
+  }
+
+  galiProvAnalisis(p: ProviderCard): { calidad: string; sugerencias: string[] } {
+    const sugerencias = p.productCount > 100
+      ? ['Negociar por volumen (desc. 12%)', 'Explorar exclusividad de SKU']
+      : p.verified
+        ? ['Solicitar muestra antes de lanzar', 'Acordar plazos de entrega fijos']
+        : ['Verificar calidad con pedido de prueba', 'Comparar precios con otro proveedor'];
+    return {
+      calidad: p.premium ? '4.7/5' : p.verified ? '4.2/5' : '3.8/5',
+      sugerencias,
+    };
+  }
+
+  readonly TIPO_GUIAS = {
+    fabricante: {
+      titulo: 'Fabricantes en Colombia',
+      desc: 'Te conectamos con fabricantes verificados en Colombia. Gali puede analizar sus capacidades de producción y facilitar condiciones de exclusividad.',
+      cta: 'Ver fabricantes disponibles →',
+    },
+    importador: {
+      titulo: 'Proveedores internacionales',
+      desc: 'Gali puede evaluar proveedores internacionales y calcular costos reales de importación incluyendo aranceles y logística.',
+      cta: 'Explorar importadores →',
+    },
+    marca: {
+      titulo: 'Marca propia',
+      desc: 'Si tienes la fórmula o diseño, Gali puede ayudarte a encontrar manufactura a medida y facilitar el proceso de marca.',
+      cta: 'Construir tu marca con Gali →',
+    },
+  } as const;
 }

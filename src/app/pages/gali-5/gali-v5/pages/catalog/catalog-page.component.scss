@@ -1,5 +1,124 @@
 @import 'styles/gali-v5-tokens';
 
+// ── Panel Gali contextual H1 ──────────────────────────────────────────────────
+
+@keyframes catalog-panel-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes catalog-panel-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.catalog-gali-layout {
+  display: flex;
+  gap: $size-4;
+  align-items: flex-start;
+
+  .catalog-page__products { flex: 1; min-width: 0; }
+}
+
+.catalog-g6-edge {
+  position: sticky; top: 80px; align-self: flex-start;
+  background: #fff; border: 1px solid rgba($primary-500, 0.3); border-radius: $radius-lg;
+  padding: $size-3 $size-2; cursor: pointer; font-size: 11px; font-weight: $font-semibold;
+  color: $primary-600; min-width: 52px; box-shadow: 0 2px 8px rgba($primary-500, 0.12);
+  transition: all 150ms ease; white-space: nowrap; display: flex; align-items: center; gap: 4px;
+
+  span { color: $primary-500; }
+  &:hover { background: rgba($primary-500, 0.06); border-color: $primary-400; }
+}
+
+.catalog-g6-panel {
+  width: 272px; flex-shrink: 0; background: $gray-50;
+  border: 1px solid $gray-100; border-top: 3px solid $primary-500;
+  border-radius: $radius-lg; box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  position: sticky; top: 80px; animation: catalog-panel-in 220ms ease-out; overflow: hidden;
+
+  &__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: $size-3 $size-4; border-bottom: 1px solid $gray-100; background: #fff;
+  }
+  &__eyebrow {
+    font-size: 11px; font-weight: $font-semibold; text-transform: uppercase;
+    letter-spacing: 0.06em; color: $primary-600; display: flex; align-items: center; gap: 4px;
+  }
+  &__close {
+    background: none; border: none; font-size: 18px; color: $gray-400; cursor: pointer;
+    line-height: 1; padding: 0 2px;
+    &:hover { color: $gray-700; }
+  }
+
+  &__idle {
+    display: flex; flex-direction: column; align-items: center;
+    padding: $size-8 $size-4; gap: $size-3; text-align: center;
+  }
+  &__idle-icon { font-size: 28px; color: $gray-300; }
+  &__idle-text { font-size: $font-sm; color: $gray-500; line-height: 1.55; margin: 0; }
+
+  &__content { padding: $size-4; display: flex; flex-direction: column; gap: $size-3; }
+
+  &__product-name {
+    margin: 0; font-size: $font-sm; font-weight: $font-bold; color: $gray-900; line-height: 1.3;
+  }
+  &__insight {
+    margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.55; font-style: italic;
+    background: rgba($primary-500, 0.05); border-left: 2px solid $primary-300;
+    padding: $size-2 $size-3; border-radius: 0 $radius-sm $radius-sm 0;
+  }
+
+  &__metrics {
+    display: flex; flex-direction: column; gap: $size-2;
+    background: #fff; border-radius: $radius-md; padding: $size-3; border: 1px solid $gray-100;
+  }
+  &__metric { display: flex; align-items: flex-start; gap: $size-2; }
+  &__metric-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  &__metric-body { display: flex; flex-direction: column; gap: 2px; }
+  &__metric-lbl {
+    font-size: 10px; color: $gray-500; text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: $font-semibold;
+  }
+  &__metric-val {
+    font-size: $font-xs; font-weight: $font-bold; color: $gray-800;
+    &--ok { color: #16a34a; }
+  }
+
+  &__objetivo {
+    font-size: $font-xs; color: $primary-700; background: rgba($primary-500, 0.08);
+    border-radius: $radius-sm; padding: $size-2 $size-3; line-height: 1.5;
+    display: flex; gap: 6px; align-items: flex-start;
+    span { flex-shrink: 0; }
+  }
+
+  &__actions { display: flex; flex-direction: column; gap: $size-2; }
+  &__btn-launch {
+    background: $primary-500; color: #fff; border: none; border-radius: $radius-md;
+    padding: $size-2 $size-4; font-size: $font-sm; font-weight: $font-semibold;
+    cursor: pointer; width: 100%; transition: background 150ms ease;
+    &:hover { background: $primary-600; }
+  }
+  &__btn-detail {
+    background: none; border: 1px solid $gray-200; border-radius: $radius-md;
+    padding: $size-2 $size-4; font-size: $font-xs; color: $gray-600;
+    cursor: pointer; width: 100%; transition: all 150ms ease;
+    &:hover { border-color: $gray-400; color: $gray-800; }
+  }
+
+  &__launched {
+    display: flex; flex-direction: column; align-items: center;
+    padding: $size-8 $size-4; gap: $size-3; text-align: center;
+  }
+  &__launched-icon { font-size: 32px; color: $primary-500; animation: catalog-panel-pulse 1s ease-in-out infinite; }
+  &__launched-text { font-size: $font-sm; color: $gray-600; line-height: 1.55; margin: 0; }
+}
+
+.product-card--gali-selected {
+  outline: 2px solid $primary-500;
+  outline-offset: 2px;
+  border-radius: $radius-lg;
+}
+
 // ── Semantic Search ──────────────────────────────────────────────────────────
 
 .catalog-semantic-search {

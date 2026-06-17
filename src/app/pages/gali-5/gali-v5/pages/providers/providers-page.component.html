@@ -72,35 +72,139 @@
     </div>
   </section>
 
-  <div class="providers-page__grid">
-    <article *ngFor="let p of providers" class="provider-card">
-      <button
-        type="button"
-        class="provider-card__fav"
-        data-proto-skip
-        [class.provider-card__fav--active]="p.favorite"
-        (click)="toggleFavorite(p)"
-        aria-label="Favorito">
-        <i class="pi" [ngClass]="p.favorite ? 'pi-heart-fill' : 'pi-heart'"></i>
+  <!-- Grid + Panel Gali H2/H3 -->
+  <div class="prov-gali-layout">
+
+    <div class="providers-page__grid">
+      <article *ngFor="let p of providers" class="provider-card"
+               [class.provider-card--gali-selected]="selectedProvider()?.name === p.name"
+               (click)="selectGaliProvider(p, $event)">
+        <button
+          type="button"
+          class="provider-card__fav"
+          data-proto-skip
+          [class.provider-card__fav--active]="p.favorite"
+          (click)="toggleFavorite(p); $event.stopPropagation()"
+          aria-label="Favorito">
+          <i class="pi" [ngClass]="p.favorite ? 'pi-heart-fill' : 'pi-heart'"></i>
+        </button>
+        <div class="provider-card__avatar">
+          <img [src]="p.avatar" [alt]="p.name" />
+          <img
+            *ngIf="p.premium"
+            src="assets/images/dropi-baseline/catalog/insignia-premium.png"
+            alt=""
+            class="provider-card__insignia provider-card__insignia--premium"
+            aria-hidden="true"
+          />
+          <span *ngIf="p.verified && !p.premium" class="provider-card__insignia provider-card__insignia--verified">
+            <i class="pi pi-verified"></i>
+          </span>
+        </div>
+        <div class="provider-card__body">
+          <h3 class="provider-card__name">{{ p.name }}</h3>
+          <p class="provider-card__count">{{ p.productCount }} Productos</p>
+          <p class="provider-card__categories">{{ p.categories }}</p>
+        </div>
+      </article>
+    </div>
+
+    <!-- Panel Gali (H2 cuando hay proveedor seleccionado, H3 cuando no) -->
+    @if (galiPanelOpen()) {
+      <aside class="prov-g6-panel" role="complementary" aria-label="Análisis Gali del proveedor">
+        <div class="prov-g6-panel__head">
+          <span class="prov-g6-panel__eyebrow"><span aria-hidden="true">✦</span> Gali</span>
+          <button class="prov-g6-panel__close" type="button" (click)="closeGaliPanel()" aria-label="Cerrar panel">×</button>
+        </div>
+
+        @if (!selectedProvider()) {
+          <!-- H3 — flujo de tipo de proveedor -->
+          @if (!proveedorTipo()) {
+            <div class="prov-g6-panel__tipo-selector">
+              <p class="prov-g6-panel__tipo-pregunta">¿Qué tipo de proveedor buscas?</p>
+              <button class="prov-g6-panel__tipo-btn" type="button" (click)="selectTipo('fabricante')">
+                <span class="prov-g6-panel__tipo-icon" aria-hidden="true">🏭</span>
+                <span class="prov-g6-panel__tipo-label">Fabricante local</span>
+                <span class="prov-g6-panel__tipo-hint">Producción en Colombia</span>
+              </button>
+              <button class="prov-g6-panel__tipo-btn" type="button" (click)="selectTipo('importador')">
+                <span class="prov-g6-panel__tipo-icon" aria-hidden="true">🌐</span>
+                <span class="prov-g6-panel__tipo-label">Importador</span>
+                <span class="prov-g6-panel__tipo-hint">Proveedor internacional</span>
+              </button>
+              <button class="prov-g6-panel__tipo-btn" type="button" (click)="selectTipo('marca')">
+                <span class="prov-g6-panel__tipo-icon" aria-hidden="true">✨</span>
+                <span class="prov-g6-panel__tipo-label">Marca propia</span>
+                <span class="prov-g6-panel__tipo-hint">Diseño o fórmula propios</span>
+              </button>
+            </div>
+          } @else {
+            <div class="prov-g6-panel__tipo-guia">
+              <button class="prov-g6-panel__tipo-back" type="button" (click)="proveedorTipo.set(null)">← Volver</button>
+              <h3 class="prov-g6-panel__tipo-titulo">{{ TIPO_GUIAS[proveedorTipo()!].titulo }}</h3>
+              <p class="prov-g6-panel__tipo-desc">{{ TIPO_GUIAS[proveedorTipo()!].desc }}</p>
+              <div class="prov-g6-panel__tipo-nota">
+                <span aria-hidden="true">✦</span>
+                Selecciona un proveedor del listado para que Gali lo analice en detalle.
+              </div>
+              <button class="prov-g6-panel__btn-launch" type="button" (click)="goToLanzar()">
+                {{ TIPO_GUIAS[proveedorTipo()!].cta }}
+              </button>
+            </div>
+          }
+
+        } @else {
+          <!-- H2 — análisis de proveedor específico -->
+          <div class="prov-g6-panel__content">
+            <p class="prov-g6-panel__prov-name">{{ selectedProvider()!.name }}</p>
+            <p class="prov-g6-panel__insight">
+              "Proveedor con {{ galiProvAnalisis(selectedProvider()!).calidad }} de calidad. Verificado por otros dropshippers esta semana."
+            </p>
+
+            <div class="prov-g6-panel__metrics">
+              <div class="prov-g6-panel__metric">
+                <span class="prov-g6-panel__metric-icon" aria-hidden="true">⭐</span>
+                <span class="prov-g6-panel__metric-body">
+                  <span class="prov-g6-panel__metric-lbl">Calidad</span>
+                  <span class="prov-g6-panel__metric-val">{{ galiProvAnalisis(selectedProvider()!).calidad }}</span>
+                </span>
+              </div>
+              <div class="prov-g6-panel__metric">
+                <span class="prov-g6-panel__metric-icon" aria-hidden="true">⏱</span>
+                <span class="prov-g6-panel__metric-body">
+                  <span class="prov-g6-panel__metric-lbl">Respuesta</span>
+                  <span class="prov-g6-panel__metric-val">2–4h</span>
+                </span>
+              </div>
+              <div class="prov-g6-panel__metric">
+                <span class="prov-g6-panel__metric-icon" aria-hidden="true">📦</span>
+                <span class="prov-g6-panel__metric-body">
+                  <span class="prov-g6-panel__metric-lbl">Productos</span>
+                  <span class="prov-g6-panel__metric-val">{{ selectedProvider()!.productCount }}</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="prov-g6-panel__sugerencias">
+              <span class="prov-g6-panel__sug-titulo">Gali sugiere negociar por:</span>
+              <ul class="prov-g6-panel__sug-list">
+                @for (s of galiProvAnalisis(selectedProvider()!).sugerencias; track s) {
+                  <li>✓ {{ s }}</li>
+                }
+              </ul>
+            </div>
+
+            <button class="prov-g6-panel__btn-launch" type="button" (click)="goToLanzar()">
+              Contactar con estrategia de Gali →
+            </button>
+          </div>
+        }
+      </aside>
+    } @else {
+      <button class="prov-g6-edge" type="button" (click)="openGaliPanel()" aria-label="Abrir análisis de Gali">
+        <span aria-hidden="true">✦</span> Gali
       </button>
-      <div class="provider-card__avatar">
-        <img [src]="p.avatar" [alt]="p.name" />
-        <img
-          *ngIf="p.premium"
-          src="assets/images/dropi-baseline/catalog/insignia-premium.png"
-          alt=""
-          class="provider-card__insignia provider-card__insignia--premium"
-          aria-hidden="true"
-        />
-        <span *ngIf="p.verified && !p.premium" class="provider-card__insignia provider-card__insignia--verified">
-          <i class="pi pi-verified"></i>
-        </span>
-      </div>
-      <div class="provider-card__body">
-        <h3 class="provider-card__name">{{ p.name }}</h3>
-        <p class="provider-card__count">{{ p.productCount }} Productos</p>
-        <p class="provider-card__categories">{{ p.categories }}</p>
-      </div>
-    </article>
-  </div>
+    }
+
+  </div><!-- /prov-gali-layout -->
 </div>

@@ -357,14 +357,18 @@
     </div>
   </section>
 
-  <!-- 9. Product grid -->
+  <!-- 9. Product grid + Panel Gali H1 -->
+  <div class="catalog-gali-layout">
+
   <section
     class="catalog-page__products"
     [class.catalog-page__products--list]="viewMode === 'list'">
     <article
       *ngFor="let product of filteredProducts; let i = index"
       class="product-card"
-      [style.animation-delay.ms]="i * 40">
+      [class.product-card--gali-selected]="selectedProducto()?.id === product.id"
+      [style.animation-delay.ms]="i * 40"
+      (click)="selectGaliProducto(product, $event)">
       <div class="product-card__image-wrap">
         <div class="product-card__image">
           <img [src]="product.image" [alt]="product.name" />
@@ -416,12 +420,85 @@
         </div>
       </div>
 
-      <button type="button" class="product-card__cta">
+      <button type="button" class="product-card__cta" (click)="$event.stopPropagation()">
         <i class="pi pi-shopping-cart"></i>
         <span>Enviar a cliente</span>
       </button>
     </article>
   </section>
+
+  <!-- Panel Gali contextual (H1) -->
+  @if (galiPanelOpen()) {
+    <aside class="catalog-g6-panel" role="complementary" aria-label="Análisis Gali del producto seleccionado">
+      <div class="catalog-g6-panel__head">
+        <span class="catalog-g6-panel__eyebrow"><span aria-hidden="true">✦</span> Gali</span>
+        <button class="catalog-g6-panel__close" type="button" (click)="closeGaliPanel()" aria-label="Cerrar panel">×</button>
+      </div>
+
+      @if (!selectedProducto()) {
+        <div class="catalog-g6-panel__idle">
+          <span class="catalog-g6-panel__idle-icon" aria-hidden="true">◎</span>
+          <p class="catalog-g6-panel__idle-text">Selecciona un producto del catálogo para que Gali lo analice.</p>
+        </div>
+      } @else if (galiLanzado()) {
+        <div class="catalog-g6-panel__launched">
+          <span class="catalog-g6-panel__launched-icon" aria-hidden="true">✦</span>
+          <p class="catalog-g6-panel__launched-text">Abriendo proyectos para lanzar <strong>{{ selectedProducto()!.name }}</strong>…</p>
+        </div>
+      } @else {
+        <div class="catalog-g6-panel__content">
+          <p class="catalog-g6-panel__product-name">{{ selectedProducto()!.name }}</p>
+          <p class="catalog-g6-panel__insight">"{{ galiInsight(selectedProducto()!) }}"</p>
+
+          <div class="catalog-g6-panel__metrics">
+            <div class="catalog-g6-panel__metric">
+              <span class="catalog-g6-panel__metric-icon" aria-hidden="true">📦</span>
+              <span class="catalog-g6-panel__metric-body">
+                <span class="catalog-g6-panel__metric-lbl">Stock</span>
+                <span class="catalog-g6-panel__metric-val" [class.catalog-g6-panel__metric-val--ok]="selectedProducto()!.stock > 0">
+                  {{ selectedProducto()!.stock > 0 ? 'Verificado ✓' : 'Sin stock' }}
+                </span>
+              </span>
+            </div>
+            <div class="catalog-g6-panel__metric" *ngIf="selectedProducto()!.adaScore">
+              <span class="catalog-g6-panel__metric-icon" aria-hidden="true">📈</span>
+              <span class="catalog-g6-panel__metric-body">
+                <span class="catalog-g6-panel__metric-lbl">Score ADA Spy</span>
+                <span class="catalog-g6-panel__metric-val">{{ selectedProducto()!.adaScore }}/100</span>
+              </span>
+            </div>
+            <div class="catalog-g6-panel__metric">
+              <span class="catalog-g6-panel__metric-icon" aria-hidden="true">💰</span>
+              <span class="catalog-g6-panel__metric-body">
+                <span class="catalog-g6-panel__metric-lbl">Margen estimado</span>
+                <span class="catalog-g6-panel__metric-val">{{ galiMargenPct(selectedProducto()!) }}%</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="catalog-g6-panel__objetivo">
+            <span aria-hidden="true">✦</span>
+            Con este producto podrías avanzar hacia tu objetivo de pedidos esta semana.
+          </div>
+
+          <div class="catalog-g6-panel__actions">
+            <button class="catalog-g6-panel__btn-detail" type="button" (click)="verAnalisis(selectedProducto()!.id)">
+              Ver análisis completo
+            </button>
+            <button class="catalog-g6-panel__btn-launch" type="button" (click)="crearProyectoDesdePanel()">
+              🚀 Crear proyecto →
+            </button>
+          </div>
+        </div>
+      }
+    </aside>
+  } @else {
+    <button class="catalog-g6-edge" type="button" (click)="openGaliPanel()" aria-label="Abrir análisis de Gali">
+      <span aria-hidden="true">✦</span> Gali
+    </button>
+  }
+
+  </div><!-- /catalog-gali-layout -->
 </div>
 
 @if (adaDetailProductId()) {
