@@ -88,10 +88,12 @@ const ROUTE_PENDING_MAP: Record<string, number> = {
             <ul *ngIf="!collapsed() && isExpanded(item.id)" class="section-nav__tree">
               <li *ngFor="let child of item.children">
                 <a
-                  [routerLink]="child.route"
+                  [routerLink]="routePath(child.route)"
+                  [queryParams]="routeQueryParams(child.route)"
                   routerLinkActive="section-nav__tree-link--active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  class="section-nav__tree-link">
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  class="section-nav__tree-link"
+                  [class.section-nav__tree-link--active]="isChildTabActive(child.route)">
                   <span class="section-nav__tree-line" aria-hidden="true"></span>
                   <span class="section-nav__tree-label">{{ child.label }}</span>
                 </a>
@@ -193,11 +195,39 @@ export class DropiSectionNavComponent {
     this.userOverrides.update(m => ({ ...m, [id]: !this.isExpanded(id) }));
   }
 
+  /** Separa el path de una ruta que puede contener ?querystring */
+  routePath(route: string): string {
+    return route.split('?')[0];
+  }
+
+  /** Extrae queryParams de una ruta con ?key=val&key2=val2 */
+  routeQueryParams(route: string): Record<string, string> | null {
+    const q = route.split('?')[1];
+    if (!q) return null;
+    return Object.fromEntries(q.split('&').map(p => { const [k, v] = p.split('='); return [k, v]; }));
+  }
+
+  /** Compara solo el path de la URL actual contra la ruta de un child, ignorando queryParams */
+  isChildTabActive(childRoute: string): boolean {
+    const url = this.currentUrl();
+    const currentPath = url.split('?')[0];
+    const currentQuery = url.includes('?') ? url.split('?')[1] : '';
+    const childPath = childRoute.split('?')[0];
+    const childQuery = childRoute.split('?')[1] ?? '';
+
+    if (currentPath !== childPath) return false;
+    if (!childQuery) return !currentQuery; // ruta sin queryParams solo activa si URL tampoco tiene
+    // Si la ruta tiene queryParams, verificar que coincidan todos
+    const childParams = Object.fromEntries(childQuery.split('&').map(p => p.split('=')));
+    const currentParams = Object.fromEntries(currentQuery.split('&').filter(Boolean).map(p => p.split('=')));
+    return Object.entries(childParams).every(([k, v]) => currentParams[k] === v);
+  }
+
   isChildRouteActive(item: SectionNavItem): boolean {
     if (!item.children?.length) return false;
     const path = this.currentUrl().split('?')[0];
     return item.children.some(
-      child => path === child.route || path.startsWith(`${child.route}/`),
+      child => path === child.route.split('?')[0] || path.startsWith(`${child.route.split('?')[0]}/`),
     );
   }
 

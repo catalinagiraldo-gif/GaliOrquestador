@@ -3,12 +3,27 @@
 :host { display: block; width: 100%; }
 
 .hoy {
-  max-width: 760px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: $size-8 $size-6 $size-10;
   display: flex;
   flex-direction: column;
   gap: $size-6;
+}
+
+// ── Grid 2 columnas ──────────────────────────────────────────────────────────
+.hoy__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-6;
+  align-items: start;
+}
+
+.hoy__col-left,
+.hoy__col-right {
+  display: flex;
+  flex-direction: column;
+  gap: $size-5;
 }
 
 /* 1 · Status */
@@ -113,7 +128,7 @@
     letter-spacing: 0.01em;
   }
   &__link { font-size: $font-xs; color: $primary-600; text-decoration: none; font-weight: $font-semibold; }
-  &__stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: $size-3; }
+  &__stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: $size-3; }
   &__stat { display: flex; flex-direction: column; gap: 2px; &--hero .impacto__val { color: $primary-600; } }
   &__val {
     font-size: $font-xl; font-weight: $font-bold; color: $gray-900; line-height: 1.1;
@@ -123,7 +138,6 @@
   &__lbl { font-size: 11px; color: $gray-500; line-height: 1.3; }
   &__auto { color: $gray-500; }
 
-  /* Switch toggle */
   &__switch {
     display: inline-flex; align-items: center; gap: 6px;
     background: none; border: 1px solid $gray-200; border-radius: $radius-full;
@@ -153,7 +167,6 @@
     }
   }
 
-  /* Delta chips */
   &__delta-chip {
     display: inline-block;
     font-size: 10px; font-weight: $font-semibold;
@@ -163,7 +176,6 @@
     margin-top: 2px;
   }
 
-  /* Banner comparativo */
   &__gali-banner {
     display: flex; align-items: flex-start; gap: $size-2;
     margin-top: $size-4; padding: $size-3 $size-4;
@@ -178,7 +190,6 @@
   }
 }
 
-/* Status: delta chip inline */
 .status__gali-delta {
   display: inline-flex; align-items: center; gap: 3px;
   font-size: 11px; font-weight: $font-semibold;
@@ -187,7 +198,7 @@
   animation: g6-fade-up 180ms ease both;
 }
 
-/* 4 · Palanca */
+/* 4 · Palanca / Tu recorrido */
 .palanca {
   display: flex; align-items: center; gap: $size-5; background: $gray-900; color: #fff;
   border-radius: $radius-lg; padding: $size-5 $size-6;
@@ -216,31 +227,22 @@
   }
 }
 
-// ── Cola de señales pendientes ──────────────────────────────────────────
+// ── Cola de señales (siempre visible, sin toggle) ────────────────────────────
 .cola {
   border: 1px solid $gray-100;
   border-radius: $radius-lg;
   overflow: hidden;
   background: $white;
-
-  &__toggle {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: $size-3 $size-4; background: none; border: none; cursor: pointer;
-    &:hover { background: $gray-50; }
-  }
+  padding: $size-3 $size-4 $size-2;
 
   &__eyebrow {
     display: flex; align-items: center; gap: $size-2;
     font-size: $font-sm; font-weight: $font-semibold; color: $gray-700;
-  }
-
-  &__chevron {
-    font-size: 14px; color: $gray-400; transition: transform 150ms ease;
-    &--open { transform: rotate(180deg); }
+    margin-bottom: $size-2;
   }
 
   &__list {
-    list-style: none; padding: 0 $size-4 $size-2; margin: 0;
+    list-style: none; padding: 0; margin: 0;
     border-top: 1px solid $gray-100;
   }
 
@@ -272,13 +274,59 @@
   }
 
   &__ver-todas {
-    display: block; text-align: right; padding: $size-2 $size-4 $size-3;
+    display: block; text-align: right; padding: $size-2 0 $size-1;
     font-size: $font-xs; color: $primary-500; text-decoration: none; font-weight: $font-medium;
     &:hover { text-decoration: underline; }
   }
 }
 
-// ── Progresión modular ───────────────────────────────────────────────────
+// ── Asistentes activos ───────────────────────────────────────────────────────
+.asistentes-compact {
+  background: $white;
+  border: 1px solid $gray-100;
+  border-radius: $radius-lg;
+  padding: $size-4;
+
+  &__eyebrow {
+    display: block; font-size: 11px; font-weight: $font-semibold;
+    text-transform: uppercase; letter-spacing: 0.06em; color: $gray-400;
+    margin-bottom: $size-3;
+  }
+
+  &__chips {
+    display: flex; flex-wrap: wrap; gap: $size-2; margin-bottom: $size-3;
+  }
+
+  &__chip {
+    display: inline-flex; align-items: center;
+    font-size: $font-xs; font-weight: $font-semibold;
+    padding: 3px 10px; border-radius: $radius-full;
+    background: $gray-100; color: $gray-600;
+    border: 1px solid $gray-200;
+    transition: background 120ms ease, color 120ms ease;
+
+    &[data-on="true"] {
+      background: rgba($primary-500, 0.1);
+      color: $primary-700;
+      border-color: rgba($primary-500, 0.25);
+
+      &::before {
+        content: '●';
+        margin-right: 4px;
+        font-size: 8px;
+        color: $primary-500;
+      }
+    }
+  }
+
+  &__link {
+    display: block; font-size: $font-xs; color: $primary-500;
+    text-decoration: none; font-weight: $font-semibold;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ── Progresión modular ───────────────────────────────────────────────────────
 .modulos {
   background: linear-gradient(135deg, $gray-50, #f0f0f8);
   border: 1px solid $gray-100;
@@ -336,6 +384,10 @@
 @keyframes g6-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes g6-count-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes g6-breathe { 0%, 100% { box-shadow: $shadow-small; } 50% { box-shadow: 0 0 0 4px rgba($primary-500, 0.05); } }
+
+@media (max-width: 900px) {
+  .hoy__grid { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 640px) {
   .hoy { padding: $size-5 $size-4 $size-8; gap: $size-5; }

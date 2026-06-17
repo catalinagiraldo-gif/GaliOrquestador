@@ -5,6 +5,7 @@ import { GaliStateService } from '../../services/gali-state.service';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { loadAutopilotScope } from '../gali-autopilot-config/gali-autopilot-config.component';
 import { DropiPanelSplitterComponent } from '../dropi-panel-splitter/dropi-panel-splitter.component';
+import { MOCK_ALERTAS, GaliAlerta } from '../../../../../../../mocks/gali-v5/senales.mock';
 
 type PanelTab = 'chat' | 'agentes' | 'senales' | 'live' | 'memory' | 'files';
 
@@ -59,6 +60,7 @@ export interface ChatThread {
 })
 export class GaliRightPanelComponent implements AfterViewChecked {
   @Output() closed = new EventEmitter<void>();
+  @Output() galiActing = new EventEmitter<void>();
   @ViewChild('chatEnd') chatEnd?: ElementRef;
 
   readonly gali = inject(GaliStateService);
@@ -593,10 +595,24 @@ export class GaliRightPanelComponent implements AfterViewChecked {
     }
   }
 
+  // I3: Reactive screen — muestra preview antes de actuar
+  readonly chatActionPreview = signal<string | null>(null);
+  private readonly ACTION_KEYWORDS = /crea|proyecto|lanza|activa|hazlo/i;
+
   send(): void {
     const text = this.chatInput().trim();
     if (!text) return;
     this.chatInput.set('');
+
+    // I3: Si el mensaje tiene keywords de acción, mostrar preview reactivo + notificar shell
+    if (this.ACTION_KEYWORDS.test(text)) {
+      this.chatActionPreview.set(
+        `Gali va a ${text.toLowerCase().includes('crea') ? 'crear' : 'ejecutar'} esto. ¿Confirmas?`
+      );
+      this.galiActing.emit();
+      setTimeout(() => this.chatActionPreview.set(null), 4000);
+    }
+
     if (this.activeThreadId() === 'gali-main') {
       this.gali.sendMessage(text);
     } else {
@@ -773,6 +789,29 @@ export class GaliRightPanelComponent implements AfterViewChecked {
       usedIn: null,
     },
   ];
+
+  // I3: Señales del panel usan MOCK_ALERTAS (mismos que /senales)
+  readonly panelAlertas: GaliAlerta[] = MOCK_ALERTAS.filter((a: GaliAlerta) => a.tipo === 'critical' || a.tipo === 'warning');
+
+  readonly esExperto = computed(() => {
+    try { return localStorage.getItem('gali-6-modo') === 'experto'; } catch { return false; }
+  });
+
+  readonly autopilotStates = signal<Record<string, boolean>>({
+    roax: true, vigilante: true, chatea: false, ada: false, kronos: false
+  });
+
+  readonly agentesConAutopilot = [
+    { id: 'roax',      nombre: 'Roax',       color: '#f97316', accionesHoy: '3 acciones hoy' },
+    { id: 'vigilante', nombre: 'Vigilante',   color: '#fbbf24', accionesHoy: '2 acciones hoy' },
+    { id: 'chatea',    nombre: 'Chatea Pro',  color: '#34d399', accionesHoy: 'esperando' },
+    { id: 'ada',       nombre: 'ADA Spy',     color: '#818cf8', accionesHoy: 'esperando' },
+    { id: 'kronos',    nombre: 'Kronos',      color: '#60a5fa', accionesHoy: 'esperando' },
+  ];
+
+  toggleAutopilotAgent(id: string): void {
+    this.autopilotStates.update(s => ({ ...s, [id]: !(s as any)[id] }));
+  }
 
   readonly filesFilter = signal<'all' | 'gdrive' | 'local'>('all');
 

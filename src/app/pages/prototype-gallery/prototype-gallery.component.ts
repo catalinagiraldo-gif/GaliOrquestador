@@ -229,10 +229,10 @@ export class PrototypeGalleryComponent {
 
   vistasG6: VistaShortcut[] = [
     { label: 'Hoy', route: '/gali-6', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
+    { label: 'Punto cero', route: '/gali-6?zero=1', badge: '○', description: 'Usuario sin historial · ZeroState onboarding' },
     { label: 'Proyectos', route: '/gali-6/proyectos', badge: '◎', description: 'Objetivo editable · salud · Gali recomienda' },
-    { label: 'Conexiones', route: '/gali-6/conexiones', badge: '⬡', description: '5 MCP core · qué contexto da a Gali' },
+    { label: 'Mi Contexto', route: '/gali-6/mi-negocio', badge: '⬡', description: '3 tabs: Señales · Conexiones · Mi Operación' },
     { label: 'Impacto', route: '/gali-6/impacto', badge: '↗', description: 'Ledger · $ ahorrados · acciones · horas' },
-    { label: 'Catálogo', route: '/gali-6/productos/catalogo', badge: '◆', description: 'Página operativa heredada de Gali 5' },
     { label: 'Wallet', route: '/gali-6/financiero/historial-de-cartera', badge: '◆', description: 'Kronos · ledger financiero' },
   ];
 

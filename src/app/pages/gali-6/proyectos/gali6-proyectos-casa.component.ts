@@ -146,6 +146,8 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       });
   });
 
+  readonly searchQuery = signal('');
+
   readonly proyectosFiltrados = computed<ProyectoRow[]>(() => {
     const f = this.activeFilter();
     const todos = this.proyectos();
@@ -154,6 +156,13 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     if (f === 'borradores') return todos.filter(p => p.estado === 'borrador');
     if (f === 'cerrados')   return todos.filter(p => p.estado === 'cerrado');
     return todos;
+  });
+
+  readonly proyectosFiltradosYBuscados = computed<ProyectoRow[]>(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    const filtrados = this.proyectosFiltrados();
+    if (!q) return filtrados;
+    return filtrados.filter(p => p.nombre.toLowerCase().includes(q));
   });
 
   readonly filterCounts = computed(() => {
@@ -278,6 +287,12 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly galiMejorarEstado = signal<'idle' | 'procesando' | 'propuesta'>('idle');
   readonly galiPropuestaTexto = signal('');
   readonly galiPropuestaMeta = signal(100);
+
+  // I9e: Gali ayuda a definir objetivo desde el texto libre del draftTexto
+  ayudarDefinirConGali(): void {
+    this.galiMejorarInput.set(this.draftTexto());
+    this.mejorarConGali();
+  }
 
   mejorarConGali(): void {
     const texto = this.galiMejorarInput().toLowerCase();
@@ -597,6 +612,15 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     // Auto-abrir modal selector si viene del panel de Gali en catálogo (Cambio B)
     if (this.route.snapshot.queryParamMap.has('autoNuevo')) {
       setTimeout(() => this.abrirNuevoModal(), 250);
+    }
+
+    // I8d: abrir modal de edición si viene desde el detalle del proyecto con ?edit=<id>
+    const editId = this.route.snapshot.queryParamMap.get('edit');
+    if (editId) {
+      setTimeout(() => {
+        const p = this.proyectos().find(r => r.id === editId);
+        if (p) this.openEditProyecto(p, new MouseEvent('click'));
+      }, 300);
     }
 
     // Seed objetivo from legacy keys if v2 key not yet present

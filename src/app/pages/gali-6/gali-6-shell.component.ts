@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
-import { NavigationEnd, NavigationStart, Router, RouterOutlet, RouterModule } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { A11yModule } from '@angular/cdk/a11y';
@@ -83,6 +83,14 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   readonly walletLabel = '$2.717.360';
   readonly alertaTopSenales = MOCK_ALERTAS.find(a => a.tipo === 'critical' || a.tipo === 'warning');
   readonly alertasCriticasCount = MOCK_ALERTAS.filter(a => a.tipo === 'critical' || a.tipo === 'warning').length;
+  readonly alertCount = MOCK_ALERTAS.filter(a => a.tipo === 'critical').length;
+  readonly galiIsActing = signal(false);
+
+  onGaliActing(): void {
+    this.galiIsActing.set(true);
+    setTimeout(() => this.galiIsActing.set(false), 1500);
+  }
+
   readonly catalogPanelPctDespues = computed(() =>
     Math.min(100, this.objetivoPct() + 18)
   );
@@ -116,7 +124,23 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
     { id: 'ninguno', label: 'Ninguno aún' },
   ];
 
+  private route = inject(ActivatedRoute);
+
   constructor() {
+    // Detectar ?zero=1 para resetear onboarding (Punto Cero desde galería)
+    this.route.queryParams.subscribe(params => {
+      if (params['zero'] === '1') {
+        localStorage.removeItem('gali-6-onboarding-done');
+        localStorage.removeItem('gali-6-objetivo-meta');
+        localStorage.removeItem('gali-6-objetivo-v2');
+        this.zeroOpen.set(true);
+        this.zeroStep.set(0);
+        this.zeroPedidos.set(100);
+        this.zeroFriccion.set(null);
+        this.zeroCanal.set(null);
+      }
+    });
+
     this.syncNav(this.router.url);
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))

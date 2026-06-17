@@ -173,6 +173,65 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+// ── Objetivo compacto (I6) ─────────────────────────────────────────────
+.objetivo-compact {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  min-height: 48px;
+  padding: $size-3 $size-4;
+  background: $white;
+  border: 1px solid $gray-100;
+  border-left: 3px solid $primary-500;
+  border-radius: $radius-md;
+  box-shadow: $shadow-small;
+  flex-wrap: wrap;
+
+  &__texto {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $gray-800;
+    flex: 1;
+    min-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__bar {
+    width: 100px;
+    height: 5px;
+    background: $gray-100;
+    border-radius: $radius-full;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  &__fill {
+    height: 100%;
+    background: $primary-500;
+    border-radius: $radius-full;
+    transition: width 300ms ease;
+  }
+
+  &__val {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  &__edit {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $primary-500;
+    text-decoration: none;
+    flex-shrink: 0;
+    &:hover { text-decoration: underline; }
+  }
+}
+
 // ── Check-ins de Gali (Bloque 5) ────────────────────────────────────────
 
 .checkins {
@@ -293,6 +352,28 @@
   line-height: 16px;
 }
 
+// ── Buscador portafolio (I8a) ────────────────────────────────────────────
+.port__search {
+  margin-bottom: $size-3;
+}
+
+.port__search-input {
+  width: 100%;
+  max-width: 340px;
+  padding: $size-2 $size-4;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  font-size: $font-sm;
+  font-family: $font-primary;
+  color: $gray-800;
+  background: $white;
+  outline: none;
+  transition: border-color 120ms ease;
+
+  &::placeholder { color: $gray-400; }
+  &:focus { border-color: $primary-400; }
+}
+
 // ── Portafolio (Bloque 3 + 4) ────────────────────────────────────────────
 
 .port {
@@ -305,7 +386,7 @@
   }
 
   &__legend {
-    display: grid; grid-template-columns: 96px 1fr 120px 56px 140px 56px; gap: $size-3;
+    display: grid; grid-template-columns: 80px 1fr 140px 40px; gap: $size-3;
     padding: 0 $size-4 $size-2;
     span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: $gray-500; font-weight: $font-semibold; }
   }
@@ -314,7 +395,7 @@
 
   &__item {
     display: grid;
-    grid-template-columns: 96px 1fr 120px 56px 140px 56px;
+    grid-template-columns: 80px 1fr 140px 40px;
     align-items: center; gap: $size-3;
     background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
     padding: $size-3 $size-4; cursor: pointer;
@@ -322,6 +403,23 @@
     transition: border-color 120ms ease, transform 120ms ease;
     &:hover { border-color: $primary-300; transform: translateX(2px); }
     &:focus-visible { outline: 2px solid $primary-500; outline-offset: 1px; border-color: $primary-300; }
+  }
+
+  // Borrador simplificado (I8c): 4 columnas pero sin salud
+  &__item--borrador {
+    grid-template-columns: 80px 1fr 1fr 80px;
+    background: #fffbf5;
+    border-color: rgba($primary-300, 0.4);
+    border-style: dashed;
+  }
+
+  &__borrador-hint {
+    font-size: 11px;
+    color: $gray-400;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__estado {
@@ -384,12 +482,6 @@
     border-color: $gray-100;
     border-style: dashed;
     &:hover { opacity: 0.85; transform: none; }
-  }
-
-  &__item--borrador {
-    background: #fffbf5;
-    border-color: rgba($primary-300, 0.4);
-    border-style: dashed;
   }
 
   &__item--recien {
@@ -565,8 +657,9 @@
 @media (max-width: 760px) {
   .reco__cards { grid-template-columns: 1fr; }
   .port__legend { display: none; }
-  .port__item { grid-template-columns: 80px 1fr 80px; }
-  .port__contrib-track, .port__contrib-val, .port__metric, .port__health, .port__actions { display: none; }
+  .port__item { grid-template-columns: 80px 1fr 40px; }
+  .port__item--borrador { grid-template-columns: 80px 1fr 80px; }
+  .port__health, .port__actions .port__edit-btn { display: none; }
   .goal__contrib-row { grid-template-columns: 10px 1fr 36px; }
   .goal__contrib-track, .goal__contrib-pct { display: none; }
   .tipo-picker { grid-template-columns: 1fr; }
@@ -1200,4 +1293,41 @@
 @media (max-width: 640px) {
   .modal--nuevo { width: 100%; }
   .nuevo-cards { grid-template-columns: 1fr; }
+}
+
+// I9e: Textarea libre objetivo + botón Gali ayúdame
+.modal__textarea--libre {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.modal__gali-ayuda {
+  margin-top: $size-2;
+  background: rgba($primary-500, 0.07);
+  border: 1px solid rgba($primary-500, 0.22);
+  border-radius: $radius-md;
+  color: $primary-600;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  padding: $size-2 $size-4;
+  display: flex;
+  align-items: center;
+  gap: $size-1;
+  font-family: $font-primary;
+  transition: background 150ms ease;
+
+  &:hover:not(:disabled) { background: rgba($primary-500, 0.14); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.modal__gali-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba($primary-500, 0.3);
+  border-top-color: $primary-500;
+  border-radius: 50%;
+  animation: gali-spin 0.7s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
 }

@@ -26,6 +26,11 @@
   --dropi-section-width: 48px;
 }
 
+.g6shell--gali-acting .g6shell__content {
+  box-shadow: inset 0 0 0 2px rgba(244, 154, 61, 0.35);
+  transition: box-shadow 200ms ease;
+}
+
 .g6shell {
   display: flex;
   flex-direction: column;
@@ -160,6 +165,20 @@
   }
 
   &__right { margin-left: auto; display: flex; align-items: center; gap: $size-3; }
+
+  &__alerts-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: $radius-full;
+    background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
+    color: $primary-700; text-decoration: none;
+    font-size: $font-xs; font-weight: $font-semibold;
+    transition: background 120ms ease;
+    &:hover { background: rgba($primary-500, 0.14); }
+  }
+
+  &__alerts-count {
+    font-size: $font-xs; font-weight: $font-bold; color: $primary-600;
+  }
 
   &__modo {
     background: none; border: 1px solid $gray-200; border-radius: $radius-full; cursor: pointer;

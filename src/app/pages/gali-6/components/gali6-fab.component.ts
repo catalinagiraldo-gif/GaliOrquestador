@@ -184,7 +184,7 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
         width: 20px;
         height: 20px;
         object-fit: contain;
-        filter: invert(1);
+        filter: brightness(0) invert(1);
       }
 
       &__mini-icon {

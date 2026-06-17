@@ -1,7 +1,8 @@
 <div class="g6shell"
   [class.g6shell--nav-open]="navOpen()"
   [class.g6shell--panel-open]="gali.galiMode() > 0"
-  [class.g6shell--section-collapsed]="sectionCollapsed()">
+  [class.g6shell--section-collapsed]="sectionCollapsed()"
+  [class.g6shell--gali-acting]="galiIsActing()">
   <!-- Topbar — misma estructura que V5v1 (brand-section: gallery + logo) -->
   <header class="topbar">
     <button class="topbar__menu" (click)="toggleNav()" aria-label="Menú">☰</button>
@@ -26,6 +27,10 @@
     </a>
 
     <div class="topbar__right">
+      <a routerLink="/gali-6/senales" class="topbar__alerts-badge"
+         [attr.aria-label]="'Ver alertas: ' + alertCount + ' pendientes'">
+        ◎ <span class="topbar__alerts-count">{{ alertCount }}</span>
+      </a>
       <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()"
               [attr.aria-label]="modo() === 'basico' ? 'Cambiar a modo experto' : 'Cambiar a modo básico'">
         {{ modo() === 'basico' ? 'Modo básico' : 'Modo experto' }}
@@ -132,7 +137,7 @@
   <!-- Chat lateral de Gali -->
   @if (gali.galiMode() > 0) {
     <div class="g6shell__panel gali-panel-slide-in" [style.width.px]="gali.panelWidth()">
-      <gali-right-panel (closed)="gali.togglePanel()" />
+      <gali-right-panel (closed)="gali.togglePanel()" (galiActing)="onGaliActing()" />
     </div>
   }
 </div>

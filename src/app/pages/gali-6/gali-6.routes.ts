@@ -254,8 +254,8 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'mi-negocio',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/micromundo/micromundo-page.component').then(
-        m => m.MicromundoPageComponent,
+      import('./mi-contexto/gali6-mi-contexto.component').then(
+        m => m.Gali6MiContextoComponent,
       ),
   },
 

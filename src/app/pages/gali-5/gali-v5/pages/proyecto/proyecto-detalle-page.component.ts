@@ -339,10 +339,60 @@ export class ProyectoDetallePageComponent implements OnInit {
     });
   }
 
+  // I8d: estado local de pausa (override del estado del mock)
+  readonly proyectoPausado = signal(false);
+  readonly toastPausa = signal<string | null>(null);
+
+  pausarProyecto(): void {
+    this.proyectoPausado.set(true);
+    this.toastPausa.set('Proyecto pausado · Gali detuvo las acciones automáticas');
+    setTimeout(() => this.toastPausa.set(null), 3500);
+  }
+
+  reanudarProyecto(): void {
+    this.proyectoPausado.set(false);
+    this.toastPausa.set('Proyecto reanudado · Gali retomará las acciones automáticas');
+    setTimeout(() => this.toastPausa.set(null), 3500);
+  }
+
+  editarProyecto(): void {
+    this.router.navigate(['/gali-6/proyectos'], { queryParams: { edit: this.proyectoId() } });
+  }
+
+  // I10: flag cuando viene del wizard de lanzamiento
+  readonly recienDesdeWizard = signal(false);
+
   ngOnInit(): void {
     this.route.params.subscribe(p => {
       if (p['id']) this.proyectoId.set(p['id']);
     });
+    this.route.queryParams.subscribe(q => {
+      if (q['recien'] === '1') {
+        this.recienDesdeWizard.set(true);
+      }
+    });
+  }
+
+  // I10: creativos pendientes desde projects.json
+  readonly proyectoCreativosPendientes = computed(() => !!(this.proyectoData() as any)?.creativos_pendientes);
+  readonly creativosPendientesVisible = signal(true);
+
+  galiAutomatiza(): void {
+    this.creativosPendientesVisible.set(false);
+    this.toastPausa.set('Gali está configurando tu landing y creativos...');
+    setTimeout(() => this.toastPausa.set(null), 3000);
+  }
+
+  // Legacy banner handler (queryParam ?recien=1)
+  galiAutomatizaCreativos(): void {
+    this.recienDesdeWizard.set(false);
+    this.router.navigate(['/gali-6/proyecto', this.proyectoId()], {
+      queryParams: { tab: 'creativos' },
+    });
+  }
+
+  irACreador(): void {
+    this.router.navigate(['/gali-6/marketing/creador-de-paginas']);
   }
 
   setTab(id: TabId): void {

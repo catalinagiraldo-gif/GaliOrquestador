@@ -155,6 +155,14 @@ export class Gali6HoyHomeComponent {
     localStorage.setItem('gali-6-delegar-vigilante', String(next));
   }
 
+  readonly asistentes = [
+    { id: 'roax', nombre: 'Roax', autopilot: true },
+    { id: 'vigilante', nombre: 'Vigilante', autopilot: true },
+    { id: 'chatea', nombre: 'Chatea Pro', autopilot: false },
+    { id: 'ada', nombre: 'ADA Spy', autopilot: false },
+    { id: 'kronos', nombre: 'Kronos', autopilot: false },
+  ];
+
   lanzarPalanca(): void {
     this.router.navigate(['/gali-6/proyectos/nuevo']);
   }

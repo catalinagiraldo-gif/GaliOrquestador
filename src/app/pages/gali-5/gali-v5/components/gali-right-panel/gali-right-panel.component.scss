@@ -3020,3 +3020,119 @@ $panel-info:     #3b82f6;
     animation-duration: 1ms !important;
   }
 }
+
+// ── Autopilot por agente (I4) ─────────────────────────────────────────────────
+.autopilot-agents {
+  display: flex;
+  flex-direction: column;
+  gap: $size-2;
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: $font-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: $panel-muted;
+    margin-bottom: $size-1;
+  }
+}
+
+.autopilot-agent-row {
+  display: flex;
+  align-items: center;
+  gap: $size-3;
+  padding: $size-3 $size-3;
+  border: 1px solid $panel-border;
+  border-radius: $radius-md;
+  background: $panel-surface;
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__name {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $panel-text;
+  }
+
+  &__acciones {
+    font-size: 11px;
+    color: $panel-muted;
+  }
+
+  &__toggle {
+    padding: 3px 10px;
+    border-radius: $radius-full;
+    font-size: 11px;
+    font-weight: $font-bold;
+    border: 1px solid $panel-border;
+    background: $panel-bg;
+    color: $panel-muted;
+    cursor: pointer;
+    transition: all 120ms ease;
+    flex-shrink: 0;
+
+    &--on {
+      background: rgba($primary-500, 0.1);
+      border-color: rgba($primary-500, 0.3);
+      color: $primary-700;
+    }
+
+    &:hover {
+      border-color: $primary-400;
+    }
+  }
+}
+
+// ── I3: Preview reactivo de acción en chat ────────────────────────────────────
+.chat-action-preview {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  padding: $size-2 $size-3;
+  margin-bottom: $size-2;
+  background: rgba($primary-500, 0.08);
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-md;
+  animation: panel-fade-up 200ms ease both;
+
+  &__spark {
+    color: $primary-500;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    font-size: $font-xs;
+    color: $primary-700;
+    font-weight: $font-medium;
+  }
+}
+
+@keyframes panel-fade-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.panel-ver-todas {
+  display: block;
+  text-align: center;
+  font-size: $font-xs;
+  color: $primary-500;
+  font-weight: $font-semibold;
+  padding: $size-3;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}

@@ -157,7 +157,39 @@
   &__text { font-size: $font-sm; color: $gray-700; line-height: 1.55; margin: 0; }
 }
 
-// ── Lista de productos (Paso 2) ───────────────────────────────────────────
+// ── Buscador de producto (I9) ─────────────────────────────────────────────
+
+.prod-search {
+  margin-bottom: $size-3;
+
+  &__input {
+    width: 100%; padding: $size-2 $size-4;
+    border: 1px solid $gray-200; border-radius: $radius-md;
+    font-size: $font-sm; font-family: $font-primary; color: $gray-800;
+    background: $white; outline: none; transition: border-color 120ms ease;
+    &::placeholder { color: $gray-400; }
+    &:focus { border-color: $primary-400; }
+  }
+
+  &__empty {
+    text-align: center; color: $gray-400; font-size: $font-sm;
+    padding: $size-6 $size-4;
+  }
+}
+
+// ── ADA Risk Alert (I9) ───────────────────────────────────────────────────
+
+.ada-risk-alert {
+  display: flex; gap: $size-3; align-items: flex-start;
+  padding: $size-3 $size-4;
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: $radius-md;
+  margin-bottom: $size-2;
+
+  &__icon { color: #dc2626; font-size: $font-md; flex-shrink: 0; margin-top: 1px; }
+  &__text { font-size: $font-sm; color: #991b1b; line-height: 1.5; }
+}
+
+// ── Lista de productos (Paso 1) ───────────────────────────────────────────
 
 .productos-list { display: flex; flex-direction: column; gap: $size-3; }
 
@@ -214,6 +246,20 @@
     font-family: $font-primary; background: white;
     &:focus { outline: none; }
   }
+
+  &__static {
+    flex: 1; padding: 0 $size-3; height: 40px; display: flex; align-items: center;
+    font-size: $font-md; font-weight: $font-semibold; color: $gray-500;
+    background: $gray-50;
+  }
+
+  &__readonly-tag {
+    font-size: 10px; font-weight: $font-semibold; padding: 1px 6px;
+    background: $gray-100; color: $gray-500; border-radius: $radius-full;
+    margin-left: $size-2;
+  }
+
+  &--readonly .brujula-field__row { background: $gray-50; }
 }
 
 .brujula-outputs {
@@ -255,7 +301,27 @@
     &--neutral { color: $gray-700; }
     &--warn { color: #d97706; }
     &--primary { color: $primary-600; }
+    &--green { color: #16a34a; }
   }
+
+  &--ganancia {
+    border-top: 1px solid $gray-200;
+    padding-top: $size-3;
+    border-bottom: none;
+  }
+}
+
+// Expectativa pedidos desde brújula (I9)
+.brujula-expectativa {
+  display: flex; align-items: center; gap: $size-3;
+  padding: $size-3 $size-4;
+  background: rgba($primary-500, 0.06);
+  border: 1px solid rgba($primary-500, 0.18);
+  border-radius: $radius-md;
+
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $primary-700; flex-shrink: 0; }
+  &__val { font-size: $font-md; font-weight: $font-bold; color: $gray-900; flex: 1; }
+  &__sub { font-size: 11px; color: $gray-500; }
 }
 
 .brujula-slider-section {

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { getObjetivo, G6Objetivo, TIPO_LABEL } from '../../../../../mocks/gali-v6/objetivo';
 
-type Step = 'objetivo' | 'producto' | 'brujula' | 'presupuesto' | 'agentes' | 'lanzar';
+type Step = 'producto' | 'brujula' | 'presupuesto' | 'lanzar';
 
 interface ProductoOption {
   id: string;
@@ -40,7 +40,7 @@ const ROAS_HISTORICO = 1.93;
 export class Gali6NuevoProyectoComponent {
   private router = inject(Router);
 
-  readonly step = signal<Step>('objetivo');
+  readonly step = signal<Step>('producto');
   readonly objetivo: G6Objetivo = getObjetivo();
   readonly tipoLabel = TIPO_LABEL[this.objetivo.tipo];
 
@@ -64,13 +64,29 @@ export class Gali6NuevoProyectoComponent {
     return `Con este proyecto llegarías a ${total}/sem. Te quedarían ${resta} para completar tu objetivo.`;
   });
 
-  // ── Paso 2: Producto ──────────────────────────────────────────────────
+  // ── Paso 1: Producto ──────────────────────────────────────────────────
+  readonly productoSearch = signal('');
   readonly productos = ADA_PRODUCTOS;
+
+  readonly productosFiltrados = computed(() => {
+    const q = this.productoSearch().toLowerCase().trim();
+    if (!q) return ADA_PRODUCTOS;
+    return ADA_PRODUCTOS.filter(p =>
+      p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
+    );
+  });
+
   readonly selectedProducto = signal<ProductoOption | null>(null);
+
+  readonly adaRiskAlert = computed(() => {
+    const p = this.selectedProducto();
+    return p && p.adaScore < 55
+      ? `ADA detecta riesgo: score ${p.adaScore}/100. Alta competencia en "${p.categoria}". Considera ajustar precio.`
+      : null;
+  });
 
   selectProducto(p: ProductoOption): void {
     this.selectedProducto.set(p);
-    // Pre-cargar valores de Brújula con defaults del producto
     this.costoProd.set(p.costoBase);
     this.fleteEst.set(p.fleteBase);
   }
@@ -81,25 +97,37 @@ export class Gali6NuevoProyectoComponent {
     return 'cool';
   }
 
-  // ── Paso 3: Calculadora Brújula ───────────────────────────────────────
+  // ── Paso 2: Brújula ampliada ──────────────────────────────────────────
   readonly costoProd = signal(18000);
-  readonly fleteEst = signal(7000);
-  readonly margenObjetivo = 40; // 40% de margen objetivo
+  readonly FLETE_FIJO = 7000; // flete read-only
+  readonly COMISION_PCT = 8;  // comisión Dropi fija
+  readonly margenObjetivo = 40;
 
-  readonly costoTotal = computed(() => this.costoProd() + this.fleteEst());
-  readonly precioMinimo = computed(() => Math.round(this.costoTotal() / 0.85)); // break-even con 15% buffer
+  readonly costoTotal = computed(() => this.costoProd() + this.FLETE_FIJO);
+  readonly precioMinimo = computed(() => Math.round(this.costoTotal() / 0.85));
   readonly precioRecomendado = computed(() => Math.round(this.costoTotal() / (1 - this.margenObjetivo / 100)));
-  readonly precioSlider = signal(0); // 0 = usar recomendado
+  readonly precioSlider = signal(0);
 
   readonly precioFinal = computed(() => {
     const slider = this.precioSlider();
     return slider > 0 ? slider : this.precioRecomendado();
   });
-  readonly margenFinal = computed(() => {
+
+  readonly comisionDropi = computed(() => Math.round(this.precioFinal() * this.COMISION_PCT / 100));
+
+  readonly gananciaReal = computed(() => {
     const precio = this.precioFinal();
     const costo = this.costoTotal();
-    return Math.round(((precio - costo) / precio) * 100);
+    const comision = this.comisionDropi();
+    return precio - costo - comision;
   });
+
+  readonly margenFinal = computed(() => {
+    const precio = this.precioFinal();
+    const ganancia = this.gananciaReal();
+    return precio > 0 ? Math.round((ganancia / precio) * 100) : 0;
+  });
+
   readonly margenSemaforo = computed(() => {
     const m = this.margenFinal();
     if (m >= 35) return 'verde';
@@ -107,32 +135,38 @@ export class Gali6NuevoProyectoComponent {
     return 'rojo';
   });
 
+  // Expectativa pedidos calculada desde presupuesto y precio
+  readonly expectativaPedidosSem = computed(() => {
+    const presupuesto = this.presupuestoDiario() * 7;
+    const precio = this.precioFinal();
+    if (precio <= 0) return 0;
+    return Math.round((presupuesto * ROAS_HISTORICO) / precio);
+  });
+
+  readonly fleteEst = signal(7000); // kept for reference, UI uses FLETE_FIJO
+
   usarPrecioRecomendado(): void {
     this.precioSlider.set(this.precioRecomendado());
   }
 
-  // ── Paso 4: Presupuesto ───────────────────────────────────────────────
+  // ── Paso 3: Presupuesto ───────────────────────────────────────────────
   readonly presupuestoDiario = signal(25000);
 
   readonly galiSugerenciaPresupuesto = computed(() => {
     const faltanteObj = this.objetivo.meta_pedidos_sem - this.pedidosActuales;
     const pedidosTarget = Math.min(faltanteObj, this.pedidosEsperadosSem());
     const precio = this.precioFinal();
-    // (pedidos objetivo/sem × precio / ROAS) / 7 días
     const sugerido = Math.round((pedidosTarget * precio) / ROAS_HISTORICO / 7);
     const sugeridoRedondeado = Math.ceil(sugerido / 5000) * 5000;
     return {
       valor: sugeridoRedondeado,
-      contexto: `Para tus ${pedidosTarget} pedidos/sem faltantes con ROAS ${ROAS_HISTORICO}x, necesitas mínimo $${(sugeridoRedondeado / 1000).toFixed(0)}k/día`,
+      contexto: `Para ${pedidosTarget} pedidos/sem faltantes con ROAS ${ROAS_HISTORICO}x, necesitas ~$${(sugeridoRedondeado / 1000).toFixed(0)}k/día`,
     };
   });
 
   readonly presupuestoPedidosEst = computed(() => {
-    const p = this.presupuestoDiario();
-    if (p < 15000) return '3–5/sem';
-    if (p < 25000) return '6–10/sem';
-    if (p < 40000) return '10–18/sem';
-    return '18–30/sem';
+    const est = this.expectativaPedidosSem();
+    return est > 0 ? `~${est} pedidos/sem` : '—';
   });
 
   usarSugerenciaGali(): void {
@@ -189,25 +223,20 @@ export class Gali6NuevoProyectoComponent {
     this.launchProgress.set(0);
     this.launchStepActive.set(1);
 
-    setTimeout(() => {
-      this.launchProgress.set(30);
-      this.launchStepActive.set(1);
-    }, 200);
-
-    setTimeout(() => {
-      this.launchProgress.set(65);
-      this.launchStepActive.set(2);
-    }, 900);
-
-    setTimeout(() => {
-      this.launchProgress.set(100);
-      this.launchStepActive.set(3);
-    }, 1700);
+    setTimeout(() => { this.launchProgress.set(30); this.launchStepActive.set(1); }, 200);
+    setTimeout(() => { this.launchProgress.set(65); this.launchStepActive.set(2); }, 900);
+    setTimeout(() => { this.launchProgress.set(100); this.launchStepActive.set(3); }, 1700);
 
     setTimeout(() => {
       this.isLaunching.set(false);
-      this.launched.set(true);
-    }, 2400);
+      // I10: redirige al proyecto recién lanzado con flag ?recien=1
+      import('../../../../../mocks/gali-v5/projects.json').then(m => {
+        const projects = m.default as any[];
+        const activo = projects.find(p => p.estado === 'recien_lanzado' || p.estado === 'activo');
+        const id = activo?.id ?? 'proj-001';
+        this.router.navigate(['/gali-6/proyecto', id], { queryParams: { recien: '1' } });
+      });
+    }, 2500);
   }
 
   volverAProyectos(): void {
@@ -216,21 +245,25 @@ export class Gali6NuevoProyectoComponent {
 
   // ── Navegación ──────────────────────────────────────────────────────
   readonly STEPS: Array<{ id: Step; label: string }> = [
-    { id: 'objetivo',    label: 'Objetivo' },
     { id: 'producto',    label: 'Producto' },
-    { id: 'brujula',    label: 'Brújula' },
+    { id: 'brujula',     label: 'Brújula' },
     { id: 'presupuesto', label: 'Presupuesto' },
-    { id: 'agentes',    label: 'Agentes' },
-    { id: 'lanzar',     label: 'Lanzar' },
+    { id: 'lanzar',      label: 'Lanzar' },
   ];
+
+  readonly STEP_ORDER: Step[] = ['producto', 'brujula', 'presupuesto', 'lanzar'];
 
   goTo(s: Step): void { this.step.set(s); }
 
   goBack(): void {
-    const order: Step[] = ['objetivo', 'producto', 'brujula', 'presupuesto', 'agentes', 'lanzar'];
-    const idx = order.indexOf(this.step());
-    if (idx > 0) this.step.set(order[idx - 1]);
+    const idx = this.STEP_ORDER.indexOf(this.step());
+    if (idx > 0) this.step.set(this.STEP_ORDER[idx - 1]);
     else this.router.navigate(['/gali-6/proyectos']);
+  }
+
+  goNext(): void {
+    const idx = this.STEP_ORDER.indexOf(this.step());
+    if (idx < this.STEP_ORDER.length - 1) this.step.set(this.STEP_ORDER[idx + 1]);
   }
 
   stepIndex(s: Step): number {

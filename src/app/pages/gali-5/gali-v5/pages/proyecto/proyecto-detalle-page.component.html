@@ -24,6 +24,15 @@
       <div class="proyecto__actions-top">
         <button type="button" class="btn-hero btn-hero--ghost">Ver en mapa</button>
         <button type="button" class="btn-hero btn-hero--ghost">Historial completo</button>
+        <!-- I8d: Pausar / Reanudar / Editar desde dentro del proyecto -->
+        <div class="proy-detail__header-actions">
+          @if (!proyectoPausado() && (proyectoEstado() === 'activo' || proyectoEstado() === 'en_escala' || proyectoEstado() === 'recien_lanzado')) {
+            <button class="proy-detail__pause-btn" type="button" (click)="pausarProyecto()">⏸ Pausar</button>
+          } @else if (proyectoPausado()) {
+            <button class="proy-detail__pause-btn proy-detail__pause-btn--reanudar" type="button" (click)="reanudarProyecto()">▶ Reanudar</button>
+          }
+          <button class="proy-detail__edit-btn" type="button" (click)="editarProyecto()">✎ Editar</button>
+        </div>
       </div>
     </div>
 
@@ -88,6 +97,36 @@
       </div>
     }
   </header>
+
+  <!-- I8d: Toast de pausa/reanudación -->
+  @if (toastPausa()) {
+    <div class="proy-toast" role="status" aria-live="polite">{{ toastPausa() }}</div>
+  }
+
+  <!-- I10: Sección "Falta lo más importante" — visible cuando recien_lanzado + creativos_pendientes -->
+  @if (isRecienLanzado() && proyectoCreativosPendientes() && creativosPendientesVisible()) {
+    <section class="proy-pendiente-creative">
+      <span class="proy-pendiente-creative__eyebrow">⚡ Falta lo más importante</span>
+      <h2 class="proy-pendiente-creative__title">Tu campaña necesita landing page y creativos</h2>
+      <p class="proy-pendiente-creative__sub">
+        Sin esto la pauta no puede correr. Gali puede generarlos o puedes hacerlo tú.
+      </p>
+      <div class="proy-pendiente-creative__opciones">
+        <button class="proy-pendiente-creative__opt proy-pendiente-creative__opt--auto"
+                type="button" (click)="galiAutomatiza()">
+          <span aria-hidden="true">✦</span>
+          <strong>Que Gali lo haga</strong>
+          <span>Conecta con tus asistentes para generar página y creativos</span>
+        </button>
+        <button class="proy-pendiente-creative__opt proy-pendiente-creative__opt--manual"
+                type="button" (click)="irACreador()">
+          <span aria-hidden="true">✎</span>
+          <strong>Lo hago yo</strong>
+          <span>Ir al Creador de Páginas con asistencia de IA</span>
+        </button>
+      </div>
+    </section>
+  }
 
   @if (isRecienLanzado()) {
     <!-- ══ ACTIVATION VIEW: Recién lanzado ══ -->

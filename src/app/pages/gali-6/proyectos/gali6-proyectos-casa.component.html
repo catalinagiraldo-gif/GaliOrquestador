@@ -1,92 +1,22 @@
 <div class="proy gali-stagger-in">
   <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" sub="Proyectos organizados alrededor de tu meta de negocio." />
 
-  <!-- ── BLOQUE 4: Objetivo con contribuciones ── -->
-  <section class="goal" [attr.data-estado]="metaEstado()">
-    <div class="goal__header">
-      <div class="goal__meta">
-        <div class="goal__top-row">
-          <span class="goal__tipo-pill">{{ tipoLabel() }}</span>
-          <span class="goal__plazo">Semana {{ semanasTranscurridas() }}/{{ objetivo().plazo_semanas }} · inicio {{ fechaInicioLabel() }}</span>
-        </div>
-        <span class="goal__eyebrow">Tu objetivo</span>
-        <h1 class="goal__text">{{ objetivo().texto }}</h1>
-      </div>
-      <button class="goal__edit" (click)="openEdit()">Editar</button>
+  <!-- ── BLOQUE 4: Objetivo compacto ── -->
+  <div class="objetivo-compact">
+    <span class="objetivo-compact__texto">{{ objetivo().texto }}</span>
+    <div class="objetivo-compact__bar"
+         role="progressbar"
+         [attr.aria-valuenow]="pedidosActual"
+         [attr.aria-valuemin]="0"
+         [attr.aria-valuemax]="objetivo().meta_pedidos_sem"
+         [attr.aria-label]="pedidosActual + ' de ' + objetivo().meta_pedidos_sem + ' pedidos · ' + metaPct() + '%'">
+      <div class="objetivo-compact__fill" [style.width.%]="metaPct()"></div>
     </div>
-
-    <!-- Barra de progreso global -->
-    <div class="goal__progress">
-      <div class="goal__track"
-           role="progressbar"
-           [attr.aria-valuenow]="pedidosActual"
-           [attr.aria-valuemin]="0"
-           [attr.aria-valuemax]="objetivo().meta_pedidos_sem"
-           [attr.aria-label]="pedidosActual + ' de ' + objetivo().meta_pedidos_sem + ' pedidos — ' + metaPct() + '%'">
-        <div class="goal__fill" [style.width.%]="metaPct()"></div>
-      </div>
-      <span class="goal__num">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} pedidos · {{ metaPct() }}%</span>
-      <span class="goal__state" [attr.data-estado]="metaEstado()">
-        {{ metaEstado() === 'cumplida' ? 'Cumplida ✓' : metaEstado() === 'en_camino' ? 'En camino' : 'En riesgo' }}
-      </span>
-    </div>
-
-    <!-- Contribución por proyecto -->
-    @if (proyectosActivos().length > 0) {
-      <div class="goal__breakdown">
-        <span class="goal__breakdown-title">Contribución por proyecto</span>
-        <div class="goal__contrib-list">
-          @for (p of proyectosActivos(); track p.id) {
-            <div class="goal__contrib-row">
-              <span class="goal__contrib-estado" [attr.data-estado]="p.estado"></span>
-              <span class="goal__contrib-name">{{ p.nombre }}</span>
-              <div class="goal__contrib-track">
-                <div class="goal__contrib-fill" [attr.data-estado]="p.estado"
-                     [style.width.%]="p.contribucionPct"></div>
-              </div>
-              <span class="goal__contrib-num">{{ p.pedidosSem > 0 ? (p.pedidosSem + '/sem') : '—' }}</span>
-              <span class="goal__contrib-pct">{{ p.contribucionPct }}%</span>
-            </div>
-          }
-          @if (pedidosActual < objetivo().meta_pedidos_sem) {
-            <div class="goal__contrib-gap">
-              <span class="goal__contrib-estado" data-estado="gap"></span>
-              <span class="goal__contrib-name goal__contrib-name--gap">Brecha sin cubrir</span>
-              <div class="goal__contrib-track">
-                <div class="goal__contrib-fill goal__contrib-fill--gap"
-                     [style.width.%]="100 - metaPct()"></div>
-              </div>
-              <span class="goal__contrib-num">{{ objetivo().meta_pedidos_sem - pedidosActual }}/sem</span>
-              <span class="goal__contrib-pct goal__contrib-pct--gap">{{ 100 - metaPct() }}%</span>
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Sub-metas -->
-    @if (objetivo().sub_metas.length > 0) {
-      <div class="goal__submetas">
-        <span class="goal__submetas-title">
-          Pasos del objetivo
-          <span class="goal__submetas-count">{{ subMetasLogradas() }}/{{ objetivo().sub_metas.length }} logrados</span>
-        </span>
-        <div class="goal__submetas-list">
-          @for (sm of objetivo().sub_metas; track sm.id) {
-            <label class="goal__submeta" [class.is-done]="sm.lograda" (click)="toggleSubMeta(sm.id)">
-              <span class="goal__submeta-check" [class.is-done]="sm.lograda">
-                @if (sm.lograda) { ✓ } @else { ○ }
-              </span>
-              <span class="goal__submeta-label">{{ sm.label }}</span>
-              @if (sm.lograda && sm.fecha_logro) {
-                <span class="goal__submeta-fecha">{{ formatFechaLogro(sm.fecha_logro) }}</span>
-              }
-            </label>
-          }
-        </div>
-      </div>
-    }
-  </section>
+    <span class="objetivo-compact__val">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} · {{ metaPct() }}%</span>
+    <a routerLink="/gali-6/mi-negocio" [queryParams]="{tab: 'operacion'}" class="objetivo-compact__edit">
+      Editar →
+    </a>
+  </div>
 
   <!-- ── BLOQUE 5: Toast Gali cuando cambia el objetivo ── -->
   @if (galiCambioMensaje()) {
@@ -147,6 +77,14 @@
       <button class="port__new" (click)="nuevo()">+ Nuevo proyecto</button>
     </div>
 
+    <!-- Search bar (I8a) -->
+    <div class="port__search">
+      <input type="search" class="port__search-input"
+             placeholder="Buscar proyecto..."
+             [ngModel]="searchQuery()"
+             (ngModelChange)="searchQuery.set($event)">
+    </div>
+
     <!-- Filtros de estado -->
     <div class="port__filters" role="group" aria-label="Filtrar proyectos por estado">
       <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'todos'"
@@ -181,68 +119,68 @@
     <div class="port__legend">
       <span>Estado</span>
       <span>Proyecto</span>
-      <span>Contribución</span>
-      <span galiGlosario="ROAS">ROAS</span>
       <span>Salud</span>
       <span></span>
     </div>
     @if (portfolioVisible()) {
     <ul class="port__list">
-      @for (p of proyectosFiltrados(); track p.id; let i = $index) {
-        <li class="port__item"
-            [class.port__item--cerrado]="p.estado === 'cerrado'"
-            [class.port__item--borrador]="p.estado === 'borrador'"
-            [class.port__item--recien]="p.estado === 'recien_lanzado'"
-            [style.animationDelay]="(i * 55) + 'ms'"
-            tabindex="0"
-            [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
-            (click)="abrir(p.id)"
-            (keydown.enter)="abrir(p.id)"
-            (keydown.space)="abrir(p.id); $event.preventDefault()">
-          <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
-          <span class="port__name">{{ p.nombre }}</span>
+      @for (p of proyectosFiltradosYBuscados(); track p.id; let i = $index) {
 
-          <!-- Columna contribución al objetivo -->
-          <div class="port__contrib">
-            @if (p.pedidosSem > 0 && p.estado !== 'cerrado') {
-              <div class="port__contrib-track">
-                <div class="port__contrib-fill" [attr.data-estado]="p.estado"
-                     [style.width.%]="p.contribucionPct"></div>
-              </div>
-              <span class="port__contrib-val">{{ p.pedidos }}</span>
-            } @else {
-              <span class="port__contrib-none">—</span>
-            }
-          </div>
+        <!-- Borradores simplificados (I8c) -->
+        @if (p.estado === 'borrador') {
+          <li class="port__item port__item--borrador"
+              [style.animationDelay]="(i * 55) + 'ms'"
+              (click)="abrir(p.id)"
+              tabindex="0"
+              [attr.aria-label]="'Borrador: ' + p.nombre + '. Falta completar'"
+              (keydown.enter)="abrir(p.id)"
+              (keydown.space)="abrir(p.id); $event.preventDefault()">
+            <span class="port__estado" data-estado="borrador">Borrador</span>
+            <span class="port__name">{{ p.nombre }}</span>
+            <span class="port__borrador-hint">Falta elegir producto y precio</span>
+            <span class="port__go">Completar →</span>
+          </li>
+        } @else {
+          <!-- Proyectos normales — 4 columnas (I8b) -->
+          <li class="port__item"
+              [class.port__item--cerrado]="p.estado === 'cerrado'"
+              [class.port__item--recien]="p.estado === 'recien_lanzado'"
+              [style.animationDelay]="(i * 55) + 'ms'"
+              tabindex="0"
+              [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
+              (click)="abrir(p.id)"
+              (keydown.enter)="abrir(p.id)"
+              (keydown.space)="abrir(p.id); $event.preventDefault()">
+            <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+            <span class="port__name">{{ p.nombre }}</span>
 
-          <span class="port__metric">{{ p.roas }}</span>
-          <span class="port__health">
-            <span class="port__health-track">
-              <span class="port__health-fill"
-                    [style.width.%]="p.saludPct"
-                    [class.is-low]="p.saludPct < 45"
-                    [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
+            <span class="port__health">
+              <span class="port__health-track">
+                <span class="port__health-fill"
+                      [style.width.%]="p.saludPct"
+                      [class.is-low]="p.saludPct < 45"
+                      [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
+              </span>
+              <span class="port__health-num">{{ p.saludPct }}%</span>
             </span>
-            <span class="port__health-num">{{ p.saludPct }}%</span>
-          </span>
 
-          <div class="port__actions" (click)="$event.stopPropagation()">
-            @if (p.estado !== 'cerrado') {
-              <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
-                      [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
-            }
-            <span class="port__go">
-              @if (p.estado === 'cerrado') { Ver postmortem → }
-              @else if (p.estado === 'borrador') { Continuar → }
-              @else { → }
-            </span>
-          </div>
-        </li>
+            <div class="port__actions" (click)="$event.stopPropagation()">
+              @if (p.estado !== 'cerrado') {
+                <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
+                        [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
+              }
+              <span class="port__go">
+                @if (p.estado === 'cerrado') { Ver postmortem → }
+                @else { → }
+              </span>
+            </div>
+          </li>
+        }
       }
 
-      @if (proyectosFiltrados().length === 0) {
+      @if (proyectosFiltradosYBuscados().length === 0) {
         <li class="port__empty">
-          <span>No hay proyectos en este estado</span>
+          <span>{{ searchQuery() ? 'Sin resultados para "' + searchQuery() + '"' : 'No hay proyectos en este estado' }}</span>
         </li>
       }
     </ul>
@@ -261,23 +199,41 @@
               (click)="editOpen.set(false)">×</button>
     </div>
 
-    <div class="tipo-picker">
-      @for (t of tipoOptions; track t.id) {
-        <label class="tipo-opt" [class.active]="draftTipo() === t.id">
-          <input type="radio" name="tipo" [value]="t.id"
-                 [checked]="draftTipo() === t.id"
-                 (change)="draftTipo.set(t.id)" class="sr-only">
-          <span class="tipo-opt__label">{{ t.label }}</span>
-          <span class="tipo-opt__desc">{{ t.desc }}</span>
-        </label>
-      }
-    </div>
-
-    <label class="modal__label" for="modal-objetivo-texto">¿Cuál es tu meta de negocio?</label>
-    <textarea id="modal-objetivo-texto" class="modal__input modal__textarea"
+    <label class="modal__label" for="modal-objetivo-texto">¿Qué quieres lograr con tu negocio?</label>
+    <textarea id="modal-objetivo-texto" class="modal__input modal__textarea modal__textarea--libre"
+              placeholder="Ej: generar $3M/mes en ganancia, o tener 5 proyectos simultáneos corriendo solos..."
               [value]="draftTexto()"
               (input)="draftTexto.set($any($event.target).value)"
-              rows="2" autofocus></textarea>
+              rows="3" autofocus></textarea>
+    <button class="modal__gali-ayuda"
+            type="button"
+            [disabled]="!draftTexto().trim() || galiMejorarEstado() === 'procesando'"
+            (click)="ayudarDefinirConGali()">
+      @if (galiMejorarEstado() === 'procesando') {
+        <span class="modal__gali-spinner" aria-hidden="true"></span>
+        Analizando…
+      } @else {
+        ✦ Gali, ayúdame a definir esto
+      }
+    </button>
+
+    @if (galiMejorarEstado() === 'propuesta') {
+      <div class="gali-propuesta" role="status" aria-live="polite">
+        <div class="gali-propuesta__head">
+          <span class="gali-propuesta__icon" aria-hidden="true">✦</span>
+          <span class="gali-propuesta__eyebrow">Gali propone</span>
+        </div>
+        <p class="gali-propuesta__texto">{{ galiPropuestaTexto() }}</p>
+        <div class="gali-propuesta__meta-row">
+          <span class="gali-propuesta__meta-label">Meta sugerida</span>
+          <strong class="gali-propuesta__meta-val">{{ galiPropuestaMeta() }} pedidos/sem</strong>
+        </div>
+        <div class="gali-propuesta__actions">
+          <button class="gali-propuesta__accept" (click)="aceptarPropuestaGali()">Usar propuesta →</button>
+          <button class="gali-propuesta__discard" (click)="descartarPropuestaGali()">Descartar</button>
+        </div>
+      </div>
+    }
 
     <div class="modal__row2">
       <div class="modal__field">
@@ -316,46 +272,6 @@
       }
     </div>
 
-    <!-- ── Mejorar con Gali ── -->
-    <div class="gali-mejorar">
-      <label class="modal__label" for="gali-mejorar-input">Cuéntale a Gali qué quieres lograr</label>
-      <div class="gali-mejorar__row">
-        <textarea id="gali-mejorar-input"
-                  class="modal__input modal__textarea gali-mejorar__input"
-                  placeholder="Cuéntale a Gali qué quieres lograr con tu negocio…"
-                  rows="2"
-                  [value]="galiMejorarInput()"
-                  (input)="galiMejorarInput.set($any($event.target).value)"></textarea>
-        <button class="gali-mejorar__cta"
-                [disabled]="!galiMejorarInput().trim() || galiMejorarEstado() === 'procesando'"
-                (click)="mejorarConGali()">
-          @if (galiMejorarEstado() === 'procesando') {
-            <span class="gali-mejorar__spinner" aria-hidden="true"></span>
-            Analizando…
-          } @else {
-            ✦ Mejorar con Gali →
-          }
-        </button>
-      </div>
-
-      @if (galiMejorarEstado() === 'propuesta') {
-        <div class="gali-propuesta" role="status" aria-live="polite">
-          <div class="gali-propuesta__head">
-            <span class="gali-propuesta__icon" aria-hidden="true">✦</span>
-            <span class="gali-propuesta__eyebrow">Gali propone</span>
-          </div>
-          <p class="gali-propuesta__texto">{{ galiPropuestaTexto() }}</p>
-          <div class="gali-propuesta__meta-row">
-            <span class="gali-propuesta__meta-label">Meta sugerida</span>
-            <strong class="gali-propuesta__meta-val">{{ galiPropuestaMeta() }} pedidos/sem</strong>
-          </div>
-          <div class="gali-propuesta__actions">
-            <button class="gali-propuesta__accept" (click)="aceptarPropuestaGali()">Usar propuesta →</button>
-            <button class="gali-propuesta__discard" (click)="descartarPropuestaGali()">Descartar</button>
-          </div>
-        </div>
-      }
-    </div>
 
     <p class="modal__hint">Gali usará este objetivo para facilitar tus proyectos y priorizarte las señales más relevantes.</p>
     <div class="modal__actions">

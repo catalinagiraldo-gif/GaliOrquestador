@@ -490,6 +490,7 @@
     "id": "difusor-aromaterapia",
     "nombre": "Difusor Aromaterapia Ultra",
     "estado": "recien_lanzado",
+    "creativos_pendientes": true,
     "pedidos_sem": 3,
     "pedidos_sem_label": "3/sem",
     "roas_real": 0,

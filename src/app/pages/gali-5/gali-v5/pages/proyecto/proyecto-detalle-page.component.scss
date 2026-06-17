@@ -2449,3 +2449,345 @@ $hub-info: #3b82f6;
   }
 }
 
+
+// ── I10: Banner creativos pendientes ─────────────────────────────────────────
+.proy-creativos-pendientes {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-left: 4px solid $primary-500;
+  border-radius: $radius-lg;
+  padding: $size-4 $size-5;
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  animation: fade-up 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &__body {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-3;
+  }
+
+  &__spark {
+    font-size: 18px;
+    color: $primary-500;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__texto {
+    font-size: $font-sm;
+    color: $gray-800;
+    line-height: 1.55;
+
+    strong { color: $gray-900; }
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $size-3;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__btn {
+    padding: 7px $size-4;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    cursor: pointer;
+    font-family: $font-primary;
+    border: none;
+    transition: all 120ms ease;
+
+    &--primary {
+      background: $primary-500;
+      color: #fff;
+      &:hover { background: $primary-600; }
+    }
+
+    &--sec {
+      background: $white;
+      border: 1px solid $gray-300;
+      color: $gray-700;
+      &:hover { border-color: $primary-400; color: $primary-700; }
+    }
+
+    &--ghost {
+      background: none;
+      color: $gray-400;
+      font-size: $font-xs;
+      padding: 4px 8px;
+      &:hover { color: $gray-600; }
+    }
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// I8d: Pausar/Reanudar/Editar buttons in hero header
+.proy-detail__header-actions {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+}
+
+.proy-detail__pause-btn {
+  padding: 5px $size-3;
+  border-radius: $radius-md;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  border: 1px solid $gray-300;
+  background: $white;
+  color: $gray-700;
+  transition: all 120ms ease;
+  font-family: $font-primary;
+
+  &:hover { border-color: $gray-400; background: $gray-50; }
+
+  &--reanudar {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #15803d;
+    &:hover { background: #dcfce7; }
+  }
+}
+
+.proy-detail__edit-btn {
+  padding: 5px $size-3;
+  border-radius: $radius-md;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  border: 1px solid $primary-300;
+  background: rgba($primary-500, 0.06);
+  color: $primary-700;
+  transition: all 120ms ease;
+  font-family: $font-primary;
+
+  &:hover { background: rgba($primary-500, 0.13); border-color: $primary-400; }
+}
+
+// I8d: Modal editar proyecto
+.proy-edit-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  animation: fade-up 150ms ease both;
+}
+
+.proy-edit-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  background: $white;
+  border-radius: $radius-xl;
+  padding: $size-6;
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: $size-4;
+  animation: fade-up 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: $font-md;
+    font-weight: $font-bold;
+    color: $gray-900;
+    margin: 0;
+  }
+
+  &__close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: $gray-100;
+    border-radius: $radius-md;
+    font-size: 16px;
+    cursor: pointer;
+    color: $gray-500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover { background: $gray-200; }
+  }
+
+  &__label {
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    color: $gray-600;
+    display: block;
+    margin-bottom: -$size-2;
+  }
+
+  &__input {
+    width: 100%;
+    padding: $size-3 $size-4;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    font-family: $font-primary;
+    color: $gray-900;
+    box-sizing: border-box;
+    transition: border-color 120ms ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-400;
+      box-shadow: 0 0 0 3px rgba($primary-500, 0.1);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $size-3;
+    margin-top: $size-2;
+  }
+
+  &__cancel {
+    padding: $size-2 $size-4;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    background: none;
+    color: $gray-600;
+    font-size: $font-sm;
+    font-family: $font-primary;
+    cursor: pointer;
+    &:hover { background: $gray-50; }
+  }
+
+  &__save {
+    padding: $size-2 $size-5;
+    border: none;
+    border-radius: $radius-md;
+    background: $primary-500;
+    color: $white;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    font-family: $font-primary;
+    cursor: pointer;
+    &:hover { background: $primary-600; }
+  }
+}
+
+// I8d: Toast de pausa
+.proy-toast {
+  margin: $size-3 0;
+  padding: $size-3 $size-5;
+  background: $gray-900;
+  color: #fff;
+  border-radius: $radius-md;
+  font-size: $font-sm;
+  font-family: $font-primary;
+  animation: fade-up 200ms ease both;
+}
+
+// I10: Sección "Falta lo más importante"
+.proy-pendiente-creative {
+  margin: $size-5 0;
+  padding: $size-6;
+  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+  border: 2px solid $primary-200;
+  border-radius: $radius-lg;
+  animation: fade-up 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &__eyebrow {
+    display: block;
+    font-size: $font-xs;
+    font-weight: $font-bold;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $primary-600;
+    margin-bottom: $size-2;
+  }
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: $font-bold;
+    color: $gray-900;
+    margin: 0 0 $size-2;
+    line-height: 1.3;
+  }
+
+  &__sub {
+    font-size: $font-sm;
+    color: $gray-600;
+    margin: 0 0 $size-5;
+    line-height: 1.55;
+  }
+
+  &__opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $size-4;
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__opt {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $size-2;
+    padding: $size-5;
+    border-radius: $radius-lg;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: all 150ms ease;
+    font-family: $font-primary;
+
+    > span:first-child { font-size: 20px; }
+
+    strong {
+      font-size: $font-md;
+      font-weight: $font-bold;
+      color: $gray-900;
+    }
+
+    > span:last-child {
+      font-size: $font-xs;
+      color: $gray-500;
+      line-height: 1.5;
+    }
+
+    &--auto {
+      background: $primary-50;
+      border-color: $primary-300;
+
+      > span:first-child { color: $primary-500; }
+
+      &:hover {
+        background: $primary-100;
+        border-color: $primary-500;
+      }
+    }
+
+    &--manual {
+      background: $gray-50;
+      border-color: $gray-200;
+
+      > span:first-child { color: $gray-600; }
+
+      &:hover {
+        background: $gray-100;
+        border-color: $gray-400;
+      }
+    }
+  }
+}

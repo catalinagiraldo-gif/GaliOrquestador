@@ -695,6 +695,14 @@
           (click)="quickAsk('Quiero lanzar un nuevo producto')">Lanzar</button>
       </div>
 
+      <!-- I3: Preview reactivo cuando Gali va a actuar -->
+      @if (chatActionPreview()) {
+        <div class="chat-action-preview" role="status" aria-live="polite">
+          <span class="chat-action-preview__spark">✦</span>
+          <span class="chat-action-preview__text">{{ chatActionPreview() }}</span>
+        </div>
+      }
+
       <!-- Input -->
       <div class="gali-panel__input-row">
         <input
@@ -718,38 +726,39 @@
   <!-- ── TAB: Agentes ── -->
   @if (activeTab() === 'agentes') {
     <div class="gali-panel__content gali-panel__agentes">
-      @for (agent of gali.agents(); track agent.id) {
-        <div class="agent-row">
-          <div class="agent-row__left">
-            <span class="agent-row__dot" [style.background]="agent.color"
-              [class.agent-row__dot--pulse]="agent.status === 'activo'"></span>
-            <div class="agent-row__info">
-              <span class="agent-row__name">{{ agent.name }}</span>
-              <span class="agent-row__action">{{ agent.action }}</span>
-              @if (agent.skills.length) {
-                <div class="agent-row__skills">
-                  @for (skill of agent.skills; track skill) {
-                    <span class="agent-row__skill-tag">{{ skill }}</span>
-                  }
-                </div>
-              }
+      <div class="autopilot-agents">
+        <span class="autopilot-agents__eyebrow">Autopilot por asistente</span>
+        @for (ag of agentesConAutopilot; track ag.id) {
+          <div class="autopilot-agent-row">
+            <span class="autopilot-agent-row__dot" [style.background]="ag.color"></span>
+            <div class="autopilot-agent-row__info">
+              <span class="autopilot-agent-row__name">{{ ag.nombre }}</span>
+              <span class="autopilot-agent-row__acciones">{{ (autopilotStates()[ag.id] ? ag.accionesHoy : 'desactivado') }}</span>
             </div>
+            <button class="autopilot-agent-row__toggle"
+                    [class.autopilot-agent-row__toggle--on]="autopilotStates()[ag.id]"
+                    type="button"
+                    [attr.aria-label]="'Autopilot ' + ag.nombre + ': ' + (autopilotStates()[ag.id] ? 'ON' : 'OFF')"
+                    (click)="toggleAutopilotAgent(ag.id)">
+              {{ (autopilotStates()[ag.id]) ? 'ON' : 'OFF' }}
+            </button>
           </div>
-          <span class="agent-row__status" [class.agent-row__status--active]="agent.status === 'activo'">
-            {{ agent.status }}
-          </span>
-        </div>
-      }
+        }
+      </div>
 
       <div class="gali-panel__agent-actions">
-        <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button" data-proto-skip
-          (click)="navigateTo('/gali-v5/skills')">
-          <i class="pi pi-cog"></i> Gestionar skills
-        </button>
-        <button class="gali-panel__agent-btn" type="button"
-          (click)="navigateTo('/gali-v5/agentes')">
-          <i class="pi pi-sliders-h"></i> Configurar autopilot →
-        </button>
+        @if (esExperto()) {
+          <button class="gali-panel__agent-btn gali-panel__agent-btn--primary" type="button"
+            (click)="navigateTo('/gali-6/agentes')">
+            <i class="pi pi-bolt"></i> Ver detalles →
+          </button>
+        } @else {
+          <button class="gali-panel__agent-btn gali-panel__agent-btn--primary"
+            type="button" disabled
+            title="Activa modo experto para gestionar asistentes">
+            <i class="pi pi-lock"></i> Ver detalles
+          </button>
+        }
       </div>
     </div>
   }
@@ -757,22 +766,23 @@
   <!-- ── TAB: Señales ── -->
   @if (activeTab() === 'senales') {
     <div class="gali-panel__content gali-panel__senales">
-      @for (sig of gali.galiSignals(); track sig.id) {
+      @for (alerta of panelAlertas; track alerta.id) {
         <div class="signal-item"
-          [class.signal-item--critica]="sig.type === 'critica'"
-          [class.signal-item--sugerencia]="sig.type === 'sugerencia'"
-          [class.signal-item--info]="sig.type === 'info'">
-          <span class="signal-item__emoji">{{ sig.emoji }}</span>
+          [class.signal-item--critica]="alerta.tipo === 'critical'"
+          [class.signal-item--sugerencia]="alerta.tipo === 'warning'">
+          <span class="signal-item__emoji">{{ alerta.tipo === 'critical' ? '◎' : '⚠' }}</span>
           <div class="signal-item__body">
-            <p class="signal-item__msg">{{ sig.message }}</p>
-            <span class="signal-item__time">{{ sig.time }}</span>
+            <p class="signal-item__msg">{{ alerta.titulo }}</p>
+            <span class="signal-item__time">{{ alerta.agente }}</span>
           </div>
-          @if (sig.cta && sig.ctaAction) {
-            <button class="signal-item__cta" type="button"
-              (click)="executeAction(sig.ctaAction!)" data-proto-skip>{{ sig.cta }}</button>
+          @if (alerta.ctaPrincipal) {
+            <button class="signal-item__cta" type="button" data-proto-skip>{{ alerta.ctaPrincipal }}</button>
           }
         </div>
       }
+      <a routerLink="/gali-6/senales" class="panel-ver-todas" (click)="close()">
+        Ver todas las señales →
+      </a>
     </div>
   }
 
