@@ -15,7 +15,7 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
   { prefix: '/gali-6/proyectos',   btn: { icon: '+', label: 'Nuevo proyecto', route: '/gali-6/proyectos/nuevo' } },
   { prefix: '/gali-6/senales',     btn: { icon: '◎', label: 'Ver proyectos', route: '/gali-6/proyectos' } },
   { prefix: '/gali-6/impacto',     btn: { icon: '◇', label: 'Ver proyectos', route: '/gali-6/proyectos' } },
-  { prefix: '/gali-6/marketing',   btn: { icon: '⚡', label: 'Ver señales', route: '/gali-6/senales' } },
+  { prefix: '/gali-6/marketing',   btn: { icon: '⚡', label: 'Ver alertas', route: '/gali-6/senales' } },
 ];
 
 @Component({

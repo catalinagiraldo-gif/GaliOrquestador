@@ -181,7 +181,7 @@ export class Gali6NuevoProyectoComponent {
   readonly LAUNCH_STEPS = [
     { label: 'Creando proyecto en Dropi', pct: 30 },
     { label: 'Asignando agentes', pct: 65 },
-    { label: 'Configurando señales de monitoreo', pct: 100 },
+    { label: 'Activando alertas de monitoreo', pct: 100 },
   ];
 
   launch(): void {

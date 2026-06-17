@@ -333,6 +333,11 @@
     strong { color: $gray-800; }
   }
 
+  &__value-prop {
+    font-size: $font-sm; color: $gray-500; line-height: 1.6; margin: 0;
+    border-top: 1px solid $gray-100; padding-top: $size-3; width: 100%; text-align: center;
+  }
+
   &--confirm .zero__body { gap: $size-5; }
 }
 

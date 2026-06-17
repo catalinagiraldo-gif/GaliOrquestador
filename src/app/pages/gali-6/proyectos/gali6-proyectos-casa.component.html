@@ -401,7 +401,7 @@
     </div>
 
     <div class="modal__agentes">
-      <span class="modal__label">Agentes activos para este proyecto</span>
+      <span class="modal__label">Asistentes de Gali para este proyecto</span>
       <div class="modal__agentes-grid">
         @for (ag of agentesEntries; track ag.id) {
           <label class="modal__agente-opt" [class.is-on]="draftAgentes()[ag.id]">
@@ -478,8 +478,8 @@
           <p class="nuevo-card__objetivo-tag">
             ✦ Con este proyecto llegarías al {{ galiPropuestaAuto()?.pctDespues }}% de tu objetivo.
           </p>
-          <button class="nuevo-card__cta" (click)="confirmarAutoProyecto()">
-            Correr este proyecto →
+          <button class="nuevo-card__cta" (click)="irPreviewAuto()">
+            Correr con Gali →
           </button>
         </article>
 
@@ -496,6 +496,71 @@
             Crear de cero →
           </button>
         </article>
+      </div>
+    }
+
+    <!-- Estado: Preview Card — H4 (preview-then-confirm antes de lanzar) -->
+    @if (nuevoAutoEstado() === 'preview') {
+      <div class="nuevo-preview">
+        @if (previewLoading()) {
+          <div class="nuevo-preview__skel-wrap" aria-label="Cargando propuesta de Gali">
+            <div class="nuevo-preview__skel nuevo-preview__skel--badge"></div>
+            <div class="nuevo-preview__skel nuevo-preview__skel--title"></div>
+            <div class="nuevo-preview__skel nuevo-preview__skel--text"></div>
+            <div class="nuevo-preview__skel-stats">
+              <div class="nuevo-preview__skel nuevo-preview__skel--stat"></div>
+              <div class="nuevo-preview__skel nuevo-preview__skel--stat"></div>
+              <div class="nuevo-preview__skel nuevo-preview__skel--stat"></div>
+            </div>
+          </div>
+          <p class="nuevo-preview__loading-msg">Gali está preparando tu proyecto…</p>
+        } @else {
+          <div class="nuevo-preview__content" role="region" aria-label="Propuesta de Gali">
+
+            <div class="nuevo-preview__top">
+              <button class="nuevo-preview__back" type="button" (click)="nuevoAutoEstado.set('listo')" aria-label="Volver al selector">
+                ← Volver
+              </button>
+              <span class="nuevo-preview__badge">✦ Gali preparó este proyecto</span>
+            </div>
+
+            <div class="nuevo-preview__producto">
+              <h3 class="nuevo-preview__nombre">{{ galiPropuestaAuto()?.producto }}</h3>
+              <p class="nuevo-preview__insight">{{ galiPropuestaAuto()?.por }}</p>
+            </div>
+
+            <div class="nuevo-preview__metrics">
+              <div class="nuevo-preview__metric">
+                <span class="nuevo-preview__metric-val">{{ galiPropuestaAuto()?.presupuestoSugerido }}/día</span>
+                <span class="nuevo-preview__metric-lbl">Presupuesto inicial</span>
+              </div>
+              <div class="nuevo-preview__metric">
+                <span class="nuevo-preview__metric-val">{{ galiPropuestaAuto()?.pedidosMin }}–{{ galiPropuestaAuto()?.pedidosMax }}</span>
+                <span class="nuevo-preview__metric-lbl">pedidos/sem estimados</span>
+              </div>
+              <div class="nuevo-preview__metric">
+                <span class="nuevo-preview__metric-val">{{ galiPropuestaAuto()?.pctDespues }}%</span>
+                <span class="nuevo-preview__metric-lbl">de tu objetivo al alcanzar</span>
+              </div>
+            </div>
+
+            <div class="nuevo-preview__nota">
+              <span class="nuevo-preview__nota-icon" aria-hidden="true">✦</span>
+              <p class="nuevo-preview__nota-text">
+                Gali se encargará de la pauta y el monitoreo durante los primeros {{ galiPropuestaAuto()?.ventana }} días. Podrás ajustar o pausar en cualquier momento.
+              </p>
+            </div>
+
+            <div class="nuevo-preview__actions">
+              <button class="nuevo-preview__btn-detail" type="button" (click)="irWizard()">
+                Ver cómo lo calculó ▸
+              </button>
+              <button class="nuevo-preview__btn-launch" type="button" (click)="confirmarAutoProyecto()">
+                🚀 Lanzar →
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 

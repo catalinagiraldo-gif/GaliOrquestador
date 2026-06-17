@@ -77,8 +77,20 @@
   padding: $size-8 $size-6; text-align: center; background: #fff;
   border: 1px solid $gray-100; border-radius: $radius-lg; box-shadow: $shadow-small;
   animation: g6-breathe 4s ease-in-out infinite;
+  display: flex; flex-direction: column; align-items: center; gap: $size-2;
+
+  &__eyebrow {
+    font-size: 11px; font-weight: $font-semibold; text-transform: uppercase;
+    letter-spacing: 0.06em; color: $primary-500;
+    span { margin-right: 4px; }
+  }
   &__title { margin: 0; font-size: $font-lg; font-weight: $font-semibold; color: $gray-800; }
-  &__sub { margin: 6px 0 0; font-size: $font-sm; color: $gray-500; }
+  &__sub { margin: 0; font-size: $font-sm; color: $gray-500; line-height: 1.55; max-width: 42ch; }
+  &__cta {
+    margin-top: $size-2; font-size: $font-sm; font-weight: $font-semibold;
+    color: $primary-600; text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
 }
 
 /* 3 · Impacto */

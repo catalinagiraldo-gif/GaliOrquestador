@@ -26,7 +26,7 @@ import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
           <div class="stat"><span class="stat__v">{{ s.acciones_totales }}</span><span class="stat__l">acciones · <em>{{ s.acciones_autonomas }} autónomas</em></span></div>
           <div class="stat"><span class="stat__v">{{ s.novedades_evitadas }}</span><span class="stat__l"><span galiGlosario="novedad">novedades</span> evitadas</span></div>
           <div class="stat"><span class="stat__v">{{ s.campanas_escaladas }}</span><span class="stat__l">campañas escaladas</span></div>
-          <div class="stat"><span class="stat__v">{{ s.senales_detectadas }}</span><span class="stat__l">señales detectadas</span></div>
+          <div class="stat"><span class="stat__v">{{ s.senales_detectadas }}</span><span class="stat__l">alertas detectadas</span></div>
           <div class="stat"><span class="stat__v">{{ s.horas_libradas }}h</span><span class="stat__l">que no operaste tú</span></div>
         </div>
         <div class="bars">

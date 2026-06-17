@@ -213,7 +213,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
         tipo: 'atencion',
         titulo: `${pausados.length} proyecto${pausados.length > 1 ? 's' : ''} pausado${pausados.length > 1 ? 's' : ''} no contribuyen a tu meta`,
         cuerpo: `${nombres}${pausados.length > 2 ? ' y otros' : ''} están sin pauta activa. Reactivarlos podría sumar hasta ${pausados.reduce((a, p) => a + (p.pedidosSem ?? 5), 0)}/sem a tu objetivo.`,
-        cta: 'Ver señales de reactivación',
+        cta: 'Ver alertas de reactivación',
         accion: 'ver',
       });
     }
@@ -297,7 +297,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
       let textoGenerado: string;
       if (/automatizar|automati/.test(texto)) {
-        textoGenerado = `Automatizar la operación y sostener ${meta} pedidos/semana con proyectos activos que Gali monitorea en tiempo real.`;
+        textoGenerado = `Facilitar la operación y sostener ${meta} pedidos/semana con proyectos activos que Gali cuida en tiempo real.`;
       } else if (/escalar|crecer/.test(texto)) {
         textoGenerado = `Escalar el negocio a ${meta} pedidos/semana lanzando proyectos nuevos y optimizando los que ya corren.`;
       } else if (/primer|empezar|iniciar|comenzar/.test(texto)) {
@@ -331,6 +331,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   onEscape(): void {
     if (this.editProyectoOpen()) { this.editProyectoOpen.set(false); return; }
     if (this.editOpen()) { this.editOpen.set(false); return; }
+    if (this.nuevoModalOpen() && this.nuevoAutoEstado() === 'preview') { this.nuevoAutoEstado.set('listo'); return; }
     if (this.nuevoModalOpen()) { this.cerrarNuevoModal(); }
   }
 
@@ -392,7 +393,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       const dir = diff > 0 ? 'subiste' : 'bajaste';
       this.galiCambioMensaje.set(
         `${dir === 'subiste' ? '↑' : '↓'} Ajustaste tu meta de ${anterior.meta_pedidos_sem} a ${updated.meta_pedidos_sem} pedidos/sem. ` +
-        `Gali recalculó tus check-ins y priorizará las señales más relevantes para la nueva meta.`
+        `Gali recalculó tus check-ins y priorizará las alertas más relevantes para la nueva meta.`
       );
       setTimeout(() => this.galiCambioMensaje.set(null), 8000);
     } else if (anterior.texto !== updated.texto) {
@@ -506,12 +507,13 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
   // ── Nuevo proyecto: modal selector (Cambio A) ─────────────────────────
   readonly nuevoModalOpen = signal(false);
-  readonly nuevoAutoEstado = signal<'cargando' | 'listo' | 'lanzando'>('cargando');
+  readonly nuevoAutoEstado = signal<'cargando' | 'listo' | 'preview' | 'lanzando'>('cargando');
+  readonly previewLoading = signal(true);
   readonly lanzamientoPct = signal(0);
   readonly lanzamientoSteps = signal([
     { label: 'Proyecto creado en Dropi', done: false },
-    { label: 'Agentes asignados al proyecto', done: false },
-    { label: 'Señales de monitoreo configuradas', done: false },
+    { label: 'Apoyo de Gali asignado al proyecto', done: false },
+    { label: 'Alertas de monitoreo activadas', done: false },
   ]);
 
   readonly galiPropuestaAuto = computed(() => {
@@ -525,6 +527,8 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       por: (senal as any).recomendacion ?? senal.contextoMacromundo,
       ventana: (senal as any).ventanaDias ?? 7,
       pedidosEstimados: est,
+      pedidosMin: Math.round(est * 0.8),
+      pedidosMax: Math.round(est * 1.2),
       presupuestoSugerido: '$35.000',
       metrica: (senal as any).metrica ?? '',
       pctDespues,
@@ -537,6 +541,12 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     setTimeout(() => this.nuevoAutoEstado.set('listo'), 1400);
   }
 
+  irPreviewAuto(): void {
+    this.previewLoading.set(true);
+    this.nuevoAutoEstado.set('preview');
+    setTimeout(() => this.previewLoading.set(false), 220);
+  }
+
   cerrarNuevoModal(): void {
     this.nuevoModalOpen.set(false);
   }
@@ -546,8 +556,8 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.lanzamientoPct.set(0);
     this.lanzamientoSteps.set([
       { label: 'Proyecto creado en Dropi', done: false },
-      { label: 'Agentes asignados al proyecto', done: false },
-      { label: 'Señales de monitoreo configuradas', done: false },
+      { label: 'Apoyo de Gali asignado al proyecto', done: false },
+      { label: 'Alertas de monitoreo activadas', done: false },
     ]);
     setTimeout(() => {
       this.lanzamientoPct.set(33);

@@ -11,7 +11,7 @@
         <span class="status__period-badge">Semanal</span>
         hacia tu meta
         @if (verImpactoGali()) {
-          <span class="status__gali-delta" title="Pedidos atribuibles a acciones de Gali esta semana">✦ +{{ galiDelta.pedidos }} por Gali</span>
+          <span class="status__gali-delta" title="Pedidos atribuibles a acciones de Gali esta semana">✦ +{{ galiDelta.pedidos }} con Gali · {{ pedidosActual - galiDelta.pedidos }} sin Gali</span>
         }
       </p>
     </div>
@@ -51,8 +51,10 @@
       </button>
     } @else if (decisionResuelta() && !decisionToast()) {
       <div class="calma">
-        <p class="calma__title">Todo está corriendo.</p>
-        <p class="calma__sub">Última acción de Gali {{ ultimaAccionGali }}.</p>
+        <span class="calma__eyebrow"><span aria-hidden="true">✦</span> Gali tiene el timón</span>
+        <p class="calma__title">Todo está en orden.</p>
+        <p class="calma__sub">Mientras tú te enfocas en tu visión, Gali monitorea tus métricas y te avisa si hay algo importante.</p>
+        <a routerLink="/gali-6/impacto" class="calma__cta">Ver lo que Gali hizo hoy →</a>
       </div>
     }
   </section>
@@ -128,15 +130,15 @@
     </div>
   </section>
 
-  <!-- ── 5 · Cola de señales pendientes ── -->
+  <!-- ── 5 · Cola de alertas pendientes ── -->
   @if (colaDecisiones().length > 0) {
-    <section class="cola" aria-label="Otras señales pendientes">
+    <section class="cola" aria-label="Otras alertas pendientes">
       <button class="cola__toggle" type="button"
               [attr.aria-expanded]="colaExpanded()"
               (click)="toggleCola()">
         <span class="cola__eyebrow">
           <span aria-hidden="true">◎</span>
-          {{ colaDecisiones().length }} señal{{ colaDecisiones().length !== 1 ? 'es' : '' }} pendiente{{ colaDecisiones().length !== 1 ? 's' : '' }}
+          {{ colaDecisiones().length }} alerta{{ colaDecisiones().length !== 1 ? 's' : '' }} pendiente{{ colaDecisiones().length !== 1 ? 's' : '' }}
         </span>
         <span class="cola__chevron" [class.cola__chevron--open]="colaExpanded()" aria-hidden="true">▾</span>
       </button>
@@ -155,7 +157,7 @@
             </li>
           }
         </ul>
-        <a routerLink="/gali-6/senales" class="cola__ver-todas">Ver todas en Señales →</a>
+        <a routerLink="/gali-6/senales" class="cola__ver-todas">Ver todas las alertas →</a>
       }
     </section>
   }

@@ -212,9 +212,10 @@
        aria-labelledby="zero-confirm-title" cdkTrapFocus cdkTrapFocusAutoCapture>
     <div class="zero__body">
       <span class="zero__gali zero__gali--lg" aria-hidden="true">✦</span>
-      <h2 id="zero-confirm-title" class="zero__title">Tú pusiste la meta. Gali se encarga del resto.</h2>
+      <h2 id="zero-confirm-title" class="zero__title">Tú pones la visión.<br>Gali armoniza el resto.</h2>
       <p class="zero__respuesta">{{ zeroRespuesta() }}</p>
       <p class="zero__hint">Empezás en <strong>modo básico</strong> — lo que necesitás, sin ruido. Activá modo experto cuando quieras ver la maquinaria completa.</p>
+      <p class="zero__value-prop">Basándonos en lo que nos contaste, Gali ya preparó tu primer paso. Puedes cambiarlo cuando quieras.</p>
       <button class="zero__cta zero__cta--confirm" (click)="zeroClose()">Empezar con Gali →</button>
     </div>
   </div>
@@ -333,7 +334,7 @@
     </div>
     <div class="g6-cat-panel__body">
       <p class="g6-cat-panel__context">
-        Señales activas · {{ alertasCriticasCount }} con prioridad alta entre {{ alertasCriticasCount + 4 }} detectadas
+        Alertas activas · {{ alertasCriticasCount }} con prioridad alta entre {{ alertasCriticasCount + 4 }} detectadas
       </p>
       <h3 id="sen-panel-title" class="g6-cat-panel__title">
         {{ alertaTopSenales.agente | titlecase }} necesita tu decisión ahora
@@ -364,7 +365,7 @@
         Decidir en el inicio →
       </button>
       <button class="g6-cat-panel__sec" type="button" (click)="gali.closeSenalesPanel()">
-        Ver todas las señales aquí
+        Ver todas las alertas →
       </button>
     </div>
   </aside>
