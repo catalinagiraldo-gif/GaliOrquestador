@@ -1,0 +1,339 @@
+@import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
+
+:host { display: block; width: 100%; }
+
+.g6-mkt {
+  padding: 1.5rem 1.5rem 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+// ── Header ─────────────────────────────────────────────────
+.g6-mkt__header { margin-bottom: 1.5rem; }
+
+.g6-mkt__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $os-text-primary;
+  margin: 0 0 0.25rem;
+}
+
+.g6-mkt__subtitle {
+  font-size: 0.8rem;
+  color: $os-text-secondary;
+  margin: 0;
+}
+
+// ── Filtros ────────────────────────────────────────────────
+.g6-mkt__filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.g6-mkt__filtro-row {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.g6-mkt__filtro-chip {
+  padding: 0.35rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.73rem;
+  font-weight: 500;
+  background: $os-surface-2;
+  border: 1px solid $os-border;
+  color: $os-text-secondary;
+  cursor: pointer;
+  min-height: 28px;
+  transition: all $os-transition;
+
+  &:hover {
+    background: $os-surface-3;
+    color: $os-text-primary;
+    border-color: $os-border-strong;
+  }
+
+  &--active {
+    background: rgba($os-accent, 0.08);
+    border-color: rgba($os-accent, 0.3);
+    color: $os-accent;
+    font-weight: 600;
+  }
+
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+// ── Grid ───────────────────────────────────────────────────
+.g6-mkt__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+// ── Card ───────────────────────────────────────────────────
+.g6-mkt-card {
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  transition: border-color $os-transition, box-shadow $os-transition;
+
+  &:hover {
+    border-color: $os-border-strong;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  }
+
+  &--activo { border-left: 3px solid $os-ok; }
+}
+
+// ── Badges ─────────────────────────────────────────────────
+.g6-mkt-card__badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.g6-mkt-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+
+  &--free {
+    background: $os-ok-dim;
+    color: #065f46;
+    border: 1px solid rgba($os-ok, 0.2);
+  }
+  &--paid {
+    background: $os-warn-dim;
+    color: #92400e;
+    border: 1px solid rgba($os-warn, 0.2);
+  }
+  &--tokens {
+    background: rgba(109,40,217,0.08);
+    color: #6d28d9;
+    border: 1px solid rgba(109,40,217,0.18);
+  }
+  &--ia-warn {
+    background: $os-warn-dim;
+    color: #92400e;
+    border: 1px solid rgba($os-warn, 0.2);
+    cursor: help;
+  }
+  &--activo {
+    background: $os-ok-dim;
+    color: #065f46;
+    border: 1px solid rgba($os-ok, 0.2);
+  }
+}
+
+// ── Avatar ─────────────────────────────────────────────────
+.g6-mkt-card__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $os-radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+// ── Body ───────────────────────────────────────────────────
+.g6-mkt-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.g6-mkt-card__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.g6-mkt-card__nombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $os-text-primary;
+  margin: 0;
+}
+
+.g6-mkt-card__tipo {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 8px;
+}
+
+.tipo--deterministic {
+  background: rgba(59,130,246,0.08);
+  color: #1d4ed8;
+  border: 1px solid rgba(59,130,246,0.18);
+}
+
+.tipo--ia-ligera {
+  background: rgba(5,150,105,0.08);
+  color: #065f46;
+  border: 1px solid rgba(5,150,105,0.2);
+}
+
+.tipo--ia-compleja {
+  background: rgba(109,40,217,0.08);
+  color: #6d28d9;
+  border: 1px solid rgba(109,40,217,0.18);
+}
+
+.g6-mkt-card__desc {
+  font-size: 0.75rem;
+  color: $os-text-secondary;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.g6-mkt-card__monitorea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.g6-mkt-card__monitorea-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $os-text-muted;
+  margin-bottom: 0.2rem;
+}
+
+.g6-mkt-card__monitorea-item {
+  font-size: 0.7rem;
+  color: $os-text-secondary;
+  padding-left: 0.875rem;
+  position: relative;
+
+  &::before {
+    content: '·';
+    position: absolute;
+    left: 0.25rem;
+    color: $os-accent;
+    font-weight: 700;
+  }
+}
+
+.g6-mkt-card__advertencia {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba($os-warn, 0.06);
+  border: 1px solid rgba($os-warn, 0.18);
+  border-radius: $os-radius-sm;
+  padding: 0.625rem;
+  font-size: 0.7rem;
+
+  p {
+    margin: 0;
+    color: #92400e;
+    line-height: 1.45;
+  }
+}
+
+// ── Footer ─────────────────────────────────────────────────
+.g6-mkt-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.625rem;
+  border-top: 1px solid $os-border;
+}
+
+.g6-mkt-card__precio {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.g6-mkt-card__precio-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: $os-text-primary;
+
+  &--free {
+    font-size: 0.875rem;
+    color: #065f46;
+    font-weight: 700;
+  }
+}
+
+.g6-mkt-card__precio-sub {
+  font-size: 0.65rem;
+  color: $os-text-muted;
+}
+
+.g6-mkt-card__cta {
+  padding: 0.45rem 1rem;
+  border-radius: $os-radius-sm;
+  font-size: 0.73rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-height: 32px;
+  min-width: 44px;
+  transition: all $os-transition;
+
+  &--activo {
+    background: $os-ok-dim;
+    color: #065f46;
+    cursor: default;
+  }
+
+  &--activar {
+    background: rgba($os-accent, 0.08);
+    color: $os-accent;
+    border: 1px solid rgba($os-accent, 0.3);
+
+    &:hover { background: rgba($os-accent, 0.14); }
+    &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+  }
+}
+
+// ── Empty state ────────────────────────────────────────────
+.g6-mkt__empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.g6-mkt__empty-icon { font-size: 2rem; }
+
+.g6-mkt__empty p {
+  color: $os-text-secondary;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.g6-mkt__empty-reset {
+  background: $os-surface-2;
+  border: 1px solid $os-border-strong;
+  color: $os-accent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: $os-radius-sm;
+  cursor: pointer;
+  min-height: 32px;
+
+  &:hover { background: $os-surface-3; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}

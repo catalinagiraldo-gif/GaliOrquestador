@@ -1,0 +1,138 @@
+<div class="g6-mkt gali-stagger-in">
+
+  <!-- ── HEADER ── -->
+  <div class="g6-mkt__header">
+    <div class="g6-mkt__header-text">
+      <h1 class="g6-mkt__title">Marketplace de agentes</h1>
+      <p class="g6-mkt__subtitle">Amplía lo que Gali puede hacer por ti. Elige agentes según tu negocio.</p>
+    </div>
+  </div>
+
+  <!-- ── FILTROS ── -->
+  <div class="g6-mkt__filtros">
+    <!-- Fila 1: Tier -->
+    <div class="g6-mkt__filtro-row">
+      @for (t of tierTabs; track t.value) {
+        <button class="g6-mkt__filtro-chip"
+                [class.g6-mkt__filtro-chip--active]="tierFiltro() === t.value"
+                (click)="setTierFiltro($any(t.value))">
+          {{ t.label }}
+        </button>
+      }
+    </div>
+    <!-- Fila 2: Tipo de proceso -->
+    <div class="g6-mkt__filtro-row g6-mkt__filtro-row--tipo">
+      @for (t of tipoTabs; track t.value) {
+        <button class="g6-mkt__filtro-chip g6-mkt__filtro-chip--tipo"
+                [class.g6-mkt__filtro-chip--active]="tipoFiltro() === t.value"
+                (click)="setTipoFiltro($any(t.value))">
+          {{ t.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── GRID DE AGENTES ── -->
+  @if (agentesFiltrados().length > 0) {
+    <div class="g6-mkt__grid">
+      @for (ag of agentesFiltrados(); track ag.id) {
+        <div class="g6-mkt-card" [class.g6-mkt-card--activo]="ag.estado === 'activo'">
+
+          <!-- Badges superiores -->
+          <div class="g6-mkt-card__badges">
+            @if (ag.tier === 'free') {
+              <span class="g6-mkt-badge g6-mkt-badge--free">FREE</span>
+            }
+            @if (ag.tier === 'paid') {
+              <span class="g6-mkt-badge g6-mkt-badge--paid">PAGO</span>
+            }
+            @if (ag.tier === 'tokens') {
+              <span class="g6-mkt-badge g6-mkt-badge--tokens">TOKENS</span>
+            }
+            @if (ag.tipo === 'ia-compleja') {
+              <span class="g6-mkt-badge g6-mkt-badge--ia-warn"
+                    [title]="ag.advertenciaIA ?? ''">⚠️ IA</span>
+            }
+            @if (ag.estado === 'activo') {
+              <span class="g6-mkt-badge g6-mkt-badge--activo">Activo</span>
+            }
+          </div>
+
+          <!-- Avatar -->
+          <div class="g6-mkt-card__avatar"
+               [style.background]="ag.colorAvatar + '18'"
+               [style.color]="ag.colorAvatar">
+            <i [class]="ag.icono"></i>
+          </div>
+
+          <!-- Info -->
+          <div class="g6-mkt-card__body">
+            <div class="g6-mkt-card__name-row">
+              <h3 class="g6-mkt-card__nombre">{{ ag.nombre }}</h3>
+              <span class="g6-mkt-card__tipo {{ getProcesoClass(ag.tipo) }}"
+                    [title]="procesoTipoTooltip[ag.tipo]">
+                {{ procesoTipoLabel[ag.tipo] }}
+              </span>
+            </div>
+            <p class="g6-mkt-card__desc">{{ ag.descripcion }}</p>
+
+            <!-- Qué monitorea -->
+            <div class="g6-mkt-card__monitorea">
+              <span class="g6-mkt-card__monitorea-label">Monitorea</span>
+              @for (m of ag.monitorea; track m) {
+                <span class="g6-mkt-card__monitorea-item">{{ m }}</span>
+              }
+            </div>
+
+            <!-- Advertencia IA si aplica -->
+            @if (ag.advertenciaIA) {
+              <div class="g6-mkt-card__advertencia">
+                <span>⚠️</span>
+                <p>{{ ag.advertenciaIA }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Footer con precio y CTA -->
+          <div class="g6-mkt-card__footer">
+            <div class="g6-mkt-card__precio">
+              @if (ag.tier === 'free') {
+                <span class="g6-mkt-card__precio-val g6-mkt-card__precio-val--free">Gratis</span>
+                <span class="g6-mkt-card__precio-sub">incluido en tu plan</span>
+              }
+              @if (ag.tier === 'paid' && ag.precioCopMes) {
+                <span class="g6-mkt-card__precio-val">{{ ag.precioCopMes | number }}</span>
+                <span class="g6-mkt-card__precio-sub">COP/mes</span>
+              }
+              @if (ag.tier === 'tokens' && ag.tokensUso) {
+                <span class="g6-mkt-card__precio-val">{{ ag.tokensUso }}</span>
+                <span class="g6-mkt-card__precio-sub">tokens por uso</span>
+              }
+            </div>
+            @if (ag.estado === 'activo') {
+              <button class="g6-mkt-card__cta g6-mkt-card__cta--activo" disabled>
+                ✓ Activo
+              </button>
+            } @else {
+              <button class="g6-mkt-card__cta g6-mkt-card__cta--activar"
+                      (click)="activarAgente(ag)">
+                @if (ag.tier === 'free') { Activar }
+                @if (ag.tier === 'paid') { Suscribirse }
+                @if (ag.tier === 'tokens') { Usar ahora }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="g6-mkt__empty">
+      <span class="g6-mkt__empty-icon">🔍</span>
+      <p>No hay agentes con estos filtros.</p>
+      <button class="g6-mkt__empty-reset" (click)="setTierFiltro('todos'); setTipoFiltro('todos')">
+        Ver todos
+      </button>
+    </div>
+  }
+
+</div>

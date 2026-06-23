@@ -1,0 +1,299 @@
+@if (proyecto(); as p) {
+<div class="g6-detalle gali-stagger-in">
+
+  <!-- ── HEADER ── -->
+  <div class="g6-detalle__header">
+    <button class="g6-detalle__back" (click)="volverAProyectos()">← Proyectos</button>
+    <div class="g6-detalle__title-row">
+      <h1 class="g6-detalle__title">{{ p.nombre }}</h1>
+      <span class="g6-detalle__estado" [attr.data-estado]="p.estado">{{ estadoLabel() }}</span>
+    </div>
+    <div class="g6-detalle__meta-row">
+      <span class="g6-detalle__meta-item">📦 {{ p.pedidos_sem_label ?? '—' }}/sem</span>
+      <span class="g6-detalle__meta-item">📊 ROAS {{ p.roas_real_label ?? '—' }}</span>
+      @if (p.pauta_diaria_label) {
+        <span class="g6-detalle__meta-item">💰 {{ p.pauta_diaria_label }}</span>
+      }
+      @if (campanas().length > 0) {
+        <span class="g6-detalle__meta-item">📣 {{ campanas().length }} campaña{{ campanas().length !== 1 ? 's' : '' }}</span>
+      }
+    </div>
+    @if (p.gali_nota) {
+      <div class="g6-detalle__gali-nota">
+        <span class="gali-spark">✦</span>
+        <span>{{ p.gali_nota }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── TABS ── -->
+  <div class="g6-detalle__tabs">
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'canvas'"
+            (click)="setTab('canvas')">
+      Canvas
+    </button>
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'campanas'"
+            (click)="setTab('campanas')">
+      Campañas
+      @if (campanas().length > 0) {
+        <span class="g6-detalle__tab-badge">{{ campanas().length }}</span>
+      }
+    </button>
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'agentes'"
+            (click)="setTab('agentes')">
+      Agentes
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════
+       TAB: CANVAS (métricas + timeline)
+  ════════════════════════════════════ -->
+  @if (activeTab() === 'canvas') {
+    <div class="g6-canvas gali-stagger-in">
+
+      <!-- KPIs -->
+      <div class="g6-canvas__kpis">
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">📦 Pedidos/sem</span>
+          <span class="g6-kpi__val">{{ p.pedidos_sem_label ?? '—' }}</span>
+        </div>
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">📊 ROAS real</span>
+          <span class="g6-kpi__val" [class.g6-kpi__val--ok]="p.roas_real >= 1.5">{{ p.roas_real_label ?? '—' }}</span>
+        </div>
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">💰 Pauta/día</span>
+          <span class="g6-kpi__val">{{ p.pauta_diaria_label ?? '—' }}</span>
+        </div>
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">📈 Margen</span>
+          <span class="g6-kpi__val">{{ p.margen_neto_pct_label ?? '—' }}</span>
+        </div>
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">🚛 Novedad</span>
+          <span class="g6-kpi__val" [class.g6-kpi__val--warn]="p.tasa_novedad_pct > 15">{{ p.tasa_novedad_label ?? '—' }}</span>
+        </div>
+        <div class="g6-kpi">
+          <span class="g6-kpi__label">💵 Ganancia/sem</span>
+          <span class="g6-kpi__val">{{ p.ganancia_neta_semanal_label ?? '—' }}</span>
+        </div>
+      </div>
+
+      <!-- Alerta activa -->
+      @if (p.alerta_activa && p.alerta_mensaje) {
+        <div class="g6-canvas__alerta">
+          <span class="g6-canvas__alerta-icon">⚠️</span>
+          <p class="g6-canvas__alerta-texto">{{ p.alerta_mensaje }}</p>
+          <button class="g6-canvas__alerta-cta" (click)="irASenales()">Ver señal →</button>
+        </div>
+      }
+
+      <!-- Acciones rápidas de campañas -->
+      @if (campanas().length > 0) {
+        <div class="g6-canvas__campanas-preview">
+          <div class="g6-canvas__campanas-head">
+            <span class="g6-canvas__campanas-title">📣 Campañas activas</span>
+            <button class="g6-canvas__campanas-ver" (click)="setTab('campanas')">Ver todas →</button>
+          </div>
+          @for (c of campanas().slice(0, 2); track c.id) {
+            <div class="g6-campana-preview-row">
+              <span>{{ getCanalIcon(c.canal) }}</span>
+              <span class="g6-campana-preview-row__nombre">{{ c.nombre }}</span>
+              <span class="g6-campana-preview-row__estado" [attr.data-estado]="c.estado">{{ getCampanaEstadoLabel(c.estado) }}</span>
+              @if (c.roasActualLabel) {
+                <span class="g6-campana-preview-row__roas" [ngClass]="getRoasClass(c)">{{ c.roasActualLabel }}</span>
+              }
+            </div>
+          }
+        </div>
+      } @else if (p.estado !== 'cerrado') {
+        <div class="g6-canvas__no-campanas">
+          <p>Este proyecto no tiene campañas activas todavía.</p>
+          <button class="g6-canvas__nueva-campana" (click)="nuevaCampana()">+ Crear primera campaña</button>
+        </div>
+      }
+
+      <!-- Acciones de agentes -->
+      @if (p.agent_actions?.length > 0) {
+        <div class="g6-canvas__agentes-section">
+          <span class="g6-canvas__section-title">Últimas acciones de agentes</span>
+          @for (aa of p.agent_actions.slice(0, 3); track aa.id) {
+            <div class="g6-agent-action g6-agent-action--{{ aa.status }}">
+              <span class="g6-agent-action__dot"></span>
+              <div class="g6-agent-action__body">
+                <span class="g6-agent-action__agente">{{ aa.agente }}</span>
+                <span class="g6-agent-action__tiempo">{{ aa.tiempo_label }}</span>
+                <p class="g6-agent-action__accion">{{ aa.accion }}</p>
+                @if (aa.impacto) {
+                  <p class="g6-agent-action__impacto">→ {{ aa.impacto }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════
+       TAB: CAMPAÑAS
+  ════════════════════════════════════ -->
+  @if (activeTab() === 'campanas') {
+    <div class="g6-campanas-tab gali-stagger-in">
+
+      <!-- Header + filtros -->
+      <div class="g6-campanas-tab__head">
+        <div class="g6-campanas-filtros">
+          @for (f of [
+            { id: 'todas', label: 'Todas', count: campanasCounts().todas },
+            { id: 'activa', label: 'Activas', count: campanasCounts().activa },
+            { id: 'pausada', label: 'Pausadas', count: campanasCounts().pausada },
+            { id: 'borrador', label: 'Borradores', count: campanasCounts().borrador }
+          ]; track f.id) {
+            @if (f.count > 0 || f.id === 'todas') {
+              <button class="g6-campana-filtro"
+                      [class.g6-campana-filtro--active]="campanaFiltro() === f.id"
+                      (click)="setCampanaFiltro($any(f.id))">
+                {{ f.label }}
+                @if (f.count > 0) { <span class="g6-campana-filtro__count">{{ f.count }}</span> }
+              </button>
+            }
+          }
+        </div>
+        @if (p.estado !== 'cerrado') {
+          <button class="g6-campanas-tab__nueva" (click)="nuevaCampana()">+ Nueva campaña</button>
+        }
+      </div>
+
+      <!-- Lista de campañas -->
+      @if (campanasFiltradas().length > 0) {
+        <div class="g6-campanas-list">
+          @for (c of campanasFiltradas(); track c.id) {
+            <div class="g6-campana-card g6-campana-card--{{ c.estado }}">
+              <div class="g6-campana-card__header">
+                <span class="g6-campana-card__canal-icon">{{ getCanalIcon(c.canal) }}</span>
+                <div class="g6-campana-card__title-block">
+                  <h3 class="g6-campana-card__nombre">{{ c.nombre }}</h3>
+                  <span class="g6-campana-card__canal">{{ c.canalLabel }}</span>
+                </div>
+                <span class="g6-campana-card__estado" [attr.data-estado]="c.estado">
+                  {{ getCampanaEstadoLabel(c.estado) }}
+                </span>
+                @if (c.sugeridaPorGali) {
+                  <span class="g6-campana-card__gali-badge">✦ Gali</span>
+                }
+              </div>
+
+              <!-- Métricas -->
+              <div class="g6-campana-card__metrics">
+                @if (c.roasActualLabel) {
+                  <div class="g6-campana-metric">
+                    <span class="g6-campana-metric__label">ROAS actual</span>
+                    <span class="g6-campana-metric__val" [ngClass]="getRoasClass(c)">
+                      {{ c.roasActualLabel }}
+                      <span class="g6-campana-metric__obj">(objetivo {{ c.roasObjetivo }}x)</span>
+                    </span>
+                  </div>
+                }
+                <div class="g6-campana-metric">
+                  <span class="g6-campana-metric__label">Presupuesto/día</span>
+                  <span class="g6-campana-metric__val">{{ c.presupuestoDiarioLabel }}</span>
+                </div>
+                @if (c.pedidosSem) {
+                  <div class="g6-campana-metric">
+                    <span class="g6-campana-metric__label">Pedidos/sem</span>
+                    <span class="g6-campana-metric__val">{{ c.pedidosSem }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Productos -->
+              <div class="g6-campana-card__productos">
+                <span class="g6-campana-card__productos-label">Productos:</span>
+                @for (prod of c.productos; track prod.id) {
+                  <span class="g6-campana-card__producto-chip">
+                    {{ prod.nombre }} · {{ prod.precioVentaLabel }} · {{ prod.margenPct }}% margen
+                  </span>
+                }
+              </div>
+
+              <!-- Agentes activos en campaña -->
+              @if (c.agentesActivos.length > 0) {
+                <div class="g6-campana-card__agentes">
+                  @for (ag of c.agentesActivos; track ag.agenteId) {
+                    <span class="g6-campana-card__agente-chip" [class.g6-campana-card__agente-chip--off]="!ag.activo">
+                      {{ ag.nombre }}
+                    </span>
+                  }
+                </div>
+              }
+
+              <!-- Nota Gali -->
+              @if (c.notaGali) {
+                <div class="g6-campana-card__nota">
+                  <span class="gali-spark">✦</span> {{ c.notaGali }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="g6-campanas-empty">
+          <span class="g6-campanas-empty__icon">📣</span>
+          <p>No hay campañas en este estado.</p>
+          @if (campanaFiltro() !== 'todas') {
+            <button class="g6-campanas-empty__ver-todas" (click)="setCampanaFiltro('todas')">Ver todas</button>
+          } @else {
+            <button class="g6-campanas-empty__nueva" (click)="nuevaCampana()">+ Crear primera campaña</button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════
+       TAB: AGENTES
+  ════════════════════════════════════ -->
+  @if (activeTab() === 'agentes') {
+    <div class="g6-agentes-tab gali-stagger-in">
+      @if (agentesActivos().length > 0) {
+        @for (ag of agentesActivos(); track ag.id) {
+          <div class="g6-agente-row">
+            <div class="g6-agente-row__icon">
+              <i [class]="ag.icono"></i>
+            </div>
+            <div class="g6-agente-row__info">
+              <span class="g6-agente-row__nombre">{{ ag.nombre }}</span>
+              <span class="g6-agente-row__desc">{{ ag.descripcionCorta }}</span>
+            </div>
+            <span class="g6-agente-row__tipo" [attr.data-tipo]="ag.tipo">{{ ag.nombreCorto }}</span>
+          </div>
+        }
+      } @else {
+        <div class="g6-agentes-empty">
+          <p>No hay agentes especializados asignados aún.</p>
+          <button class="g6-agentes-empty__cta"
+                  (click)="router.navigate(['/gali-6/agentes'])">
+            Ver agentes disponibles →
+          </button>
+        </div>
+      }
+      <div class="g6-agentes-tab__footer">
+        <button class="g6-agentes-tab__ver-todos" (click)="router.navigate(['/gali-6/agentes'])">
+          Gestionar agentes →
+        </button>
+      </div>
+    </div>
+  }
+
+</div>
+} @else {
+  <div class="g6-detalle g6-detalle--not-found">
+    <button class="g6-detalle__back" (click)="volverAProyectos()">← Volver</button>
+    <h2>Proyecto no encontrado</h2>
+    <p>El proyecto con ID "{{ proyectoId() }}" no existe.</p>
+  </div>
+}

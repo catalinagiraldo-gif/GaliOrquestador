@@ -1,5 +1,11 @@
 export type SignalType = 'opportunity' | 'scale' | 'trend' | 'risk' | 'completed';
 export type AlertType  = 'critical' | 'warning' | 'info';
+/**
+ * Tipo de proceso que generó la señal.
+ * deterministico = dato directo de BD Dropi, siempre confiable.
+ * ia = generado por análisis de IA, puede variar con el modelo.
+ */
+export type SignalFuenteTipo = 'deterministico' | 'ia';
 
 export interface SignalMetricPair {
   label: string;
@@ -16,7 +22,19 @@ export interface GaliSignal {
   ctaPrincipal: string;
   ctaSecundario: string;
   agente: string;
+  /** ID del agente especializado que generó esta señal (ej: 'roas-tracker', 'stock-guardian') */
+  agenteOrigenId?: string;
+  /** Nombre legible del agente origen */
+  agenteOrigenNombre?: string;
+  /**
+   * Tipo de proceso que generó la señal.
+   * - deterministico: viene de datos reales de Dropi — 100% confiable
+   * - ia: análisis o recomendación de IA — puede variar, verificar antes de actuar
+   */
+  fuente: SignalFuenteTipo;
   proyectoId?: string;
+  /** ID de la campaña asociada (nueva jerarquía Proyecto → Campaña) */
+  campanaId?: string;
   metrica?: string;
   fechaDeteccion: string;
   segunDatos?: string;
@@ -53,9 +71,21 @@ export interface GaliAlerta {
   ctaPrincipal: string;
   ctaSecundario: string;
   agente: string;
+  /** ID del agente especializado que generó esta alerta */
+  agenteOrigenId?: string;
+  /** Nombre legible del agente origen */
+  agenteOrigenNombre?: string;
+  /**
+   * Tipo de proceso que generó la alerta.
+   * - deterministico: umbral superado en datos reales — siempre confiable
+   * - ia: análisis de IA — puede variar
+   */
+  fuente: SignalFuenteTipo;
   agenteColor?: string;
   opciones?: AlertaOpcion[];
   proyectoId?: string;
+  /** ID de la campaña asociada */
+  campanaId?: string;
   pedidosAfectados?: number;
   fechaDeteccion: string;
   /** Resumen de lo que Gali ya hizo antes de mostrar esta alerta */
@@ -68,6 +98,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-001',
     tipo: 'scale',
+    fuente: 'ia',
+    agenteOrigenId: 'roas-tracker',
+    agenteOrigenNombre: 'ROAS Tracker',
     titulo: 'Ventana de escala para Collar GPS',
     contextoMacromundo:
       'Según datos de la red Dropi: 847 dropshippers activos en categoría mascotas esta semana. ' +
@@ -101,6 +134,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-002',
     tipo: 'trend',
+    fuente: 'ia',
+    agenteOrigenId: 'product-scout',
+    agenteOrigenNombre: 'Product Scout',
     titulo: 'Difusor de aromaterapia: tendencia emergente en Bogotá',
     contextoMacromundo:
       'ADA Spy detectó: búsquedas de "difusor de aromaterapia" +67% en Bogotá ' +
@@ -134,6 +170,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-003',
     tipo: 'opportunity',
+    fuente: 'ia',
+    agenteOrigenId: 'product-scout',
+    agenteOrigenNombre: 'Product Scout',
     titulo: 'Skincare K-Beauty: audiencia no explotada en Medellín',
     contextoMacromundo:
       'Búsquedas de K-Beauty +42% en Medellín esta semana en la red Dropi. ' +
@@ -166,6 +205,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-004',
     tipo: 'risk',
+    fuente: 'deterministico',
+    agenteOrigenId: 'stock-guardian',
+    agenteOrigenNombre: 'Stock Guardian',
     titulo: 'Stock Collar GPS: 87 unidades restantes',
     contextoMacromundo:
       'PetStore Colombia tiene 87 unidades de Collar GPS en inventario. ' +
@@ -199,6 +241,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-005',
     tipo: 'opportunity',
+    fuente: 'ia',
+    agenteOrigenId: 'roas-tracker',
+    agenteOrigenNombre: 'ROAS Tracker',
     titulo: 'Bandas de Fitness: CTR recuperado — momento de reactivar',
     contextoMacromundo:
       'El creative de Bandas de Fitness tiene CTR 1.4% (estable) tras 5 días pausado. ' +
@@ -231,6 +276,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-006',
     tipo: 'opportunity',
+    fuente: 'ia',
+    agenteOrigenId: 'product-scout',
+    agenteOrigenNombre: 'Product Scout',
     titulo: 'Ventana de mercado: Cali y búsquedas de collar mascotas',
     contextoMacromundo:
       'Según datos de 1.200 dropshippers en Colombia esta semana, el volumen de ' +
@@ -253,6 +301,9 @@ export const MOCK_SENALES: GaliSignal[] = [
   {
     id: 'sen-007',
     tipo: 'risk',
+    fuente: 'ia',
+    agenteOrigenId: 'roas-tracker',
+    agenteOrigenNombre: 'ROAS Tracker',
     titulo: 'Saturación de audiencia en Meta — Bandas de Fitness',
     contextoMacromundo:
       'Según datos de 520 dropshippers activos en fitness en Dropi esta semana, ' +
@@ -277,6 +328,9 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
   {
     id: 'alt-001',
     tipo: 'critical',
+    fuente: 'deterministico',
+    agenteOrigenId: 'logistics-pro',
+    agenteOrigenNombre: 'Logistics Pro',
     titulo: 'Coordinadora Bogotá: 15% novedad — 12 pedidos en riesgo',
     descripcion:
       'Coordinadora lleva 3 días consecutivos con novedad > 12% en rutas de Bogotá. ' +
@@ -312,6 +366,9 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
   {
     id: 'alt-002',
     tipo: 'critical',
+    fuente: 'deterministico',
+    agenteOrigenId: 'logistics-pro',
+    agenteOrigenNombre: 'Logistics Pro',
     titulo: 'Siigo desconectado — $450k sin facturar',
     descripcion:
       'La integración con Siigo lleva 6 días desconectada. ' +
@@ -328,6 +385,9 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
   {
     id: 'alt-003',
     tipo: 'warning',
+    fuente: 'ia',
+    agenteOrigenId: 'roas-tracker',
+    agenteOrigenNombre: 'ROAS Tracker',
     titulo: 'Skincare K-Beauty: tu anuncio está perdiendo efectividad',
     descripcion:
       'Tu anuncio de Skincare está perdiendo efectividad — el clic de cada 100 usuarios bajó de 1.8 a 1.1 en las últimas 48h. ' +
@@ -361,6 +421,9 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
   {
     id: 'alt-004',
     tipo: 'warning',
+    fuente: 'deterministico',
+    agenteOrigenId: 'stock-guardian',
+    agenteOrigenNombre: 'Stock Guardian',
     titulo: 'Stock bajo: Collar GPS — 87 unidades restantes',
     descripcion:
       'A tu ritmo de 47 pedidos/semana, el stock se agota en ~13 días. ' +
@@ -376,6 +439,9 @@ export const MOCK_ALERTAS: GaliAlerta[] = [
   {
     id: 'alt-005',
     tipo: 'critical',
+    fuente: 'deterministico',
+    agenteOrigenId: 'roas-tracker',
+    agenteOrigenNombre: 'ROAS Tracker',
     titulo: 'Bandas de Fitness: ROAS cayó bajo umbral — 1.2x en últimas 48h',
     descripcion:
       'El ROAS de Bandas de Fitness cayó de 2.1x a 1.2x en las últimas 48 horas. ' +

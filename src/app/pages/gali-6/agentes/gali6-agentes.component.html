@@ -1,0 +1,159 @@
+<div class="g6-agentes gali-stagger-in">
+
+  <!-- ── BANNER PAQUETE BÁSICO ── -->
+  <div class="g6-agentes__paquete-banner">
+    <div class="g6-agentes__paquete-head">
+      <div class="g6-agentes__paquete-title-row">
+        <span class="g6-agentes__paquete-icon">🛡️</span>
+        <div>
+          <h2 class="g6-agentes__paquete-title">Tu paquete básico está activo</h2>
+          <p class="g6-agentes__paquete-sub">3 agentes monitoreando tu negocio, sin costo adicional</p>
+        </div>
+        <span class="g6-agentes__paquete-badge">Gratis</span>
+      </div>
+      <div class="g6-agentes__paquete-chips">
+        @for (ag of paqueteBasico; track ag.id) {
+          <div class="g6-agentes__paquete-chip">
+            <span class="g6-agentes__paquete-chip-dot g6-agentes__paquete-chip-dot--activo"></span>
+            <i [class]="ag.icono"></i>
+            <span>{{ ag.nombreCorto }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AGENTES ACTIVOS ── -->
+  <section class="g6-agentes__section">
+    <h3 class="g6-agentes__section-title">Tus agentes activos</h3>
+
+    <div class="g6-agentes__list">
+      @for (ag of agentesActivos(); track ag.id) {
+        <div class="g6-agente-card g6-agente-card--activo"
+             [class.g6-agente-card--expanded]="expandedAgenteId() === ag.id">
+
+          <!-- Cabecera del card -->
+          <div class="g6-agente-card__header" (click)="toggleDetalle(ag.id)">
+            <div class="g6-agente-card__avatar" [style.background]="ag.colorAvatar + '22'"
+                 [style.color]="ag.colorAvatar">
+              <i [class]="ag.icono"></i>
+            </div>
+            <div class="g6-agente-card__info">
+              <div class="g6-agente-card__name-row">
+                <span class="g6-agente-card__nombre">{{ ag.nombre }}</span>
+                <span class="g6-agente-card__tipo {{ getProcesoClass(ag.tipo) }}"
+                      [title]="procesoTipoTooltip[ag.tipo]">
+                  {{ procesoTipoLabel[ag.tipo] }}
+                </span>
+                @if (ag.tier === 'free') {
+                  <span class="g6-agente-card__tier g6-agente-card__tier--free">Gratis</span>
+                }
+              </div>
+              <p class="g6-agente-card__desc">{{ ag.descripcionCorta }}</p>
+            </div>
+            <div class="g6-agente-card__estado-badge">
+              <span class="g6-agente-card__estado-dot"></span>
+              <span>Activo</span>
+            </div>
+            <button class="g6-agente-card__toggle"
+                    [attr.aria-expanded]="expandedAgenteId() === ag.id">
+              <i class="pi" [class.pi-chevron-down]="expandedAgenteId() !== ag.id"
+                            [class.pi-chevron-up]="expandedAgenteId() === ag.id"></i>
+            </button>
+          </div>
+
+          <!-- Detalle expandible -->
+          @if (expandedAgenteId() === ag.id) {
+            <div class="g6-agente-card__detalle gali-stagger-in">
+
+              @if (ag.ejemploSenal) {
+                <div class="g6-agente-card__ejemplo">
+                  <span class="g6-agente-card__ejemplo-label">Ejemplo de señal</span>
+                  <p class="g6-agente-card__ejemplo-texto">{{ ag.ejemploSenal }}</p>
+                </div>
+              }
+
+              <div class="g6-agente-card__skills">
+                <span class="g6-agente-card__skills-label">Skills activas</span>
+                @for (sk of ag.skillsDefecto; track sk.id) {
+                  <div class="g6-agente-skill">
+                    <span class="g6-agente-skill__tipo {{ getProcesoClass(sk.tipo) }}">
+                      {{ procesoTipoLabel[sk.tipo] }}
+                    </span>
+                    <span class="g6-agente-skill__label">{{ sk.label }}</span>
+                  </div>
+                }
+              </div>
+
+              @if (ag.reglasDefecto.length > 0) {
+                <div class="g6-agente-card__reglas">
+                  <span class="g6-agente-card__reglas-label">Reglas activas</span>
+                  @for (r of ag.reglasDefecto; track r.condicion) {
+                    <div class="g6-agente-regla">
+                      <span class="g6-agente-regla__si">Si</span>
+                      <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
+                      <span class="g6-agente-regla__entonces">→</span>
+                      <span class="g6-agente-regla__accion">{{ r.accion }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── DISPONIBLES EN MARKETPLACE ── -->
+  @if (agentesDisponibles().length > 0) {
+    <section class="g6-agentes__section">
+      <div class="g6-agentes__disponibles-head">
+        <h3 class="g6-agentes__section-title">Disponibles para agregar</h3>
+        <button class="g6-agentes__ver-marketplace" (click)="irAMarketplace()">
+          Ver marketplace completo →
+        </button>
+      </div>
+
+      <div class="g6-agentes__list g6-agentes__list--disponibles">
+        @for (ag of agentesDisponibles(); track ag.id) {
+          <div class="g6-agente-card g6-agente-card--disponible">
+            <div class="g6-agente-card__header">
+              <div class="g6-agente-card__avatar g6-agente-card__avatar--dim"
+                   [style.background]="ag.colorAvatar + '11'"
+                   [style.color]="ag.colorAvatar + '88'">
+                <i [class]="ag.icono"></i>
+              </div>
+              <div class="g6-agente-card__info">
+                <div class="g6-agente-card__name-row">
+                  <span class="g6-agente-card__nombre">{{ ag.nombre }}</span>
+                  <span class="g6-agente-card__tipo {{ getProcesoClass(ag.tipo) }}">
+                    {{ procesoTipoLabel[ag.tipo] }}
+                  </span>
+                  @if (ag.tipo === 'ia-compleja') {
+                    <span class="g6-agente-card__ia-warn" title="{{ ag.advertenciaIA }}">⚠️ IA</span>
+                  }
+                  @if (ag.tier === 'paid') {
+                    <span class="g6-agente-card__tier g6-agente-card__tier--paid">
+                      ${{ (ag.precioCopMes ?? 0) | number }}/mes
+                    </span>
+                  }
+                  @if (ag.tier === 'tokens') {
+                    <span class="g6-agente-card__tier g6-agente-card__tier--tokens">
+                      🪙 {{ ag.tokensUso }} tokens/uso
+                    </span>
+                  }
+                </div>
+                <p class="g6-agente-card__desc">{{ ag.descripcionCorta }}</p>
+              </div>
+              <button class="g6-agente-card__activar-cta" (click)="irAMarketplace()">
+                Ver →
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+</div>

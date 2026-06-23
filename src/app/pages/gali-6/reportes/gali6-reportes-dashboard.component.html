@@ -1,0 +1,153 @@
+<div class="dash gali-stagger-in">
+
+  <!-- ══════════════════════════════════════════════
+       FILA 0 — BANNER DE GALI (IA ligera)
+  ══════════════════════════════════════════════ -->
+  <div class="dash__banner">
+    <div class="dash__banner-left">
+      <div class="dash__banner-meta">
+        <span class="dash__banner-avatar">✦</span>
+        <span class="dash__banner-label">Gali dice</span>
+        <span class="dash__chip dash__chip--ia-ligera">🤖 IA guiada</span>
+      </div>
+      <p class="dash__banner-texto">
+        Semana sólida. Tu ROAS efectivo fue 1.91x — ligeramente por debajo del objetivo pero con
+        tendencia estable. Hay una oportunidad de optimización en horario nocturno que merece atención.
+        @if (!bannerExpandido()) {
+          <button class="dash__banner-ver-mas" (click)="bannerExpandido.set(true)">
+            Ver análisis completo →
+          </button>
+        }
+      </p>
+      @if (bannerExpandido()) {
+        <p class="dash__banner-detalle">
+          El agente ROAS Tracker detectó que entre las 8pm–10pm el ROAS sube a 2.3x en Collar GPS.
+          Concentrar el 30% del presupuesto diario en ese horario podría mejorar el ROAS global en ~0.2x.
+          <button class="dash__banner-colapsar" (click)="bannerExpandido.set(false)">Colapsar</button>
+        </p>
+      }
+    </div>
+    <button class="dash__banner-cta" (click)="onVerSenal($any(senalesSemana[0])?.id ?? '')">
+      Ver señal →
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FILA 1 — KPIs principales (determinísticos)
+  ══════════════════════════════════════════════ -->
+  <section class="dash__kpis" aria-label="KPIs del período">
+    @for (kpi of kpis; track kpi.label) {
+      <button class="dash__kpi"
+              [class.dash__kpi--clickable]="!!kpi.route"
+              (click)="onKpiClick(kpi)"
+              [attr.aria-label]="kpi.label + ': ' + kpi.valor">
+        <div class="dash__kpi-header">
+          <span class="dash__kpi-label">{{ kpi.label }}</span>
+          @if (kpi.deterministico) {
+            <span class="dash__kpi-fuente" title="Dato directo de Dropi. 100% confiable.">📊</span>
+          }
+        </div>
+        <span class="dash__kpi-valor">{{ kpi.valor }}</span>
+        <span class="dash__kpi-delta" [class.dash__kpi-delta--pos]="kpi.deltaPos"
+              [class.dash__kpi-delta--neg]="!kpi.deltaPos">
+          {{ kpi.delta }}
+        </span>
+      </button>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       FILA 2 — Rendimiento por campaña (tabla)
+  ══════════════════════════════════════════════ -->
+  <section class="dash__seccion">
+    <h2 class="dash__seccion-titulo">
+      Rendimiento por proyecto
+      <span class="dash__chip dash__chip--deterministic">📊 Datos reales</span>
+    </h2>
+    <div class="dash__tabla-wrap">
+      <table class="dash__tabla" aria-label="Rendimiento por proyecto">
+        <thead>
+          <tr>
+            <th>Proyecto</th>
+            <th>Estado</th>
+            <th>Pedidos/sem</th>
+            <th>ROAS real</th>
+            <th>ROAS meta</th>
+            <th>Pauta/día</th>
+            <th>Revenue/sem</th>
+            <th>Margen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of proyectos; track p.nombre) {
+            <tr [class.dash__tr--alerta]="p.alertaActiva">
+              <td class="dash__td-nombre">
+                {{ p.nombre }}
+                @if (p.alertaActiva) {
+                  <span class="dash__alerta-dot" title="Tiene alerta activa">⚠️</span>
+                }
+              </td>
+              <td><span class="dash__badge {{ getEstadoClass(p.estado) }}">{{ getEstadoLabel(p.estado) }}</span></td>
+              <td>{{ p.pedidosSem }}</td>
+              <td [class.dash__td--bajo]="p.roas < p.roasMeta">{{ p.roas }}</td>
+              <td class="dash__td-meta">{{ p.roasMeta }}</td>
+              <td>{{ p.pauta }}</td>
+              <td>{{ p.revenue }}</td>
+              <td>{{ p.margen }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       FILA 3 — Señales del período
+  ══════════════════════════════════════════════ -->
+  <section class="dash__seccion">
+    <h2 class="dash__seccion-titulo">
+      Lo que los agentes encontraron esta semana
+    </h2>
+    <div class="dash__senales">
+      @for (s of senalesSemana; track s.id) {
+        <div class="dash__senal-card">
+          <div class="dash__senal-chips">
+            <span class="dash__chip {{ getFuenteClass(s) }}">{{ getFuenteLabel(s) }}</span>
+            @if (s.agenteOrigenNombre) {
+              <span class="dash__chip dash__chip--agente">{{ s.agenteOrigenNombre }}</span>
+            }
+          </div>
+          <p class="dash__senal-titulo">{{ s.titulo }}</p>
+          <p class="dash__senal-desc">{{ s.recomendacion }}</p>
+          <button class="dash__senal-cta" (click)="onVerSenal(s.id)">
+            Ver señal →
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       FILA 4 — Gráficos (placeholder)
+  ══════════════════════════════════════════════ -->
+  <section class="dash__seccion dash__seccion--graficos">
+    <h2 class="dash__seccion-titulo">Tendencias</h2>
+    <div class="dash__graficos-grid">
+      <div class="dash__grafico-placeholder">
+        <div class="dash__grafico-placeholder-inner">
+          <span class="dash__grafico-placeholder-icon">📈</span>
+          <span class="dash__grafico-placeholder-label">ROAS por día</span>
+          <span class="dash__grafico-placeholder-nota">Próximamente</span>
+        </div>
+      </div>
+      <div class="dash__grafico-placeholder">
+        <div class="dash__grafico-placeholder-inner">
+          <span class="dash__grafico-placeholder-icon">📦</span>
+          <span class="dash__grafico-placeholder-label">Pedidos por canal</span>
+          <span class="dash__grafico-placeholder-nota">Próximamente</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

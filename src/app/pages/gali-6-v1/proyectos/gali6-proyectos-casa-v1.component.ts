@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { A11yModule } from '@angular/cdk/a11y';
-import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
-import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
+import { GaliGlosarioDirective } from '../../gali-6/directives/gali-glosario.directive';
+import { Gali6PageHeaderComponent } from '../../gali-6/components/gali6-page-header.component';
 import PROJECTS from '../../../../../mocks/gali-v5/projects.json';
 import KPIS from '../../../../../mocks/gali-v5/kpis-global.json';
 import { MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
@@ -12,7 +12,6 @@ import {
   G6Objetivo, SubMeta, ObjetivoTipo, TIPO_LABEL,
   getObjetivo, saveObjetivo, syncLegacyKeys,
 } from '../../../../../mocks/gali-v6/objetivo';
-import { MOCK_CAMPANAS, Campana } from '../../../../../mocks/gali-v6/campanas.mock';
 
 const ESTADO_LABEL: Record<string, string> = {
   en_escala: 'En escala', activo: 'Activo', pausado: 'Pausado', lanzando: 'Lanzando',
@@ -40,7 +39,6 @@ interface ProyectoRow {
   roas: string;
   contribucionPct: number;
   borrador_steps?: any[];
-  campanaCount: number;
 }
 
 interface GaliCheckin {
@@ -82,11 +80,11 @@ const AGENTES_DEFAULT: Record<string, { label: string; desc: string; default: bo
 };
 
 @Component({
-  selector: 'app-gali6-proyectos-casa',
+  selector: 'app-gali6-proyectos-casa-v1',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, GaliGlosarioDirective, Gali6PageHeaderComponent, A11yModule],
-  templateUrl: './gali6-proyectos-casa.component.html',
-  styleUrl: './gali6-proyectos-casa.component.scss',
+  templateUrl: './gali6-proyectos-casa-v1.component.html',
+  styleUrl: './gali6-proyectos-casa-v1.component.scss',
 })
 export class Gali6ProyectosCasaComponent implements OnInit {
   private router = inject(Router);
@@ -144,7 +142,6 @@ export class Gali6ProyectosCasaComponent implements OnInit {
           roas: p.roas_real_label ?? '—',
           contribucionPct: meta > 0 ? Math.min(100, Math.round((pedidosSem / meta) * 100)) : 0,
           borrador_steps: p.borrador_steps,
-          campanaCount: MOCK_CAMPANAS.filter(c => c.proyectoId === p.id).length,
         };
       });
   });
@@ -358,7 +355,6 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
   // ── Editar objetivo (Bloque 4) ────────────────────────────────────────
   readonly editOpen = signal(false);
-  readonly editTab = signal<'mi-objetivo' | 'gali-sugiere' | 'sub-metas'>('gali-sugiere');
   readonly draftTexto = signal('');
   readonly draftMeta = signal(100);
   readonly draftTipo = signal<ObjetivoTipo>('volumen');
@@ -370,43 +366,6 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     { id: 'financiero',  label: 'Financiero',   desc: 'Meta en ganancia/mes' },
     { id: 'expansion',   label: 'Expansión',    desc: 'Lanzar N proyectos nuevos' },
   ];
-
-  readonly sugerencias = computed(() => {
-    const actual = this.pedidosActual;
-    const roas = (KPIS as any).roas_efectivo_global?.valor ?? 1.9;
-    return [
-      {
-        id: 'A',
-        titulo: `Llegar a ${Math.round(actual * 1.5)} ped/sem — factible en 6 semanas`,
-        detalle: `Con tu ROAS actual (${roas}x) y optimizando el horario de pauta, este objetivo es ambicioso pero alcanzable.`,
-        pedidos: Math.round(actual * 1.5),
-        semanas: 6,
-        factibilidad: 'verde' as const,
-      },
-      {
-        id: 'B',
-        titulo: `Objetivo conservador: ${Math.round(actual * 1.2)} ped/sem en 4 semanas`,
-        detalle: 'Incremento gradual basado en tu ritmo actual. Ideal si prefieres estabilidad antes de escalar.',
-        pedidos: Math.round(actual * 1.2),
-        semanas: 4,
-        factibilidad: 'verde' as const,
-      },
-    ];
-  });
-
-  readonly factibilidad = computed(() => {
-    const meta = this.draftMeta();
-    const actual = this.pedidosActual;
-    if (meta <= actual * 1.6) return { label: '● Factible', clase: 'fact--verde' };
-    if (meta <= actual * 2.5) return { label: '● Ambicioso pero posible', clase: 'fact--amarillo' };
-    return { label: '● Muy ambicioso', clase: 'fact--rojo' };
-  });
-
-  usarSugerencia(s: { pedidos: number; semanas: number }): void {
-    this.draftMeta.set(s.pedidos);
-    this.draftPlazo.set(s.semanas);
-    this.editTab.set('mi-objetivo');
-  }
 
   setFilter(f: 'todos' | 'activos' | 'pausados' | 'borradores' | 'cerrados'): void {
     if (this.activeFilter() === f) return;
@@ -426,7 +385,6 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.galiMejorarEstado.set('idle');
     this.galiMejorarInput.set('');
     this.galiPropuestaTexto.set('');
-    this.editTab.set('gali-sugiere');
     this.editOpen.set(true);
   }
 
@@ -638,36 +596,6 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   irWizard(): void {
     this.cerrarNuevoModal();
     this.router.navigate(['/gali-6/proyectos/nuevo']);
-  }
-
-  // ── Campañas accordion ────────────────────────────────────────────────
-  readonly expandedCampanas = signal<Set<string>>(new Set());
-
-  toggleCampanas(proyectoId: string, event: Event): void {
-    event.stopPropagation();
-    this.expandedCampanas.update(set => {
-      const next = new Set(set);
-      if (next.has(proyectoId)) next.delete(proyectoId);
-      else next.add(proyectoId);
-      return next;
-    });
-  }
-
-  isCampanasExpanded(proyectoId: string): boolean {
-    return this.expandedCampanas().has(proyectoId);
-  }
-
-  getCampanas(proyectoId: string): Campana[] {
-    return MOCK_CAMPANAS.filter(c => c.proyectoId === proyectoId);
-  }
-
-  getCampanaEstadoLabel(estado: string): string {
-    return ({ activa: 'Activa', pausada: 'Pausada', borrador: 'Borrador', cerrada: 'Cerrada' } as Record<string, string>)[estado] ?? estado;
-  }
-
-  nuevaCampana(proyectoId: string, event: Event): void {
-    event.stopPropagation();
-    this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { proyectoId } });
   }
 
   // ── Navegación ────────────────────────────────────────────────────────

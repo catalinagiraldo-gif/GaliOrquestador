@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { getObjetivo, G6Objetivo, TIPO_LABEL } from '../../../../../mocks/gali-v6/objetivo';
-import { SUGERENCIAS_CAMPANA_NUEVO_PROYECTO, SugerenciaCampana } from '../../../../../mocks/gali-v6/campanas.mock';
 
-type Step = 'producto' | 'brujula' | 'campana' | 'presupuesto' | 'lanzar';
+type Step = 'producto' | 'brujula' | 'presupuesto' | 'lanzar';
 
 interface ProductoOption {
   id: string;
@@ -32,11 +31,11 @@ const ADA_PRODUCTOS: ProductoOption[] = [
 const ROAS_HISTORICO = 1.93;
 
 @Component({
-  selector: 'app-gali6-nuevo-proyecto',
+  selector: 'app-gali6-nuevo-proyecto-v1',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './gali6-nuevo-proyecto.component.html',
-  styleUrl: './gali6-nuevo-proyecto.component.scss',
+  templateUrl: './gali6-nuevo-proyecto-v1.component.html',
+  styleUrl: './gali6-nuevo-proyecto-v1.component.scss',
 })
 export class Gali6NuevoProyectoComponent {
   private router = inject(Router);
@@ -174,26 +173,6 @@ export class Gali6NuevoProyectoComponent {
     this.presupuestoDiario.set(this.galiSugerenciaPresupuesto().valor);
   }
 
-  // ── Paso 2.5: Campañas ────────────────────────────────────────────────
-  readonly sugerenciasCampana = SUGERENCIAS_CAMPANA_NUEVO_PROYECTO;
-  readonly selectedCampanas = signal<Set<string>>(new Set());
-
-  toggleCampanaSugerencia(id: string): void {
-    this.selectedCampanas.update(set => {
-      const next = new Set(set);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  isCampanaSelected(id: string): boolean {
-    return this.selectedCampanas().has(id);
-  }
-
-  readonly campanaCustomNombre = signal('');
-  readonly showCampanaCustom = signal(false);
-
   // ── Paso 5: Agentes ───────────────────────────────────────────────────
   readonly agentes = signal({ roax: true, vigilante: true, ada: false, chatea: false });
   readonly agenteExpandido = signal<string | null>('roax');
@@ -268,12 +247,11 @@ export class Gali6NuevoProyectoComponent {
   readonly STEPS: Array<{ id: Step; label: string }> = [
     { id: 'producto',    label: 'Producto' },
     { id: 'brujula',     label: 'Brújula' },
-    { id: 'campana',     label: 'Campaña' },
     { id: 'presupuesto', label: 'Presupuesto' },
     { id: 'lanzar',      label: 'Lanzar' },
   ];
 
-  readonly STEP_ORDER: Step[] = ['producto', 'brujula', 'campana', 'presupuesto', 'lanzar'];
+  readonly STEP_ORDER: Step[] = ['producto', 'brujula', 'presupuesto', 'lanzar'];
 
   goTo(s: Step): void { this.step.set(s); }
 

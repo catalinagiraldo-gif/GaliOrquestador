@@ -63,8 +63,11 @@ interface VistaShortcut {
         </div>
 
         <footer class="featured__foot">
-          <a routerLink="/gali-6" class="featured__cta">
-            <span aria-hidden="true">✦</span> Abrir Gali 6
+          <a routerLink="/gali-6-v1" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
+            Gali 6 V1 →
+          </a>
+          <a routerLink="/gali-6" class="featured__cta" (click)="$event.stopPropagation()">
+            <span aria-hidden="true">✦</span> Gali 6 V2
             <span aria-hidden="true">→</span>
           </a>
           <span class="featured__kbd">Ultimate Plan · Jun 15 2026</span>

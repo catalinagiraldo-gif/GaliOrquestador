@@ -13,9 +13,9 @@
       <div class="objetivo-compact__fill" [style.width.%]="metaPct()"></div>
     </div>
     <span class="objetivo-compact__val">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} · {{ metaPct() }}%</span>
-    <button class="objetivo-compact__edit" type="button" (click)="openEdit()">
+    <a routerLink="/gali-6/mi-negocio" [queryParams]="{tab: 'operacion'}" class="objetivo-compact__edit">
       Editar →
-    </button>
+    </a>
   </div>
 
   <!-- ── BLOQUE 5: Toast Gali cuando cambia el objetivo ── -->
@@ -141,93 +141,39 @@
             <span class="port__go">Completar →</span>
           </li>
         } @else {
-          <!-- Proyectos normales con accordion de campañas -->
-          <li class="port__item-wrap" [style.animationDelay]="(i * 55) + 'ms'">
-            <!-- Fila principal del proyecto -->
-            <div class="port__item"
-                [class.port__item--cerrado]="p.estado === 'cerrado'"
-                [class.port__item--recien]="p.estado === 'recien_lanzado'"
-                [class.port__item--expanded]="isCampanasExpanded(p.id)"
-                tabindex="0"
-                [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
-                (click)="abrir(p.id)"
-                (keydown.enter)="abrir(p.id)"
-                (keydown.space)="abrir(p.id); $event.preventDefault()">
-              <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
-              <span class="port__name">{{ p.nombre }}</span>
+          <!-- Proyectos normales — 4 columnas (I8b) -->
+          <li class="port__item"
+              [class.port__item--cerrado]="p.estado === 'cerrado'"
+              [class.port__item--recien]="p.estado === 'recien_lanzado'"
+              [style.animationDelay]="(i * 55) + 'ms'"
+              tabindex="0"
+              [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
+              (click)="abrir(p.id)"
+              (keydown.enter)="abrir(p.id)"
+              (keydown.space)="abrir(p.id); $event.preventDefault()">
+            <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+            <span class="port__name">{{ p.nombre }}</span>
 
-              <span class="port__health">
-                <span class="port__health-track">
-                  <span class="port__health-fill"
-                        [style.width.%]="p.saludPct"
-                        [class.is-low]="p.saludPct < 45"
-                        [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
-                </span>
-                <span class="port__health-num">{{ p.saludPct }}%</span>
+            <span class="port__health">
+              <span class="port__health-track">
+                <span class="port__health-fill"
+                      [style.width.%]="p.saludPct"
+                      [class.is-low]="p.saludPct < 45"
+                      [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
               </span>
+              <span class="port__health-num">{{ p.saludPct }}%</span>
+            </span>
 
-              <div class="port__actions" (click)="$event.stopPropagation()">
-                @if (p.estado !== 'cerrado' && p.campanaCount > 0) {
-                  <button class="port__campanas-toggle"
-                          [class.port__campanas-toggle--open]="isCampanasExpanded(p.id)"
-                          (click)="toggleCampanas(p.id, $event)"
-                          [attr.aria-label]="'Ver campañas de ' + p.nombre"
-                          [attr.aria-expanded]="isCampanasExpanded(p.id)">
-                    📣 {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
-                    <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
-                  </button>
-                }
-                @if (p.estado !== 'cerrado') {
-                  <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
-                          [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
-                }
-                <span class="port__go">
-                  @if (p.estado === 'cerrado') { Ver postmortem → }
-                  @else { → }
-                </span>
-              </div>
+            <div class="port__actions" (click)="$event.stopPropagation()">
+              @if (p.estado !== 'cerrado') {
+                <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
+                        [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
+              }
+              <span class="port__go">
+                @if (p.estado === 'cerrado') { Ver postmortem → }
+                @else { → }
+              </span>
             </div>
-
-            <!-- Accordion de campañas -->
-            @if (isCampanasExpanded(p.id) && p.estado !== 'cerrado') {
-              <div class="campanas-accordion">
-                <div class="campanas-accordion__header">
-                  <span class="campanas-accordion__title">Campañas</span>
-                  <button class="campanas-accordion__nueva"
-                          (click)="nuevaCampana(p.id, $event)">
-                    + Nueva campaña
-                  </button>
-                </div>
-                <div class="campanas-accordion__list">
-                  @for (c of getCampanas(p.id); track c.id) {
-                    <div class="campana-row campana-row--{{ c.estado }}">
-                      <div class="campana-row__left">
-                        <span class="campana-row__estado" [attr.data-estado]="c.estado">
-                          {{ getCampanaEstadoLabel(c.estado) }}
-                        </span>
-                        <span class="campana-row__nombre">{{ c.nombre }}</span>
-                        <span class="campana-row__canal">{{ c.canalLabel }}</span>
-                      </div>
-                      <div class="campana-row__metrics">
-                        @if (c.roasActualLabel) {
-                          <span class="campana-row__roas"
-                                [class.campana-row__roas--ok]="(c.roasActual ?? 0) >= c.roasObjetivo"
-                                [class.campana-row__roas--low]="(c.roasActual ?? 0) < c.roasObjetivo">
-                            ROAS {{ c.roasActualLabel }}
-                          </span>
-                        }
-                        <span class="campana-row__presupuesto">{{ c.presupuestoDiarioLabel }}</span>
-                      </div>
-                      @if (c.notaGali) {
-                        <div class="campana-row__nota">
-                          <span class="gali-spark">✦</span> {{ c.notaGali }}
-                        </div>
-                      }
-                    </div>
-                  }
-                </div>
-              </div>
-            }
           </li>
         }
       }
@@ -242,212 +188,95 @@
   </section>
 </div>
 
-<!-- ── Modal editar objetivo — 3 tabs ── -->
+<!-- ── Modal editar objetivo (Bloque 4) ── -->
 @if (editOpen()) {
   <div class="modal-bg" (click)="editOpen.set(false)" aria-hidden="true"></div>
   <div class="modal modal--objetivo" role="dialog" aria-modal="true"
        aria-labelledby="modal-objetivo-title" cdkTrapFocus cdkTrapFocusAutoCapture>
-
-    <div class="obj-modal-hdr">
-      <div class="obj-modal-hdr__left">
-        <span class="obj-modal-hdr__spark" aria-hidden="true">✦</span>
-        <h2 class="obj-modal-hdr__title" id="modal-objetivo-title">Tu objetivo</h2>
-      </div>
-      <button class="modal__close-btn" type="button" aria-label="Cerrar" (click)="editOpen.set(false)">×</button>
+    <div class="modal__header">
+      <h2 class="modal__title" id="modal-objetivo-title">Editar objetivo</h2>
+      <button class="modal__close-btn" type="button" aria-label="Cerrar modal"
+              (click)="editOpen.set(false)">×</button>
     </div>
 
-    <!-- Tabs -->
-    <div class="obj-tabs" role="tablist" aria-label="Secciones del objetivo">
-      <button class="obj-tab" role="tab"
-              [class.obj-tab--active]="editTab() === 'gali-sugiere'"
-              [attr.aria-selected]="editTab() === 'gali-sugiere'"
-              (click)="editTab.set('gali-sugiere')">
-        <span class="obj-tab__spark" aria-hidden="true">✦</span> Gali sugiere
-      </button>
-      <button class="obj-tab" role="tab"
-              [class.obj-tab--active]="editTab() === 'mi-objetivo'"
-              [attr.aria-selected]="editTab() === 'mi-objetivo'"
-              (click)="editTab.set('mi-objetivo')">
-        Mi objetivo
-      </button>
-      <button class="obj-tab" role="tab"
-              [class.obj-tab--active]="editTab() === 'sub-metas'"
-              [attr.aria-selected]="editTab() === 'sub-metas'"
-              (click)="editTab.set('sub-metas')">
-        Sub-metas
-        <span class="obj-tab__pill">{{ draftSubMetas().length }}</span>
-      </button>
-    </div>
+    <label class="modal__label" for="modal-objetivo-texto">¿Qué quieres lograr con tu negocio?</label>
+    <textarea id="modal-objetivo-texto" class="modal__input modal__textarea modal__textarea--libre"
+              placeholder="Ej: generar $3M/mes en ganancia, o tener 5 proyectos simultáneos corriendo solos..."
+              [value]="draftTexto()"
+              (input)="draftTexto.set($any($event.target).value)"
+              rows="3" autofocus></textarea>
+    <button class="modal__gali-ayuda"
+            type="button"
+            [disabled]="!draftTexto().trim() || galiMejorarEstado() === 'procesando'"
+            (click)="ayudarDefinirConGali()">
+      @if (galiMejorarEstado() === 'procesando') {
+        <span class="modal__gali-spinner" aria-hidden="true"></span>
+        Analizando…
+      } @else {
+        ✦ Gali, ayúdame a definir esto
+      }
+    </button>
 
-    <!-- ══ GALI SUGIERE ══ -->
-    @if (editTab() === 'gali-sugiere') {
-      <div class="obj-panel" role="tabpanel">
-
-        <div class="obj-gali-header">
-          <div class="obj-gali-header__context">
-            <span class="obj-gali-header__label">Gali analizó tu negocio</span>
-            <div class="obj-gali-header__chips">
-              <span class="obj-gali-chip">📦 {{ pedidosActual }} ped/sem</span>
-              <span class="obj-gali-chip">📊 ROAS 1.91x</span>
-              <span class="obj-gali-chip">🚀 2 campañas</span>
-            </div>
-          </div>
-          <span class="obj-gali-header__badge">🤖 IA ligera</span>
+    @if (galiMejorarEstado() === 'propuesta') {
+      <div class="gali-propuesta" role="status" aria-live="polite">
+        <div class="gali-propuesta__head">
+          <span class="gali-propuesta__icon" aria-hidden="true">✦</span>
+          <span class="gali-propuesta__eyebrow">Gali propone</span>
         </div>
-
-        <div class="obj-sugerencias">
-          @for (sug of sugerencias(); track sug.id; let i = $index) {
-            <button class="obj-sug-card"
-                    [class.obj-sug-card--activa]="draftMeta() === sug.pedidos && draftPlazo() === sug.semanas"
-                    (click)="usarSugerencia(sug)">
-              <div class="obj-sug-card__num">{{ i + 1 }}</div>
-              <div class="obj-sug-card__body">
-                <div class="obj-sug-card__top">
-                  <span class="obj-sug-card__titulo">{{ sug.titulo }}</span>
-                  <span class="obj-sug-fact obj-sug-fact--{{ sug.factibilidad }}">● Factible</span>
-                </div>
-                <p class="obj-sug-card__detalle">{{ sug.detalle }}</p>
-                <div class="obj-sug-card__nums">
-                  <span class="obj-sug-card__kpi">{{ sug.pedidos }} <small>ped/sem</small></span>
-                  <span class="obj-sug-card__kpi">{{ sug.semanas }} <small>semanas</small></span>
-                </div>
-              </div>
-              <span class="obj-sug-card__arrow">→</span>
-            </button>
-          }
+        <p class="gali-propuesta__texto">{{ galiPropuestaTexto() }}</p>
+        <div class="gali-propuesta__meta-row">
+          <span class="gali-propuesta__meta-label">Meta sugerida</span>
+          <strong class="gali-propuesta__meta-val">{{ galiPropuestaMeta() }} pedidos/sem</strong>
         </div>
-
-        <p class="obj-hint">Selecciona una opción — puedes ajustar los números en "Mi objetivo".</p>
+        <div class="gali-propuesta__actions">
+          <button class="gali-propuesta__accept" (click)="aceptarPropuestaGali()">Usar propuesta →</button>
+          <button class="gali-propuesta__discard" (click)="descartarPropuestaGali()">Descartar</button>
+        </div>
       </div>
     }
 
-    <!-- ══ MI OBJETIVO ══ -->
-    @if (editTab() === 'mi-objetivo') {
-      <div class="obj-panel" role="tabpanel">
+    <div class="modal__row2">
+      <div class="modal__field">
+        <label class="modal__label">Meta (pedidos/semana)</label>
+        <input class="modal__input" type="number" min="1" max="1000"
+               [value]="draftMeta()"
+               (input)="draftMeta.set(+$any($event.target).value)">
+      </div>
+      <div class="modal__field">
+        <label class="modal__label">Plazo (semanas)</label>
+        <input class="modal__input" type="number" min="2" max="52"
+               [value]="draftPlazo()"
+               (input)="draftPlazo.set(+$any($event.target).value)">
+      </div>
+    </div>
 
-        <div class="obj-segmented" role="group" aria-label="Tipo de objetivo">
-          @for (opt of tipoOptions; track opt.id) {
-            <button class="obj-seg-btn"
-                    [class.obj-seg-btn--active]="draftTipo() === opt.id"
-                    (click)="draftTipo.set(opt.id)"
-                    [attr.aria-pressed]="draftTipo() === opt.id">
-              {{ opt.label }}
-            </button>
-          }
-        </div>
-
-        <div class="obj-inputs-row">
-          <div class="obj-input-group">
-            <label class="obj-input-label" for="draft-meta">Meta</label>
-            <div class="obj-input-wrap">
-              <input id="draft-meta" class="obj-input" type="number" min="1" max="1000"
-                     [value]="draftMeta()"
-                     (input)="draftMeta.set(+$any($event.target).value)">
-              <span class="obj-input-unit">ped/sem</span>
-            </div>
-          </div>
-          <div class="obj-input-divider" aria-hidden="true">en</div>
-          <div class="obj-input-group">
-            <label class="obj-input-label" for="draft-plazo">Plazo</label>
-            <div class="obj-input-wrap">
-              <input id="draft-plazo" class="obj-input" type="number" min="2" max="52"
-                     [value]="draftPlazo()"
-                     (input)="draftPlazo.set(+$any($event.target).value)">
-              <span class="obj-input-unit">sem</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="obj-fact-bar obj-fact-bar--{{ factibilidad().clase }}" role="status" aria-live="polite">
-          <span class="obj-fact-bar__label">{{ factibilidad().label }}</span>
-          <span class="obj-fact-bar__meta">{{ draftMeta() }} ped/sem · {{ draftPlazo() }} semanas</span>
-        </div>
-
-        <div class="obj-vision-group">
-          <label class="obj-input-label" for="modal-objetivo-texto">
-            Visión en tus palabras <span class="obj-optional">opcional</span>
+    <div class="modal__submetas">
+      <div class="modal__submetas-head">
+        <span class="modal__label">Pasos del objetivo</span>
+        <button class="modal__add-btn" type="button" (click)="addDraftSubMeta()">+ Agregar paso</button>
+      </div>
+      @for (sm of draftSubMetas(); track sm.id) {
+        <div class="modal__submeta-row">
+          <label class="modal__submeta-check" [class.is-done]="sm.lograda">
+            <input type="checkbox" [checked]="sm.lograda"
+                   (change)="toggleDraftSubMeta(sm.id)">
+            <span>{{ sm.lograda ? '✓' : '○' }}</span>
           </label>
-          <textarea id="modal-objetivo-texto" class="obj-textarea"
-                    placeholder="Ej: quiero poder delegar la operación y que Gali la cuide mientras escalo…"
-                    [value]="draftTexto()"
-                    (input)="draftTexto.set($any($event.target).value)"
-                    rows="3"></textarea>
-          <button class="obj-gali-btn" type="button"
-                  [class.obj-gali-btn--loading]="galiMejorarEstado() === 'procesando'"
-                  [disabled]="!draftTexto().trim() || galiMejorarEstado() === 'procesando'"
-                  (click)="ayudarDefinirConGali()">
-            @if (galiMejorarEstado() === 'procesando') {
-              <span class="modal__gali-spinner" aria-hidden="true"></span> Analizando…
-            } @else {
-              <span aria-hidden="true">✦</span> Gali, redacta esto mejor
-            }
-          </button>
+          <input class="modal__submeta-input" type="text"
+                 [value]="sm.label" placeholder="Describe el paso…"
+                 (input)="updateDraftSubMetaLabel(sm.id, $any($event.target).value)">
+          <button class="modal__submeta-del" type="button"
+                  [attr.aria-label]="'Eliminar paso: ' + sm.label"
+                  (click)="removeDraftSubMeta(sm.id)">×</button>
         </div>
+      }
+    </div>
 
-        @if (galiMejorarEstado() === 'propuesta') {
-          <div class="obj-propuesta" role="status" aria-live="polite">
-            <div class="obj-propuesta__hdr">
-              <span class="obj-propuesta__spark" aria-hidden="true">✦</span>
-              <span class="obj-propuesta__label">Gali propone</span>
-              <span class="obj-propuesta__badge">🤖 IA</span>
-            </div>
-            <p class="obj-propuesta__texto">{{ galiPropuestaTexto() }}</p>
-            <div class="obj-propuesta__kpi">
-              <strong>{{ galiPropuestaMeta() }}</strong> pedidos/sem sugeridos
-            </div>
-            <div class="obj-propuesta__actions">
-              <button class="obj-propuesta__accept" (click)="aceptarPropuestaGali()">Usar propuesta →</button>
-              <button class="obj-propuesta__discard" (click)="descartarPropuestaGali()">Descartar</button>
-            </div>
-          </div>
-        }
-      </div>
-    }
 
-    <!-- ══ SUB-METAS ══ -->
-    @if (editTab() === 'sub-metas') {
-      <div class="obj-panel" role="tabpanel">
-        <div class="obj-submetas-hdr">
-          <span class="obj-input-label">Hitos del camino</span>
-          <button class="obj-add-hito" type="button" (click)="addDraftSubMeta()">
-            + Agregar hito
-          </button>
-        </div>
-
-        @if (draftSubMetas().length === 0) {
-          <div class="obj-submetas-empty">
-            <span class="obj-submetas-empty__icon">🎯</span>
-            <p class="obj-submetas-empty__text">Sin hitos aún. Divide tu objetivo en pasos para medir el progreso.</p>
-          </div>
-        }
-
-        <div class="obj-submetas-list">
-          @for (sm of draftSubMetas(); track sm.id) {
-            <div class="obj-submeta" [class.obj-submeta--done]="sm.lograda">
-              <button class="obj-submeta__check" type="button"
-                      [class.obj-submeta__check--done]="sm.lograda"
-                      [attr.aria-label]="sm.lograda ? 'Marcar pendiente' : 'Marcar logrado'"
-                      (click)="toggleDraftSubMeta(sm.id)">
-                {{ sm.lograda ? '✓' : '' }}
-              </button>
-              <input class="obj-submeta__input" type="text"
-                     [value]="sm.label" placeholder="Describe el hito…"
-                     (input)="updateDraftSubMetaLabel(sm.id, $any($event.target).value)">
-              <button class="obj-submeta__del" type="button"
-                      [attr.aria-label]="'Eliminar: ' + sm.label"
-                      (click)="removeDraftSubMeta(sm.id)">×</button>
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <div class="obj-footer">
-      <p class="obj-footer__hint">Gali usará este objetivo para priorizar señales y proyectos.</p>
-      <div class="obj-footer__actions">
-        <button class="obj-btn-cancel" type="button" (click)="editOpen.set(false)">Cancelar</button>
-        <button class="obj-btn-save" type="button" (click)="saveEdit()">Guardar objetivo</button>
-      </div>
+    <p class="modal__hint">Gali usará este objetivo para facilitar tus proyectos y priorizarte las señales más relevantes.</p>
+    <div class="modal__actions">
+      <button class="modal__cancel" (click)="editOpen.set(false)">Cancelar</button>
+      <button class="modal__save" (click)="saveEdit()">Guardar objetivo →</button>
     </div>
   </div>
 }

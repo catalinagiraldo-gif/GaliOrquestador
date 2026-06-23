@@ -1,0 +1,609 @@
+@import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
+
+:host { display: flex; flex-direction: column; min-height: 100vh; }
+
+.wizard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $os-6 $os-4;
+  min-height: 100vh;
+}
+
+// ── Paso base ────────────────────────────────────────
+
+.wizard__paso {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ── Paso 0: Bienvenida ────────────────────────────────
+
+.wizard__paso--bienvenida {
+  align-items: center;
+  text-align: center;
+  gap: 1.75rem;
+}
+
+.wizard__gali-avatar {
+  width: 64px;
+  height: 64px;
+  background: rgba($os-accent, 0.1);
+  border: 2px solid rgba($os-accent, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  color: $os-accent;
+}
+
+.wizard__bienvenida-titulo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: $os-text-primary;
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.wizard__bienvenida-texto {
+  font-size: 0.95rem;
+  color: $os-text-secondary;
+  margin: 0;
+  line-height: 1.7;
+}
+
+// ── Cabecera + progreso ───────────────────────────────
+
+.wizard__cabecera { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.wizard__progreso { display: flex; flex-direction: column; gap: 0.375rem; }
+
+.wizard__progreso-texto {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: $os-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wizard__progreso-barra {
+  height: 4px;
+  background: $os-border;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.wizard__progreso-fill {
+  height: 100%;
+  background: $os-accent;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.wizard__titulo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: $os-text-primary;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.wizard__subtitulo {
+  font-size: 0.82rem;
+  color: $os-text-secondary;
+  margin: 0;
+  line-height: 1.6;
+}
+
+// ── Cards de situación ────────────────────────────────
+
+.wizard__cards { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.wizard__card-situacion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  cursor: pointer;
+  text-align: left;
+  transition: all $os-transition;
+  width: 100%;
+
+  &:hover {
+    border-color: rgba($os-accent, 0.3);
+    background: rgba($os-accent, 0.02);
+  }
+
+  &--seleccionada {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.04);
+    box-shadow: 0 0 0 3px rgba($os-accent, 0.08);
+  }
+
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.wizard__card-emoji { font-size: 1.5rem; flex-shrink: 0; }
+
+.wizard__card-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.wizard__card-titulo {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.wizard__card-sub {
+  font-size: 0.75rem;
+  color: $os-text-muted;
+}
+
+.wizard__card-check {
+  font-size: 1rem;
+  color: $os-accent;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+// ── Objetivo ──────────────────────────────────────────
+
+.wizard__objetivo-opciones { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.wizard__radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  cursor: pointer;
+  font-size: 0.84rem;
+  color: $os-text-secondary;
+  transition: all $os-transition;
+
+  input[type="radio"] { accent-color: $os-accent; flex-shrink: 0; cursor: pointer; }
+
+  &--activa {
+    border-color: $os-accent;
+    color: $os-text-primary;
+    background: rgba($os-accent, 0.03);
+  }
+
+  &:hover { border-color: rgba($os-accent, 0.35); }
+}
+
+.wizard__input-num {
+  width: 52px;
+  padding: 0.125rem 0.375rem;
+  background: $os-surface-2;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-sm;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: $os-text-primary;
+  text-align: center;
+  cursor: text;
+
+  &:focus { outline: 2px solid $os-accent; outline-offset: 1px; }
+  &::-webkit-inner-spin-button { -webkit-appearance: none; }
+}
+
+// ── Sugerencia Gali ───────────────────────────────────
+
+.wizard__sugerencia {
+  background: rgba(109,40,217,0.04);
+  border: 1px solid rgba(109,40,217,0.14);
+  border-left: 3px solid #6d28d9;
+  border-radius: $os-radius-md;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wizard__sugerencia-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wizard__sugerencia-icon { font-size: 1rem; }
+
+.wizard__sugerencia-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6d28d9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wizard__chip {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+
+  &--ia {
+    background: rgba(109,40,217,0.08);
+    color: #6d28d9;
+    border: 1px solid rgba(109,40,217,0.18);
+  }
+}
+
+.wizard__sugerencia-texto {
+  font-size: 0.78rem;
+  color: $os-text-secondary;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.wizard__sugerencia-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wizard__sugerencia-meta-num {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.wizard__factibilidad {
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  &--verde { color: #065f46; }
+  &--amarillo { color: #92400e; }
+}
+
+.wizard__cta-secundario {
+  background: none;
+  border: none;
+  color: #6d28d9;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  align-self: flex-start;
+
+  &:hover { text-decoration: underline; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; border-radius: 2px; }
+}
+
+// ── Productos ─────────────────────────────────────────
+
+.wizard__buscador-wrap { position: relative; }
+
+.wizard__buscador {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  font-size: 0.84rem;
+  color: $os-text-primary;
+
+  &:focus { outline: 2px solid $os-accent; outline-offset: 2px; }
+  &::placeholder { color: $os-text-muted; }
+}
+
+.wizard__seccion-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $os-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.wizard__productos { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.wizard__card-producto {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+  cursor: pointer;
+  text-align: left;
+  transition: all $os-transition;
+  width: 100%;
+
+  &:hover {
+    border-color: rgba($os-accent, 0.3);
+    background: rgba($os-accent, 0.02);
+  }
+
+  &--seleccionada {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.04);
+    box-shadow: 0 0 0 3px rgba($os-accent, 0.08);
+  }
+
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.wizard__producto-emoji { font-size: 1.5rem; flex-shrink: 0; }
+
+.wizard__producto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.wizard__producto-nombre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.wizard__producto-cat {
+  font-size: 0.72rem;
+  color: $os-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wizard__producto-nums {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.wizard__producto-precio {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: $os-text-secondary;
+}
+
+.wizard__gali-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #065f46;
+  background: rgba(5,150,105,0.08);
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(5,150,105,0.2);
+}
+
+// ── Paquete agentes ───────────────────────────────────
+
+.wizard__paquete { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.wizard__agente-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-md;
+}
+
+.wizard__agente-emoji { font-size: 1.5rem; flex-shrink: 0; }
+
+.wizard__agente-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.wizard__agente-nombre {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.wizard__agente-desc {
+  font-size: 0.75rem;
+  color: $os-text-muted;
+}
+
+.wizard__agente-estado {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #065f46;
+  white-space: nowrap;
+}
+
+.wizard__nota {
+  font-size: 0.75rem;
+  color: $os-text-muted;
+  margin: 0;
+  text-align: center;
+}
+
+// ── Lanzamiento ───────────────────────────────────────
+
+.wizard__paso--lanzar { align-items: center; gap: 2rem; }
+
+.wizard__resumen-card {
+  width: 100%;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-lg;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.wizard__resumen-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $os-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wizard__resumen-titulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $os-text-primary;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.wizard__resumen-items { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.wizard__resumen-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.wizard__resumen-item-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $os-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  min-width: 72px;
+}
+
+.wizard__resumen-item-val {
+  font-size: 0.82rem;
+  color: $os-text-secondary;
+}
+
+.wizard__lanzamiento-pasos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.wizard__lanzamiento-paso {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: $os-text-muted;
+  padding: 0.625rem 1rem;
+  border-radius: $os-radius-md;
+  transition: all $os-transition;
+
+  &--activo {
+    color: $os-text-primary;
+    background: rgba($os-accent, 0.05);
+    font-weight: 600;
+
+    .wizard__lanzamiento-paso-icon { animation: spin 0.8s linear infinite; }
+  }
+
+  &--done {
+    color: #065f46;
+    font-weight: 600;
+  }
+}
+
+.wizard__lanzamiento-paso-icon {
+  font-size: 1rem;
+  display: inline-block;
+  width: 1.25rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// ── CTAs ──────────────────────────────────────────────
+
+.wizard__cta-principal {
+  background: $os-accent;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: $os-radius-md;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 44px;
+  transition: opacity $os-transition, transform $os-transition;
+
+  &:hover:not(:disabled) { opacity: 0.9; }
+  &:active:not(:disabled) { transform: scale(0.98); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 3px; }
+}
+
+.wizard__cta-atras {
+  background: none;
+  border: 1px solid $os-border;
+  padding: 0.75rem 1.25rem;
+  border-radius: $os-radius-md;
+  font-size: 0.84rem;
+  color: $os-text-secondary;
+  cursor: pointer;
+  min-height: 44px;
+  transition: border-color $os-transition;
+
+  &:hover { border-color: $os-border-strong; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.wizard__cta-lanzar {
+  background: $os-accent;
+  color: #fff;
+  border: none;
+  padding: 0.875rem 2.5rem;
+  border-radius: $os-radius-md;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 52px;
+  transition: opacity $os-transition, transform $os-transition;
+  letter-spacing: -0.01em;
+
+  &:hover { opacity: 0.9; }
+  &:active { transform: scale(0.98); }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 3px; }
+}
+
+.wizard__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  &--solo { justify-content: flex-end; }
+}
+
+// ── Responsive ────────────────────────────────────────
+
+@media (max-width: 520px) {
+  .wizard { padding: $os-4 $os-3 $os-6; justify-content: flex-start; }
+  .wizard__bienvenida-titulo { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard__lanzamiento-paso-icon { animation: none !important; }
+  .wizard__progreso-fill { transition: none; }
+  * { transition-duration: 0.01ms !important; }
+}

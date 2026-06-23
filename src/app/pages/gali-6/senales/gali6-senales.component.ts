@@ -1,0 +1,320 @@
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
+import {
+  MOCK_SENALES,
+  MOCK_ALERTAS,
+  GaliSignal,
+  GaliAlerta,
+  SignalFuenteTipo,
+} from '../../../../../mocks/gali-v5/senales.mock';
+import { SenalDetalleComponent, SelectedItem } from '../../gali-5/gali-v5/pages/senales/senal-detalle/senal-detalle.component';
+import { ConfirmActionModalComponent, ConfirmActionConfig } from '../../gali-5/gali-v5/components/shared';
+import {
+  AGENTES_ESPECIALIZADOS,
+  PROCESO_TIPO_LABEL,
+  PROCESO_TIPO_TOOLTIP,
+} from '../../../../../mocks/gali-v6/agentes-especializados';
+
+/** Tabs principales de la página */
+type MainTab = 'senales-activas' | 'fuentes-conexiones';
+/** Filtro por tipo de señal dentro de tab señales */
+type SignalFiltro = 'todas' | 'dato-real' | 'analisis-ia' | 'alertas';
+/** Filtro por agente */
+type AgenteFiltro = 'todos' | string;
+
+interface FuenteDropi {
+  id: string;
+  label: string;
+  descripcion: string;
+  activa: boolean;
+  tipo: 'dropi-base' | 'conexion-usuario' | 'archivo-contexto';
+  senalesCount?: number;
+}
+
+@Component({
+  selector: 'app-gali6-senales',
+  standalone: true,
+  imports: [CommonModule, SenalDetalleComponent, ConfirmActionModalComponent],
+  templateUrl: './gali6-senales.component.html',
+  styleUrls: ['./gali6-senales.component.scss'],
+})
+export class Gali6SenalesComponent implements OnInit {
+  readonly router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  // ─────────────────────────────────────────────────────────────
+  // Estado de tabs y filtros
+  // ─────────────────────────────────────────────────────────────
+
+  mainTab = signal<MainTab>('senales-activas');
+  signalFiltro = signal<SignalFiltro>('todas');
+  agenteFiltro = signal<AgenteFiltro>('todos');
+  proyectoFiltro = signal<string | null>(null);
+  selectedId = signal<string | null>(null);
+  highlightId = signal<string | null>(null);
+
+  // ─────────────────────────────────────────────────────────────
+  // Datos
+  // ─────────────────────────────────────────────────────────────
+
+  readonly todasSenales = MOCK_SENALES;
+  readonly todasAlertas = MOCK_ALERTAS;
+  readonly agentesEspecializados = AGENTES_ESPECIALIZADOS;
+  readonly procesoTipoLabel = PROCESO_TIPO_LABEL;
+  readonly procesoTipoTooltip = PROCESO_TIPO_TOOLTIP;
+
+  /** Fuentes de datos disponibles — Bloque A (Dropi base) + B (conexiones usuario) + C (archivos) */
+  readonly fuentesDropi: FuenteDropi[] = [
+    // Grupo A — Dropi base (siempre activas, determinísticas)
+    { id: 'dropi-pedidos',   label: 'Pedidos',                  descripcion: 'Sincronización automática de pedidos', activa: true,  tipo: 'dropi-base', senalesCount: 2 },
+    { id: 'dropi-inventario',label: 'Inventario Dropi',          descripcion: 'Stock disponible por producto',         activa: true,  tipo: 'dropi-base', senalesCount: 1 },
+    { id: 'dropi-novedades', label: 'Novedades y garantías',     descripcion: 'Estado de novedades logísticas',        activa: true,  tipo: 'dropi-base', senalesCount: 1 },
+    { id: 'dropi-cartera',   label: 'Cartera y saldos',          descripcion: 'Historial financiero',                  activa: true,  tipo: 'dropi-base', senalesCount: 0 },
+    // Grupo B — Conexiones usuario
+    { id: 'conn-meta',       label: 'Meta Ads',                  descripcion: 'Datos de campañas Facebook/Instagram',  activa: true,  tipo: 'conexion-usuario', senalesCount: 3 },
+    { id: 'conn-tiktok',     label: 'TikTok Ads',                descripcion: 'Campañas en TikTok',                    activa: false, tipo: 'conexion-usuario', senalesCount: 0 },
+    { id: 'conn-google',     label: 'Google Analytics',          descripcion: 'Tráfico web y conversiones',            activa: false, tipo: 'conexion-usuario', senalesCount: 0 },
+    // Grupo C — Archivos de contexto
+    { id: 'file-precios',    label: 'Lista de precios.xlsx',     descripcion: 'Subido Jun 10, 2026',                   activa: true,  tipo: 'archivo-contexto', senalesCount: 0 },
+  ];
+
+  // ─────────────────────────────────────────────────────────────
+  // Computed: señales y alertas filtradas
+  // ─────────────────────────────────────────────────────────────
+
+  private senalesBase = computed(() => {
+    const pf = this.proyectoFiltro();
+    let items = this.todasSenales.filter(s => s.tipo !== 'completed');
+    if (pf) items = items.filter(s => !s.proyectoId || s.proyectoId === pf);
+    return items;
+  });
+
+  private alertasBase = computed(() => {
+    const pf = this.proyectoFiltro();
+    if (!pf) return this.todasAlertas;
+    return this.todasAlertas.filter(a => !a.proyectoId || a.proyectoId === pf);
+  });
+
+  senalesVisibles = computed(() => {
+    const filtro = this.signalFiltro();
+    const agente = this.agenteFiltro();
+    let items = this.senalesBase();
+
+    if (filtro === 'dato-real') items = items.filter(s => s.fuente === 'deterministico');
+    else if (filtro === 'analisis-ia') items = items.filter(s => s.fuente === 'ia');
+    else if (filtro === 'alertas') return [];
+
+    if (agente !== 'todos') items = items.filter(s => s.agenteOrigenId === agente);
+    return items;
+  });
+
+  alertasVisibles = computed(() => {
+    if (this.signalFiltro() === 'dato-real' || this.signalFiltro() === 'analisis-ia') {
+      // Para filtros de fuente, también mostramos alertas del mismo tipo
+      const filtro = this.signalFiltro();
+      let items = this.alertasBase();
+      if (filtro === 'dato-real') items = items.filter(a => a.fuente === 'deterministico');
+      if (filtro === 'analisis-ia') items = items.filter(a => a.fuente === 'ia');
+      const agente = this.agenteFiltro();
+      if (agente !== 'todos') items = items.filter(a => a.agenteOrigenId === agente);
+      return items;
+    }
+    if (this.signalFiltro() === 'alertas') {
+      const items = this.alertasBase();
+      const agente = this.agenteFiltro();
+      if (agente !== 'todos') return items.filter(a => a.agenteOrigenId === agente);
+      return items;
+    }
+    const items = this.alertasBase();
+    const agente = this.agenteFiltro();
+    if (agente !== 'todos') return items.filter(a => a.agenteOrigenId === agente);
+    return items;
+  });
+
+  totalActivas = computed(() => this.senalesVisibles().length + this.alertasVisibles().length);
+
+  selectedItem = computed<SelectedItem | null>(() => {
+    const id = this.selectedId();
+    if (!id) return null;
+    const senal = this.senalesVisibles().find(s => s.id === id);
+    if (senal) return { kind: 'senal', data: senal };
+    const alerta = this.alertasVisibles().find(a => a.id === id);
+    if (alerta) return { kind: 'alerta', data: alerta };
+    // Buscar en todas si no está en vista filtrada (selección por deeplink)
+    const senalAll = this.todasSenales.find(s => s.id === id);
+    if (senalAll) return { kind: 'senal', data: senalAll };
+    const alertaAll = this.todasAlertas.find(a => a.id === id);
+    if (alertaAll) return { kind: 'alerta', data: alertaAll };
+    return null;
+  });
+
+  isAlertSelected = computed(() => this.selectedItem()?.kind === 'alerta');
+
+  // ─────────────────────────────────────────────────────────────
+  // Filtros de UI
+  // ─────────────────────────────────────────────────────────────
+
+  readonly filtroTabs = [
+    { value: 'todas' as SignalFiltro,       label: 'Todas' },
+    { value: 'dato-real' as SignalFiltro,   label: '📊 Datos reales' },
+    { value: 'analisis-ia' as SignalFiltro, label: '🤖 Análisis Gali' },
+    { value: 'alertas' as SignalFiltro,     label: '⚠️ Alertas' },
+  ];
+
+  /** Agentes únicos que han generado señales */
+  agentesConSenales = computed(() => {
+    const ids = new Set([
+      ...this.todasSenales.map(s => s.agenteOrigenId).filter(Boolean) as string[],
+      ...this.todasAlertas.map(a => a.agenteOrigenId).filter(Boolean) as string[],
+    ]);
+    return this.agentesEspecializados.filter(a => ids.has(a.id));
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Modal de confirmación
+  // ─────────────────────────────────────────────────────────────
+
+  showConfirmModal = signal(false);
+  confirmConfig = signal<ConfirmActionConfig | null>(null);
+
+  // ─────────────────────────────────────────────────────────────
+  // Lifecycle
+  // ─────────────────────────────────────────────────────────────
+
+  ngOnInit() {
+    const params = this.route.snapshot.queryParamMap;
+    const signalId = params.get('signalId');
+    const projectId = params.get('projectId');
+    const tab = params.get('tab') as MainTab | null;
+
+    if (projectId) this.proyectoFiltro.set(projectId);
+    if (tab === 'fuentes-conexiones') this.mainTab.set('fuentes-conexiones');
+
+    if (signalId) {
+      this.selectedId.set(signalId);
+      this.highlightId.set(signalId);
+      setTimeout(() => this.highlightId.set(null), 3000);
+    } else {
+      this.seleccionarPrimero();
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Handlers de estado
+  // ─────────────────────────────────────────────────────────────
+
+  setMainTab(tab: MainTab) { this.mainTab.set(tab); }
+
+  setFiltro(f: SignalFiltro) {
+    this.signalFiltro.set(f);
+    this.seleccionarPrimero();
+  }
+
+  setAgenteFiltro(id: AgenteFiltro) {
+    this.agenteFiltro.set(id);
+    this.seleccionarPrimero();
+  }
+
+  selectSignal(id: string) { this.selectedId.set(id); }
+  selectAlert(id: string) { this.selectedId.set(id); }
+
+  private seleccionarPrimero() {
+    const primeraSenal = this.senalesVisibles()[0];
+    const primeraAlerta = this.alertasVisibles()[0];
+    this.selectedId.set(primeraSenal?.id ?? primeraAlerta?.id ?? null);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Handlers de CTA
+  // ─────────────────────────────────────────────────────────────
+
+  onCtaPrimario(item: SelectedItem) {
+    if (item.kind === 'alerta' && item.data.tipo === 'critical') {
+      this.abrirModalConfirmacion(item.data);
+    }
+  }
+
+  onCtaSecundario(_item: SelectedItem) {}
+
+  onLanzar() {
+    const selected = this.selectedItem();
+    this.router.navigate(['/gali-6/proyectos/nuevo'], {
+      queryParams: selected ? { signalId: selected.data.id } : {},
+    });
+  }
+
+  onOperar() {
+    this.signalFiltro.set('alertas');
+    const primera = this.alertasVisibles()[0];
+    if (primera) this.selectedId.set(primera.id);
+  }
+
+  onMedir() {
+    this.router.navigate(['/gali-6/reportes/dashboard']);
+  }
+
+  onIgnorar(item: SelectedItem) {
+    this.selectedId.set(null);
+    console.log('Señal ignorada:', item.data.id);
+  }
+
+  onGuardarDespues(_item: SelectedItem) {}
+
+  onOpcionElegida(event: { alertaId: string; opcionId: string }) {
+    console.log('Opción elegida:', event.alertaId, '→', event.opcionId);
+  }
+
+  onConfirmAlerta() {
+    this.showConfirmModal.set(false);
+    this.confirmConfig.set(null);
+  }
+
+  onCancelAlerta() {
+    this.showConfirmModal.set(false);
+    this.confirmConfig.set(null);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Helpers de UI
+  // ─────────────────────────────────────────────────────────────
+
+  getTipoIcon(tipo: string): string {
+    return ({ scale: '⚡', trend: '🔭', opportunity: '💎', risk: '⚠️', completed: '✅' } as Record<string, string>)[tipo] ?? '•';
+  }
+
+  getFuenteLabel(fuente: SignalFuenteTipo): string {
+    return fuente === 'deterministico' ? '📊 Dato real' : '🤖 Análisis Gali';
+  }
+
+  getFuenteClass(fuente: SignalFuenteTipo): string {
+    return fuente === 'deterministico' ? 'chip-fuente--deterministic' : 'chip-fuente--ia';
+  }
+
+  getFuenteTooltip(fuente: SignalFuenteTipo): string {
+    return fuente === 'deterministico'
+      ? 'Este dato viene directamente de Dropi. 100% confiable.'
+      : 'Generado por IA — verifica antes de actuar.';
+  }
+
+  getFuenteGrupoLabel(tipo: FuenteDropi['tipo']): string {
+    return { 'dropi-base': 'Dropi (incluido)', 'conexion-usuario': 'Tus conexiones', 'archivo-contexto': 'Archivos de contexto' }[tipo];
+  }
+
+  get fuentesDropiBase() { return this.fuentesDropi.filter(f => f.tipo === 'dropi-base'); }
+  get fuentesConexionUsuario() { return this.fuentesDropi.filter(f => f.tipo === 'conexion-usuario'); }
+  get fuentesArchivo() { return this.fuentesDropi.filter(f => f.tipo === 'archivo-contexto'); }
+
+  private abrirModalConfirmacion(alerta: GaliAlerta) {
+    this.confirmConfig.set({
+      titulo: alerta.titulo,
+      descripcion: alerta.descripcion,
+      impacto: alerta.impacto,
+      pedidosAfectados: alerta.pedidosAfectados ?? undefined,
+      ctaLabel: alerta.ctaPrincipal,
+      cancelLabel: 'Cancelar',
+      variant: alerta.tipo === 'critical' ? 'critical' : 'warning',
+    });
+    this.showConfirmModal.set(true);
+  }
+}

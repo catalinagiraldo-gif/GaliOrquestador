@@ -1,0 +1,291 @@
+<div class="wizard">
+
+  <!-- ══════════════ PASO 0 — Bienvenida ══════════════ -->
+  @if (paso() === 0) {
+    <div class="wizard__paso wizard__paso--bienvenida gali-stagger-in">
+      <div class="wizard__gali-avatar">✦</div>
+      <h1 class="wizard__bienvenida-titulo">Hola, soy Gali.</h1>
+      <p class="wizard__bienvenida-texto">
+        Voy a ayudarte a construir tu negocio de dropshipping desde cero.<br>
+        Empecemos por lo más importante: ¿qué quieres lograr?
+      </p>
+      <button class="wizard__cta-principal" (click)="avanzar()">
+        Cuéntame →
+      </button>
+    </div>
+  }
+
+  <!-- ══════════════ PASO 1 — Situación ══════════════ -->
+  @if (paso() === 1) {
+    <div class="wizard__paso gali-stagger-in">
+      <div class="wizard__cabecera">
+        <div class="wizard__progreso">
+          <span class="wizard__progreso-texto">Paso 1 de 4</span>
+          <div class="wizard__progreso-barra">
+            <div class="wizard__progreso-fill" style="width: 25%"></div>
+          </div>
+        </div>
+        <h2 class="wizard__titulo">¿Dónde estás ahora?</h2>
+        <p class="wizard__subtitulo">Cuéntanos tu punto de partida para que Gali pueda ayudarte mejor.</p>
+      </div>
+
+      <div class="wizard__cards">
+        @for (op of situacionOpciones; track op.tipo) {
+          <button class="wizard__card-situacion"
+                  [class.wizard__card-situacion--seleccionada]="situacion() === op.tipo"
+                  (click)="onSituacion(op.tipo)">
+            <span class="wizard__card-emoji">{{ op.emoji }}</span>
+            <div class="wizard__card-texto">
+              <span class="wizard__card-titulo">{{ op.titulo }}</span>
+              <span class="wizard__card-sub">{{ op.subtitulo }}</span>
+            </div>
+            @if (situacion() === op.tipo) {
+              <span class="wizard__card-check" aria-hidden="true">✓</span>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="wizard__nav">
+        <button class="wizard__cta-principal" [disabled]="!puedeContinuar()" (click)="avanzar()">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════ PASO 2 — Objetivo ══════════════ -->
+  @if (paso() === 2) {
+    <div class="wizard__paso gali-stagger-in">
+      <div class="wizard__cabecera">
+        <div class="wizard__progreso">
+          <span class="wizard__progreso-texto">Paso 2 de 4</span>
+          <div class="wizard__progreso-barra">
+            <div class="wizard__progreso-fill" style="width: 50%"></div>
+          </div>
+        </div>
+        <h2 class="wizard__titulo">¿Qué quieres lograr?</h2>
+        <p class="wizard__subtitulo">Define tu meta para que los agentes de Gali trabajen enfocados.</p>
+      </div>
+
+      <div class="wizard__objetivo-opciones">
+        <label class="wizard__radio-label" [class.wizard__radio-label--activa]="objetivoTipo() === 'primera-venta'">
+          <input type="radio" name="objetivo" value="primera-venta"
+                 [checked]="objetivoTipo() === 'primera-venta'"
+                 (change)="objetivoTipo.set('primera-venta')">
+          Hacer mi primera venta
+        </label>
+
+        <label class="wizard__radio-label" [class.wizard__radio-label--activa]="objetivoTipo() === 'pedidos'">
+          <input type="radio" name="objetivo" value="pedidos"
+                 [checked]="objetivoTipo() === 'pedidos'"
+                 (change)="objetivoTipo.set('pedidos')">
+          Llegar a
+          <input class="wizard__input-num"
+                 type="number" min="1" max="999"
+                 [value]="objetivoPedidos()"
+                 (input)="objetivoPedidos.set(+$any($event.target).value)"
+                 (click)="objetivoTipo.set('pedidos')"
+                 aria-label="Número de pedidos">
+          pedidos en
+          <input class="wizard__input-num"
+                 type="number" min="1" max="52"
+                 [value]="objetivoSemanas()"
+                 (input)="objetivoSemanas.set(+$any($event.target).value)"
+                 (click)="objetivoTipo.set('pedidos')"
+                 aria-label="Número de semanas">
+          semanas
+        </label>
+      </div>
+
+      @if (sugerencia(); as sug) {
+        <div class="wizard__sugerencia">
+          <div class="wizard__sugerencia-header">
+            <span class="wizard__sugerencia-icon">💡</span>
+            <span class="wizard__sugerencia-label">Gali sugiere</span>
+            <span class="wizard__chip wizard__chip--ia">🤖 IA guiada</span>
+          </div>
+          <p class="wizard__sugerencia-texto">{{ sug.descripcion }}</p>
+          <div class="wizard__sugerencia-meta">
+            <span class="wizard__sugerencia-meta-num">{{ sug.pedidosSem }} pedidos/sem en {{ sug.semanas }} sem</span>
+            <span class="wizard__factibilidad wizard__factibilidad--{{ sug.factibilidad }}">
+              @if (sug.factibilidad === 'verde') { ● Factible }
+              @else { ● Ambicioso }
+            </span>
+          </div>
+          <button class="wizard__cta-secundario" (click)="usarSugerencia()">
+            Usar esta sugerencia
+          </button>
+        </div>
+      }
+
+      <div class="wizard__nav">
+        <button class="wizard__cta-atras" (click)="retroceder()">← Atrás</button>
+        <button class="wizard__cta-principal" [disabled]="!puedeContinuar()" (click)="avanzar()">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════ PASO 3 — Producto ══════════════ -->
+  @if (paso() === 3) {
+    <div class="wizard__paso gali-stagger-in">
+      <div class="wizard__cabecera">
+        <div class="wizard__progreso">
+          <span class="wizard__progreso-texto">Paso 3 de 4</span>
+          <div class="wizard__progreso-barra">
+            <div class="wizard__progreso-fill" style="width: 75%"></div>
+          </div>
+        </div>
+        <h2 class="wizard__titulo">Tu primera apuesta</h2>
+        <p class="wizard__subtitulo">Elige el producto con el que vas a empezar.</p>
+      </div>
+
+      <div class="wizard__buscador-wrap">
+        <input class="wizard__buscador" type="search"
+               placeholder="🔍 Buscar producto en Dropi..."
+               [value]="busqueda()"
+               (input)="busqueda.set($any($event.target).value)"
+               aria-label="Buscar producto">
+      </div>
+
+      <p class="wizard__seccion-label">Gali recomienda para tu objetivo:</p>
+
+      <div class="wizard__productos">
+        @for (p of productosFiltrados(); track p.id) {
+          <button class="wizard__card-producto"
+                  [class.wizard__card-producto--seleccionada]="productoSeleccionado()?.id === p.id"
+                  (click)="seleccionarProducto(p)">
+            <div class="wizard__producto-emoji">{{ p.emoji }}</div>
+            <div class="wizard__producto-info">
+              <span class="wizard__producto-nombre">{{ p.nombre }}</span>
+              <span class="wizard__producto-cat">{{ p.categoria }}</span>
+              <div class="wizard__producto-nums">
+                <span class="wizard__producto-precio">{{ p.precioLabel }}</span>
+                <span class="wizard__producto-margen">
+                  <span class="wizard__gali-badge">Gali sugiere → {{ p.margenEstimado }}% margen est.</span>
+                </span>
+              </div>
+            </div>
+            @if (productoSeleccionado()?.id === p.id) {
+              <span class="wizard__card-check" aria-hidden="true">✓</span>
+            }
+          </button>
+        }
+      </div>
+
+      <div class="wizard__nav">
+        <button class="wizard__cta-atras" (click)="retroceder()">← Atrás</button>
+        <button class="wizard__cta-principal" [disabled]="!puedeContinuar()" (click)="avanzar()">
+          Continuar →
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════ PASO 4 — Paquete ══════════════ -->
+  @if (paso() === 4) {
+    <div class="wizard__paso gali-stagger-in">
+      <div class="wizard__cabecera">
+        <div class="wizard__progreso">
+          <span class="wizard__progreso-texto">Paso 4 de 4</span>
+          <div class="wizard__progreso-barra">
+            <div class="wizard__progreso-fill" style="width: 100%"></div>
+          </div>
+        </div>
+        <h2 class="wizard__titulo">Tu equipo de agentes</h2>
+        <p class="wizard__subtitulo">Tu paquete inicial incluye 3 agentes gratuitos que monitorean tu negocio.</p>
+      </div>
+
+      <div class="wizard__paquete">
+        @for (ag of paquete; track ag.nombre) {
+          <div class="wizard__agente-card">
+            <div class="wizard__agente-emoji">{{ ag.emoji }}</div>
+            <div class="wizard__agente-info">
+              <span class="wizard__agente-nombre">{{ ag.nombre }}</span>
+              <span class="wizard__agente-desc">{{ ag.desc }}</span>
+            </div>
+            <span class="wizard__agente-estado">🟢 Gratis</span>
+          </div>
+        }
+      </div>
+
+      <p class="wizard__nota">
+        Puedes agregar más agentes después en el Marketplace.
+      </p>
+
+      <div class="wizard__nav wizard__nav--solo">
+        <button class="wizard__cta-principal" (click)="avanzar()">
+          Activar paquete →
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ══════════════ PASO 5 — Lanzar ══════════════ -->
+  @if (paso() === 5) {
+    <div class="wizard__paso wizard__paso--lanzar gali-stagger-in">
+      <div class="wizard__resumen-card">
+        <div class="wizard__resumen-label">Gali va a crear tu primer proyecto:</div>
+        <h2 class="wizard__resumen-titulo">
+          {{ productoSeleccionado()?.nombre ?? 'Tu primer proyecto' }}
+        </h2>
+        <div class="wizard__resumen-items">
+          <div class="wizard__resumen-item">
+            <span class="wizard__resumen-item-label">Objetivo</span>
+            <span class="wizard__resumen-item-val">{{ resumenObjetivo() }}</span>
+          </div>
+          <div class="wizard__resumen-item">
+            <span class="wizard__resumen-item-label">Producto</span>
+            <span class="wizard__resumen-item-val">{{ productoSeleccionado()?.nombre }}</span>
+          </div>
+          <div class="wizard__resumen-item">
+            <span class="wizard__resumen-item-label">Agentes</span>
+            <span class="wizard__resumen-item-val">ROAS + Stock + Logística</span>
+          </div>
+        </div>
+      </div>
+
+      @if (pasoLanzamiento() === 'idle') {
+        <button class="wizard__cta-lanzar" (click)="lanzar()">
+          ¡Lanzar mi primer proyecto! 🚀
+        </button>
+      }
+
+      @if (pasoLanzamiento() !== 'idle') {
+        <div class="wizard__lanzamiento-pasos">
+          <div class="wizard__lanzamiento-paso"
+               [class.wizard__lanzamiento-paso--activo]="pasoLanzamiento() === 'proyecto'"
+               [class.wizard__lanzamiento-paso--done]="pasoLanzamiento() === 'agentes' || pasoLanzamiento() === 'listo'">
+            <span class="wizard__lanzamiento-paso-icon">
+              @if (pasoLanzamiento() === 'proyecto') { ⟳ }
+              @else { ✓ }
+            </span>
+            Creando proyecto...
+          </div>
+          <div class="wizard__lanzamiento-paso"
+               [class.wizard__lanzamiento-paso--activo]="pasoLanzamiento() === 'agentes'"
+               [class.wizard__lanzamiento-paso--done]="pasoLanzamiento() === 'listo'">
+            <span class="wizard__lanzamiento-paso-icon">
+              @if (pasoLanzamiento() === 'agentes') { ⟳ }
+              @else if (pasoLanzamiento() === 'listo') { ✓ }
+              @else { ○ }
+            </span>
+            Activando agentes...
+          </div>
+          <div class="wizard__lanzamiento-paso"
+               [class.wizard__lanzamiento-paso--done]="pasoLanzamiento() === 'listo'">
+            <span class="wizard__lanzamiento-paso-icon">
+              @if (pasoLanzamiento() === 'listo') { ✓ }
+              @else { ○ }
+            </span>
+            @if (pasoLanzamiento() === 'listo') { ¡Listo! 🎉 }
+            @else { Preparando tu dashboard... }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

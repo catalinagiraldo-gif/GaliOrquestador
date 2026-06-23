@@ -159,67 +159,9 @@
         <span class="brujula-expectativa__sub">Con el presupuesto actual y ROAS histórico de {{ 1.93 }}x</span>
       </div>
 
-      <button class="wizard__next" (click)="goTo('campana')">
-        Continuar → Elige tu campaña
+      <button class="wizard__next" (click)="goTo('presupuesto')">
+        Continuar → Presupuesto de pauta
       </button>
-    </div>
-  }
-
-  <!-- ── PASO 2.5: Campaña ── -->
-  @if (step() === 'campana') {
-    <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">¿Cómo vas a promocionar este producto?</h1>
-      <p class="wizard__sub">Selecciona una o más campañas. Puedes cambiarlas después.</p>
-
-      <!-- Sugerencias Gali -->
-      <div class="campana-sugerencias">
-        @for (sug of sugerenciasCampana; track sug.id) {
-          <div class="campana-sug-card"
-               [class.campana-sug-card--selected]="isCampanaSelected(sug.id)"
-               (click)="toggleCampanaSugerencia(sug.id)">
-            <div class="campana-sug-card__header">
-              <div class="campana-sug-card__check">
-                @if (isCampanaSelected(sug.id)) { ✓ }
-              </div>
-              <span class="campana-sug-card__canal">{{ sug.canalLabel }}</span>
-              <span class="campana-sug-card__presupuesto">{{ sug.presupuestoDiarioEstimadoLabel }}</span>
-            </div>
-            <h3 class="campana-sug-card__nombre">{{ sug.nombre }}</h3>
-            <p class="campana-sug-card__desc">{{ sug.descripcion }}</p>
-            <div class="campana-sug-card__gali">
-              <span class="gali-spark">✦</span>
-              <span>{{ sug.razonGali }}</span>
-            </div>
-          </div>
-        }
-
-        <!-- Campaña personalizada -->
-        <div class="campana-sug-card campana-sug-card--custom"
-             [class.campana-sug-card--selected]="showCampanaCustom()"
-             (click)="showCampanaCustom.set(!showCampanaCustom())">
-          <div class="campana-sug-card__header">
-            <div class="campana-sug-card__check">@if (showCampanaCustom()) { ✓ }</div>
-            <span class="campana-sug-card__canal">Personalizada</span>
-          </div>
-          <h3 class="campana-sug-card__nombre">Crear campaña personalizada</h3>
-          <p class="campana-sug-card__desc">Configura el canal, presupuesto y agentes a tu medida</p>
-          @if (showCampanaCustom()) {
-            <input class="campana-custom-input" type="text" placeholder="Nombre de la campaña..."
-                   [value]="campanaCustomNombre()"
-                   (input)="campanaCustomNombre.set($any($event.target).value)"
-                   (click)="$event.stopPropagation()">
-          }
-        </div>
-      </div>
-
-      <div class="wizard__nav-row">
-        <button class="wizard__back" (click)="goBack()">← Brújula</button>
-        <button class="wizard__next"
-                [disabled]="selectedCampanas().size === 0 && !showCampanaCustom()"
-                (click)="goTo('presupuesto')">
-          Continuar → Presupuesto
-        </button>
-      </div>
     </div>
   }
 

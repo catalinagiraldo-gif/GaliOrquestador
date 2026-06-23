@@ -114,8 +114,8 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'reportes/dashboard',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/reportes/report-dashboard-kpi-page.component').then(
-        m => m.ReportDashboardKpiPageComponent,
+      import('./reportes/gali6-reportes-dashboard.component').then(
+        m => m.Gali6ReportesDashboardComponent,
       ),
   },
   {
@@ -205,8 +205,8 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'agentes',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/agentes/agentes-page.component').then(
-        m => m.AgentesPageComponent,
+      import('./agentes/gali6-agentes.component').then(
+        m => m.Gali6AgentesComponent,
       ),
   },
   {
@@ -226,15 +226,15 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'marketplace',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/marketplace/marketplace-page.component').then(
-        m => m.MarketplacePageComponent,
+      import('./marketplace/gali6-marketplace.component').then(
+        m => m.Gali6MarketplaceComponent,
       ),
   },
   {
     path: 'senales',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/senales/senales-page.component').then(
-        m => m.SenalesPageComponent,
+      import('./senales/gali6-senales.component').then(
+        m => m.Gali6SenalesComponent,
       ),
   },
   {
@@ -247,8 +247,8 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'proyecto/:id',
     loadComponent: () =>
-      import('../gali-5/gali-v5/pages/proyecto/proyecto-detalle-page.component').then(
-        m => m.ProyectoDetallePageComponent,
+      import('./proyecto/gali6-proyecto-detalle.component').then(
+        m => m.Gali6ProyectoDetalleComponent,
       ),
   },
   {

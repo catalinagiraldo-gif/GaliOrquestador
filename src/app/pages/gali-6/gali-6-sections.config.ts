@@ -57,10 +57,9 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
       defaultExpanded: true,
       children: [
         { label: 'Hoy',         route: '/gali-6' },
-        { label: 'Señales',     route: '/gali-6/mi-negocio?tab=senales' },
-        { label: 'Conexiones',  route: '/gali-6/mi-negocio?tab=conexiones' },
-        { label: 'Impacto',     route: '/gali-6/mi-negocio?tab=impacto' },
-        { label: 'Mi Contexto', route: '/gali-6/mi-negocio?tab=operacion' },
+        { label: 'Señales',     route: '/gali-6/senales' },
+        { label: 'Impacto',     route: '/gali-6/impacto' },
+        { label: 'Mi Contexto', route: '/gali-6/mi-negocio' },
       ],
     },
     { id: 'proyectos', label: 'Proyectos', route: '/gali-6/proyectos', icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
@@ -75,6 +74,8 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
         { label: 'Skills',      route: '/gali-6/skills' },
         { label: 'Reglas',      route: '/gali-6/reglas' },
         { label: 'Marketplace', route: '/gali-6/marketplace' },
+        { label: 'Conexiones',  route: '/gali-6/conexiones' },
+        { label: 'Mensajes',    route: '/gali-6/marketing/chatea-pro', badge: 'Próximamente' } as any,
         { label: 'Academy',     route: '/gali-6/academy' },
       ],
     },
@@ -88,7 +89,52 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
   },
 };
 
+/** Panel de Gali 6 V1 — navegación idéntica al commit de GitHub antes del plan de evolución */
+export const GALI_6_V1_MISSION_PANEL: SectionPanel = {
+  railKey: 'home',
+  title: 'Gali 6 V1',
+  items: [
+    {
+      id: 'mi-negocio',
+      label: 'Mi Negocio',
+      type: 'accordion' as const,
+      icon: 'assets/icons/sidebar/gali-v5/user-circle.svg',
+      defaultExpanded: true,
+      children: [
+        { label: 'Hoy',         route: '/gali-6-v1' },
+        { label: 'Señales',     route: '/gali-6-v1/mi-negocio?tab=senales' },
+        { label: 'Conexiones',  route: '/gali-6-v1/mi-negocio?tab=conexiones' },
+        { label: 'Impacto',     route: '/gali-6-v1/mi-negocio?tab=impacto' },
+        { label: 'Mi Contexto', route: '/gali-6-v1/mi-negocio?tab=operacion' },
+      ],
+    },
+    { id: 'proyectos', label: 'Proyectos', route: '/gali-6-v1/proyectos', icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
+    {
+      id: 'centro-gali',
+      label: 'Centro de Gali',
+      type: 'accordion' as const,
+      icon: 'assets/icons/sidebar/gali-v5/apps-add.svg',
+      defaultExpanded: false,
+      children: [
+        { label: 'Agentes',     route: '/gali-6-v1/agentes' },
+        { label: 'Skills',      route: '/gali-6-v1/skills' },
+        { label: 'Reglas',      route: '/gali-6-v1/reglas' },
+        { label: 'Marketplace', route: '/gali-6-v1/marketplace' },
+        { label: 'Academy',     route: '/gali-6-v1/academy' },
+      ],
+    },
+  ],
+  agentFooter: {
+    agentId: 'gali',
+    label: 'Gali 6',
+    color: '#f49a3d',
+    statusLabel: 'La Casita · facilitador activo',
+    contextKey: 'home',
+  },
+};
+
 const G6_HOME_EXACT = new Set(['/gali-6', '/gali-6/']);
+const G6_V1_HOME_EXACT = new Set(['/gali-6-v1', '/gali-6-v1/']);
 const G6_HUB_PREFIXES = [
   '/gali-6/proyectos', '/gali-6/proyecto',
   '/gali-6/mi-negocio', '/gali-6/conexiones',
@@ -96,14 +142,25 @@ const G6_HUB_PREFIXES = [
   '/gali-6/agentes', '/gali-6/skills',
   '/gali-6/reglas', '/gali-6/marketplace',
   '/gali-6/academy', '/gali-6/centro-control',
+  '/gali-6/marketing/chatea-pro',
+];
+const G6_V1_HUB_PREFIXES = [
+  '/gali-6-v1/proyectos', '/gali-6-v1/proyecto',
+  '/gali-6-v1/mi-negocio', '/gali-6-v1/conexiones',
+  '/gali-6-v1/impacto', '/gali-6-v1/agentes',
+  '/gali-6-v1/skills', '/gali-6-v1/reglas',
+  '/gali-6-v1/marketplace', '/gali-6-v1/academy',
+  '/gali-6-v1/centro-control',
 ];
 
 export function resolveG6RailKey(url: string): string {
-  return resolveActiveRailKey(toV5(url));
+  return resolveActiveRailKey(toV5(url.replace('/gali-6-v1', '/gali-6')));
 }
 
 export function resolveG6SectionPanel(url: string): SectionPanel | null {
   const path = url.split('?')[0];
+  if (G6_V1_HOME_EXACT.has(path)) return GALI_6_V1_MISSION_PANEL;
+  if (G6_V1_HUB_PREFIXES.some(p => path.startsWith(p))) return GALI_6_V1_MISSION_PANEL;
   if (G6_HOME_EXACT.has(path)) return GALI_6_MISSION_PANEL;
   if (G6_HUB_PREFIXES.some(p => path.startsWith(p))) return GALI_6_MISSION_PANEL;
 

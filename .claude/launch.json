@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dropi-prototypes2",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--", "--port", "50284"],
+      "port": 50284
+    }
+  ]
+}

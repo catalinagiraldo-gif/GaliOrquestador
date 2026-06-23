@@ -1,0 +1,69 @@
+<div class="zero-hoy gali-stagger-in">
+
+  <!-- ══════════ Hero: primer proyecto activo ══════════ -->
+  <div class="zero-hoy__hero">
+    <div class="zero-hoy__hero-meta">
+      <span class="zero-hoy__hero-gali">✦ Gali</span>
+    </div>
+    <h1 class="zero-hoy__hero-titulo">
+      Tu primer proyecto está activo 🎉
+    </h1>
+    <p class="zero-hoy__hero-desc">
+      Gali está monitoreando <strong>Collar GPS para mascotas</strong>.
+      Te avisará cuando haya algo importante que hacer.
+    </p>
+  </div>
+
+  <!-- ══════════ KPIs en cero ══════════ -->
+  <div class="zero-hoy__kpis" aria-label="Indicadores iniciales">
+    <div class="zero-hoy__kpi">
+      <span class="zero-hoy__kpi-label">Pedidos</span>
+      <span class="zero-hoy__kpi-valor">0</span>
+      <span class="zero-hoy__kpi-nota">¡Tu primera venta está por venir!</span>
+    </div>
+    <div class="zero-hoy__kpi">
+      <span class="zero-hoy__kpi-label">ROAS</span>
+      <span class="zero-hoy__kpi-valor zero-hoy__kpi-valor--dash">—</span>
+      <span class="zero-hoy__kpi-nota">Disponible con primera pauta</span>
+    </div>
+    <div class="zero-hoy__kpi">
+      <span class="zero-hoy__kpi-label">Novedades</span>
+      <span class="zero-hoy__kpi-valor zero-hoy__kpi-valor--dash">—</span>
+      <span class="zero-hoy__kpi-nota">Sin pedidos activos aún</span>
+    </div>
+  </div>
+
+  <!-- ══════════ Próximos pasos de Gali ══════════ -->
+  <section class="zero-hoy__pasos">
+    <h2 class="zero-hoy__pasos-titulo">
+      <span>Para conseguir tu primera venta</span>
+      <span class="zero-hoy__chip-gali">Gali sugiere</span>
+    </h2>
+    <div class="zero-hoy__pasos-lista">
+      @for (paso of proximosPasos; track paso.titulo; let i = $index) {
+        <div class="zero-hoy__paso-card">
+          <div class="zero-hoy__paso-num">{{ i + 1 }}</div>
+          <div class="zero-hoy__paso-emoji">{{ paso.emoji }}</div>
+          <div class="zero-hoy__paso-info">
+            <span class="zero-hoy__paso-titulo">{{ paso.titulo }}</span>
+            <span class="zero-hoy__paso-desc">{{ paso.desc }}</span>
+          </div>
+          <button class="zero-hoy__paso-cta" (click)="onPaso(paso.ruta)">
+            {{ paso.cta }} →
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════ Enlace al prototipo completo ══════════ -->
+  <div class="zero-hoy__footer">
+    <p class="zero-hoy__footer-nota">
+      ¿Tienes experiencia y quieres ver el prototipo completo?
+    </p>
+    <button class="zero-hoy__footer-cta" (click)="onVerPrototipoCompleto()">
+      Ver Gali 6 completo →
+    </button>
+  </div>
+
+</div>

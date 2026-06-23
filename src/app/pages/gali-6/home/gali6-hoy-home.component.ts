@@ -1,169 +1,87 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import {
-  GaliDecisionTheaterComponent,
-  DecisionTheaterData,
-  DecisionUrgency,
-} from '../../gali-5/gali-v5/components/gali-decision-theater/gali-decision-theater.component';
-import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
-import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
-import KPIS from '../../../../../mocks/gali-v5/kpis-global.json';
-import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
-import PROJECTS from '../../../../../mocks/gali-v5/projects.json';
-import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
+  MOCK_HOY_ESTADO,
+  HoyEstado,
+  AccesoRapido,
+  KpiHoy,
+} from '../../../../../mocks/gali-v6/hoy-estado';
 
-/** Home "Hoy" de Gali 6 — los 4 bloques calmados: estado · decisión · impacto · palanca. */
 @Component({
   selector: 'app-gali6-hoy-home',
   standalone: true,
-  imports: [CommonModule, TitleCasePipe, RouterModule, GaliDecisionTheaterComponent, GaliGlosarioDirective, Gali6PageHeaderComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './gali6-hoy-home.component.html',
   styleUrl: './gali6-hoy-home.component.scss',
 })
 export class Gali6HoyHomeComponent {
-  private router = inject(Router);
+  readonly router = inject(Router);
 
-  readonly semana = (KPIS as any)._meta?.semana?.split('-W')[1] ?? '23';
-  readonly objetivoMeta = signal<number>(Number(localStorage.getItem('gali-6-objetivo-meta') ?? 100));
-  readonly pedidosActual = (KPIS as any).pedidos_sem_total?.valor ?? 70;
-  readonly metaPct = computed(() =>
-    Math.min(100, Math.round((this.pedidosActual / this.objetivoMeta()) * 100)),
-  );
+  readonly estado: HoyEstado = MOCK_HOY_ESTADO;
+  readonly decision = this.estado.decision_urgente;
+  readonly kpis: KpiHoy[] = this.estado.kpis;
+  readonly accesos: AccesoRapido[] = this.estado.accesos_rapidos;
 
-  private readonly proyectoLider = (PROJECTS as any[])
-    .filter(p => p.id)
-    .sort((a, b) => (b.revenue_semanal ?? 0) - (a.revenue_semanal ?? 0))[0];
+  readonly decisionDismissed = signal(false);
+  readonly toastMsg = signal<string | null>(null);
 
-  readonly trend = [0.64, 0.76, 0.86, 0.93, 1.0, 1.07].map(
-    f => +((this.proyectoLider?.roas_real ?? 1) * f).toFixed(2),
-  );
-
-  readonly sparkPoints = computed(() => {
-    const max = Math.max(...this.trend);
-    const min = Math.min(...this.trend);
-    const w = 88, h = 22;
-    return this.trend
-      .map((v, i) => {
-        const x = (i / (this.trend.length - 1)) * w;
-        const y = h - ((v - min) / (max - min || 1)) * h;
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      })
-      .join(' ');
-  });
-
-  readonly alertaTop = MOCK_ALERTAS.find(a => a.tipo === 'critical' && a.opciones?.length);
-  readonly decisionResuelta = signal(false);
-  readonly decisionToast = signal<string | null>(null);
-
-  readonly decision = signal<DecisionTheaterData>(
-    this.alertaTop
-      ? {
-          signalId: this.alertaTop.id,
-          agente: this.alertaTop.agente.charAt(0).toUpperCase() + this.alertaTop.agente.slice(1),
-          agenteColor: this.alertaTop.agenteColor ?? '#fbbf24',
-          urgencia: this.alertaTop.tipo as DecisionUrgency,
-          titulo: this.alertaTop.titulo,
-          contexto: this.alertaTop.descripcion,
-          riesgoSiNoActua: this.alertaTop.impacto,
-          impactoEstimado: this.alertaTop.impactoSiActua ?? this.alertaTop.impacto,
-          options: this.alertaTop.opciones!.map(o => ({
-            id: o.id,
-            label: o.label,
-            description: o.description,
-            impactoEstimado: o.impactoEstimado,
-            isPrimary: o.isPrimary,
-          })),
-          pendingQueueCount: MOCK_ALERTAS.filter(a => a.tipo === 'critical').length - 1,
-        }
-      : {
-          signalId: 'no-decision',
-          agente: 'Gali',
-          agenteColor: '#f49a3d',
-          urgencia: 'medium' as DecisionUrgency,
-          titulo: 'Todo en orden',
-          contexto: 'No hay decisiones urgentes pendientes. Gali 6 está monitoreando.',
-          riesgoSiNoActua: '',
-          impactoEstimado: '',
-          options: [],
-          pendingQueueCount: 0,
-        },
-  );
-
-  readonly delegarProxima = signal(localStorage.getItem('gali-6-delegar-vigilante') === 'true');
-  readonly ultimaAccionGali = 'hace 12 min · escaló campaña +15%';
-
-  // Cola de decisiones pendientes (todas menos la que se muestra en el theater)
-  readonly colaDecisiones = computed(() =>
-    MOCK_ALERTAS.filter(a => a.id !== this.alertaTop?.id && (a.tipo === 'critical' || a.tipo === 'warning'))
-  );
-  readonly colaExpanded = signal(false);
-
-  // Progresión modular (D2/D3/D4)
-  readonly modulosProgresion = [
-    { id: 'productos', glyph: '◈', nombre: 'Productos', sub: 'Activo — 3 proyectos corriendo', estado: 'activo' },
-    { id: 'ordenes', glyph: '◌', nombre: 'Órdenes', sub: 'Próximamente · completa 2 semanas exitosas', estado: 'proximo' },
-    { id: 'logistica', glyph: '▦', nombre: 'Logística', sub: 'Se desbloquea después de Órdenes', estado: 'bloqueado' },
-  ];
-
-  readonly verImpactoGali = signal(false);
-  readonly galiDelta = {
-    pedidos: 18,
-    pesos_ahorrados: '$380.000',
-    novedades_evitadas: 12,
-    horas_libradas: 6,
-  };
-
-  readonly impacto = (LEDGER as any).summary_semana;
-
-  readonly senalPalanca =
-    MOCK_SENALES.find(s => s.id === 'sen-006') ??
-    MOCK_SENALES.find(s => s.canLaunch && (s.tipo === 'opportunity' || s.tipo === 'trend'));
-  readonly palanca = {
-    titulo: this.senalPalanca?.titulo ?? 'Ventana de mercado',
-    detalle: (this.senalPalanca?.contextoMacromundo ?? '').split('. ')[0] + '.',
-    ventanaDias: this.senalPalanca?.ventanaDias ?? 0,
-  };
-
-  onOption(ev: { signalId: string; optionId: string }): void {
-    const opcion = this.decision().options.find(o => o.id === ev.optionId);
-    const msg = opcion
-      ? `✓ "${opcion.label}" — ${opcion.impactoEstimado || 'Gali lo procesa ahora'}`
-      : '✓ Decisión tomada — Gali lo procesa ahora';
-    this.decisionToast.set(msg);
-    setTimeout(() => { this.decisionToast.set(null); this.decisionResuelta.set(true); }, 3500);
+  getDecisionClass(): string {
+    const map: Record<string, string> = {
+      alerta: 'hero--alerta',
+      oportunidad: 'hero--oportunidad',
+      info: 'hero--info',
+    };
+    return map[this.decision.tipo] ?? 'hero--info';
   }
 
-  onDecidirDespues(): void {
-    this.decisionToast.set('◷ Decisión diferida — Gali te recuerda mañana si sigue siendo relevante');
-    setTimeout(() => { this.decisionToast.set(null); this.decisionResuelta.set(true); }, 3500);
+  getProcesoLabel(): string {
+    return this.decision.procesaTipo === 'deterministico'
+      ? '📊 Dato real'
+      : this.decision.procesaTipo === 'ia-ligera'
+      ? '🤖 IA guiada'
+      : '✨ Análisis IA';
   }
 
-  onVerCola(): void {
-    this.router.navigate(['/gali-6/proyectos']);
+  getProcesoClass(): string {
+    const map: Record<string, string> = {
+      deterministico: 'chip-proceso--deterministic',
+      'ia-ligera': 'chip-proceso--ia-ligera',
+      'ia-compleja': 'chip-proceso--ia-compleja',
+    };
+    return map[this.decision.procesaTipo] ?? 'chip-proceso--deterministic';
   }
 
-  toggleImpactoGali(): void {
-    this.verImpactoGali.update(v => !v);
+  onCtaPrincipal(): void {
+    if (this.decision.senalId) {
+      this.router.navigate(['/gali-6/senales'], {
+        queryParams: { signalId: this.decision.senalId },
+      });
+    } else {
+      this.router.navigate(['/gali-6/senales']);
+    }
   }
 
-  toggleCola(): void { this.colaExpanded.update(v => !v); }
-
-  toggleDelegar(): void {
-    const next = !this.delegarProxima();
-    this.delegarProxima.set(next);
-    localStorage.setItem('gali-6-delegar-vigilante', String(next));
+  onDismiss(): void {
+    this.toastMsg.set('◷ Te recordaré esto más tarde');
+    setTimeout(() => {
+      this.toastMsg.set(null);
+      this.decisionDismissed.set(true);
+    }, 2500);
   }
 
-  readonly asistentes = [
-    { id: 'roax', nombre: 'Roax', autopilot: true },
-    { id: 'vigilante', nombre: 'Vigilante', autopilot: true },
-    { id: 'chatea', nombre: 'Chatea Pro', autopilot: false },
-    { id: 'ada', nombre: 'ADA Spy', autopilot: false },
-    { id: 'kronos', nombre: 'Kronos', autopilot: false },
-  ];
+  onAcceso(ar: AccesoRapido): void {
+    if (ar.route) {
+      this.router.navigate([ar.route]);
+    } else if (ar.abrePanel) {
+      this.toastMsg.set('✦ Panel de Gali próximamente');
+      setTimeout(() => this.toastMsg.set(null), 2500);
+    }
+  }
 
-  lanzarPalanca(): void {
-    this.router.navigate(['/gali-6/proyectos/nuevo']);
+  onKpiClick(kpi: KpiHoy): void {
+    if (kpi.detailRoute) {
+      this.router.navigate([kpi.detailRoute]);
+    }
   }
 }
