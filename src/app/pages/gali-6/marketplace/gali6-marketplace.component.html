@@ -19,7 +19,113 @@
   <h2 class="g6-mkt__sec-title" id="sec-agentes">🤖 Agentes</h2>
   <p class="g6-mkt__sec-sub">Agentes especializados que operan en tu nombre, monitoreando y actuando.</p>
 
-  <!-- ── FILTROS ── -->
+  <!-- ── BUSCADOR ── -->
+  <div class="g6-mkt__search-wrap">
+    <span class="g6-mkt__search-icon" aria-hidden="true">🔍</span>
+    <input class="g6-mkt__search"
+           type="search"
+           placeholder="Buscar agentes por nombre o función…"
+           [ngModel]="searchQuery()"
+           (ngModelChange)="searchQuery.set($event)"
+           aria-label="Buscar agentes">
+    @if (searchQuery()) {
+      <button class="g6-mkt__search-clear" (click)="searchQuery.set('')" aria-label="Limpiar búsqueda">×</button>
+    }
+  </div>
+
+  <!-- ── TABS DE SECCIÓN ── -->
+  <div class="g6-mkt__sec-tabs" role="tablist" aria-label="Secciones del marketplace">
+    <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'todos'"
+            (click)="seccionTab.set('todos')">🤖 Catálogo Dropi</button>
+    <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'mis-agentes'"
+            (click)="seccionTab.set('mis-agentes')">
+      ✦ Mis agentes
+      <span class="g6-mkt__sec-tab-count">{{ agentesActivos().length }}</span>
+    </button>
+    <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'comunidad'"
+            (click)="seccionTab.set('comunidad')">👥 Comunidad</button>
+  </div>
+
+  <!-- ── MIS AGENTES ── -->
+  @if (seccionTab() === 'mis-agentes') {
+    @if (agentesActivos().length === 0) {
+      <div class="g6-mkt__empty">
+        <span class="g6-mkt__empty-icon">🤖</span>
+        <p>Aún no tienes agentes activos. Explora el catálogo para activar uno.</p>
+        <button class="g6-mkt__empty-reset" (click)="seccionTab.set('todos')">Ver catálogo →</button>
+      </div>
+    } @else {
+      <div class="g6-mkt__grid">
+        @for (ag of agentesActivos(); track ag.id) {
+          <div class="g6-mkt-card g6-mkt-card--activo">
+            <div class="g6-mkt-card__badges">
+              <span class="g6-mkt-badge g6-mkt-badge--activo">Activo</span>
+            </div>
+            <div class="g6-mkt-card__avatar" [style.background]="ag.colorAvatar + '18'" [style.color]="ag.colorAvatar">
+              <i [class]="ag.icono"></i>
+            </div>
+            <div class="g6-mkt-card__body">
+              <div class="g6-mkt-card__name-row">
+                <h3 class="g6-mkt-card__nombre">{{ ag.nombre }}</h3>
+              </div>
+              <p class="g6-mkt-card__desc">{{ ag.descripcionCorta }}</p>
+            </div>
+            <div class="g6-mkt-card__footer">
+              <a routerLink="/gali-6/agentes" class="g6-mkt-card__cta g6-mkt-card__cta--ver">
+                Configurar →
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ── COMUNIDAD ── -->
+  @if (seccionTab() === 'comunidad') {
+    <div class="g6-mkt__comunidad-nota">
+      <span aria-hidden="true">✦</span>
+      <p>Agentes creados por la comunidad de dropshippers Dropi. Úsalos bajo tu propio criterio — no son oficiales.</p>
+    </div>
+    <div class="g6-mkt__grid">
+      @for (ag of agentesComun; track ag.id) {
+        <div class="g6-mkt-card">
+          <div class="g6-mkt-card__badges">
+            <span class="g6-mkt-badge g6-mkt-badge--comunidad">Comunidad</span>
+            @if (ag.tier === 'paid') {
+              <span class="g6-mkt-badge g6-mkt-badge--paid">PAGO</span>
+            }
+            @if (ag.tier === 'tokens') {
+              <span class="g6-mkt-badge g6-mkt-badge--tokens">TOKENS</span>
+            }
+          </div>
+          <div class="g6-mkt-card__avatar" [style.background]="ag.colorAvatar + '18'" [style.color]="ag.colorAvatar">
+            <i [class]="ag.icono"></i>
+          </div>
+          <div class="g6-mkt-card__body">
+            <div class="g6-mkt-card__name-row">
+              <h3 class="g6-mkt-card__nombre">{{ ag.nombre }}</h3>
+            </div>
+            <p class="g6-mkt-card__desc">{{ ag.descripcionCorta }}</p>
+            <p class="g6-mkt__comunidad-autor">por {{ ag.autor }}</p>
+          </div>
+          <div class="g6-mkt-card__footer">
+            <span class="g6-mkt-card__precio-sub">
+              @if (ag.tier === 'free') { Gratis }
+              @if (ag.tier === 'paid' && ag.precioCopMes) { {{ ag.precioCopMes | number }} COP/mes }
+              @if (ag.tier === 'tokens') { Tokens por uso }
+            </span>
+            <button class="g6-mkt-card__cta g6-mkt-card__cta--activar">
+              Probar →
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── FILTROS (solo en tab "todos") ── -->
+  @if (seccionTab() === 'todos') {
   <div class="g6-mkt__filtros">
     <!-- Fila 1: Tier -->
     <div class="g6-mkt__filtro-row">
@@ -216,7 +322,124 @@
     </button>
   </div>
 
+  } <!-- /seccionTab 'todos' -->
+
+  <!-- ══════════════════════════════════════════════
+       ACCESO REGLAS GLOBALES
+  ══════════════════════════════════════════════ -->
+  <a routerLink="/gali-6/reglas" class="g6-mkt__reglas-link">
+    <span class="g6-mkt__reglas-link-icon">🔒</span>
+    <div class="g6-mkt__reglas-link-body">
+      <span class="g6-mkt__reglas-link-title">Gestionar reglas globales</span>
+      <span class="g6-mkt__reglas-link-sub">Reglas que aplican a todos los agentes sin excepción</span>
+    </div>
+    <span class="g6-mkt__reglas-link-arrow">→</span>
+  </a>
+
 </div>
+
+<!-- ── Modal detalle agente ── -->
+@if (detalleAgente()) {
+  <div class="g6-mkt-modal-bg" (click)="cerrarDetalle()" aria-hidden="true"></div>
+  <div class="g6-mkt-modal" role="dialog" aria-modal="true">
+    <div class="g6-mkt-modal__hdr">
+      <div class="g6-mkt-modal__avatar"
+           [style.background]="detalleAgente()!.colorAvatar + '18'"
+           [style.color]="detalleAgente()!.colorAvatar">
+        <i [class]="detalleAgente()!.icono"></i>
+      </div>
+      <div>
+        <h2 class="g6-mkt-modal__nombre">{{ detalleAgente()!.nombre }}</h2>
+        <span class="g6-mkt-modal__tipo {{ getProcesoClass(detalleAgente()!.tipo) }}">
+          {{ procesoTipoLabel[detalleAgente()!.tipo] }}
+        </span>
+      </div>
+      <button class="g6-mkt-modal__close" (click)="cerrarDetalle()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="g6-mkt-modal__body">
+      <!-- ¿Qué resuelve? -->
+      <div class="g6-mkt-modal__bloque">
+        <span class="g6-mkt-modal__lbl">¿Qué resuelve?</span>
+        <p class="g6-mkt-modal__desc">{{ detalleAgente()!.descripcion }}</p>
+      </div>
+
+      <!-- Lo que monitorea -->
+      <div class="g6-mkt-modal__bloque">
+        <span class="g6-mkt-modal__lbl">Monitorea</span>
+        <ul class="g6-mkt-modal__list">
+          @for (m of detalleAgente()!.monitorea; track m) {
+            <li>{{ m }}</li>
+          }
+        </ul>
+      </div>
+
+      <!-- Caso de uso real -->
+      <div class="g6-mkt-modal__bloque g6-mkt-modal__bloque--caso">
+        <span class="g6-mkt-modal__lbl">En tu negocio haría</span>
+        <p class="g6-mkt-modal__caso">
+          @if (detalleAgente()!.id === 'roax-ads') {
+            Monitorear tus 3 campañas activas · Escalar Collar GPS (ROAS 2.3x › obj 1.5x) · Pausar K-Beauty si baja del umbral
+          } @else if (detalleAgente()!.id === 'stock-guardian') {
+            Vigilar stock de 8 productos en 3 proyectos · Alertar cuando Collar GPS baje de 50 un. · Pausar campañas automáticamente
+          } @else if (detalleAgente()!.id === 'vigilante-logistico') {
+            Revisar 23 pedidos activos · Detectar patrones de novedad · Reasignar transportadoras cuando hay ahorro
+          } @else {
+            Trabajar en sincronía con tus proyectos y campañas activas
+          }
+        </p>
+      </div>
+
+      <!-- Conexiones necesarias -->
+      @if (detalleAgente()!.conexionesRequeridas?.length) {
+        <div class="g6-mkt-modal__bloque">
+          <span class="g6-mkt-modal__lbl">Necesita</span>
+          <div class="g6-mkt-modal__conexiones">
+            @for (cx of detalleAgente()!.conexionesRequeridas!; track cx) {
+              <span class="g6-mkt-modal__cx-chip">✓ {{ cx }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (detalleAgente()!.advertenciaIA) {
+        <div class="g6-mkt-card__advertencia">
+          <span>⚠️</span>
+          <p>{{ detalleAgente()!.advertenciaIA }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="g6-mkt-modal__footer">
+      <div class="g6-mkt-modal__precio">
+        @if (detalleAgente()!.tier === 'free') {
+          <strong>Gratis</strong>
+          <span>incluido en tu plan Dropi</span>
+        }
+        @if (detalleAgente()!.tier === 'paid' && detalleAgente()!.precioCopMes) {
+          <strong>{{ detalleAgente()!.precioCopMes | number }} COP/mes</strong>
+          <span>facturado mensualmente</span>
+        }
+        @if (detalleAgente()!.tier === 'tokens' && detalleAgente()!.tokensUso) {
+          <strong>{{ detalleAgente()!.tokensUso }} tokens por uso</strong>
+          <span>se descuentan de tu saldo</span>
+        }
+      </div>
+      <div class="g6-mkt-modal__actions">
+        @if (detalleAgente()!.tier !== 'free') {
+          <button class="g6-mkt-modal__btn g6-mkt-modal__btn--trial">
+            Probar 7 días gratis
+          </button>
+        }
+        <button class="g6-mkt-modal__btn g6-mkt-modal__btn--primary" (click)="activarDesdeDetalle()">
+          @if (detalleAgente()!.tier === 'free') { Activar ahora }
+          @else if (detalleAgente()!.tier === 'paid') { Suscribirse }
+          @else { Usar con tokens }
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- Toast -->
 @if (toastMsg()) {

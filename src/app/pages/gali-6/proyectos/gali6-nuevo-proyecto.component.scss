@@ -670,6 +670,128 @@
   box-sizing: border-box;
 }
 
+// ── PASO 0: Inicio bifurcado ─────────────────────────────────────────────────
+.wizard__body--inicio {
+  display: flex; flex-direction: column; align-items: stretch;
+  padding-top: $size-6;
+}
+
+.wizard__inicio-eyebrow {
+  display: flex; align-items: center; gap: 6px;
+  font-size: $font-xs; font-weight: $font-semibold; color: $primary-500;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: $size-3;
+}
+
+.wizard__inicio-spark { font-size: 10px; }
+
+.wizard__inicio-cards {
+  display: flex; flex-direction: column; gap: $size-3; margin: $size-5 0;
+}
+
+.wizard__inicio-card {
+  display: flex; align-items: center; gap: $size-4;
+  background: #fff; border: 1.5px solid $gray-200; border-radius: $radius-md;
+  padding: $size-5 $size-5; cursor: pointer; text-align: left;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+  font-family: $font-primary;
+
+  &:hover {
+    border-color: $primary-400; box-shadow: 0 4px 16px rgba($primary-500, 0.12);
+    transform: translateY(-1px);
+  }
+
+  &-icon {
+    font-size: 28px; flex-shrink: 0; width: 44px; text-align: center;
+    line-height: 1;
+  }
+
+  &-body { flex: 1; }
+
+  &-title {
+    display: block; font-size: $font-base; font-weight: $font-semibold;
+    color: $gray-900; margin-bottom: 4px;
+  }
+
+  &-desc {
+    font-size: $font-sm; color: $gray-500; line-height: 1.5; margin: 0;
+  }
+
+  &-arrow {
+    font-size: 18px; color: $primary-400; flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+
+  &:hover &-arrow { transform: translateX(3px); }
+}
+
+.wizard__inicio-gali {
+  display: flex; align-items: flex-start; gap: $size-2;
+  background: linear-gradient(135deg, rgba($primary-500, 0.04), rgba($primary-500, 0.02));
+  border: 1px solid rgba($primary-500, 0.15); border-radius: $radius-sm;
+  padding: $size-3 $size-4; margin-top: $size-2;
+
+  &-spark { color: $primary-500; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+
+  &-texto { margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.5; }
+}
+
+// ── PASO 0b: Problema ────────────────────────────────────────────────────────
+.wizard__problemas {
+  display: flex; flex-direction: column; gap: $size-2; margin: $size-4 0;
+}
+
+.wizard__problema-card {
+  display: flex; align-items: center; gap: $size-3;
+  background: #fff; border: 1.5px solid $gray-200; border-radius: $radius-sm;
+  padding: $size-3 $size-4; cursor: pointer; text-align: left;
+  font-family: $font-primary; transition: border-color 0.15s, background 0.15s;
+
+  &:hover { border-color: $primary-300; background: rgba($primary-500, 0.02); }
+
+  &--selected {
+    border-color: $primary-500; background: rgba($primary-500, 0.05);
+  }
+}
+
+.wizard__problema-icon {
+  font-size: 20px; flex-shrink: 0; width: 28px; text-align: center;
+}
+
+.wizard__problema-label {
+  flex: 1; font-size: $font-sm; font-weight: $font-medium; color: $gray-800;
+}
+
+.wizard__problema-check {
+  color: $primary-500; font-weight: $font-bold; font-size: $font-base;
+}
+
+.wizard__gali-analizando {
+  display: flex; align-items: center; gap: $size-2;
+  font-size: $font-sm; color: $gray-500; padding: $size-3 0;
+}
+
+.wizard__gali-spin {
+  display: inline-block; color: $primary-400;
+  animation: gali-breathe 1s ease-in-out infinite;
+}
+
+.wizard__gali-respuesta {
+  background: linear-gradient(135deg, rgba($primary-500, 0.06), rgba($primary-500, 0.02));
+  border: 1.5px solid rgba($primary-500, 0.2); border-radius: $radius-md;
+  padding: $size-5; margin-top: $size-3;
+
+  &-hdr {
+    display: flex; align-items: center; gap: $size-2;
+    color: $primary-600; font-size: $font-sm; margin-bottom: $size-2;
+    span { font-size: 12px; }
+    strong { font-weight: $font-semibold; }
+  }
+
+  &-texto {
+    font-size: $font-sm; color: $gray-700; line-height: 1.6; margin: 0 0 $size-4;
+  }
+}
+
 .wizard__nav-row {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: $size-4; gap: $size-3;

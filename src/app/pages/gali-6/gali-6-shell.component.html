@@ -19,13 +19,6 @@
       </a>
     </div>
 
-    <!-- Meta global -->
-    <a class="topbar__goal" routerLink="/gali-6/proyectos">
-      <span class="topbar__goal-label">Meta</span>
-      <span class="topbar__goal-track"><span class="topbar__goal-fill" [style.width.%]="objetivoPct()"></span></span>
-      <span class="topbar__goal-val">{{ objetivoActual }}/{{ objetivoMeta() }} ped · {{ objetivoPct() }}%</span>
-    </a>
-
     <div class="topbar__right">
       <a routerLink="/gali-6/senales" class="topbar__alerts-badge"
          [attr.aria-label]="'Ver alertas: ' + alertCount + ' pendientes'">

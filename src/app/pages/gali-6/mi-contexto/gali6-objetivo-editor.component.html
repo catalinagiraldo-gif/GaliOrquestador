@@ -1,0 +1,142 @@
+<div class="oe gali-stagger-in">
+
+  <!-- ── NAV ── -->
+  <div class="oe__topbar">
+    <button class="oe__back" (click)="volver()">← Mi Negocio</button>
+    <h1 class="oe__titulo">Editar objetivo</h1>
+  </div>
+
+  <!-- ── LAYOUT 2 COLUMNAS ── -->
+  <div class="oe__cols">
+
+    <!-- ─── IZQUIERDA: Chat con Gali ─── -->
+    <div class="oe__chat-col">
+      <div class="oe__chat-label">
+        <span class="oe__chat-spark" aria-hidden="true">✦</span>
+        Gali te ayuda a construir tu objetivo
+      </div>
+
+      <!-- Mensajes -->
+      <div class="oe__chat-mensajes" #chatContainer>
+        @for (m of mensajes(); track $index) {
+          <div class="oe__mensaje oe__mensaje--{{ m.rol }}">
+            @if (m.rol === 'gali') {
+              <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
+            }
+            <div class="oe__mensaje-burbuja">
+              <p class="oe__mensaje-texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
+              <span class="oe__mensaje-hora">{{ m.timestamp }}</span>
+            </div>
+          </div>
+        }
+
+        @if (escribiendo()) {
+          <div class="oe__mensaje oe__mensaje--gali">
+            <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
+            <div class="oe__typing">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Input -->
+      @if (!chatTerminado) {
+        <div class="oe__chat-input-row">
+          <textarea class="oe__chat-input"
+                    rows="2"
+                    [value]="inputUsuario()"
+                    (input)="inputUsuario.set($any($event.target).value)"
+                    [placeholder]="placeholderActual"
+                    (keydown.enter)="onEnter($event)">
+          </textarea>
+          <button class="oe__chat-send"
+                  [disabled]="!inputUsuario().trim() || escribiendo()"
+                  (click)="enviarMensaje()">
+            →
+          </button>
+        </div>
+      }
+
+      @if (chatTerminado && !guardado()) {
+        <div class="oe__chat-acciones">
+          <button class="oe__btn oe__btn--usar" (click)="usarObjetivo()">
+            ✦ Sí, usar este objetivo
+          </button>
+          <button class="oe__btn oe__btn--ajustar" (click)="ajustarObjetivo()">
+            Ajustarlo →
+          </button>
+        </div>
+      }
+
+      @if (guardado()) {
+        <div class="oe__guardado">
+          <span class="oe__guardado-icon">✦</span>
+          ¡Objetivo guardado! Volviendo…
+        </div>
+      }
+    </div>
+
+    <!-- ─── DERECHA: Objetivo en construcción ─── -->
+    <div class="oe__preview-col">
+      <div class="oe__preview-card">
+        <div class="oe__preview-hdr">
+          <span class="oe__preview-eyebrow">Objetivo en construcción</span>
+        </div>
+
+        <div class="oe__preview-campo">
+          <label class="oe__preview-label">¿Qué quieres lograr?</label>
+          <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().texto">
+            {{ borrador().texto || 'Escribe tu respuesta a Gali →' }}
+          </p>
+        </div>
+
+        <div class="oe__preview-row">
+          <div class="oe__preview-campo">
+            <label class="oe__preview-label">Meta de pedidos/sem</label>
+            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().meta_pedidos_sem">
+              {{ borrador().meta_pedidos_sem ? borrador().meta_pedidos_sem + ' pedidos' : '—' }}
+            </p>
+          </div>
+          <div class="oe__preview-campo">
+            <label class="oe__preview-label">Plazo</label>
+            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().plazo_semanas">
+              {{ borrador().plazo_semanas ? borrador().plazo_semanas + ' semanas' : '—' }}
+            </p>
+          </div>
+        </div>
+
+        @if (objetivoFinal()) {
+          <div class="oe__preview-progreso">
+            <div class="oe__preview-barra">
+              <div class="oe__preview-barra-fill" style="width: 47%"></div>
+            </div>
+            <span class="oe__preview-barra-label">47% del camino · en progreso</span>
+          </div>
+        }
+
+        @if (objetivo()) {
+          <div class="oe__preview-actual">
+            <span class="oe__preview-actual-label">Objetivo actual guardado:</span>
+            <p class="oe__preview-actual-texto">{{ objetivo()!.texto }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Sugerencia de Gali -->
+      @if (objetivoFinal() && chatTerminado) {
+        <div class="oe__sugerencia">
+          <span class="oe__sugerencia-spark" aria-hidden="true">✦</span>
+          <p class="oe__sugerencia-texto">
+            Según tus datos actuales, vas en buen camino.
+            Si escalas TikTok un 20%, puedes llegar a
+            <strong>{{ (objetivoFinal()!.meta_pedidos_sem ?? 100) + 30 }} pedidos/sem</strong>
+            antes del plazo.
+          </p>
+        </div>
+      }
+    </div>
+
+  </div><!-- /cols -->
+
+</div>

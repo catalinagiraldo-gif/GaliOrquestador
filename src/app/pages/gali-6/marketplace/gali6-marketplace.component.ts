@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import {
   AGENTES_ESPECIALIZADOS,
@@ -33,10 +34,28 @@ interface ConexionPreview {
   estado: 'conectado' | 'pendiente' | 'proximamente';
 }
 
+interface ReglaGlobal {
+  id: string;
+  condicion: string;
+  accion: string;
+  activa: boolean;
+}
+
+interface AgenteComun {
+  id: string;
+  nombre: string;
+  descripcionCorta: string;
+  autor: string;
+  icono: string;
+  colorAvatar: string;
+  tier: AgenteTier;
+  precioCopMes?: number;
+}
+
 @Component({
   selector: 'app-gali6-marketplace',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './gali6-marketplace.component.html',
   styleUrls: ['./gali6-marketplace.component.scss'],
 })
@@ -51,6 +70,9 @@ export class Gali6MarketplaceComponent {
   readonly tierFiltro = signal<TierFiltro>('todos');
   readonly tipoFiltro = signal<TipoFiltro>('todos');
   readonly toastMsg = signal<string | null>(null);
+  readonly searchQuery = signal('');
+  readonly seccionTab = signal<'todos' | 'mis-agentes' | 'comunidad'>('todos');
+  readonly detalleAgente = signal<AgenteEspecializado | null>(null);
 
   readonly tierTabs: { value: TierFiltro; label: string }[] = [
     { value: 'todos',  label: 'Todos' },
@@ -69,12 +91,31 @@ export class Gali6MarketplaceComponent {
   readonly agentesFiltrados = computed(() => {
     const tier = this.tierFiltro();
     const tipo = this.tipoFiltro();
+    const q = this.searchQuery().toLowerCase().trim();
     return this.todosLosAgentes.filter(ag => {
       const matchTier = tier === 'todos' || ag.tier === tier;
       const matchTipo = tipo === 'todos' || ag.tipo === tipo;
-      return matchTier && matchTipo;
+      const matchQ = !q || ag.nombre.toLowerCase().includes(q) || ag.descripcionCorta.toLowerCase().includes(q);
+      return matchTier && matchTipo && matchQ;
     });
   });
+
+  readonly agentesActivos = computed(() =>
+    this.todosLosAgentes.filter(ag => ag.estado === 'activo')
+  );
+
+  readonly reglasGlobales = signal<ReglaGlobal[]>([
+    { id: 'rg1', condicion: 'Presupuesto diario total > $500.000', accion: 'Detener toda pauta y notificarme', activa: true },
+    { id: 'rg2', condicion: 'ROAS de cualquier campaña < 0.8x por 2 días seguidos', accion: 'Pausar campaña y crear alerta crítica', activa: true },
+    { id: 'rg3', condicion: 'Stock de cualquier producto < 20 unidades', accion: 'Pausar campaña asociada automáticamente', activa: false },
+    { id: 'rg4', condicion: 'Novedad > 25% en algún producto esta semana', accion: 'Bloquear pauta y notificarme para revisar transportadora', activa: true },
+  ]);
+
+  readonly agentesComun: AgenteComun[] = [
+    { id: 'com-1', nombre: 'PriceBot Lite', descripcionCorta: 'Monitorea precios de competencia en Dropi y sugiere ajustes', autor: '@juandropi', icono: 'pi pi-tag', colorAvatar: '#0ea5e9', tier: 'free' },
+    { id: 'com-2', nombre: 'WhatsBot CX', descripcionCorta: 'Responde FAQs por WhatsApp Business usando plantillas', autor: '@marketingpro', icono: 'pi pi-comments', colorAvatar: '#22c55e', tier: 'tokens', precioCopMes: undefined },
+    { id: 'com-3', nombre: 'TikTok Trend Scanner', descripcionCorta: 'Detecta tendencias de TikTok Colombia relevantes para tu categoría', autor: '@contenidopro', icono: 'pi pi-video', colorAvatar: '#f43f5e', tier: 'paid', precioCopMes: 25000 },
+  ];
 
   /** Skills marketplace */
   readonly skillsEstado = signal<SkillMkt[]>([
@@ -109,8 +150,27 @@ export class Gali6MarketplaceComponent {
     return map[tipo];
   }
 
-  activarAgente(ag: AgenteEspecializado): void {
+  abrirDetalle(ag: AgenteEspecializado): void {
+    this.detalleAgente.set(ag);
+  }
+
+  cerrarDetalle(): void {
+    this.detalleAgente.set(null);
+  }
+
+  activarDesdeDetalle(): void {
+    this.cerrarDetalle();
     this.router.navigate(['/gali-6/agentes']);
+  }
+
+  activarAgente(ag: AgenteEspecializado): void {
+    this.abrirDetalle(ag);
+  }
+
+  toggleReglaGlobal(id: string): void {
+    this.reglasGlobales.update(list =>
+      list.map(r => r.id === id ? { ...r, activa: !r.activa } : r)
+    );
   }
 
   toggleSkill(skillId: string): void {

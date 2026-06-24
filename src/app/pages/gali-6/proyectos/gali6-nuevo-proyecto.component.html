@@ -10,6 +10,85 @@
     <span class="wizard__step-hint">{{ STEPS[stepIndex(step())].label }}</span>
   </div>
 
+  <!-- ── PASO 0: ¿Desde dónde arrancas? ── -->
+  @if (step() === 'inicio') {
+    <div class="wizard__body wizard__body--inicio gali-stagger-in">
+      <div class="wizard__inicio-eyebrow">
+        <span class="wizard__inicio-spark" aria-hidden="true">✦</span>
+        Nuevo proyecto
+      </div>
+      <h1 class="wizard__title">¿Desde dónde arrancas?</h1>
+      <p class="wizard__sub">Gali te ayuda a construir tu estrategia desde cualquier punto de partida.</p>
+
+      <div class="wizard__inicio-cards">
+        <button class="wizard__inicio-card" (click)="elegirDesdeProducto()">
+          <div class="wizard__inicio-card-icon">📦</div>
+          <div class="wizard__inicio-card-body">
+            <strong class="wizard__inicio-card-title">Tengo un producto en mente</strong>
+            <p class="wizard__inicio-card-desc">Elige el producto, calcula el precio con Brújula y lanza tu campaña.</p>
+          </div>
+          <span class="wizard__inicio-card-arrow">→</span>
+        </button>
+
+        <button class="wizard__inicio-card" (click)="elegirDesdeProblema()">
+          <div class="wizard__inicio-card-icon">🎯</div>
+          <div class="wizard__inicio-card-body">
+            <strong class="wizard__inicio-card-title">Quiero resolver un problema de ventas</strong>
+            <p class="wizard__inicio-card-desc">Describe el problema y Gali sugiere los mejores productos para atacarlo.</p>
+          </div>
+          <span class="wizard__inicio-card-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="wizard__inicio-gali">
+        <span class="wizard__inicio-gali-spark" aria-hidden="true">✦</span>
+        <p class="wizard__inicio-gali-texto">Gali analizará tu objetivo actual para personalizar las recomendaciones de cada ruta.</p>
+      </div>
+    </div>
+  }
+
+  <!-- ── PASO 0b: Desde problema ── -->
+  @if (step() === 'problema') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">¿Cuál es el problema?</h1>
+      <p class="wizard__sub">Selecciona la situación que más se parece a lo que vives. Gali buscará las mejores oportunidades para resolverla.</p>
+
+      <div class="wizard__problemas">
+        @for (prob of problemas; track prob.id) {
+          <button class="wizard__problema-card"
+                  [class.wizard__problema-card--selected]="problemaSeleccionado()?.id === prob.id"
+                  (click)="seleccionarProblema(prob)">
+            <span class="wizard__problema-icon">{{ prob.icon }}</span>
+            <span class="wizard__problema-label">{{ prob.label }}</span>
+            @if (problemaSeleccionado()?.id === prob.id) {
+              <span class="wizard__problema-check" aria-hidden="true">✓</span>
+            }
+          </button>
+        }
+      </div>
+
+      @if (galiAnalizandoProblema()) {
+        <div class="wizard__gali-analizando">
+          <span class="wizard__gali-spin" aria-hidden="true">◌</span>
+          Gali está analizando tu situación…
+        </div>
+      }
+
+      @if (galiProblemaListo() && problemaSeleccionado()) {
+        <div class="wizard__gali-respuesta gali-fade-up">
+          <div class="wizard__gali-respuesta-hdr">
+            <span aria-hidden="true">✦</span>
+            <strong>Gali encontró oportunidades</strong>
+          </div>
+          <p class="wizard__gali-respuesta-texto">{{ problemaSeleccionado()!.galiSugerencia }}</p>
+          <button class="wizard__next" (click)="usarSugerenciaProblema()">
+            Ver productos sugeridos → Brújula
+          </button>
+        </div>
+      }
+    </div>
+  }
+
   <!-- ── PASO 1: Producto ── -->
   @if (step() === 'producto') {
     <div class="wizard__body gali-stagger-in">

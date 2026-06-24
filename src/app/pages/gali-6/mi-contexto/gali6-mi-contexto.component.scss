@@ -619,6 +619,188 @@
   }
 }
 
+// ── Header de sección con botón editar ────────────────────
+.op-seccion__hdr {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: $size-3;
+  .op-seccion__titulo { margin-bottom: 0; }
+}
+
+.op-btn-edit {
+  font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+  background: none; border: none; cursor: pointer; padding: 0;
+  &:hover { color: $primary-700; }
+}
+
+// ── Gráfico de contribuciones ─────────────────────────────
+.op-contrib { margin-top: $size-3; display: flex; flex-direction: column; gap: $size-1; }
+
+.op-contrib__label { font-size: $font-xs; color: $gray-500; }
+
+.op-contrib-bar {
+  display: flex; height: 8px; border-radius: $radius-full; overflow: hidden;
+  background: $gray-100; gap: 2px;
+}
+
+.op-contrib-seg {
+  height: 100%; border-radius: $radius-full; transition: width 0.5s ease;
+  &--gap { background: $gray-200 !important; }
+}
+
+.op-contrib-legend {
+  display: flex; align-items: center; gap: $size-1; flex-wrap: wrap;
+}
+
+.op-contrib-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  &--gap { background: $gray-300 !important; }
+}
+
+.op-contrib-name { font-size: 10px; color: $gray-500; margin-right: $size-2; }
+
+// ── Sub-metas ─────────────────────────────────────────────
+.op-submetas { display: flex; flex-direction: column; gap: $size-1; margin-top: $size-4; }
+
+.op-submetas__eyebrow {
+  font-size: 10px; font-weight: $font-bold; color: $gray-400;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: $size-1;
+  display: block;
+}
+
+.op-submeta {
+  display: flex; align-items: flex-start; gap: $size-2;
+  padding: $size-2 $size-3; border-radius: $radius-md;
+  background: $gray-50; border: 1px solid $gray-100;
+  font-size: $font-xs; text-align: left; width: 100%; cursor: pointer;
+  transition: all 0.15s;
+
+  &--lograda {
+    background: rgba(#059669, 0.04); border-color: rgba(#059669, 0.2);
+    .op-submeta__check { color: #059669; }
+    .op-submeta__label { color: $gray-500; text-decoration: line-through; }
+  }
+
+  &:not(.op-submeta--lograda):hover { border-color: $primary-300; }
+}
+
+.op-submeta__check { color: $gray-400; font-size: $font-sm; flex-shrink: 0; }
+.op-submeta__label { color: $gray-700; line-height: 1.4; }
+
+// ── Modal de editar objetivo ──────────────────────────────
+.ctx-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); backdrop-filter: blur(3px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: $size-4;
+  animation: ctx-fade-up 0.15s ease;
+}
+
+.ctx-modal {
+  background: #fff; border-radius: $radius-xl;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+
+.ctx-modal__hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: $size-5 $size-6 $size-4;
+  border-bottom: 1px solid $gray-100;
+}
+
+.ctx-modal__title { margin: 0; font-size: $font-lg; font-weight: $font-bold; color: $gray-900; }
+
+.ctx-modal__close {
+  background: none; border: none; font-size: $font-xl; color: $gray-400;
+  cursor: pointer; padding: 0 $size-1; line-height: 1;
+  &:hover { color: $gray-700; }
+}
+
+.ctx-modal__tabs {
+  display: flex; gap: 0;
+  border-bottom: 1px solid $gray-100;
+  padding: 0 $size-6;
+}
+
+.ctx-modal__tab {
+  padding: $size-3 $size-4; font-size: $font-xs; font-weight: $font-semibold;
+  color: $gray-500; background: none; border: none;
+  border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s;
+
+  &--active { color: $primary-600; border-bottom-color: $primary-500; }
+  &:hover:not(.ctx-modal__tab--active) { color: $gray-700; }
+}
+
+.ctx-modal__body {
+  padding: $size-5 $size-6;
+  display: flex; flex-direction: column; gap: $size-4;
+}
+
+.ctx-modal__hint { margin: 0; font-size: $font-xs; color: $gray-500; line-height: 1.5; }
+
+.ctx-modal__textarea {
+  width: 100%; padding: $size-3; border: 1px solid $gray-200;
+  border-radius: $radius-md; font-size: $font-sm; color: $gray-800;
+  resize: vertical; font-family: inherit; line-height: 1.5;
+  transition: border-color 0.15s;
+  &:focus { outline: none; border-color: $primary-400; box-shadow: 0 0 0 3px rgba($primary-500, 0.08); }
+  &--sm { rows: 2; }
+}
+
+.ctx-modal__btn-gali {
+  display: flex; align-items: center; gap: $size-2;
+  padding: $size-2 $size-4; border-radius: $radius-md;
+  background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
+  color: $primary-700; font-size: $font-xs; font-weight: $font-semibold; cursor: pointer;
+  transition: all 0.15s; align-self: flex-start;
+  &:hover:not(:disabled) { background: rgba($primary-500, 0.14); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.ctx-modal__spinner {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid rgba($primary-500, 0.3); border-top-color: $primary-500;
+  animation: ctx-spin 0.7s linear infinite;
+}
+
+.ctx-modal__propuesta {
+  background: rgba($primary-500, 0.04); border: 1px solid rgba($primary-500, 0.18);
+  border-radius: $radius-md; padding: $size-4;
+  display: flex; flex-direction: column; gap: $size-3;
+  animation: ctx-fade-up 0.2s ease;
+}
+
+.ctx-modal__propuesta-eyebrow {
+  font-size: 10px; font-weight: $font-bold; color: $primary-600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.ctx-modal__propuesta-texto { margin: 0; font-size: $font-sm; color: $gray-700; line-height: 1.55; }
+
+.ctx-modal__propuesta-btns, .ctx-modal__footer-btns {
+  display: flex; align-items: center; gap: $size-3; flex-wrap: wrap;
+}
+
+.ctx-modal__btn-accept {
+  padding: $size-2 $size-4; background: $primary-500; color: #fff;
+  border: none; border-radius: $radius-md; font-size: $font-xs; font-weight: $font-semibold;
+  cursor: pointer; transition: background 0.15s;
+  &:hover { background: darken($primary-500, 8%); }
+}
+
+.ctx-modal__btn-sec {
+  background: none; border: none; font-size: $font-xs; color: $gray-400;
+  cursor: pointer; padding: $size-2 0;
+  &:hover { color: $gray-600; }
+}
+
+.ctx-modal__submetas { display: flex; flex-direction: column; gap: $size-1; }
+
+.ctx-modal__nuevo-hito {
+  border-top: 1px dashed $gray-200; padding-top: $size-4;
+  display: flex; flex-direction: column; gap: $size-3;
+}
+
 @keyframes ctx-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes ctx-spin { to { transform: rotate(360deg); } }
 

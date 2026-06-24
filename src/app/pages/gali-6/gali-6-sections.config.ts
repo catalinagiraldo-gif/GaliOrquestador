@@ -75,7 +75,6 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
         { label: 'Reglas',      route: '/gali-6/reglas' },
         { label: 'Marketplace', route: '/gali-6/marketplace' },
         { label: 'Conexiones',  route: '/gali-6/conexiones' },
-        { label: 'Mensajes',    route: '/gali-6/marketing/chatea-pro', badge: 'Próximamente' } as any,
         { label: 'Academy',     route: '/gali-6/academy' },
       ],
     },
@@ -142,7 +141,6 @@ const G6_HUB_PREFIXES = [
   '/gali-6/agentes', '/gali-6/skills',
   '/gali-6/reglas', '/gali-6/marketplace',
   '/gali-6/academy', '/gali-6/centro-control',
-  '/gali-6/marketing/chatea-pro',
 ];
 const G6_V1_HUB_PREFIXES = [
   '/gali-6-v1/proyectos', '/gali-6-v1/proyecto',

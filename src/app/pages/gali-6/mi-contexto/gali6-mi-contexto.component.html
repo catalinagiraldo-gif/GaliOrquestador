@@ -179,39 +179,57 @@
   @if (activeTab() === 'operacion') {
     <div class="ctx-body" role="tabpanel" aria-label="Mi Operación">
 
-      <!-- Objetivo -->
-      <section class="op-seccion">
-        <span class="op-seccion__titulo">Objetivo de negocio</span>
+      <!-- Objetivo con gráfico de contribuciones -->
+      <section class="op-seccion op-seccion--objetivo">
+        <div class="op-seccion__hdr">
+          <span class="op-seccion__titulo">Objetivo de negocio</span>
+          <button class="op-btn-edit" (click)="openEdit()">Editar objetivo →</button>
+        </div>
+
         <div class="op-objetivo">
           <p class="op-objetivo__texto">{{ objetivo() }}</p>
           <div class="op-objetivo__progress">
             <div class="op-objetivo__track">
               <div class="op-objetivo__fill" [style.width.%]="metaPct()"></div>
             </div>
-            <span class="op-objetivo__pct">{{ metaPct() }}% cumplido</span>
+            <span class="op-objetivo__pct">{{ metaPct() }}% del objetivo</span>
           </div>
-          <button class="op-objetivo__mejorar"
-                  [disabled]="galiMejorandoObjetivo()"
-                  (click)="mejorarConGali()">
-            @if (galiMejorandoObjetivo()) {
-              <span class="op-objetivo__spinner" aria-hidden="true"></span>
-              Mejorando…
-            } @else {
-              ✦ Mejorar con Gali
-            }
-          </button>
         </div>
 
-        @if (objetivoMejorado()) {
-          <div class="gali-propuesta-op" role="status" aria-live="polite">
-            <span class="gali-propuesta-op__eyebrow"><span aria-hidden="true">✦</span> Gali propone</span>
-            <p class="gali-propuesta-op__texto">{{ objetivoMejorado() }}</p>
-            <div class="gali-propuesta-op__acciones">
-              <button class="op-btn-primary" (click)="aceptarObjetivoGali()">Usar propuesta →</button>
-              <button class="op-btn-sec" (click)="objetivoMejorado.set(null)">Descartar</button>
+        <!-- Gráfico de contribuciones por proyecto -->
+        @if (proyectoContribuciones.length) {
+          <div class="op-contrib" aria-label="Aporte de proyectos al objetivo">
+            <span class="op-contrib__label">Cómo llegan tus pedidos a la meta</span>
+            <div class="op-contrib-bar" role="img">
+              @for (p of proyectoContribuciones; track p.id) {
+                <span class="op-contrib-seg"
+                      [style.width.%]="getContribPct(p)"
+                      [style.background]="p.color"
+                      [title]="p.nombre + ': ' + p.pedidosSem + ' ped/sem'"></span>
+              }
+              <span class="op-contrib-seg op-contrib-seg--gap" [style.width.%]="getContribGap()"></span>
+            </div>
+            <div class="op-contrib-legend">
+              @for (p of proyectoContribuciones; track p.id) {
+                <span class="op-contrib-dot" [style.background]="p.color"></span>
+                <span class="op-contrib-name">{{ p.nombre }} ({{ p.pedidosSem }})</span>
+              }
+              <span class="op-contrib-dot op-contrib-dot--gap"></span>
+              <span class="op-contrib-name">Por alcanzar ({{ getGapCount() }})</span>
             </div>
           </div>
         }
+
+        <!-- Sub-metas -->
+        <div class="op-submetas">
+          <span class="op-submetas__eyebrow">Hitos del objetivo</span>
+          @for (sm of subMetas(); track sm.id) {
+            <button class="op-submeta" [class.op-submeta--lograda]="sm.lograda" (click)="toggleSubMeta(sm.id)">
+              <span class="op-submeta__check" aria-hidden="true">{{ sm.lograda ? '✓' : '○' }}</span>
+              <span class="op-submeta__label">{{ sm.label }}</span>
+            </button>
+          }
+        </div>
       </section>
 
       <!-- Mayor fricción -->
@@ -256,3 +274,115 @@
   }
 
 </div>
+
+<!-- ═══════════════════════════════════════
+     MODAL: Editar objetivo
+════════════════════════════════════════ -->
+@if (editOpen()) {
+  <div class="ctx-modal-overlay" role="dialog" aria-label="Editar objetivo de negocio" (click)="closeEdit()">
+    <div class="ctx-modal" (click)="$event.stopPropagation()">
+
+      <div class="ctx-modal__hdr">
+        <h2 class="ctx-modal__title">Objetivo de negocio</h2>
+        <button class="ctx-modal__close" (click)="closeEdit()" aria-label="Cerrar">×</button>
+      </div>
+
+      <!-- Tabs del modal -->
+      <div class="ctx-modal__tabs" role="tablist">
+        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'gali'"
+                (click)="editTab.set('gali')">✦ Gali sugiere</button>
+        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'manual'"
+                (click)="editTab.set('manual')">Mi objetivo</button>
+        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'sub'"
+                (click)="editTab.set('sub')">Hitos</button>
+      </div>
+
+      <!-- Tab Gali sugiere -->
+      @if (editTab() === 'gali') {
+        <div class="ctx-modal__body">
+          <p class="ctx-modal__hint">Describe en lenguaje natural qué quieres lograr. Gali lo convierte en un objetivo estructurado.</p>
+          <textarea class="ctx-modal__textarea" rows="3"
+                    [ngModel]="objetivoTextoEdit()"
+                    (ngModelChange)="objetivoTextoEdit.set($event)"
+                    placeholder="Ej. quiero vender más collar GPS sin depender solo de Meta"></textarea>
+          <button class="ctx-modal__btn-gali"
+                  [disabled]="galiMejorandoObjetivo()"
+                  (click)="mejorarConGali()">
+            @if (galiMejorandoObjetivo()) {
+              <span class="ctx-modal__spinner" aria-hidden="true"></span> Analizando…
+            } @else {
+              ✦ Que Gali lo estructure
+            }
+          </button>
+          @if (objetivoMejorado()) {
+            <div class="ctx-modal__propuesta" role="status" aria-live="polite">
+              <span class="ctx-modal__propuesta-eyebrow">✦ Propuesta de Gali</span>
+              <p class="ctx-modal__propuesta-texto">{{ objetivoMejorado() }}</p>
+              <div class="ctx-modal__propuesta-btns">
+                <button class="ctx-modal__btn-accept" (click)="aceptarObjetivoGali()">Usar esta propuesta →</button>
+                <button class="ctx-modal__btn-sec" (click)="objetivoMejorado.set(null)">Reformular</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Tab Mi objetivo -->
+      @if (editTab() === 'manual') {
+        <div class="ctx-modal__body">
+          <p class="ctx-modal__hint">Escribe tu objetivo directamente. Puedes ser tan específico o general como quieras.</p>
+          <textarea class="ctx-modal__textarea" rows="4"
+                    [ngModel]="objetivoTextoEdit()"
+                    (ngModelChange)="objetivoTextoEdit.set($event)"
+                    placeholder="Ej. Llegar a 100 pedidos por semana con margen > 25%"></textarea>
+          <div class="ctx-modal__footer-btns">
+            <button class="ctx-modal__btn-accept" (click)="saveEdit()">Guardar objetivo →</button>
+            <button class="ctx-modal__btn-sec" (click)="closeEdit()">Cancelar</button>
+          </div>
+        </div>
+      }
+
+      <!-- Tab Hitos -->
+      @if (editTab() === 'sub') {
+        <div class="ctx-modal__body">
+          <div class="ctx-modal__submetas">
+            @for (sm of subMetas(); track sm.id) {
+              <button class="op-submeta" [class.op-submeta--lograda]="sm.lograda" (click)="toggleSubMeta(sm.id)">
+                <span class="op-submeta__check" aria-hidden="true">{{ sm.lograda ? '✓' : '○' }}</span>
+                <span class="op-submeta__label">{{ sm.label }}</span>
+              </button>
+            }
+          </div>
+          <!-- Agregar hito con Gali -->
+          <div class="ctx-modal__nuevo-hito">
+            <p class="ctx-modal__hint">Describe un hito que quieras alcanzar. Gali lo convierte en algo medible.</p>
+            <textarea class="ctx-modal__textarea ctx-modal__textarea--sm" rows="2"
+                      [ngModel]="nuevaSubMetaTexto()"
+                      (ngModelChange)="nuevaSubMetaTexto.set($event)"
+                      placeholder="Ej. quiero tener mi primera campaña rentable en TikTok"></textarea>
+            <button class="ctx-modal__btn-gali"
+                    [disabled]="galiDefiniendoHito() || !nuevaSubMetaTexto().trim()"
+                    (click)="definirHitoConGali()">
+              @if (galiDefiniendoHito()) {
+                <span class="ctx-modal__spinner" aria-hidden="true"></span> Definiendo…
+              } @else {
+                + Agregar hito con ayuda de Gali
+              }
+            </button>
+            @if (hitoPropuesto()) {
+              <div class="ctx-modal__propuesta" role="status" aria-live="polite">
+                <span class="ctx-modal__propuesta-eyebrow">✦ Gali propone este hito</span>
+                <p class="ctx-modal__propuesta-texto">{{ hitoPropuesto() }}</p>
+                <div class="ctx-modal__propuesta-btns">
+                  <button class="ctx-modal__btn-accept" (click)="aceptarHito()">Agregar →</button>
+                  <button class="ctx-modal__btn-sec" (click)="hitoPropuesto.set(null)">Descartar</button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}

@@ -13,10 +13,12 @@ import {
   getObjetivo, saveObjetivo, syncLegacyKeys,
 } from '../../../../../mocks/gali-v6/objetivo';
 import { MOCK_CAMPANAS, Campana } from '../../../../../mocks/gali-v6/campanas.mock';
+import { PROYECTOS_MOCK } from '../../../../../mocks/gali-v6/proyectos.mock';
 
 const ESTADO_LABEL: Record<string, string> = {
   en_escala: 'En escala', activo: 'Activo', pausado: 'Pausado', lanzando: 'Lanzando',
   recien_lanzado: 'Recién lanzado', cerrado: 'Cerrado', borrador: 'Borrador',
+  configurando: 'Configurando', en_riesgo: 'En riesgo',
 };
 
 function saludDe(p: any): number {
@@ -128,7 +130,8 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly proyectos = computed<ProyectoRow[]>(() => {
     const overrides = getProyectoOverrides();
     const meta = this.objetivo().meta_pedidos_sem;
-    return (PROJECTS as any[])
+
+    const legacy: ProyectoRow[] = (PROJECTS as any[])
       .filter(p => p.id)
       .map(p => {
         const ov = overrides[p.id] ?? {};
@@ -147,6 +150,26 @@ export class Gali6ProyectosCasaComponent implements OnInit {
           campanaCount: MOCK_CAMPANAS.filter(c => c.proyectoId === p.id).length,
         };
       });
+
+    const pvRows: ProyectoRow[] = PROYECTOS_MOCK.map(pv => {
+      const estadoSalud: Record<string, number> = {
+        borrador: 15, configurando: 50, activo: 78, en_riesgo: 32, en_escala: 92, pausado: 38, cerrado: 20,
+      };
+      return {
+        id: pv.id,
+        nombre: pv.nombre,
+        estado: pv.estado,
+        estadoLabel: ESTADO_LABEL[pv.estado] ?? pv.estado,
+        saludPct: estadoSalud[pv.estado] ?? 50,
+        pedidos: pv.pedidosSem > 0 ? `${pv.pedidosSem}` : '—',
+        pedidosSem: pv.pedidosSem,
+        roas: pv.roasPromedio ? `${pv.roasPromedio}x` : '—',
+        contribucionPct: pv.contribucionPct,
+        campanaCount: pv.campanas.length,
+      };
+    });
+
+    return [...pvRows, ...legacy];
   });
 
   readonly searchQuery = signal('');
@@ -154,7 +177,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly proyectosFiltrados = computed<ProyectoRow[]>(() => {
     const f = this.activeFilter();
     const todos = this.proyectos();
-    if (f === 'activos')    return todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando'].includes(p.estado));
+    if (f === 'activos')    return todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando', 'en_riesgo', 'configurando'].includes(p.estado));
     if (f === 'pausados')   return todos.filter(p => p.estado === 'pausado');
     if (f === 'borradores') return todos.filter(p => p.estado === 'borrador');
     if (f === 'cerrados')   return todos.filter(p => p.estado === 'cerrado');
@@ -172,7 +195,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     const todos = this.proyectos();
     return {
       todos:      todos.length,
-      activos:    todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando'].includes(p.estado)).length,
+      activos:    todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando', 'en_riesgo', 'configurando'].includes(p.estado)).length,
       pausados:   todos.filter(p => p.estado === 'pausado').length,
       borradores: todos.filter(p => p.estado === 'borrador').length,
       cerrados:   todos.filter(p => p.estado === 'cerrado').length,
@@ -417,17 +440,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   }
 
   openEdit(): void {
-    const obj = this.objetivo();
-    this.draftTexto.set(obj.texto);
-    this.draftMeta.set(obj.meta_pedidos_sem);
-    this.draftTipo.set(obj.tipo);
-    this.draftPlazo.set(obj.plazo_semanas);
-    this.draftSubMetas.set(obj.sub_metas.map(s => ({ ...s })));
-    this.galiMejorarEstado.set('idle');
-    this.galiMejorarInput.set('');
-    this.galiPropuestaTexto.set('');
-    this.editTab.set('gali-sugiere');
-    this.editOpen.set(true);
+    this.router.navigate(['/gali-6/mi-negocio/objetivo']);
   }
 
   saveEdit(): void {

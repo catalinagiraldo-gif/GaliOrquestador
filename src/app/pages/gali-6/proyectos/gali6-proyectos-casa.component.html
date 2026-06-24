@@ -177,10 +177,6 @@
                     <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
                   </button>
                 }
-                @if (p.estado !== 'cerrado') {
-                  <button class="port__edit-btn" (click)="openEditProyecto(p, $event)"
-                          [attr.aria-label]="'Editar proyecto ' + p.nombre">✎</button>
-                }
                 <span class="port__go">
                   @if (p.estado === 'cerrado') { Ver postmortem → }
                   @else { → }
@@ -245,9 +241,9 @@
   </section>
 </div>
 
-<!-- ── Modal editar objetivo — 3 tabs ── -->
-@if (editOpen()) {
-  <div class="modal-bg" (click)="editOpen.set(false)" aria-hidden="true"></div>
+<!-- ── Modal editar proyecto — edición avanzada (Bloque 3) — PLACEHOLDER ── -->
+@if (false) {
+  <div class="modal-bg" aria-hidden="true"></div>
   <div class="modal modal--objetivo" role="dialog" aria-modal="true"
        aria-labelledby="modal-objetivo-title" cdkTrapFocus cdkTrapFocusAutoCapture>
 

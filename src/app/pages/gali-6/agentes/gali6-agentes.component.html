@@ -52,7 +52,7 @@
               <p class="g6-agente-card__desc">{{ ag.descripcionCorta }}</p>
             </div>
             <div class="g6-agente-card__estado-badge">
-              <span class="g6-agente-card__estado-dot"></span>
+              <span class="g6-agente-card__estado-dot g6-agente-card__estado-dot--pulse"></span>
               <span>Activo</span>
             </div>
             <button class="g6-agente-card__toggle"
@@ -66,10 +66,69 @@
           @if (expandedAgenteId() === ag.id) {
             <div class="g6-agente-card__detalle gali-stagger-in">
 
+              <!-- Tabs: Configuración | Historial -->
+              <div class="g6-agente-tabs">
+                <button class="g6-agente-tab"
+                        [class.g6-agente-tab--active]="getAgenteTab(ag.id) === 'config'"
+                        (click)="$event.stopPropagation(); setAgenteTab(ag.id, 'config')">
+                  Configuración
+                </button>
+                <button class="g6-agente-tab"
+                        [class.g6-agente-tab--active]="getAgenteTab(ag.id) === 'historial'"
+                        (click)="$event.stopPropagation(); setAgenteTab(ag.id, 'historial')">
+                  Historial
+                  @if (getHistorial(ag.id).length > 0) {
+                    <span class="g6-agente-tab__badge">{{ getHistorial(ag.id).length }}</span>
+                  }
+                </button>
+              </div>
+
+              <!-- ── TAB: HISTORIAL ── -->
+              @if (getAgenteTab(ag.id) === 'historial') {
+                <div class="g6-agente-historial gali-stagger-in">
+                  @if (getHistorial(ag.id).length === 0) {
+                    <p class="g6-agente-historial__empty">Este agente aún no registra acciones.</p>
+                  }
+                  @for (item of getHistorial(ag.id); track item.id) {
+                    <div class="g6-historial-item" [class.g6-historial-item--auto]="item.auto">
+                      <div class="g6-historial-item__hdr">
+                        <span class="g6-historial-item__tiempo">{{ item.timestamp }}</span>
+                        <span class="g6-historial-item__tipo {{ getHistorialTipoClass(item.tipo) }}">
+                          {{ item.tipo === 'deterministico' ? 'Auto' : 'IA' }}
+                        </span>
+                        @if (!item.auto) {
+                          <span class="g6-historial-item__aprobado">Requirió OK</span>
+                        }
+                      </div>
+                      <p class="g6-historial-item__accion">{{ item.accion }}</p>
+                      <p class="g6-historial-item__resultado">↳ {{ item.resultado }}</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- ── TAB: CONFIGURACIÓN ── -->
+              @if (getAgenteTab(ag.id) === 'config') {
+
               @if (ag.ejemploSenal) {
                 <div class="g6-agente-card__ejemplo">
                   <span class="g6-agente-card__ejemplo-label">Ejemplo de señal</span>
                   <p class="g6-agente-card__ejemplo-texto">{{ ag.ejemploSenal }}</p>
+                </div>
+              }
+
+              <!-- "Activo en" proyectos -->
+              @if (getProyectosActivos(ag.id).length > 0) {
+                <div class="g6-agente-activo-en">
+                  <span class="g6-agente-activo-en__label">Activo en</span>
+                  <div class="g6-agente-activo-en__list">
+                    @for (proy of getProyectosActivos(ag.id); track proy.id) {
+                      <a class="g6-agente-activo-en__chip g6-agente-activo-en__chip--{{ getProyectoEstadoClass(proy.estado) }}"
+                         routerLink="/gali-6/proyecto/{{ proy.id }}">
+                        {{ proy.nombre }} →
+                      </a>
+                    }
+                  </div>
                 </div>
               }
 
@@ -94,31 +153,78 @@
                     </button>
                   </div>
                 }
-                <button class="g6-agente-card__add-skill" data-proto-skip>
-                  + Agregar skill →
+                <button class="g6-agente-card__add-skill"
+                        (click)="$event.stopPropagation(); toggleSkillsDisp(ag.id)">
+                  {{ skillsDispOpen()[ag.id] ? '▲ Cerrar skills' : '+ Agregar skill →' }}
                 </button>
+
+                <!-- Skills disponibles para agregar -->
+                @if (skillsDispOpen()[ag.id]) {
+                  <div class="g6-skills-disponibles" (click)="$event.stopPropagation()">
+                    <p class="g6-skills-disponibles__label">Skills disponibles:</p>
+                    @for (sk of ag.skills; track sk.id) {
+                      <div class="g6-skills-disp-item">
+                        <span class="g6-agente-skill__tipo {{ getProcesoClass(sk.tipo) }}">{{ procesoTipoLabel[sk.tipo] }}</span>
+                        <span class="g6-skills-disp-item__label">{{ sk.label }}</span>
+                        <button class="g6-skill-toggle"
+                                [class.g6-skill-toggle--on]="sk.activa"
+                                [class.g6-skill-toggle--off]="!sk.activa"
+                                (click)="toggleSkill(ag.id, sk.id)">
+                          <span class="g6-skill-toggle__dot"></span>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
 
               <!-- Reglas con eliminar -->
-              @if (ag.reglas.length > 0) {
-                <div class="g6-agente-card__reglas">
-                  <span class="g6-agente-card__reglas-label">Reglas activas</span>
-                  @for (r of ag.reglas; track r.id) {
-                    <div class="g6-agente-regla">
-                      <span class="g6-agente-regla__si">Si</span>
-                      <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
-                      <span class="g6-agente-regla__entonces">→</span>
-                      <span class="g6-agente-regla__accion">{{ r.accion }}</span>
-                      <button class="g6-agente-regla__del"
-                              (click)="$event.stopPropagation(); eliminarRegla(ag.id, r.id)"
-                              title="Eliminar regla">×</button>
+              <div class="g6-agente-card__reglas">
+                <span class="g6-agente-card__reglas-label">Reglas activas</span>
+                @if (ag.reglas.length === 0) {
+                  <p class="g6-agente-card__reglas-empty">Sin reglas — el agente opera con comportamiento predeterminado.</p>
+                }
+                @for (r of ag.reglas; track r.id) {
+                  <div class="g6-agente-regla">
+                    <span class="g6-agente-regla__si">Si</span>
+                    <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
+                    <span class="g6-agente-regla__entonces">→</span>
+                    <span class="g6-agente-regla__accion">{{ r.accion }}</span>
+                    <button class="g6-agente-regla__del"
+                            (click)="$event.stopPropagation(); eliminarRegla(ag.id, r.id)"
+                            title="Eliminar regla">×</button>
+                  </div>
+                }
+
+                <!-- Inline form nueva regla -->
+                @if (nuevaReglaOpen()[ag.id]) {
+                  <div class="g6-nueva-regla" (click)="$event.stopPropagation()">
+                    <div class="g6-nueva-regla__row">
+                      <span class="g6-nueva-regla__si-label">Si</span>
+                      <input class="g6-nueva-regla__input" type="text"
+                             placeholder="ej: ROAS baja de 1.2x"
+                             [value]="nuevaReglaSi()[ag.id] ?? ''"
+                             (input)="setNuevaReglaSi(ag.id, $any($event.target).value)">
                     </div>
-                  }
-                  <button class="g6-agente-card__add-skill" data-proto-skip>
-                    + Nueva regla →
-                  </button>
-                </div>
-              }
+                    <div class="g6-nueva-regla__row">
+                      <span class="g6-nueva-regla__entonces-label">→ Entonces</span>
+                      <input class="g6-nueva-regla__input" type="text"
+                             placeholder="ej: notificarme"
+                             [value]="nuevaReglaEntonces()[ag.id] ?? ''"
+                             (input)="setNuevaReglaEntonces(ag.id, $any($event.target).value)">
+                    </div>
+                    <div class="g6-nueva-regla__actions">
+                      <button class="g6-nueva-regla__agregar" (click)="agregarRegla(ag.id)">Agregar</button>
+                      <button class="g6-nueva-regla__cancelar" (click)="toggleNuevaRegla(ag.id)">Cancelar</button>
+                    </div>
+                  </div>
+                }
+
+                <button class="g6-agente-card__add-skill"
+                        (click)="$event.stopPropagation(); toggleNuevaRegla(ag.id)">
+                  {{ nuevaReglaOpen()[ag.id] ? '▲ Cerrar' : '+ Nueva regla →' }}
+                </button>
+              </div>
 
               <!-- Autonomía slider -->
               <div class="g6-agente-card__autonomia">
@@ -148,6 +254,8 @@
                 </button>
               </div>
 
+              } <!-- /config tab -->
+
             </div><!-- /detalle -->
           }
         </div>
@@ -165,24 +273,18 @@
         </button>
       </div>
 
-      <div class="g6-agentes__list g6-agentes__list--disponibles">
+      <div class="g6-agentes__grid-disponibles">
         @for (ag of agentesDisponibles(); track ag.id) {
-          <div class="g6-agente-card g6-agente-card--disponible">
-            <div class="g6-agente-card__header">
-              <div class="g6-agente-card__avatar g6-agente-card__avatar--dim"
-                   [style.background]="ag.colorAvatar + '11'"
-                   [style.color]="ag.colorAvatar + '88'">
-                <i [class]="ag.icono"></i>
+          <div class="g6-agente-disp-card">
+            <div class="g6-agente-disp-card__top">
+              <div class="g6-agente-disp-card__avatar"
+                   [style.background]="ag.colorAvatar + '18'"
+                   [style.color]="ag.colorAvatar">
+                <i [class]="ag.icono" style="font-size: 18px;"></i>
               </div>
-              <div class="g6-agente-card__info">
-                <div class="g6-agente-card__name-row">
-                  <span class="g6-agente-card__nombre">{{ ag.nombre }}</span>
-                  <span class="g6-agente-card__tipo {{ getProcesoClass(ag.tipo) }}">
-                    {{ procesoTipoLabel[ag.tipo] }}
-                  </span>
-                  @if (ag.tipo === 'ia-compleja') {
-                    <span class="g6-agente-card__ia-warn" [title]="ag.advertenciaIA ?? ''">⚠️ IA</span>
-                  }
+              <div class="g6-agente-disp-card__meta">
+                <div class="g6-agente-disp-card__name-row">
+                  <span class="g6-agente-disp-card__nombre">{{ ag.nombre }}</span>
                   @if (ag.tier === 'paid') {
                     <span class="g6-agente-card__tier g6-agente-card__tier--paid">
                       ${{ (ag.precioCopMes ?? 0) | number }}/mes
@@ -190,19 +292,25 @@
                   }
                   @if (ag.tier === 'tokens') {
                     <span class="g6-agente-card__tier g6-agente-card__tier--tokens">
-                      🪙 {{ ag.tokensUso }} tokens/uso
+                      🪙 {{ ag.tokensUso }}
                     </span>
                   }
                 </div>
-                <p class="g6-agente-card__desc">{{ ag.descripcionCorta }}</p>
+                <span class="g6-agente-disp-card__tipo {{ getProcesoClass(ag.tipo) }}">
+                  {{ procesoTipoLabel[ag.tipo] }}
+                </span>
               </div>
-              <button class="g6-agente-card__activar-cta" (click)="irAMarketplace()">
-                Ver →
-              </button>
             </div>
+            <p class="g6-agente-disp-card__desc">{{ ag.descripcionCorta }}</p>
+            <button class="g6-agente-disp-card__cta" (click)="irAMarketplace()">
+              Ver en Marketplace →
+            </button>
           </div>
         }
       </div>
+      <a routerLink="/gali-6/marketplace" class="g6-agentes__ver-mkt-link">
+        Explorar todos los agentes en Marketplace →
+      </a>
     </section>
   }
 
@@ -216,38 +324,100 @@
 
 </div>
 
-<!-- ── MODAL CREAR AGENTE ── -->
-@if (showCrearModal()) {
-  <div class="g6-crear-backdrop" (click)="cerrarCrearModal()" role="dialog" aria-label="Crear agente personalizado">
-    <div class="g6-crear-modal" (click)="$event.stopPropagation()">
-      <div class="g6-crear-modal__header">
-        <span class="g6-crear-modal__title">Crear agente personalizado</span>
-        <button class="g6-crear-modal__close" (click)="cerrarCrearModal()">×</button>
+<!-- ── PANEL CREAR AGENTE (chatbot slide-in) ── -->
+@if (panelCrear()) {
+  <div class="g6-crear-backdrop" (click)="cerrarCrearModal()" aria-hidden="true"></div>
+  <div class="g6-crear-panel" role="dialog" aria-label="Crear agente personalizado">
+
+    <div class="g6-crear-panel__header">
+      <div class="g6-crear-panel__hdr-left">
+        <span class="g6-crear-panel__spark" aria-hidden="true">✦</span>
+        <span class="g6-crear-panel__title">Crear agente personalizado</span>
       </div>
-      <div class="g6-crear-modal__body">
-        <p class="g6-crear-modal__coming">
-          <span class="g6-crear-modal__spark" aria-hidden="true">✦</span>
-          Los agentes personalizados están en construcción. Pronto podrás definir tu propio conjunto de skills, reglas y autonomía.
-        </p>
-        <div class="g6-crear-modal__preview">
-          <div class="g6-crear-preview-row">
-            <span>1. Elige un nombre y propósito</span>
-          </div>
-          <div class="g6-crear-preview-row">
-            <span>2. Selecciona skills del marketplace</span>
-          </div>
-          <div class="g6-crear-preview-row">
-            <span>3. Define reglas de acción</span>
-          </div>
-          <div class="g6-crear-preview-row">
-            <span>4. Configura autonomía</span>
+      <button class="g6-crear-panel__close" (click)="cerrarCrearModal()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="g6-crear-panel__chat">
+      @for (m of chatMensajes(); track $index) {
+        <div class="g6-crear-msg g6-crear-msg--{{ m.tipo }}">
+          @if (m.tipo === 'gali') {
+            <span class="g6-crear-msg__avatar">G</span>
+          }
+          <p class="g6-crear-msg__texto">{{ m.texto }}</p>
+        </div>
+      }
+      @if (chatEscribiendo()) {
+        <div class="g6-crear-msg g6-crear-msg--gali">
+          <span class="g6-crear-msg__avatar">G</span>
+          <div class="g6-crear-typing">
+            <span></span><span></span><span></span>
           </div>
         </div>
-      </div>
-      <div class="g6-crear-modal__footer">
-        <button class="g6-crear-modal__cta" (click)="cerrarCrearModal()">Entendido</button>
-      </div>
+      }
+
+      <!-- Propuesta de agente -->
+      @if (agentePropuesto(); as prop) {
+        <div class="g6-crear-propuesta">
+          <p class="g6-crear-propuesta__eyebrow">✦ Propuesta de Gali</p>
+          <div class="g6-crear-propuesta__campo">
+            <span class="g6-crear-propuesta__label">Nombre</span>
+            <span class="g6-crear-propuesta__valor">{{ prop.nombre }}</span>
+          </div>
+          <div class="g6-crear-propuesta__campo">
+            <span class="g6-crear-propuesta__label">Tipo</span>
+            <span class="g6-crear-propuesta__valor">{{ prop.tipo }}</span>
+          </div>
+          <div class="g6-crear-propuesta__campo">
+            <span class="g6-crear-propuesta__label">Skills</span>
+            <div class="g6-crear-propuesta__chips">
+              @for (sk of prop.skills; track sk) {
+                <span class="g6-crear-propuesta__chip">{{ sk }}</span>
+              }
+            </div>
+          </div>
+          <div class="g6-crear-propuesta__campo">
+            <span class="g6-crear-propuesta__label">Regla principal</span>
+            <span class="g6-crear-propuesta__valor">{{ prop.regla }}</span>
+          </div>
+          <div class="g6-crear-propuesta__campo">
+            <span class="g6-crear-propuesta__label">Autonomía</span>
+            <span class="g6-crear-propuesta__valor">{{ prop.autonomia }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Éxito -->
+      @if (agenteCreado()) {
+        <div class="g6-crear-exito">
+          <span class="g6-crear-exito__icon">✓</span>
+          <p class="g6-crear-exito__texto">¡Agente creado! Aparecerá en tu lista al activarlo desde Marketplace.</p>
+        </div>
+      }
     </div>
+
+    <!-- Input -->
+    @if (!agentePropuesto() && !agenteCreado()) {
+      <div class="g6-crear-panel__input-row">
+        <textarea class="g6-crear-panel__input"
+                  placeholder="Escribe tu respuesta…"
+                  rows="2"
+                  [value]="chatInput()"
+                  (input)="chatInput.set($any($event.target).value)"
+                  (keydown.enter)="$event.preventDefault(); enviarMensajeCrear()"></textarea>
+        <button class="g6-crear-panel__send"
+                [disabled]="!chatInput().trim() || chatEscribiendo()"
+                (click)="enviarMensajeCrear()">→</button>
+      </div>
+    }
+
+    <!-- Acciones finales -->
+    @if (agentePropuesto() && !agenteCreado()) {
+      <div class="g6-crear-panel__acciones">
+        <button class="g6-crear-panel__btn-crear" (click)="confirmarCrearAgente()">Crear agente</button>
+        <button class="g6-crear-panel__btn-ajustar" (click)="ajustarAgente()">Ajustar →</button>
+      </div>
+    }
+
   </div>
 }
 

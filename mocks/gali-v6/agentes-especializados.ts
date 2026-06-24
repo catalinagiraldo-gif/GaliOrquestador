@@ -45,6 +45,8 @@ export interface AgenteEspecializado {
   estado: 'activo' | 'pausado' | 'disponible';
   /** Señal de ejemplo que genera este agente */
   ejemploSenal?: string;
+  /** Conexiones/integraciones requeridas para funcionar */
+  conexionesRequeridas?: string[];
 }
 
 export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
@@ -85,6 +87,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     colorAvatar: '#3b82f6',
     estado: 'activo',
     ejemploSenal: '📦 "Collar GPS tiene solo 3 unidades disponibles — tu campaña activa puede quedar sin stock en ~2 días"',
+    conexionesRequeridas: ['Inventario Dropi'],
   },
 
   {

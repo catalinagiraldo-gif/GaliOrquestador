@@ -1,7 +1,7 @@
 <div class="hoy gali-stagger-in">
 
   <!-- ══════════════════════════════════════════════
-       STATUS HEADER
+       BLOQUE A — STATUS + OBJETIVO
   ══════════════════════════════════════════════ -->
   <header class="hoy__status">
     <div class="hoy__status-left">
@@ -21,6 +21,28 @@
           </span>
         }
       </div>
+
+      <!-- Objetivo con texto completo -->
+      <div class="hoy__objetivo-bloque">
+        <p class="hoy__objetivo-texto">{{ objetivo().texto }}</p>
+        <div class="hoy__objetivo-progreso">
+          <span class="hoy__objetivo-pct-badge">{{ pedidosPct() }}%</span>
+          <span class="hoy__objetivo-track">
+            <span class="hoy__objetivo-fill" [style.width.%]="pedidosPct()"></span>
+          </span>
+          <span class="hoy__objetivo-sub">
+            {{ estado.pedidosActual }} de {{ estado.pedidosMeta }} ped · {{ estado.semanaLabel }}
+          </span>
+        </div>
+        <div class="hoy__objetivo-acciones">
+          <button class="hoy__objetivo-edit" (click)="irAMiContextoObjetivo()">
+            editar objetivo →
+          </button>
+          <a routerLink="/gali-6/proyectos" class="hoy__objetivo-proyectos">
+            Ver proyectos →
+          </a>
+        </div>
+      </div>
     </div>
     <div class="hoy__status-right">
       <!-- Sparkline -->
@@ -29,10 +51,33 @@
           <span class="hoy__spark-bar" [style.height.px]="getSparkHeight(p.v)"></span>
         }
       </div>
-      <!-- Porcentaje de objetivo -->
       <span class="hoy__status-pct">{{ pedidosPct() }}%</span>
     </div>
   </header>
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE B — SEÑALES DEL DÍA
+  ══════════════════════════════════════════════ -->
+  @if (estado.senalesHoy?.length) {
+    <section class="hoy__senales">
+      <div class="hoy__senales-hdr">
+        <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Señales del día</span>
+        <a routerLink="/gali-6/senales" class="hoy__ver-mas">Ver todas →</a>
+      </div>
+      <div class="hoy__senales-grid">
+        @for (s of estado.senalesHoy; track s.id) {
+          <article class="hoy__senal-card hoy__senal-card--{{ s.tipo }}">
+            <p class="hoy__senal-evento">{{ s.senal }}</p>
+            <p class="hoy__senal-accion"><span aria-hidden="true">→</span> {{ s.accion }}</p>
+            <div class="hoy__senal-agente">
+              <span class="hoy__senal-dot" [style.background]="s.agenteColor"></span>
+              <span class="hoy__senal-quien">{{ s.agente }}</span>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
 
   <!-- ══════════════════════════════════════════════
        LAYOUT 2 COLUMNAS
@@ -42,7 +87,7 @@
     <!-- ─────────── COLUMNA IZQUIERDA ─────────── -->
     <div class="hoy__col hoy__col--izq">
 
-      <!-- ✦ DECISIÓN DE HOY -->
+      <!-- BLOQUE C — DECISIÓN DE HOY -->
       @if (!decisionDismissed()) {
         <section class="hoy__hero {{ getDecisionClass() }}">
           <div class="hoy__hero-header">
@@ -67,7 +112,7 @@
         </section>
       }
 
-      <!-- ✦ GALI HIZO POR TI -->
+      <!-- GALI HIZO POR TI -->
       <section class="hoy__aporte">
         <div class="hoy__aporte-hdr">
           <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
@@ -115,79 +160,48 @@
     <!-- ─────────── COLUMNA DERECHA ─────────── -->
     <div class="hoy__col hoy__col--der">
 
-      <!-- ◎ TU RECORRIDO (palanca) -->
-      <section class="hoy__palanca">
-        <span class="hoy__section-eyebrow"><span aria-hidden="true">◎</span> Tu próxima palanca</span>
-        <p class="hoy__palanca-texto">{{ estado.palancaTexto }}</p>
-        <div class="hoy__palanca-meta">
-          <span class="hoy__palanca-dias">Ventana: {{ estado.palancaDias }} días</span>
-          <a [routerLink]="estado.palancaRoute" class="hoy__palanca-cta">Ver sugerido →</a>
-        </div>
-      </section>
-
-      <!-- ⚠ COLA DE ALERTAS -->
-      @if (estado.alertasCola.length > 0) {
-        <section class="hoy__alertas">
-          <span class="hoy__section-eyebrow"><span aria-hidden="true">⚠</span> {{ estado.alertasCola.length }} alertas pendientes</span>
-          <div class="hoy__alertas-list">
-            @for (a of estado.alertasCola; track a.id) {
-              <button class="hoy__alerta-item hoy__alerta-item--{{ a.tipo }}" (click)="onAlertaClick(a)">
-                <span class="hoy__alerta-dot hoy__alerta-dot--{{ a.tipo }}"></span>
-                <span class="hoy__alerta-titulo">{{ a.titulo }}</span>
-                <span class="hoy__alerta-arrow" aria-hidden="true">→</span>
-              </button>
-            }
-          </div>
-          <a routerLink="/gali-6/senales" class="hoy__ver-mas">Ver todas las alertas →</a>
-        </section>
-      }
-
-      <!-- ASISTENTES ACTIVOS -->
+      <!-- BLOQUE D — ASISTENTES ACTIVOS -->
       <section class="hoy__asistentes">
         <span class="hoy__section-eyebrow">Asistentes activos</span>
-        <div class="hoy__asistentes-row">
+        <div class="hoy__asistentes-cards">
           @for (a of estado.agentesActivos; track a.id) {
-            <button class="hoy__asistente-chip" (click)="onAgenteClick(a)" [title]="a.nombre">
-              <span class="hoy__asistente-dot" [class.hoy__asistente-dot--auto]="a.autopilot" [style.background]="a.colorAvatar"></span>
-              <span class="hoy__asistente-nombre">{{ a.nombreCorto }}</span>
+            <button class="hoy__asistente-card" (click)="onAgenteClick(a)" [title]="a.nombre">
+              <div class="hoy__asistente-avatar" [style.background]="a.colorAvatar + '18'">
+                <span class="hoy__asistente-icono">{{ a.icono }}</span>
+                <span class="hoy__asistente-estado"
+                      [class.hoy__asistente-estado--auto]="a.autopilot"
+                      [class.hoy__asistente-estado--manual]="!a.autopilot"
+                      aria-hidden="true"></span>
+              </div>
+              <div class="hoy__asistente-info">
+                <span class="hoy__asistente-nombre">{{ a.nombreCorto }}</span>
+                <span class="hoy__asistente-modo">{{ a.autopilot ? 'Autopilot' : 'Manual' }}</span>
+              </div>
             </button>
           }
         </div>
-        <a routerLink="/gali-6/agentes" class="hoy__ver-mas">Ver asistentes →</a>
+        <a routerLink="/gali-6/agentes" class="hoy__ver-mas">Gestionar asistentes →</a>
       </section>
 
-      <!-- 💬 Chatea Pro shortcut -->
-      <section class="hoy__chatea">
-        <span class="hoy__section-eyebrow">💬 Chatea Pro</span>
-        <p class="hoy__chatea-sub">Mensajes y automatización con WhatsApp</p>
-        <button class="hoy__chatea-cta" (click)="irAChateaPro()">
-          Ir a Chatea Pro →
-        </button>
-      </section>
+      <!-- BLOQUE E — NOVEDADES DE CLIENTES / CHATEA PRO -->
+      @if (estado.chatProResumen) {
+        <section class="hoy__chatea">
+          <span class="hoy__section-eyebrow">💬 Novedades de clientes</span>
+          <p class="hoy__chatea-resumen">
+            <strong>{{ estado.chatProResumen.mensajes }}</strong> mensajes sin responder
+            @if (estado.chatProResumen.urgentes > 0) {
+              · <span class="hoy__chatea-urgente">{{ estado.chatProResumen.urgentes }} urgentes</span>
+            }
+          </p>
+          <a routerLink="/gali-6/marketing/chatea-pro" class="hoy__chatea-cta">
+            Ir a Chatea Pro →
+          </a>
+        </section>
+      }
 
     </div><!-- /col-der -->
 
   </div><!-- /cols -->
-
-  <!-- ══════════════════════════════════════════════
-       PROGRESIÓN MODULAR
-  ══════════════════════════════════════════════ -->
-  <nav class="hoy__progresion" aria-label="Progresión del negocio">
-    <span class="hoy__progresion-label">Tu progreso</span>
-    <div class="hoy__progresion-steps">
-      @for (m of estado.modulosProgresion; track m.id; let i = $index) {
-        @if (i > 0) {
-          <span class="hoy__progresion-sep" aria-hidden="true">→</span>
-        }
-        <a [routerLink]="m.route"
-           class="hoy__progresion-step hoy__progresion-step--{{ m.estado }}"
-           [attr.aria-label]="m.label + ' — ' + m.estado">
-          <span class="hoy__progresion-icono" aria-hidden="true">{{ m.icono }}</span>
-          <span class="hoy__progresion-texto">{{ m.label }}</span>
-        </a>
-      }
-    </div>
-  </nav>
 
 </div>
 

@@ -102,9 +102,28 @@ export interface HoyEstado {
   palancaTexto: string;
   palancaDias: number;
   palancaRoute: string;
+  senalesHoy?: SenalHoy[];
+  proyectoContribuciones?: ProyectoContrib[];
+  chatProResumen?: ChatProResumen;
   /** Para el modo zero-state (usuario nuevo sin datos) */
   esZeroState?: boolean;
   zeroState?: HoyZeroState;
+}
+
+export interface SenalHoy {
+  id: string;
+  senal: string;
+  accion: string;
+  agente: string;
+  agenteColor: string;
+  tipo: 'oportunidad' | 'warning' | 'info';
+}
+
+export interface ProyectoContrib {
+  id: string;
+  nombre: string;
+  pedidosSem: number;
+  color: string;
 }
 
 export interface HoyZeroState {
@@ -112,6 +131,11 @@ export interface HoyZeroState {
   productoNombre: string;
   proximoPaso: string;
   proximoPasoRuta?: string;
+}
+
+export interface ChatProResumen {
+  mensajes: number;
+  urgentes: number;
 }
 
 export const MOCK_HOY_ESTADO: HoyEstado = {
@@ -147,6 +171,37 @@ export const MOCK_HOY_ESTADO: HoyEstado = {
     { id: 'escalar',  label: 'Escalar',   icono: '↑', route: '/gali-6/proyectos',           estado: 'activo'     },
     { id: 'optimizar',label: 'Optimizar', icono: '◎', route: '/gali-6/reportes/dashboard', estado: 'bloqueado'  },
   ],
+  senalesHoy: [
+    {
+      id: 'sn1',
+      senal: 'ROAS de Collar GPS estable a 2.1x por 7 días',
+      accion: 'ROAS Tracker subió presupuesto de $45k → $60k/día',
+      agente: 'ROAS Tracker',
+      agenteColor: '#f97316',
+      tipo: 'oportunidad' as const,
+    },
+    {
+      id: 'sn2',
+      senal: 'Stock bajo en Licuadora Portátil · 3 días restantes',
+      accion: 'Stock Guardian alertó a tu proveedor y pausó pauta',
+      agente: 'Stock Guardian',
+      agenteColor: '#60a5fa',
+      tipo: 'warning' as const,
+    },
+    {
+      id: 'sn3',
+      senal: 'Novedad resuelta en pedido #4821 — K-Beauty',
+      accion: 'Reenvío programado automáticamente vía WhatsApp',
+      agente: 'Vigilante',
+      agenteColor: '#fbbf24',
+      tipo: 'info' as const,
+    },
+  ],
+  proyectoContribuciones: [
+    { id: 'proy-1', nombre: 'Collar GPS', pedidosSem: 35, color: '#f97316' },
+    { id: 'proy-2', nombre: 'K-Beauty', pedidosSem: 12, color: '#60a5fa' },
+  ],
+  chatProResumen: { mensajes: 12, urgentes: 3 },
   palancaTexto: 'Lanza una campaña de Difusor Aromaterapia en Meta Ads con $40k/día para llegar a 100 pedidos esta semana.',
   palancaDias: 10,
   palancaRoute: '/gali-6/proyectos/nuevo',

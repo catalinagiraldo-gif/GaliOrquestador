@@ -1,0 +1,169 @@
+<!-- Backdrop -->
+<div class="nc-backdrop" (click)="cerrar.emit()" aria-label="Cerrar panel"></div>
+
+<!-- Panel slide-in -->
+<div class="nc-panel" role="dialog" aria-modal="true" aria-label="Nueva campaña">
+
+  @if (!exito()) {
+    <!-- Header -->
+    <div class="nc-panel__header">
+      <div class="nc-panel__header-title">
+        <span class="nc-panel__spark" aria-hidden="true">✦</span>
+        <h2 class="nc-panel__titulo">Nueva campaña</h2>
+        @if (data?.proyectoNombre) {
+          <span class="nc-panel__proyecto-tag">en "{{ data!.proyectoNombre }}"</span>
+        }
+      </div>
+      <button class="nc-panel__close" (click)="cerrar.emit()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="nc-panel__body">
+
+      <!-- Nombre -->
+      <div class="nc-field">
+        <label class="nc-label" for="nc-nombre">Nombre de la campaña</label>
+        <input id="nc-nombre" class="nc-input"
+               [value]="nombre()"
+               (input)="nombre.set($any($event.target).value)"
+               placeholder="Ej: TikTok Ads — Collar GPS Mascotas" />
+      </div>
+
+      <!-- Canal -->
+      <div class="nc-field">
+        <label class="nc-label">Canal</label>
+        <div class="nc-canal-grid">
+          @for (c of [
+            { id: 'tiktok', label: 'TikTok', icon: '🎵' },
+            { id: 'meta',   label: 'Meta',   icon: '📘' },
+            { id: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+            { id: 'google', label: 'Google', icon: '🔍' }
+          ]; track c.id) {
+            <button class="nc-canal-btn"
+                    [class.nc-canal-btn--active]="canal() === c.id"
+                    (click)="seleccionarCanal($any(c.id))">
+              <span class="nc-canal-icon">{{ c.icon }}</span>
+              <span class="nc-canal-label">{{ c.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Producto -->
+      <div class="nc-field">
+        <label class="nc-label">Producto</label>
+        @if (producto()) {
+          <div class="nc-producto-chip">
+            <span>📦 {{ producto()!.nombre }}</span>
+            <span class="nc-producto-meta">{{ producto()!.precio }} · {{ producto()!.margen }} margen</span>
+            <button class="nc-producto-quitar" (click)="quitarProducto()" aria-label="Quitar producto">×</button>
+          </div>
+        } @else {
+          <input class="nc-input"
+                 [value]="busquedaProducto()"
+                 (input)="busquedaProducto.set($any($event.target).value)"
+                 placeholder="Buscar producto del catálogo…" />
+          @if (busquedaProducto()) {
+            <div class="nc-productos-lista">
+              @for (p of productosFiltrados(); track p.id) {
+                <button class="nc-producto-item" (click)="seleccionarProducto(p)">
+                  <span class="nc-producto-nombre">{{ p.nombre }}</span>
+                  <span class="nc-producto-precio">{{ p.precio }} · {{ p.margen }}</span>
+                </button>
+              }
+              @if (productosFiltrados().length === 0) {
+                <span class="nc-productos-vacio">Sin resultados</span>
+              }
+            </div>
+          } @else {
+            <div class="nc-productos-lista">
+              @for (p of productosFiltrados(); track p.id) {
+                <button class="nc-producto-item" (click)="seleccionarProducto(p)">
+                  <span class="nc-producto-nombre">{{ p.nombre }}</span>
+                  <span class="nc-producto-precio">{{ p.precio }} · {{ p.margen }}</span>
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Presupuesto y ROAS -->
+      <div class="nc-row-2">
+        <div class="nc-field">
+          <label class="nc-label" for="nc-presupuesto">Presupuesto diario</label>
+          <div class="nc-input-icon">
+            <span class="nc-input-icon__prefix">$</span>
+            <input id="nc-presupuesto" class="nc-input nc-input--icon"
+                   [value]="presupuestoDiario()"
+                   (input)="presupuestoDiario.set($any($event.target).value)"
+                   placeholder="20.000" />
+            <span class="nc-input-icon__suffix">/día</span>
+          </div>
+        </div>
+        <div class="nc-field">
+          <label class="nc-label" for="nc-roas">Objetivo ROAS</label>
+          <input id="nc-roas" class="nc-input"
+                 [value]="roasObjetivo()"
+                 (input)="roasObjetivo.set($any($event.target).value)"
+                 placeholder="1.5x" />
+        </div>
+      </div>
+
+      <!-- Agentes sugeridos -->
+      @if (agentesRecomendados().length > 0) {
+        <div class="nc-field">
+          <label class="nc-label">Agentes sugeridos para {{ canalLabel() }}</label>
+          <div class="nc-agentes-list">
+            @for (ag of agentesRecomendados(); track ag) {
+              <div class="nc-agente-chip nc-agente-chip--on">
+                <span class="nc-agente-check">✓</span>
+                <span>{{ ag }}</span>
+              </div>
+            }
+          </div>
+          <button class="nc-agentes-link">Personalizar agentes →</button>
+        </div>
+      }
+
+      <!-- Conexión requerida -->
+      @if (canal()) {
+        <div class="nc-conexion-status"
+             [class.nc-conexion-status--ok]="conexionActiva()"
+             [class.nc-conexion-status--pending]="!conexionActiva()">
+          @if (conexionActiva()) {
+            <span class="nc-conexion-dot nc-conexion-dot--ok"></span>
+            <span>{{ canalLabel() }} conectado</span>
+          } @else {
+            <span class="nc-conexion-dot nc-conexion-dot--pending"></span>
+            <span>{{ canalLabel() }} no está conectado</span>
+            <button class="nc-conexion-cta" (click)="irAConexiones()">Conectar →</button>
+          }
+        </div>
+      }
+
+    </div><!-- /body -->
+
+    <!-- Footer -->
+    <div class="nc-panel__footer">
+      <button class="nc-btn nc-btn--cancel" (click)="cerrar.emit()">Cancelar</button>
+      <button class="nc-btn nc-btn--crear"
+              [disabled]="!canCreate() || creando()"
+              (click)="crear()">
+        @if (creando()) {
+          <span class="nc-btn__spinner"></span> Creando…
+        } @else {
+          Crear campaña
+        }
+      </button>
+    </div>
+
+  } @else {
+    <!-- Estado éxito -->
+    <div class="nc-exito">
+      <span class="nc-exito__icon">✦</span>
+      <h3 class="nc-exito__titulo">¡Campaña creada!</h3>
+      <p class="nc-exito__desc">Gali ya está monitoreando. Te avisará cuando haya señales.</p>
+    </div>
+  }
+
+</div>

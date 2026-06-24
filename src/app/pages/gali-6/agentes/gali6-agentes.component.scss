@@ -541,61 +541,213 @@
 
 .g6-agentes__crear-icon { font-size: $font-xl; line-height: 1; color: $primary-500; }
 
-// ── Crear agente modal ─────────────────────────────────────
+// ── Panel chatbot crear agente ──────────────────────────────
 .g6-crear-backdrop {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.35); backdrop-filter: blur(3px);
   z-index: 500; animation: fadeIn 0.2s ease;
 }
 
-.g6-crear-modal {
-  background: #fff; border-radius: $radius-xl;
-  max-width: 440px; width: 90%; padding: $size-6;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.15);
-  animation: slideUp 0.25s ease;
-  display: flex; flex-direction: column; gap: $size-5;
+.g6-crear-panel {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: 420px; max-width: 95vw;
+  background: #fff; z-index: 501;
+  display: flex; flex-direction: column;
+  box-shadow: -4px 0 32px rgba(0,0,0,0.12);
+  animation: slideInPanel 0.25s ease;
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: $size-4 $size-5; border-bottom: 1px solid $gray-100;
+    flex-shrink: 0;
+  }
+
+  &__hdr-left { display: flex; align-items: center; gap: $size-2; }
+
+  &__spark { color: $primary-500; font-size: $font-lg; }
+
+  &__title { font-size: $font-md; font-weight: $font-bold; color: $gray-900; }
+
+  &__close {
+    border: none; background: none; cursor: pointer; font-size: $font-xl;
+    color: $gray-400; line-height: 1; padding: 0 $size-1; border-radius: $radius-sm;
+    &:hover { color: $gray-700; background: $gray-100; }
+  }
+
+  &__chat {
+    flex: 1; overflow-y: auto; padding: $size-4 $size-5;
+    display: flex; flex-direction: column; gap: $size-3;
+  }
+
+  &__input-row {
+    display: flex; gap: $size-2; padding: $size-4 $size-5;
+    border-top: 1px solid $gray-100; flex-shrink: 0;
+  }
+
+  &__input {
+    flex: 1; padding: $size-2 $size-3;
+    border: 1px solid $gray-200; border-radius: $radius-md;
+    font-size: $font-sm; font-family: $font-primary; resize: none;
+    &:focus { outline: none; border-color: $primary-400; }
+  }
+
+  &__send {
+    width: 38px; height: 38px; background: $primary-500; color: #fff;
+    border: none; border-radius: $radius-md; cursor: pointer; font-size: $font-md;
+    &:hover:not(:disabled) { background: $primary-600; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &__acciones {
+    display: flex; gap: $size-2; padding: $size-4 $size-5;
+    border-top: 1px solid $gray-100; flex-shrink: 0;
+  }
+
+  &__btn-crear {
+    flex: 1; background: $primary-500; color: #fff; border: none;
+    border-radius: $radius-md; padding: $size-3; font-size: $font-sm;
+    font-weight: $font-semibold; cursor: pointer;
+    &:hover { background: $primary-600; }
+  }
+
+  &__btn-ajustar {
+    background: none; color: $gray-600; border: 1px solid $gray-200;
+    border-radius: $radius-md; padding: $size-3 $size-4;
+    font-size: $font-sm; cursor: pointer;
+    &:hover { background: $gray-50; }
+  }
 }
 
-.g6-crear-modal__header {
-  display: flex; align-items: center; justify-content: space-between;
-}
-
-.g6-crear-modal__title { font-size: $font-lg; font-weight: $font-bold; color: $gray-900; }
-
-.g6-crear-modal__close {
-  border: none; background: none; cursor: pointer; font-size: $font-xl;
-  color: $gray-400; line-height: 1; padding: 0 $size-1; border-radius: $radius-sm;
-  &:hover { color: $gray-700; background: $gray-100; }
-}
-
-.g6-crear-modal__body {}
-
-.g6-crear-modal__coming {
+.g6-crear-msg {
   display: flex; align-items: flex-start; gap: $size-2;
-  font-size: $font-sm; color: $gray-600; line-height: 1.6; margin: 0 0 $size-4;
+
+  &--user { flex-direction: row-reverse; }
+
+  &__avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: $primary-500; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: $font-xs; font-weight: $font-bold; flex-shrink: 0;
+  }
+
+  &__texto {
+    max-width: 80%; padding: $size-2 $size-3;
+    border-radius: $radius-lg; font-size: $font-sm; margin: 0; line-height: 1.5;
+
+    .g6-crear-msg--gali & {
+      background: $gray-50; border: 1px solid $gray-100; color: $gray-700;
+      border-radius: $radius-sm $radius-lg $radius-lg $radius-lg;
+    }
+    .g6-crear-msg--user & {
+      background: $primary-500; color: #fff;
+      border-radius: $radius-lg $radius-sm $radius-lg $radius-lg;
+    }
+  }
 }
 
-.g6-crear-modal__spark { color: $primary-500; font-size: $font-md; flex-shrink: 0; }
-
-.g6-crear-modal__preview {
-  display: flex; flex-direction: column; gap: $size-2;
+.g6-crear-typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: $size-2 $size-3; background: $gray-50; border: 1px solid $gray-100;
+  border-radius: $radius-sm $radius-lg $radius-lg $radius-lg;
+  span {
+    width: 6px; height: 6px; border-radius: 50%; background: $gray-400;
+    animation: g6-typing 1.2s ease infinite;
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
 }
 
-.g6-crear-preview-row {
+@keyframes g6-typing {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%            { opacity: 1;   transform: translateY(-4px); }
+}
+
+.g6-crear-propuesta {
+  background: rgba($primary-500, 0.04); border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-lg; padding: $size-4; display: flex; flex-direction: column; gap: $size-2;
+  animation: fadeIn 0.3s ease;
+
+  &__eyebrow { font-size: $font-xs; font-weight: $font-bold; color: $primary-600; margin: 0 0 $size-1; }
+
+  &__campo { display: flex; flex-direction: column; gap: 2px; }
+
+  &__label { font-size: $font-xs; color: $gray-400; text-transform: uppercase; letter-spacing: 0.04em; font-weight: $font-semibold; }
+
+  &__valor { font-size: $font-sm; color: $gray-800; }
+
+  &__chips { display: flex; flex-wrap: wrap; gap: $size-1; }
+
+  &__chip { font-size: $font-xs; padding: 2px 8px; background: rgba($primary-500, 0.08); color: $primary-600; border-radius: $radius-sm; }
+}
+
+.g6-crear-exito {
   display: flex; align-items: center; gap: $size-2;
-  font-size: $font-xs; color: $gray-500;
-  padding: $size-2 $size-3; background: $gray-50; border-radius: $radius-sm;
-  counter-increment: none;
+  padding: $size-3 $size-4; background: rgba(#059669, 0.06);
+  border: 1px solid rgba(#059669, 0.2); border-radius: $radius-md;
+  animation: fadeIn 0.3s ease;
+
+  &__icon { color: #059669; font-weight: $font-bold; font-size: $font-lg; }
+  &__texto { margin: 0; font-size: $font-sm; color: $gray-700; }
 }
 
-.g6-crear-modal__footer { display: flex; justify-content: flex-end; }
+// ── G4.2: Forms inline regla/skill ────────────────────────────────────────
+.g6-nueva-regla {
+  background: $gray-50; border: 1px solid $gray-100;
+  border-radius: $radius-md; padding: $size-3;
+  display: flex; flex-direction: column; gap: $size-2;
+  margin: $size-2 0; animation: fadeIn 0.2s ease;
 
-.g6-crear-modal__cta {
-  background: $primary-500; color: #fff; border: none; cursor: pointer;
-  padding: $size-3 $size-6; border-radius: $radius-md;
-  font-size: $font-sm; font-weight: $font-semibold;
-  &:hover { background: darken($primary-500, 6%); }
+  &__row { display: flex; align-items: center; gap: $size-2; }
+
+  &__si-label, &__entonces-label {
+    font-size: $font-xs; font-weight: $font-semibold; color: $gray-500;
+    white-space: nowrap; min-width: 72px;
+  }
+
+  &__input {
+    flex: 1; padding: $size-1 $size-2; border: 1px solid $gray-200;
+    border-radius: $radius-sm; font-size: $font-xs; font-family: $font-primary;
+    &:focus { outline: none; border-color: $primary-400; }
+  }
+
+  &__actions { display: flex; gap: $size-2; }
+
+  &__agregar {
+    background: $primary-500; color: #fff; border: none;
+    border-radius: $radius-sm; padding: $size-1 $size-3;
+    font-size: $font-xs; cursor: pointer;
+    &:hover { background: $primary-600; }
+  }
+
+  &__cancelar {
+    background: none; color: $gray-500; border: 1px solid $gray-200;
+    border-radius: $radius-sm; padding: $size-1 $size-3;
+    font-size: $font-xs; cursor: pointer;
+    &:hover { background: $gray-100; }
+  }
+}
+
+.g6-skills-disponibles {
+  background: $gray-50; border: 1px solid $gray-100;
+  border-radius: $radius-md; padding: $size-3;
+  display: flex; flex-direction: column; gap: $size-2;
+  margin: $size-2 0; animation: fadeIn 0.2s ease;
+
+  &__label { font-size: $font-xs; font-weight: $font-semibold; color: $gray-500; margin: 0; }
+}
+
+.g6-skills-disp-item {
+  display: flex; align-items: center; gap: $size-2;
+  &__label { flex: 1; font-size: $font-xs; color: $gray-700; }
+}
+
+.g6-agente-card__reglas-empty {
+  font-size: $font-xs; color: $gray-400; font-style: italic; margin: $size-1 0;
+}
+
+@keyframes slideInPanel {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
 }
 
 // ── Toast ──────────────────────────────────────────────────
@@ -614,4 +766,169 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Breathe animation para dot activo ────────────────────────────────────────
+.g6-agente-card__estado-dot--pulse {
+  animation: g6-pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes g6-pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+  50% { opacity: 0.85; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+
+// ── Tabs de detalle de agente ────────────────────────────────────────────────
+.g6-agente-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid $gray-100;
+  margin-bottom: $size-4;
+}
+
+.g6-agente-tab {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  padding: $size-2 $size-4; font-size: $font-sm; font-weight: $font-medium;
+  color: $gray-500; cursor: pointer; font-family: $font-primary;
+  display: flex; align-items: center; gap: $size-1;
+  transition: color 0.15s, border-color 0.15s; margin-bottom: -1px;
+
+  &--active { color: $primary-600; border-color: $primary-500; }
+  &:hover:not(&--active) { color: $gray-700; }
+
+  &__badge {
+    background: $gray-100; color: $gray-600; font-size: 10px;
+    font-weight: $font-semibold; border-radius: 999px;
+    padding: 1px 6px; line-height: 16px;
+  }
+}
+
+// ── Historial de acciones ────────────────────────────────────────────────────
+.g6-agente-historial {
+  display: flex; flex-direction: column; gap: $size-2; max-height: 320px;
+  overflow-y: auto; padding-right: 4px;
+
+  &__empty {
+    font-size: $font-sm; color: $gray-400; text-align: center;
+    padding: $size-6 0;
+  }
+}
+
+.g6-historial-item {
+  background: $gray-50; border-radius: $radius-sm;
+  padding: $size-3 $size-4; border-left: 3px solid $gray-200;
+
+  &--auto { border-color: $primary-300; }
+
+  &__hdr {
+    display: flex; align-items: center; gap: $size-2; margin-bottom: 4px;
+  }
+
+  &__tiempo { font-size: 11px; color: $gray-400; }
+
+  &__tipo {
+    font-size: 10px; font-weight: $font-semibold; padding: 1px 6px;
+    border-radius: 999px;
+    &.tipo--deterministic { background: rgba(59,130,246,0.1); color: #1e40af; }
+    &.tipo--ia-ligera { background: rgba(168,85,247,0.1); color: #7c3aed; }
+  }
+
+  &__aprobado {
+    font-size: 10px; color: #b45309; background: rgba(251,191,36,0.15);
+    padding: 1px 6px; border-radius: 999px; font-weight: $font-medium;
+  }
+
+  &__accion {
+    font-size: $font-sm; font-weight: $font-medium; color: $gray-800;
+    margin: 0 0 3px;
+  }
+
+  &__resultado {
+    font-size: 12px; color: $gray-500; margin: 0;
+  }
+}
+
+// ── "Activo en" proyectos ────────────────────────────────────────────────────
+.g6-agente-activo-en {
+  display: flex; align-items: flex-start; gap: $size-3;
+  padding: $size-3 0 $size-2; border-top: 1px solid $gray-100;
+  margin-bottom: $size-2;
+
+  &__label {
+    font-size: $font-xs; font-weight: $font-semibold; color: $gray-400;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    white-space: nowrap; padding-top: 2px;
+  }
+
+  &__list { display: flex; flex-wrap: wrap; gap: $size-1; }
+
+  &__chip {
+    font-size: 12px; font-weight: $font-medium; padding: 3px $size-3;
+    border-radius: 999px; border: 1px solid; text-decoration: none;
+    transition: opacity 0.15s;
+
+    &--estado--escala { background: rgba(34,197,94,0.1); color: #15803d; border-color: rgba(34,197,94,0.25); }
+    &--estado--activo { background: rgba(59,130,246,0.1); color: #1d4ed8; border-color: rgba(59,130,246,0.25); }
+    &--estado--riesgo { background: rgba(239,68,68,0.1); color: #b91c1c; border-color: rgba(239,68,68,0.25); }
+    &--estado--config { background: rgba(168,85,247,0.08); color: #7c3aed; border-color: rgba(168,85,247,0.2); }
+    &--estado--pausado { background: $gray-100; color: $gray-500; border-color: $gray-200; }
+
+    &:hover { opacity: 0.8; }
+  }
+}
+
+// ── Grid de agentes disponibles ───────────────────────────────────────────────
+.g6-agentes__grid-disponibles {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: $size-3;
+  margin-top: $size-2;
+}
+
+.g6-agente-disp-card {
+  background: $gray-50; border: 1px solid $gray-200; border-radius: $radius-md;
+  padding: $size-4; transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover { border-color: $primary-300; box-shadow: 0 2px 8px rgba($primary-500, 0.08); }
+
+  &__top { display: flex; align-items: flex-start; gap: $size-3; margin-bottom: $size-2; }
+
+  &__avatar {
+    width: 40px; height: 40px; border-radius: $radius-md; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  &__meta { flex: 1; min-width: 0; }
+
+  &__name-row {
+    display: flex; align-items: center; gap: $size-1; flex-wrap: wrap;
+    margin-bottom: 3px;
+  }
+
+  &__nombre {
+    font-size: $font-sm; font-weight: $font-semibold; color: $gray-800;
+  }
+
+  &__tipo {
+    font-size: 10px; font-weight: $font-semibold; padding: 1px 6px;
+    border-radius: 999px;
+    &.tipo--deterministic { background: rgba(59,130,246,0.1); color: #1e40af; }
+    &.tipo--ia-ligera { background: rgba(168,85,247,0.1); color: #7c3aed; }
+    &.tipo--ia-compleja { background: rgba(239,68,68,0.08); color: #b91c1c; }
+  }
+
+  &__desc {
+    font-size: 12px; color: $gray-500; line-height: 1.4; margin: 0 0 $size-3;
+  }
+
+  &__cta {
+    background: none; border: 1px solid $primary-300; color: $primary-600;
+    font-size: 12px; font-weight: $font-medium; padding: $size-1 $size-3;
+    border-radius: $radius-sm; cursor: pointer; font-family: $font-primary;
+    transition: background 0.15s;
+    &:hover { background: rgba($primary-500, 0.06); }
+  }
+}
+
+.g6-agentes__ver-mkt-link {
+  display: block; text-align: center; margin-top: $size-4;
+  font-size: $font-sm; font-weight: $font-medium; color: $primary-600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
 }

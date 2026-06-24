@@ -245,10 +245,24 @@ export const GALI_6_CHILD_ROUTES: Routes = [
       ),
   },
   {
+    path: 'proyecto/:proyectoId/campana/:campanaId',
+    loadComponent: () =>
+      import('./proyecto/gali6-campana-detalle.component').then(
+        m => m.Gali6CampanaDetalleComponent,
+      ),
+  },
+  {
     path: 'proyecto/:id',
     loadComponent: () =>
       import('./proyecto/gali6-proyecto-detalle.component').then(
         m => m.Gali6ProyectoDetalleComponent,
+      ),
+  },
+  {
+    path: 'mi-negocio/objetivo',
+    loadComponent: () =>
+      import('./mi-contexto/gali6-objetivo-editor.component').then(
+        m => m.Gali6ObjetivoEditorComponent,
       ),
   },
   {

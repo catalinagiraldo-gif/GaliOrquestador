@@ -1,0 +1,152 @@
+@if (campana(); as c) {
+<div class="cd gali-stagger-in">
+
+  <!-- ── HEADER ── -->
+  <div class="cd__header">
+    <button class="cd__back" (click)="volver()">
+      ← {{ proyecto()?.nombre ?? 'Proyecto' }}
+    </button>
+    <div class="cd__title-row">
+      <h1 class="cd__titulo">{{ c.nombre }}</h1>
+      <span class="cd__canal-tag" [style.color]="c.canalColor">{{ c.canalLabel }}</span>
+      <span class="cd__estado"
+            [class.cd__estado--activa]="!pausada() && c.estado === 'activa'"
+            [class.cd__estado--pausada]="pausada() || c.estado === 'pausada'"
+            [class.cd__estado--riesgo]="(c.roasActual ?? 99) < c.roasObjetivo">
+        @if (pausada()) { ⏸ Pausada } @else { ● {{ c.estado === 'activa' ? 'Activa' : c.estado }} }
+      </span>
+    </div>
+    <div class="cd__header-actions">
+      <button class="cd__pausa-btn"
+              [class.cd__pausa-btn--pausada]="pausada()"
+              (click)="togglePausa()">
+        {{ pausada() ? '▶ Activar campaña' : '⏸ Pausar campaña' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── MÉTRICAS ── -->
+  <div class="cd__kpis">
+    @if (c.roasActual !== undefined) {
+      <div class="cd__kpi">
+        <span class="cd__kpi-label">ROAS actual</span>
+        <span class="cd__kpi-val" [class]="getRoasClass(c)">{{ c.roasActual }}x</span>
+        <span class="cd__kpi-ref">obj. {{ c.roasObjetivo }}x</span>
+      </div>
+    }
+    <div class="cd__kpi">
+      <span class="cd__kpi-label">Presupuesto/día</span>
+      <span class="cd__kpi-val">{{ c.presupuestoDiarioLabel }}</span>
+    </div>
+    @if (c.pedidosSem) {
+      <div class="cd__kpi">
+        <span class="cd__kpi-label">Pedidos/sem</span>
+        <span class="cd__kpi-val">{{ c.pedidosSem }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── PRODUCTO ── -->
+  <section class="cd__section">
+    <h2 class="cd__section-title">Productos en esta campaña</h2>
+    @if (c.producto) {
+      <div class="cd__producto-card">
+        <span class="cd__producto-icon">📦</span>
+        <span class="cd__producto-nombre">{{ c.producto }}</span>
+        <button class="cd__producto-cambiar">Cambiar →</button>
+      </div>
+    } @else {
+      <div class="cd__sin-producto">
+        <span>⚠️ Sin producto asignado</span>
+        <button class="cd__agregar-producto">+ Agregar producto</button>
+      </div>
+    }
+  </section>
+
+  <!-- ── AGENTES ── -->
+  <section class="cd__section">
+    <h2 class="cd__section-title">Agentes activos en esta campaña</h2>
+    @if (c.agentes.length > 0) {
+      <div class="cd__agentes-list">
+        @for (agId of c.agentes; track agId) {
+          <div class="cd__agente-row">
+            <div class="cd__agente-avatar">{{ getAgenteInfo(agId).icono }}</div>
+            <div class="cd__agente-info">
+              <span class="cd__agente-nombre">{{ getAgenteInfo(agId).label }}</span>
+              <span class="cd__agente-modo">
+                {{ getAgenteInfo(agId).autopilot ? 'En autopilot' : 'Esperando aprobación' }}
+              </span>
+            </div>
+            <span class="cd__agente-estado"
+                  [class.cd__agente-estado--auto]="getAgenteInfo(agId).autopilot"
+                  [class.cd__agente-estado--manual]="!getAgenteInfo(agId).autopilot">
+              {{ getAgenteInfo(agId).autopilot ? 'Auto' : 'Manual' }}
+            </span>
+            <button class="cd__agente-btn" (click)="router.navigate(['/gali-6/agentes'])">
+              Configurar →
+            </button>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="cd__empty-line">No hay agentes asignados.</div>
+    }
+    <button class="cd__agregar-cta" (click)="router.navigate(['/gali-6/agentes'])">
+      + Asignar agente
+    </button>
+  </section>
+
+  <!-- ── CONEXIONES ── -->
+  <section class="cd__section">
+    <h2 class="cd__section-title">Conexiones activas</h2>
+    @if (c.conexiones.length > 0) {
+      <div class="cd__conexiones-list">
+        @for (cnxId of c.conexiones; track cnxId) {
+          <div class="cd__conexion-row">
+            <span class="cd__conexion-icon">{{ getConexionInfo(cnxId).icono }}</span>
+            <span class="cd__conexion-nombre">{{ getConexionInfo(cnxId).label }}</span>
+            <span class="cd__conexion-estado">{{ getConexionInfo(cnxId).estado }}</span>
+            <button class="cd__conexion-btn" (click)="router.navigate(['/gali-6/conexiones'])">
+              Gestionar
+            </button>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="cd__empty-line">Sin conexiones activas.</div>
+    }
+  </section>
+
+  <!-- ── HISTORIAL GALI ── -->
+  <section class="cd__section">
+    <h2 class="cd__section-title">Historial reciente · Gali</h2>
+    <div class="cd__historial">
+      @for (h of historial; track h.tiempo) {
+        <div class="cd__historial-item">
+          <span class="cd__historial-dot"></span>
+          <div class="cd__historial-body">
+            <div class="cd__historial-header">
+              <span class="cd__historial-tiempo">{{ h.tiempo }}</span>
+              <span class="cd__historial-agente">{{ h.agente }}</span>
+            </div>
+            <p class="cd__historial-accion">{{ h.accion }}</p>
+            @if (h.impacto) {
+              <p class="cd__historial-impacto">→ {{ h.impacto }}</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (toastMsg()) {
+    <div class="cd__toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
+  }
+
+</div>
+} @else {
+  <div class="cd cd--not-found">
+    <button class="cd__back" (click)="volver()">← Volver</button>
+    <p>Campaña no encontrada.</p>
+  </div>
+}

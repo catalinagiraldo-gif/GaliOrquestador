@@ -5,7 +5,46 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { getObjetivo, G6Objetivo, TIPO_LABEL } from '../../../../../mocks/gali-v6/objetivo';
 import { SUGERENCIAS_CAMPANA_NUEVO_PROYECTO, SugerenciaCampana } from '../../../../../mocks/gali-v6/campanas.mock';
 
-type Step = 'producto' | 'brujula' | 'campana' | 'presupuesto' | 'lanzar';
+type Step = 'inicio' | 'producto' | 'problema' | 'brujula' | 'campana' | 'presupuesto' | 'lanzar';
+
+interface ProblemaOption {
+  id: string;
+  label: string;
+  icon: string;
+  galiSugerencia: string;
+  productosIds: string[];
+}
+
+const PROBLEMAS: ProblemaOption[] = [
+  {
+    id: 'saturacion',
+    label: 'Mi producto principal se está saturando',
+    icon: '📉',
+    galiSugerencia: 'ADA detecta productos con tendencia creciente en tu categoría. Te recomiendo diversificar con un producto emergente.',
+    productosIds: ['rodillo-jade', 'masajeador-cuello'],
+  },
+  {
+    id: 'margen',
+    label: 'Mi margen es demasiado bajo',
+    icon: '💸',
+    galiSugerencia: 'Para mejorar margen, busca productos con bajo costo de flete y alta percepción de valor. ADA encontró estas opciones.',
+    productosIds: ['rodillo-jade', 'difusor-v2'],
+  },
+  {
+    id: 'clientes',
+    label: 'Quiero llegar a nuevos clientes',
+    icon: '🎯',
+    galiSugerencia: 'Productos de regalo y salud personal tienen mayor alcance en nuevas audiencias. Mira estas oportunidades.',
+    productosIds: ['difusor-v2', 'termo-xl'],
+  },
+  {
+    id: 'escalado',
+    label: 'Quiero escalar lo que ya funciona',
+    icon: '🚀',
+    galiSugerencia: 'Los productos con score ADA >80 son ideales para escalar. ADA encontró estos complementos a tu catálogo actual.',
+    productosIds: ['difusor-v2', 'rodillo-jade'],
+  },
+];
 
 interface ProductoOption {
   id: string;
@@ -49,11 +88,46 @@ export class Gali6NuevoProyectoComponent {
     this.route.queryParamMap.subscribe(params => {
       this.modoCampana.set(params.get('modo') === 'campana');
       this.proyectoIdParam.set(params.get('proyectoId'));
+      if (params.get('modo') === 'campana') {
+        this.step.set('producto');
+      }
     });
   }
 
-  readonly step = signal<Step>('producto');
+  readonly step = signal<Step>('inicio');
   readonly objetivo: G6Objetivo = getObjetivo();
+
+  // ── Paso 0 bifurcado: inicio ──────────────────────────────────────────
+  readonly problemas = PROBLEMAS;
+  readonly problemaSeleccionado = signal<ProblemaOption | null>(null);
+  readonly galiAnalizandoProblema = signal(false);
+  readonly galiProblemaListo = signal(false);
+
+  elegirDesdeProducto(): void {
+    this.step.set('producto');
+  }
+
+  elegirDesdeProblema(): void {
+    this.step.set('problema');
+  }
+
+  seleccionarProblema(p: ProblemaOption): void {
+    this.problemaSeleccionado.set(p);
+    this.galiAnalizandoProblema.set(true);
+    this.galiProblemaListo.set(false);
+    setTimeout(() => {
+      this.galiAnalizandoProblema.set(false);
+      this.galiProblemaListo.set(true);
+    }, 1100);
+  }
+
+  usarSugerenciaProblema(): void {
+    const p = this.problemaSeleccionado();
+    if (!p) return;
+    const sugerido = ADA_PRODUCTOS.find(a => p.productosIds.includes(a.id));
+    if (sugerido) { this.selectProducto(sugerido); }
+    this.step.set('brujula');
+  }
   readonly tipoLabel = TIPO_LABEL[this.objetivo.tipo];
 
   // ── Paso 1: Objetivo ──────────────────────────────────────────────────
@@ -288,12 +362,19 @@ export class Gali6NuevoProyectoComponent {
     { id: 'lanzar',      label: 'Lanzar' },
   ];
 
-  readonly STEP_ORDER: Step[] = ['producto', 'brujula', 'campana', 'presupuesto', 'lanzar'];
+  readonly STEP_ORDER: Step[] = ['inicio', 'producto', 'brujula', 'campana', 'presupuesto', 'lanzar'];
 
   goTo(s: Step): void { this.step.set(s); }
 
   goBack(): void {
-    const idx = this.STEP_ORDER.indexOf(this.step());
+    const cur = this.step();
+    if (cur === 'inicio' || cur === 'problema') {
+      this.router.navigate(['/gali-6/proyectos']); return;
+    }
+    if (cur === 'producto') {
+      this.step.set(this.modoCampana() ? 'producto' : 'inicio'); return;
+    }
+    const idx = this.STEP_ORDER.indexOf(cur);
     if (idx > 0) this.step.set(this.STEP_ORDER[idx - 1]);
     else this.router.navigate(['/gali-6/proyectos']);
   }
@@ -304,6 +385,8 @@ export class Gali6NuevoProyectoComponent {
   }
 
   stepIndex(s: Step): number {
-    return this.STEPS.findIndex(x => x.id === s);
+    const wizardSteps: Step[] = ['producto', 'brujula', 'campana', 'presupuesto', 'lanzar'];
+    const idx = wizardSteps.indexOf(s);
+    return idx >= 0 ? idx : 0;
   }
 }

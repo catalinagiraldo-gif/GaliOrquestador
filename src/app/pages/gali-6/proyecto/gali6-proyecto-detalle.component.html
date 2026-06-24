@@ -1,7 +1,324 @@
+@if (proyectoNuevo(); as pv) {
+<div class="g6-detalle gali-stagger-in">
+
+  <!-- ── HEADER (nuevo — PROYECTOS_MOCK) ── -->
+  <div class="g6-detalle__header">
+    <button class="g6-detalle__back" (click)="volverAProyectos()">← Proyectos</button>
+    <div class="g6-detalle__title-row">
+      <h1 class="g6-detalle__title">{{ pv.nombre }}</h1>
+      <span class="g6-detalle__estado" [attr.data-estado]="pv.estado">{{ estadoLabel() }}</span>
+    </div>
+    <p class="g6-detalle__subobjetivo">{{ pv.descripcion }}</p>
+    <div class="g6-detalle__meta-row">
+      @if (pv.pedidosSem > 0) {
+        <span class="g6-detalle__meta-item">📦 {{ pv.pedidosSem }}/sem</span>
+      }
+      @if (pv.roasPromedio) {
+        <span class="g6-detalle__meta-item">📊 ROAS {{ pv.roasPromedio }}x</span>
+      }
+      @if (pv.presupuestoTotal > 0) {
+        <span class="g6-detalle__meta-item">💰 ${{ pv.presupuestoTotal | number }}/día total</span>
+      }
+      @if (pv.campanas.length > 0) {
+        <span class="g6-detalle__meta-item">📣 {{ pv.campanas.length }} campaña{{ pv.campanas.length !== 1 ? 's' : '' }}</span>
+      }
+    </div>
+
+    <!-- Contribución al meta + proyección -->
+    @if (pv.contribucionPct > 0 || pv.proyeccionSemanas) {
+      <div class="g6-detalle__contribucion-row">
+        @if (pv.contribucionPct > 0) {
+          <span class="g6-detalle__contribucion-chip">
+            ◎ Este proyecto aporta <strong>{{ pv.contribucionPct }}%</strong> de tu meta semanal
+          </span>
+        }
+        @if (pv.proyeccionSemanas) {
+          <span class="g6-detalle__proyeccion-chip">
+            📈 A este ritmo, alcanzas la meta en <strong>{{ pv.proyeccionSemanas }} semanas</strong>
+          </span>
+        }
+      </div>
+    }
+
+    <!-- Alerta Gali -->
+    @if (alertaGali()) {
+      <div class="g6-detalle__alerta-gali" [class.g6-detalle__alerta-gali--riesgo]="pv.estado === 'en_riesgo'">
+        <span class="g6-detalle__alerta-icon">{{ pv.estado === 'en_riesgo' ? '⚠️' : '✦' }}</span>
+        <span>{{ alertaGali() }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── TABS ── -->
+  <div class="g6-detalle__tabs">
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'canvas'"
+            (click)="setTab('canvas')">
+      Resumen
+    </button>
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'campanas'"
+            (click)="setTab('campanas')">
+      Campañas
+      @if (pv.campanas.length > 0) {
+        <span class="g6-detalle__tab-badge">{{ pv.campanas.length }}</span>
+      }
+    </button>
+    <button class="g6-detalle__tab"
+            [class.g6-detalle__tab--active]="activeTab() === 'agentes'"
+            (click)="setTab('agentes')">
+      Agentes
+    </button>
+  </div>
+
+  <!-- ═══ TAB: RESUMEN (PV) ════ -->
+  @if (activeTab() === 'canvas') {
+    <div class="g6-canvas gali-stagger-in">
+      @if (pv.campanas.length === 0) {
+        <div class="g6-canvas__setup-guide">
+          <p class="g6-canvas__setup-intro">Este proyecto está listo para arrancar. Sigue estos pasos:</p>
+          <div class="g6-canvas__steps">
+            <div class="g6-canvas__step g6-canvas__step--done">
+              <span class="g6-canvas__step-num">✓</span>
+              <div class="g6-canvas__step-body">
+                <span class="g6-canvas__step-label">Define el sub-objetivo de este proyecto</span>
+                <span class="g6-canvas__step-desc">{{ pv.descripcion }}</span>
+              </div>
+            </div>
+            <div class="g6-canvas__step">
+              <span class="g6-canvas__step-num">2</span>
+              <div class="g6-canvas__step-body">
+                <span class="g6-canvas__step-label">Crea tu primera campaña</span>
+                <span class="g6-canvas__step-desc">Elige el canal (TikTok, Meta, WhatsApp) y asigna un producto.</span>
+              </div>
+              <button class="g6-canvas__step-cta" (click)="setTab('campanas')">→ Crear campaña</button>
+            </div>
+            <div class="g6-canvas__step g6-canvas__step--locked">
+              <span class="g6-canvas__step-num">3</span>
+              <div class="g6-canvas__step-body">
+                <span class="g6-canvas__step-label">Asigna agentes</span>
+                <span class="g6-canvas__step-desc">Gali sugerirá los mejores agentes para tu canal.</span>
+              </div>
+            </div>
+            <div class="g6-canvas__step g6-canvas__step--locked">
+              <span class="g6-canvas__step-num">4</span>
+              <div class="g6-canvas__step-body">
+                <span class="g6-canvas__step-label">Conecta tus plataformas</span>
+                <span class="g6-canvas__step-desc">TikTok Ads, Meta Ads u otras para que Gali empiece a monitorear.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="g6-canvas__kpis">
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">📦 Pedidos/sem</span>
+            <span class="g6-kpi__val">{{ pv.pedidosSem || '—' }}</span>
+          </div>
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">📊 ROAS promedio</span>
+            <span class="g6-kpi__val" [class.g6-kpi__val--ok]="(pv.roasPromedio ?? 0) >= 1.5">{{ pv.roasPromedio ? pv.roasPromedio + 'x' : '—' }}</span>
+          </div>
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">💰 Presupuesto total</span>
+            <span class="g6-kpi__val">${{ pv.presupuestoTotal | number }}/día</span>
+          </div>
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">🎯 Contribución</span>
+            <span class="g6-kpi__val">{{ pv.contribucionPct || 0 }}% del meta</span>
+          </div>
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">📣 Campañas activas</span>
+            <span class="g6-kpi__val">{{ campanasCounts().activa }}</span>
+          </div>
+          <div class="g6-kpi">
+            <span class="g6-kpi__label">🤖 Agentes</span>
+            <span class="g6-kpi__val">{{ pv.agentes.length }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══ TAB: CAMPAÑAS (PV) ════ -->
+  @if (activeTab() === 'campanas') {
+    <div class="g6-campanas-tab gali-stagger-in">
+      @if (pv.campanas.length > 0) {
+        <div class="g6-campanas-list">
+          @for (c of pv.campanas; track c.id) {
+            <div class="g6-campana-card" [class.g6-campana-card--riesgo]="(c.roasActual ?? 99) < c.roasObjetivo && c.estado === 'activa'">
+
+              <!-- Canal + estado -->
+              <div class="g6-campana-card__top">
+                <span class="g6-campana-card__canal-icon">{{ getCanalPvIcon(c.canal) }}</span>
+                <div class="g6-campana-card__nombres">
+                  <span class="g6-campana-card__nombre">{{ c.nombre }}</span>
+                  <span class="g6-campana-card__canal-label" [style.color]="c.canalColor">{{ c.canalLabel }}</span>
+                </div>
+                <span class="g6-campana-card__estado-badge" [attr.data-estado]="c.estado">
+                  {{ getCampanaEstadoLabel(c.estado) }}
+                </span>
+              </div>
+
+              <!-- Producto -->
+              <div class="g6-campana-card__producto-row">
+                @if (c.producto) {
+                  <span class="g6-campana-card__producto-chip">📦 {{ c.producto }}</span>
+                } @else {
+                  <button class="g6-campana-card__sin-producto" (click)="nuevaCampana()">
+                    ⚠️ Sin producto — agregar →
+                  </button>
+                }
+              </div>
+
+              <!-- Métricas -->
+              <div class="g6-campana-card__metrics">
+                @if (c.roasActual !== undefined) {
+                  <div class="g6-campana-metric">
+                    <span class="g6-campana-metric__label">ROAS actual</span>
+                    <span class="g6-campana-metric__val" [class]="getRoasPvClass(c)">{{ c.roasActual }}x</span>
+                  </div>
+                }
+                <div class="g6-campana-metric">
+                  <span class="g6-campana-metric__label">ROAS objetivo</span>
+                  <span class="g6-campana-metric__val">{{ c.roasObjetivo }}x</span>
+                </div>
+                <div class="g6-campana-metric">
+                  <span class="g6-campana-metric__label">Presupuesto/día</span>
+                  <span class="g6-campana-metric__val">{{ c.presupuestoDiarioLabel }}</span>
+                </div>
+                @if (c.pedidosSem) {
+                  <div class="g6-campana-metric">
+                    <span class="g6-campana-metric__label">Pedidos/sem</span>
+                    <span class="g6-campana-metric__val">{{ c.pedidosSem }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Agentes asignados a esta campaña -->
+              <div class="g6-campana-card__agentes-cnx">
+                <div class="g6-campana-card__agentes-row">
+                  @if (c.agentes.length > 0) {
+                    @for (agId of c.agentes; track agId) {
+                      <button class="g6-campana-card__agente-avatar"
+                              title="{{ agId }}"
+                              (click)="router.navigate(['/gali-6/agentes'])">
+                        {{ getAgenteIcon(agId) }}
+                      </button>
+                    }
+                    <button class="g6-campana-card__agentes-link" (click)="router.navigate(['/gali-6/agentes'])">
+                      Gestionar agentes →
+                    </button>
+                  } @else {
+                    <button class="g6-campana-card__asignar-agente" (click)="router.navigate(['/gali-6/agentes'])">
+                      + Asignar agente
+                    </button>
+                  }
+                </div>
+
+                <!-- Conexiones activas para esta campaña -->
+                <div class="g6-campana-card__cnx-row">
+                  @if (c.conexiones.length > 0) {
+                    @for (cnx of c.conexiones; track cnx) {
+                      <button class="g6-campana-card__cnx-avatar"
+                              title="{{ cnx }}"
+                              (click)="router.navigate(['/gali-6/conexiones'])">
+                        {{ getConexionIcon(cnx) }}
+                      </button>
+                    }
+                    <button class="g6-campana-card__cnx-link" (click)="router.navigate(['/gali-6/conexiones'])">
+                      Ver conexiones →
+                    </button>
+                  } @else {
+                    <button class="g6-campana-card__conectar" (click)="router.navigate(['/gali-6/conexiones'])">
+                      + Conectar plataforma
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Nota Gali -->
+              @if (c.notaGali) {
+                <div class="g6-campana-card__nota">
+                  <span class="gali-spark">✦</span> {{ c.notaGali }}
+                </div>
+              }
+
+              <!-- Acciones de campaña -->
+              <div class="g6-campana-card__acciones">
+                <button class="g6-campana-card__pausa"
+                        [class.g6-campana-card__pausa--activa]="!esCampanaPausada(c.id)"
+                        [class.g6-campana-card__pausa--pausada]="esCampanaPausada(c.id)"
+                        (click)="togglePausaCampana(c.id)">
+                  {{ esCampanaPausada(c.id) ? '▶ Activar campaña' : '⏸ Pausar campaña' }}
+                </button>
+                <button class="g6-campana-card__ver-detalle"
+                        (click)="irADetalleCampana(pv.id, c.id)">
+                  Ver detalle →
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="g6-campanas__nueva-cta">
+          <button class="g6-campanas__nueva" (click)="nuevaCampana()">+ Nueva campaña</button>
+        </div>
+      } @else {
+        <div class="g6-campanas-empty">
+          <span class="g6-campanas-empty__icon">📣</span>
+          <p>Todavía no hay campañas en este proyecto.</p>
+          <button class="g6-campanas-empty__nueva" (click)="nuevaCampana()">+ Crear primera campaña</button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ═══ TAB: AGENTES (PV) ════ -->
+  @if (activeTab() === 'agentes') {
+    <div class="g6-agentes-tab gali-stagger-in">
+      @if (pv.agentes.length > 0) {
+        @for (agId of pv.agentes; track agId) {
+          <div class="g6-agente-row">
+            <div class="g6-agente-row__icon">{{ getAgenteIcon(agId) }}</div>
+            <div class="g6-agente-row__info">
+              <span class="g6-agente-row__nombre">{{ agId }}</span>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="g6-agentes-empty">
+          <p>No hay agentes asignados a este proyecto aún.</p>
+          <button class="g6-agentes-empty__cta" (click)="router.navigate(['/gali-6/agentes'])">
+            Ver agentes disponibles →
+          </button>
+        </div>
+      }
+      <div class="g6-agentes-tab__footer">
+        <button class="g6-agentes-tab__ver-todos" (click)="router.navigate(['/gali-6/agentes'])">
+          Gestionar agentes →
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (toastPausa()) {
+    <div class="g6-detalle__toast" role="status" aria-live="polite">{{ toastPausa() }}</div>
+  }
+
+  @if (panelNuevaCampana()) {
+    <app-gali6-nueva-campana
+      [data]="panelNuevaCampana()"
+      (cerrar)="cerrarPanelNuevaCampana()"
+      (creada)="cerrarPanelNuevaCampana()">
+    </app-gali6-nueva-campana>
+  }
+</div>
+} @else {
 @if (proyecto(); as p) {
 <div class="g6-detalle gali-stagger-in">
 
-  <!-- ── HEADER ── -->
+  <!-- ── HEADER (legacy) ── -->
   <div class="g6-detalle__header">
     <button class="g6-detalle__back" (click)="volverAProyectos()">← Proyectos</button>
     <div class="g6-detalle__title-row">
@@ -289,6 +606,13 @@
     </div>
   }
 
+  @if (panelNuevaCampana()) {
+    <app-gali6-nueva-campana
+      [data]="panelNuevaCampana()"
+      (cerrar)="cerrarPanelNuevaCampana()"
+      (creada)="cerrarPanelNuevaCampana()">
+    </app-gali6-nueva-campana>
+  }
 </div>
 } @else {
   <div class="g6-detalle g6-detalle--not-found">
@@ -296,4 +620,5 @@
     <h2>Proyecto no encontrado</h2>
     <p>El proyecto con ID "{{ proyectoId() }}" no existe.</p>
   </div>
+}
 }

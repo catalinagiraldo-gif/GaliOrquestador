@@ -39,12 +39,27 @@
           <div class="mcp__top">
             <span class="mcp__glyph" aria-hidden="true">{{ m.glyph }}</span>
             <span class="mcp__name">{{ m.nombre }}</span>
+            <div class="mcp__badges">
+              <span class="mcp__tipo-badge">{{ tipoLabels[m.tipo] }}</span>
+              @if (m.campanasActivas && m.campanasActivas > 0) {
+                <span class="mcp__camp-badge">Activa en {{ m.campanasActivas }} campaña{{ m.campanasActivas > 1 ? 's' : '' }}</span>
+              }
+            </div>
             <span class="mcp__dot" [attr.data-estado]="m.estado"></span>
           </div>
-          <p class="mcp__dato">{{ m.dato }}</p>
-          <p class="mcp__contexto"><span aria-hidden="true">✦</span> Le da contexto a Gali para: {{ m.contexto }}</p>
-          <button class="mcp__cta" [attr.data-estado]="m.estado" data-proto-skip>
-            {{ m.estado === 'conectado' ? 'Gestionar' : m.estado === 'urgente' ? 'Reconectar ahora' : 'Conectar' }}
+          @if (m.estado !== 'proximamente') {
+            <p class="mcp__dato">{{ m.dato }}</p>
+            <p class="mcp__contexto"><span aria-hidden="true">✦</span> Le da contexto a Gali para: {{ m.contexto }}</p>
+          } @else {
+            <p class="mcp__dato mcp__dato--prox">Próximamente disponible en Gali 6.</p>
+          }
+          <button class="mcp__cta" [attr.data-estado]="m.estado"
+                  [disabled]="m.estado === 'proximamente'"
+                  (click)="abrirPanel(m)">
+            @if (m.estado === 'conectado') { Gestionar }
+            @else if (m.estado === 'urgente') { Reconectar ahora }
+            @else if (m.estado === 'pendiente') { Conectar }
+            @else { Disponible pronto }
           </button>
         </article>
       }
@@ -124,6 +139,28 @@
   </section>
 
   <!-- ══════════════════════════════════════════
+       SECCIÓN 4 — Conocimientos aplicados
+  ═══════════════════════════════════════════ -->
+  <section class="cnx__section">
+    <div class="cnx__section-hdr">
+      <h2 class="cnx__section-title">Lo que Gali aprendió de tus plataformas</h2>
+      <p class="cnx__section-sub">Gali aplica estos aprendizajes automáticamente en tus próximas campañas y recomendaciones.</p>
+    </div>
+
+    <div class="cnx__conocimientos">
+      @for (c of conocimientos; track c.fuente) {
+        <div class="cnx__conoc-card">
+          <div class="cnx__conoc-hdr">
+            <span class="cnx__conoc-glyph" aria-hidden="true">{{ c.icono }}</span>
+            <span class="cnx__conoc-fuente">{{ c.fuente }}</span>
+          </div>
+          <p class="cnx__conoc-dato">{{ c.dato }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
        FOOTER — Marketplace
   ═══════════════════════════════════════════ -->
   <footer class="cnx__footer">
@@ -135,3 +172,115 @@
   </footer>
 
 </div>
+
+<!-- ── G6: Panel detalle conexión ── -->
+@if (panelMcp()) {
+  <div class="cnx-panel-bg" (click)="cerrarPanel()" aria-hidden="true"></div>
+  <div class="cnx-panel" role="dialog" [attr.aria-label]="panelMcp()!.nombre">
+
+    <div class="cnx-panel__hdr">
+      <div class="cnx-panel__hdr-left">
+        <span class="cnx-panel__glyph">{{ panelMcp()!.glyph }}</span>
+        <div>
+          <h3 class="cnx-panel__title">{{ panelMcp()!.nombre }}</h3>
+          <span class="cnx-panel__estado-badge" [attr.data-estado]="panelMcp()!.estado">
+            @if (panelMcp()!.estado === 'conectado') { ● Conectado }
+            @else if (panelMcp()!.estado === 'urgente') { ⚠ Acción requerida }
+            @else { ◌ Sin conectar }
+          </span>
+        </div>
+      </div>
+      <button class="cnx-panel__close" (click)="cerrarPanel()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="cnx-panel__body">
+
+      @if (panelMcp()!.estado === 'conectado' || panelMcp()!.estado === 'urgente') {
+
+        <!-- CONECTADO: lo que Gali usa -->
+        <div class="cnx-panel__bloque">
+          <span class="cnx-panel__lbl">Lo que Gali lee de aquí</span>
+          <p class="cnx-panel__dato">{{ panelMcp()!.dato }}</p>
+        </div>
+
+        <div class="cnx-panel__bloque">
+          <span class="cnx-panel__lbl">Para qué lo usa</span>
+          <p class="cnx-panel__dato">{{ panelMcp()!.contexto }}</p>
+        </div>
+
+        <!-- Proyectos que usan esta conexión -->
+        @if (getProyectosConexion(panelMcp()!).length > 0) {
+          <div class="cnx-panel__bloque">
+            <span class="cnx-panel__lbl">Usado en</span>
+            <div class="cnx-panel__proyectos">
+              @for (p of getProyectosConexion(panelMcp()!); track p.nombre) {
+                <div class="cnx-panel__proyecto-row">
+                  <span class="cnx-panel__proyecto-nombre">{{ p.nombre }}</span>
+                  <span class="cnx-panel__proyecto-camp">{{ p.campanas }} campaña{{ p.campanas !== 1 ? 's' : '' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (panelMcp()!.estado === 'urgente') {
+          <div class="cnx-panel__alerta">
+            <span>⚠️</span>
+            <p>{{ panelMcp()!.dato }}</p>
+          </div>
+        }
+
+        @if (syncDone()) {
+          <div class="cnx-panel__sync-ok">✓ Sincronización completada</div>
+        }
+
+        <div class="cnx-panel__footer-btns">
+          <button class="cnx-panel__btn-sync"
+                  [disabled]="syncing()"
+                  (click)="sincronizarAhora()">
+            @if (syncing()) { ⟳ Sincronizando… } @else { Sincronizar ahora }
+          </button>
+          <button class="cnx-panel__btn-desconectar" (click)="cerrarPanel()">
+            Desconectar
+          </button>
+        </div>
+
+      } @else {
+
+        <!-- PENDIENTE: guía de conexión -->
+        <div class="cnx-panel__bloque">
+          <span class="cnx-panel__lbl">Para qué sirve</span>
+          <p class="cnx-panel__dato">Gali consultará estos datos para {{ panelMcp()!.contexto }}</p>
+        </div>
+
+        <div class="cnx-panel__pasos">
+          <span class="cnx-panel__lbl">Pasos para conectar</span>
+          @for (paso of getPasosConexion(panelMcp()!); track $index) {
+            <div class="cnx-panel__paso">
+              <span class="cnx-panel__paso-num">{{ $index + 1 }}</span>
+              <span class="cnx-panel__paso-texto">{{ paso }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="cnx-panel__api-row">
+          <label class="cnx-panel__api-label" for="cnx-api-key">API Key / Token</label>
+          <input id="cnx-api-key" class="cnx-panel__api-input" type="password"
+                 placeholder="Pega tu clave de acceso aquí…"
+                 [value]="apiKeyInput()"
+                 (input)="apiKeyInput.set($any($event.target).value)">
+        </div>
+
+        <div class="cnx-panel__footer-btns">
+          <button class="cnx-panel__btn-conectar"
+                  [disabled]="!apiKeyInput().trim() || conectando()"
+                  (click)="conectarMcp()">
+            @if (conectando()) { ⟳ Conectando… } @else { Conectar → }
+          </button>
+        </div>
+
+      }
+
+    </div>
+  </div>
+}

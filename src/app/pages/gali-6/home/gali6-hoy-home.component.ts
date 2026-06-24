@@ -6,7 +6,10 @@ import {
   HoyEstado,
   AgenteActivo,
   AlertaCola,
+  SenalHoy,
+  ProyectoContrib,
 } from '../../../../../mocks/gali-v6/hoy-estado';
+import { getObjetivo, G6Objetivo } from '../../../../../mocks/gali-v6/objetivo';
 
 @Component({
   selector: 'app-gali6-hoy-home',
@@ -20,6 +23,7 @@ export class Gali6HoyHomeComponent {
 
   readonly estado: HoyEstado = MOCK_HOY_ESTADO;
   readonly decision = this.estado.decision_urgente;
+  readonly objetivo = signal<G6Objetivo>(getObjetivo());
 
   readonly decisionDismissed = signal(false);
   readonly toastMsg = signal<string | null>(null);
@@ -93,7 +97,23 @@ export class Gali6HoyHomeComponent {
     this.verAporte.update(v => !v);
   }
 
-  irAChateaPro(): void {
-    this.router.navigate(['/gali-6/marketing/chatea-pro']);
+  irAMarketing(): void {
+    this.router.navigate(['/gali-6/marketing']);
+  }
+
+  irAMiContextoObjetivo(): void {
+    this.router.navigate(['/gali-6/mi-negocio/objetivo']);
+  }
+
+  getContribPct(p: ProyectoContrib): number {
+    const meta = this.estado.pedidosMeta || 100;
+    return Math.min(100, Math.round((p.pedidosSem / meta) * 100));
+  }
+
+  getContribGap(): number {
+    const meta = this.estado.pedidosMeta || 100;
+    const usado = (this.estado.proyectoContribuciones ?? [])
+      .reduce((s, p) => s + p.pedidosSem, 0);
+    return Math.max(0, Math.round(((meta - usado) / meta) * 100));
   }
 }

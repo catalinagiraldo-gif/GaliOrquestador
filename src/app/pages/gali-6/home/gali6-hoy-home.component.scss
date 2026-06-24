@@ -264,45 +264,235 @@
 .hoy__alerta-titulo { flex: 1; font-size: $font-xs; color: $gray-700; line-height: 1.4; }
 .hoy__alerta-arrow  { color: $gray-400; font-size: $font-xs; }
 
-// ── ASISTENTES ────────────────────────────────────────────
+// ── CHIP OBJETIVO ─────────────────────────────────────────
+.hoy__objetivo-chip {
+  display: inline-flex; align-items: center; gap: $size-2;
+  margin-top: $size-3;
+  padding: $size-1 $size-3 $size-1 $size-2;
+  background: rgba($primary-500, 0.06);
+  border: 1px solid rgba($primary-500, 0.2);
+  border-radius: $radius-full;
+  font-size: $font-xs; color: $primary-700;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  &:hover { background: rgba($primary-500, 0.1); border-color: rgba($primary-500, 0.35); }
+}
+
+.hoy__objetivo-pct {
+  font-weight: $font-bold; font-size: $font-sm; color: $primary-600; white-space: nowrap;
+}
+
+.hoy__objetivo-track {
+  width: 48px; height: 4px; background: rgba($primary-500, 0.18);
+  border-radius: $radius-full; overflow: hidden; flex-shrink: 0;
+}
+
+.hoy__objetivo-fill {
+  display: block; height: 100%; background: $primary-500; border-radius: $radius-full;
+  transition: width 0.6s ease;
+}
+
+.hoy__objetivo-label { color: $gray-500; white-space: nowrap; }
+
+// ── OBJETIVO BLOQUE ──────────────────────────────────────
+.hoy__objetivo-bloque {
+  margin-top: $size-3;
+  padding: $size-3 $size-4;
+  background: rgba($primary-500, 0.04);
+  border: 1px solid rgba($primary-500, 0.14);
+  border-radius: $radius-lg;
+  display: flex; flex-direction: column; gap: $size-2;
+}
+
+.hoy__objetivo-texto {
+  margin: 0;
+  font-size: $font-sm; font-weight: $font-semibold; color: $gray-800;
+  line-height: 1.45;
+}
+
+.hoy__objetivo-progreso {
+  display: flex; align-items: center; gap: $size-2;
+}
+
+.hoy__objetivo-pct-badge {
+  font-size: $font-xs; font-weight: $font-bold; color: $primary-600;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.hoy__objetivo-track {
+  flex: 1; height: 4px; background: rgba($primary-500, 0.15);
+  border-radius: $radius-full; overflow: hidden;
+}
+
+.hoy__objetivo-fill {
+  display: block; height: 100%; background: $primary-500; border-radius: $radius-full;
+  transition: width 0.6s ease;
+}
+
+.hoy__objetivo-sub {
+  font-size: 11px; color: $gray-400; white-space: nowrap; flex-shrink: 0;
+}
+
+.hoy__objetivo-acciones {
+  display: flex; align-items: center; gap: $size-3;
+}
+
+.hoy__objetivo-edit {
+  background: none; border: none; cursor: pointer;
+  font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+  padding: 0; line-height: 1;
+  &:hover { color: $primary-700; text-decoration: underline; }
+}
+
+.hoy__objetivo-proyectos {
+  font-size: $font-xs; font-weight: $font-semibold; color: $gray-500;
+  text-decoration: none;
+  &:hover { color: $gray-800; }
+}
+
+// ── NOVEDADES / CHATEA PRO ────────────────────────────────
+.hoy__chatea {
+  background: $os-surface; border: 1px solid $os-border;
+  border-radius: $radius-lg; padding: $size-5;
+  display: flex; flex-direction: column; gap: $size-2;
+}
+
+.hoy__chatea-resumen {
+  margin: 0; font-size: $font-sm; color: $gray-700; line-height: 1.5;
+  strong { color: $gray-900; }
+}
+
+.hoy__chatea-urgente {
+  color: #dc2626; font-weight: $font-semibold;
+}
+
+.hoy__chatea-cta {
+  font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+  text-decoration: none; align-self: flex-start;
+  &:hover { color: $primary-700; }
+}
+
+// ── CONTRIBUCIÓN POR PROYECTO ─────────────────────────────
+.hoy__contrib { margin-top: $size-2; display: flex; flex-direction: column; gap: $size-1; }
+
+.hoy__contrib-bar {
+  display: flex; height: 6px; border-radius: $radius-full; overflow: hidden;
+  background: $gray-100; gap: 2px;
+}
+
+.hoy__contrib-seg {
+  height: 100%; border-radius: $radius-full;
+  transition: width 0.5s ease;
+
+  &--gap { background: $gray-200 !important; }
+}
+
+.hoy__contrib-legend {
+  display: flex; align-items: center; gap: $size-1; flex-wrap: wrap;
+}
+
+.hoy__contrib-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  &--gap { background: $gray-300 !important; }
+}
+
+.hoy__contrib-name { font-size: 10px; color: $gray-500; margin-right: $size-2; }
+
+// ── SEÑALES DEL DÍA ───────────────────────────────────────
+.hoy__senales {
+  background: $os-surface; border: 1px solid $os-border;
+  border-radius: $radius-lg; padding: $size-4 $size-5;
+}
+
+.hoy__senales-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: $size-3;
+}
+
+.hoy__senales-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: $size-3;
+
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.hoy__senal-card {
+  display: flex; flex-direction: column; gap: $size-1;
+  padding: $size-3; border-radius: $radius-md;
+  border: 1px solid $gray-100; background: $gray-50;
+  transition: border-color 0.15s;
+
+  &--oportunidad { border-color: rgba(#059669, 0.2); background: rgba(#059669, 0.03); }
+  &--warning     { border-color: rgba(#f59e0b, 0.2); background: rgba(#f59e0b, 0.03); }
+  &--info        { border-color: rgba($primary-500, 0.15); background: rgba($primary-500, 0.02); }
+}
+
+.hoy__senal-evento { margin: 0; font-size: 11px; font-weight: $font-semibold; color: $gray-800; line-height: 1.4; }
+.hoy__senal-accion { margin: 0; font-size: 10px; color: $gray-500; line-height: 1.4; span { color: $primary-500; } }
+
+.hoy__senal-agente {
+  display: flex; align-items: center; gap: $size-1; margin-top: $size-1;
+}
+
+.hoy__senal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.hoy__senal-quien { font-size: 10px; color: $gray-400; font-weight: $font-semibold; }
+
+// ── ASISTENTES — nueva UI tipo cards ──────────────────────
 .hoy__asistentes {
   background: $os-surface; border: 1px solid $os-border;
   border-radius: $radius-lg; padding: $size-5;
 }
 
-.hoy__asistentes-row { display: flex; flex-wrap: wrap; gap: $size-2; margin-bottom: $size-3; }
+.hoy__asistentes-cards {
+  display: flex; gap: $size-2; flex-wrap: wrap; margin-bottom: $size-3;
+}
 
-.hoy__asistente-chip {
+.hoy__asistente-card {
+  display: flex; align-items: center; gap: $size-2;
+  padding: $size-2 $size-3; background: $gray-50;
+  border: 1px solid $gray-200; border-radius: $radius-md;
+  cursor: pointer; transition: all 0.15s; text-align: left;
+  &:hover { border-color: rgba($primary-500, 0.4); background: rgba($primary-500, 0.04); }
+}
+
+.hoy__asistente-avatar {
+  position: relative; width: 36px; height: 36px;
+  border-radius: $radius-md; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.hoy__asistente-icono { font-size: 18px; line-height: 1; }
+
+.hoy__asistente-estado {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid #fff;
+
+  &--auto {
+    background: #10b981;
+    animation: hoy-agent-pulse 2s ease-in-out infinite;
+  }
+  &--manual { background: #f59e0b; }
+}
+
+@keyframes hoy-agent-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(#10b981, 0.5); }
+  50%       { box-shadow: 0 0 0 4px rgba(#10b981, 0); }
+}
+
+.hoy__asistente-info { display: flex; flex-direction: column; gap: 1px; }
+.hoy__asistente-nombre { font-size: $font-xs; font-weight: $font-semibold; color: $gray-800; }
+.hoy__asistente-modo   { font-size: 10px; color: $gray-400; }
+
+// ── CTA MARKETING ─────────────────────────────────────────
+.hoy__marketing-cta {
   display: flex; align-items: center; gap: $size-1;
-  padding: $size-1 $size-3; background: $gray-50; border: 1px solid $gray-200;
-  border-radius: $radius-full; font-size: $font-xs; color: $gray-700;
-  cursor: pointer; transition: border-color 0.15s;
-  &:hover { border-color: $primary-400; color: $primary-700; }
+  padding: $size-2 $size-3; border-radius: $radius-md;
+  font-size: $font-xs; font-weight: $font-semibold; color: $gray-600;
+  text-decoration: none; border: 1px solid $gray-200; background: $gray-50;
+  transition: all 0.15s; align-self: flex-start;
+  &:hover { border-color: $gray-300; color: $gray-800; background: $gray-100; }
 }
 
-.hoy__asistente-dot {
-  width: 7px; height: 7px; border-radius: 50; flex-shrink: 0;
-  &--auto { box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 0 0 3px currentColor; }
-}
-
-.hoy__asistente-nombre { font-weight: $font-semibold; }
-
-// ── CHATEA PRO ────────────────────────────────────────────
-.hoy__chatea {
-  background: linear-gradient(135deg, rgba($primary-500, 0.06), rgba($primary-500, 0.02));
-  border: 1px solid rgba($primary-500, 0.2);
-  border-radius: $radius-lg; padding: $size-5;
-}
-
-.hoy__chatea-sub { margin: $size-1 0 $size-3; font-size: $font-xs; color: $gray-500; }
-
-.hoy__chatea-cta {
-  border: none; background: $primary-500; color: #fff;
-  font-size: $font-xs; font-weight: $font-semibold;
-  padding: $size-2 $size-4; border-radius: $radius-md;
-  cursor: pointer; transition: background 0.15s;
-  &:hover { background: darken($primary-500, 6%); }
-}
+.hoy__marketing-cta-ico { color: $primary-500; font-size: $font-sm; }
 
 // ── SHARED ────────────────────────────────────────────────
 .hoy__ver-mas {

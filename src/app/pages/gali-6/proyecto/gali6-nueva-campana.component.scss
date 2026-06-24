@@ -1,0 +1,259 @@
+@import 'styles/gali-v5-tokens';
+
+// ── Backdrop ──────────────────────────────────────────────────────────────────
+.nc-backdrop {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.3); backdrop-filter: blur(2px);
+  animation: nc-fade-in 0.2s ease;
+}
+
+@keyframes nc-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+.nc-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 301;
+  width: 420px; max-width: calc(100vw - 32px);
+  background: #fff; box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column;
+  animation: nc-slide-in 0.28s cubic-bezier(0.16,1,0.3,1);
+  overflow: hidden;
+}
+
+@keyframes nc-slide-in {
+  from { transform: translateX(100%); opacity: 0.5; }
+  to   { transform: translateX(0);   opacity: 1; }
+}
+
+.nc-panel__header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: $size-5 $size-5 $size-4;
+  border-bottom: 1px solid $gray-100;
+  flex-shrink: 0;
+}
+
+.nc-panel__header-title {
+  display: flex; align-items: center; gap: $size-2; flex-wrap: wrap;
+}
+
+.nc-panel__spark {
+  color: $primary-500; font-size: $font-md; flex-shrink: 0;
+}
+
+.nc-panel__titulo {
+  margin: 0; font-size: $font-lg; font-weight: $font-bold; color: $gray-900;
+}
+
+.nc-panel__proyecto-tag {
+  font-size: $font-xs; color: $gray-400; font-weight: 400;
+}
+
+.nc-panel__close {
+  background: none; border: none; cursor: pointer;
+  font-size: $font-xl; color: $gray-400; line-height: 1; padding: 2px 6px;
+  border-radius: $radius-sm; flex-shrink: 0;
+  &:hover { color: $gray-700; background: $gray-100; }
+}
+
+.nc-panel__body {
+  flex: 1; overflow-y: auto; padding: $size-5;
+  display: flex; flex-direction: column; gap: $size-4;
+}
+
+.nc-panel__footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: $size-3;
+  padding: $size-4 $size-5; border-top: 1px solid $gray-100; flex-shrink: 0;
+  background: $gray-50;
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────────
+.nc-field {
+  display: flex; flex-direction: column; gap: $size-1;
+}
+
+.nc-label {
+  font-size: $font-xs; font-weight: $font-semibold; color: $gray-600;
+}
+
+.nc-input {
+  width: 100%; padding: $size-2 $size-3;
+  border: 1px solid $gray-200; border-radius: $radius-md;
+  font-size: $font-sm; color: $gray-800; background: #fff;
+  font-family: $font-primary; transition: border-color 0.15s;
+  box-sizing: border-box;
+  &:focus { outline: none; border-color: $primary-400; box-shadow: 0 0 0 3px rgba($primary-500, 0.08); }
+  &--icon { padding-left: 28px; }
+}
+
+.nc-input-icon {
+  position: relative; display: flex; align-items: center;
+  &__prefix { position: absolute; left: $size-2; font-size: $font-sm; color: $gray-400; pointer-events: none; }
+  &__suffix { position: absolute; right: $size-3; font-size: $font-xs; color: $gray-400; pointer-events: none; }
+}
+
+.nc-row-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: $size-3;
+}
+
+// ── Canal grid ────────────────────────────────────────────────────────────────
+.nc-canal-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: $size-2;
+}
+
+.nc-canal-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: $size-3 $size-2; border: 1px solid $gray-200; border-radius: $radius-md;
+  background: $gray-50; cursor: pointer; transition: all 0.15s;
+
+  &:hover { border-color: $primary-300; background: rgba($primary-500, 0.04); }
+  &--active { border-color: $primary-400; background: rgba($primary-500, 0.08); }
+}
+
+.nc-canal-icon { font-size: 20px; line-height: 1; }
+.nc-canal-label { font-size: 10px; font-weight: $font-semibold; color: $gray-600; }
+.nc-canal-btn--active .nc-canal-label { color: $primary-600; }
+
+// ── Producto ──────────────────────────────────────────────────────────────────
+.nc-producto-chip {
+  display: flex; align-items: center; gap: $size-2;
+  padding: $size-2 $size-3; border: 1px solid $gray-200;
+  border-radius: $radius-md; background: $gray-50;
+  font-size: $font-sm; color: $gray-700;
+}
+
+.nc-producto-meta {
+  font-size: $font-xs; color: $gray-400; margin-left: auto;
+}
+
+.nc-producto-quitar {
+  background: none; border: none; cursor: pointer; color: $gray-400;
+  font-size: $font-md; line-height: 1; padding: 0 2px;
+  &:hover { color: $gray-700; }
+}
+
+.nc-productos-lista {
+  border: 1px solid $gray-100; border-radius: $radius-md;
+  background: #fff; max-height: 140px; overflow-y: auto;
+}
+
+.nc-producto-item {
+  display: flex; flex-direction: column; gap: 1px;
+  width: 100%; text-align: left; padding: $size-2 $size-3;
+  background: none; border: none; border-bottom: 1px solid $gray-50;
+  cursor: pointer; transition: background 0.1s;
+  &:hover { background: $gray-50; }
+  &:last-child { border-bottom: none; }
+}
+
+.nc-producto-nombre { font-size: $font-sm; color: $gray-800; }
+.nc-producto-precio  { font-size: 11px; color: $gray-400; }
+
+.nc-productos-vacio {
+  display: block; padding: $size-3; font-size: $font-sm; color: $gray-400;
+  text-align: center;
+}
+
+// ── Agentes sugeridos ─────────────────────────────────────────────────────────
+.nc-agentes-list {
+  display: flex; gap: $size-2; flex-wrap: wrap; margin-bottom: $size-1;
+}
+
+.nc-agente-chip {
+  display: flex; align-items: center; gap: $size-1;
+  padding: $size-1 $size-3; border-radius: $radius-full;
+  font-size: $font-xs; font-weight: $font-semibold;
+
+  &--on {
+    background: rgba(#059669, 0.08); color: #065f46;
+    border: 1px solid rgba(#059669, 0.2);
+  }
+}
+
+.nc-agente-check { color: #059669; }
+
+.nc-agentes-link {
+  background: none; border: none; cursor: pointer;
+  font-size: $font-xs; color: $primary-500; font-weight: $font-semibold;
+  padding: 0;
+  &:hover { text-decoration: underline; }
+}
+
+// ── Conexión status ───────────────────────────────────────────────────────────
+.nc-conexion-status {
+  display: flex; align-items: center; gap: $size-2;
+  padding: $size-2 $size-3; border-radius: $radius-md;
+  font-size: $font-xs; color: $gray-600;
+
+  &--ok      { background: rgba(#059669, 0.06); border: 1px solid rgba(#059669, 0.15); color: #065f46; }
+  &--pending { background: rgba(#f59e0b, 0.06); border: 1px solid rgba(#f59e0b, 0.2); color: #92400e; }
+}
+
+.nc-conexion-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  &--ok      { background: #059669; }
+  &--pending { background: #f59e0b; }
+}
+
+.nc-conexion-cta {
+  background: none; border: none; cursor: pointer; margin-left: auto;
+  font-size: $font-xs; font-weight: $font-semibold; color: #b45309;
+  &:hover { text-decoration: underline; }
+}
+
+// ── Botones footer ────────────────────────────────────────────────────────────
+.nc-btn {
+  padding: $size-2 $size-5; border-radius: $radius-md;
+  font-size: $font-sm; font-weight: $font-semibold;
+  cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: $size-2;
+
+  &--cancel {
+    background: none; border: 1px solid $gray-200; color: $gray-600;
+    &:hover { background: $gray-100; }
+  }
+
+  &--crear {
+    background: $primary-500; border: 1px solid $primary-500; color: #fff;
+    &:hover:not(:disabled) { background: $primary-600; border-color: $primary-600; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &__spinner {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    animation: nc-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes nc-spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Estado éxito ──────────────────────────────────────────────────────────────
+.nc-exito {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: $size-3; padding: $size-8;
+  animation: nc-fade-in 0.3s ease;
+
+  &__icon {
+    font-size: 48px; color: $primary-500;
+    animation: nc-bounce 0.5s ease;
+  }
+
+  &__titulo {
+    margin: 0; font-size: $font-xl; font-weight: $font-bold; color: $gray-900;
+  }
+
+  &__desc {
+    margin: 0; font-size: $font-sm; color: $gray-500; text-align: center;
+  }
+}
+
+@keyframes nc-bounce {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
