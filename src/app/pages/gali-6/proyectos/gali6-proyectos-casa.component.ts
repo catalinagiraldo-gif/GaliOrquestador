@@ -667,7 +667,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
   nuevaCampana(proyectoId: string, event: Event): void {
     event.stopPropagation();
-    this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { proyectoId } });
+    this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { proyectoId, modo: 'campana' } });
   }
 
   // ── Navegación ────────────────────────────────────────────────────────

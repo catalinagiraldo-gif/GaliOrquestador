@@ -31,11 +31,7 @@
          [attr.aria-label]="'Ver alertas: ' + alertCount + ' pendientes'">
         ◎ <span class="topbar__alerts-count">{{ alertCount }}</span>
       </a>
-      <button class="topbar__modo" (click)="toggleModo()" [attr.data-modo]="modo()"
-              [attr.aria-label]="modo() === 'basico' ? 'Cambiar a modo experto' : 'Cambiar a modo básico'">
-        {{ modo() === 'basico' ? 'Modo básico' : 'Modo experto' }}
-      </button>
-      <button class="topbar__wallet"
+<button class="topbar__wallet"
               (click)="walletHidden.set(!walletHidden())"
               [attr.aria-label]="walletHidden() ? 'Mostrar balance de billetera' : 'Ocultar balance de billetera'"
               [attr.aria-expanded]="!walletHidden()">
@@ -48,16 +44,14 @@
 
   <!-- Cuerpo: rail + section-nav + contenido -->
   <div class="g6shell__body" [class.g6shell__body--no-section]="!hasSectionPanel()">
-    <app-gali6-icon-rail [esBasico]="modo() === 'basico'" />
+    <app-gali6-icon-rail />
 
-    @if (hasSectionPanel() && modo() === 'experto') {
+    @if (hasSectionPanel()) {
       <dropi-section-nav
         [panel]="filteredPanel()"
         [collapsed]="sectionCollapsed()"
         (collapseRequested)="toggleSection()"
         (expandRequested)="toggleSection()" />
-    } @else if (hasSectionPanel()) {
-      <dropi-section-nav [panel]="filteredPanel()" [collapsed]="false" />
     }
 
     <main class="g6shell__content">
@@ -219,7 +213,7 @@
       <span class="zero__gali zero__gali--lg" aria-hidden="true">✦</span>
       <h2 id="zero-confirm-title" class="zero__title">Tú pones la visión.<br>Gali armoniza el resto.</h2>
       <p class="zero__respuesta">{{ zeroRespuesta() }}</p>
-      <p class="zero__hint">Empezás en <strong>modo básico</strong> — lo que necesitás, sin ruido. Activá modo experto cuando quieras ver la maquinaria completa.</p>
+      <p class="zero__hint">Gali ya tiene todo configurado para que empieces a operar con lo que necesitás.</p>
       <p class="zero__value-prop">Basándonos en lo que nos contaste, Gali ya preparó tu primer paso. Puedes cambiarlo cuando quieras.</p>
       <button class="zero__cta zero__cta--confirm" (click)="zeroClose()">Empezar con Gali →</button>
     </div>
@@ -477,18 +471,4 @@
   </aside>
 }
 
-<!-- ── Micro-onboarding modo experto (1 slide) ── -->
-@if (expertoOnboarding()) {
-  <div class="experto-bg" (click)="cerrarExpertoOnboarding()" aria-hidden="true"></div>
-  <div class="experto-slide" role="dialog" aria-modal="true"
-       aria-labelledby="experto-slide-title" cdkTrapFocus cdkTrapFocusAutoCapture>
-    <span class="experto-slide__icon" aria-hidden="true">⚙</span>
-    <h3 id="experto-slide-title" class="experto-slide__title">Modo experto activado</h3>
-    <p class="experto-slide__body">
-      Ahora ves <strong>Agentes, Skills, Reglas y Marketplace</strong> — la maquinaria que opera tu negocio.<br>
-      Gali la usa de fondo. Entrás a ajustar cuando quieras.
-    </p>
-    <p class="experto-slide__hint">Podés volver a modo básico en cualquier momento desde la barra superior.</p>
-    <button class="experto-slide__cta" (click)="cerrarExpertoOnboarding()">Entendido →</button>
-  </div>
-}
+

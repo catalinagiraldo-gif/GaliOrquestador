@@ -1,73 +1,192 @@
 <div class="hoy gali-stagger-in">
 
   <!-- ══════════════════════════════════════════════
-       NIVEL 1 — HERO: la decisión más importante
+       STATUS HEADER
   ══════════════════════════════════════════════ -->
-  @if (!decisionDismissed()) {
-    <div class="hoy__hero {{ getDecisionClass() }}">
-      <div class="hoy__hero-header">
-        <div class="hoy__hero-meta">
-          <span class="hoy__hero-agente">{{ decision.agenteName }}</span>
-          <span class="hoy__chip-proceso {{ getProcesoClass() }}">{{ getProcesoLabel() }}</span>
-        </div>
-        <button class="hoy__hero-dismiss" (click)="onDismiss()" aria-label="Recordar más tarde">×</button>
-      </div>
-
-      <h2 class="hoy__hero-titulo">{{ decision.titulo }}</h2>
-      <p class="hoy__hero-desc">{{ decision.descripcion }}</p>
-
-      <div class="hoy__hero-actions">
-        <button class="hoy__cta-primario" (click)="onCtaPrincipal()">
-          {{ decision.ctaPrincipal }} →
-        </button>
-        @if (decision.ctaSecundario) {
-          <button class="hoy__cta-secundario" (click)="onDismiss()">
-            {{ decision.ctaSecundario }}
-          </button>
+  <header class="hoy__status">
+    <div class="hoy__status-left">
+      <h1 class="hoy__status-saludo">
+        <span class="hoy__status-spark" aria-hidden="true">✦</span>
+        Hola Cata. Gali tiene el timón.
+      </h1>
+      <div class="hoy__status-meta">
+        <span class="hoy__status-semana">{{ estado.semanaLabel }}</span>
+        <span class="hoy__status-sep" aria-hidden="true">·</span>
+        <span class="hoy__status-pedidos">
+          <strong>{{ estado.pedidosActual }}</strong>/{{ estado.pedidosMeta }} pedidos
+        </span>
+        @if (estado.galiDeltaPositivo) {
+          <span class="hoy__status-delta hoy__status-delta--pos">
+            <span aria-hidden="true">✦</span> {{ estado.galiDelta }}
+          </span>
         }
       </div>
     </div>
-  }
+    <div class="hoy__status-right">
+      <!-- Sparkline -->
+      <div class="hoy__spark" aria-label="Tendencia de pedidos esta semana" role="img">
+        @for (p of estado.sparkPoints; track $index) {
+          <span class="hoy__spark-bar" [style.height.px]="getSparkHeight(p.v)"></span>
+        }
+      </div>
+      <!-- Porcentaje de objetivo -->
+      <span class="hoy__status-pct">{{ pedidosPct() }}%</span>
+    </div>
+  </header>
 
   <!-- ══════════════════════════════════════════════
-       NIVEL 2 — PULSO: 3 KPIs del negocio
+       LAYOUT 2 COLUMNAS
   ══════════════════════════════════════════════ -->
-  <div class="hoy__kpis" role="list" aria-label="Indicadores del día">
-    @for (kpi of kpis; track kpi.id) {
-      <button class="hoy__kpi"
-              [class.hoy__kpi--clickable]="!!kpi.detailRoute"
-              (click)="onKpiClick(kpi)"
-              [attr.aria-label]="kpi.label + ': ' + kpi.valor"
-              role="listitem">
-        <div class="hoy__kpi-label-row">
-          <span class="hoy__kpi-label">{{ kpi.label }}</span>
-          @if (kpi.deterministico) {
-            <span class="hoy__kpi-fuente" title="Dato directo de Dropi. 100% confiable.">📊</span>
+  <div class="hoy__cols">
+
+    <!-- ─────────── COLUMNA IZQUIERDA ─────────── -->
+    <div class="hoy__col hoy__col--izq">
+
+      <!-- ✦ DECISIÓN DE HOY -->
+      @if (!decisionDismissed()) {
+        <section class="hoy__hero {{ getDecisionClass() }}">
+          <div class="hoy__hero-header">
+            <div class="hoy__hero-meta">
+              <span class="hoy__hero-agente">{{ decision.agenteName }}</span>
+              <span class="hoy__chip-proceso {{ getProcesoClass() }}">{{ getProcesoLabel() }}</span>
+            </div>
+            <button class="hoy__hero-dismiss" (click)="onDismiss()" title="Recordar más tarde">×</button>
+          </div>
+          <h2 class="hoy__hero-titulo">{{ decision.titulo }}</h2>
+          <p class="hoy__hero-desc">{{ decision.descripcion }}</p>
+          <div class="hoy__hero-actions">
+            <button class="hoy__cta-primario" (click)="onCtaPrincipal()">
+              {{ decision.ctaPrincipal }} →
+            </button>
+            @if (decision.ctaSecundario) {
+              <button class="hoy__cta-secundario" (click)="onDismiss()">
+                {{ decision.ctaSecundario }}
+              </button>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ✦ GALI HIZO POR TI -->
+      <section class="hoy__aporte">
+        <div class="hoy__aporte-hdr">
+          <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
+          <button class="hoy__aporte-toggle" (click)="toggleAporte()">
+            {{ verAporte() ? 'Ocultar' : 'Ver aporte' }}
+          </button>
+        </div>
+        @if (verAporte()) {
+          <div class="hoy__aporte-body">
+            <div class="hoy__aporte-grid">
+              <div class="hoy__aporte-stat">
+                <span class="hoy__aporte-val">{{ estado.impactoSemana.acciones }}</span>
+                <span class="hoy__aporte-lbl">acciones · <em>{{ estado.impactoSemana.accionesAutonomas }} autónomas</em></span>
+              </div>
+              <div class="hoy__aporte-stat">
+                <span class="hoy__aporte-val">{{ estado.impactoSemana.pesosAhorrados }}</span>
+                <span class="hoy__aporte-lbl">ahorrados esta semana</span>
+              </div>
+              <div class="hoy__aporte-stat">
+                <span class="hoy__aporte-val">{{ estado.impactoSemana.novedadesEvitadas }}</span>
+                <span class="hoy__aporte-lbl">novedades evitadas</span>
+              </div>
+              <div class="hoy__aporte-stat">
+                <span class="hoy__aporte-val">{{ estado.impactoSemana.horasLibradas }}h</span>
+                <span class="hoy__aporte-lbl">que no operaste tú</span>
+              </div>
+            </div>
+            <div class="hoy__aporte-bar">
+              <span class="hoy__aporte-bar-lbl">Acciones iniciadas por Gali</span>
+              <span class="hoy__aporte-bar-track">
+                <span class="hoy__aporte-bar-fill" [style.width.%]="estado.impactoSemana.pctAccionesGali"></span>
+              </span>
+              <span class="hoy__aporte-bar-val">{{ estado.impactoSemana.pctAccionesGali }}%</span>
+            </div>
+          </div>
+        } @else {
+          <p class="hoy__aporte-preview">
+            {{ estado.impactoSemana.acciones }} acciones · {{ estado.impactoSemana.pesosAhorrados }} ahorrados · {{ estado.impactoSemana.horasLibradas }}h libres
+          </p>
+        }
+      </section>
+
+    </div><!-- /col-izq -->
+
+    <!-- ─────────── COLUMNA DERECHA ─────────── -->
+    <div class="hoy__col hoy__col--der">
+
+      <!-- ◎ TU RECORRIDO (palanca) -->
+      <section class="hoy__palanca">
+        <span class="hoy__section-eyebrow"><span aria-hidden="true">◎</span> Tu próxima palanca</span>
+        <p class="hoy__palanca-texto">{{ estado.palancaTexto }}</p>
+        <div class="hoy__palanca-meta">
+          <span class="hoy__palanca-dias">Ventana: {{ estado.palancaDias }} días</span>
+          <a [routerLink]="estado.palancaRoute" class="hoy__palanca-cta">Ver sugerido →</a>
+        </div>
+      </section>
+
+      <!-- ⚠ COLA DE ALERTAS -->
+      @if (estado.alertasCola.length > 0) {
+        <section class="hoy__alertas">
+          <span class="hoy__section-eyebrow"><span aria-hidden="true">⚠</span> {{ estado.alertasCola.length }} alertas pendientes</span>
+          <div class="hoy__alertas-list">
+            @for (a of estado.alertasCola; track a.id) {
+              <button class="hoy__alerta-item hoy__alerta-item--{{ a.tipo }}" (click)="onAlertaClick(a)">
+                <span class="hoy__alerta-dot hoy__alerta-dot--{{ a.tipo }}"></span>
+                <span class="hoy__alerta-titulo">{{ a.titulo }}</span>
+                <span class="hoy__alerta-arrow" aria-hidden="true">→</span>
+              </button>
+            }
+          </div>
+          <a routerLink="/gali-6/senales" class="hoy__ver-mas">Ver todas las alertas →</a>
+        </section>
+      }
+
+      <!-- ASISTENTES ACTIVOS -->
+      <section class="hoy__asistentes">
+        <span class="hoy__section-eyebrow">Asistentes activos</span>
+        <div class="hoy__asistentes-row">
+          @for (a of estado.agentesActivos; track a.id) {
+            <button class="hoy__asistente-chip" (click)="onAgenteClick(a)" [title]="a.nombre">
+              <span class="hoy__asistente-dot" [class.hoy__asistente-dot--auto]="a.autopilot" [style.background]="a.colorAvatar"></span>
+              <span class="hoy__asistente-nombre">{{ a.nombreCorto }}</span>
+            </button>
           }
         </div>
-        <span class="hoy__kpi-valor">{{ kpi.valor }}</span>
-        @if (kpi.delta) {
-          <span class="hoy__kpi-delta"
-                [class.hoy__kpi-delta--pos]="kpi.deltaPositivo"
-                [class.hoy__kpi-delta--neg]="kpi.deltaPositivo === false">
-            {{ kpi.delta }}
-          </span>
-        }
-      </button>
-    }
-  </div>
+        <a routerLink="/gali-6/agentes" class="hoy__ver-mas">Ver asistentes →</a>
+      </section>
+
+      <!-- 💬 Chatea Pro shortcut -->
+      <section class="hoy__chatea">
+        <span class="hoy__section-eyebrow">💬 Chatea Pro</span>
+        <p class="hoy__chatea-sub">Mensajes y automatización con WhatsApp</p>
+        <button class="hoy__chatea-cta" (click)="irAChateaPro()">
+          Ir a Chatea Pro →
+        </button>
+      </section>
+
+    </div><!-- /col-der -->
+
+  </div><!-- /cols -->
 
   <!-- ══════════════════════════════════════════════
-       NIVEL 3 — ACCESOS RÁPIDOS
+       PROGRESIÓN MODULAR
   ══════════════════════════════════════════════ -->
-  <nav class="hoy__accesos" aria-label="Accesos rápidos">
-    @for (ar of accesos; track ar.id) {
-      <button class="hoy__acceso" (click)="onAcceso(ar)"
-              [attr.aria-label]="ar.label">
-        <i [class]="ar.icon" aria-hidden="true"></i>
-        <span class="hoy__acceso-label">{{ ar.label }}</span>
-      </button>
-    }
+  <nav class="hoy__progresion" aria-label="Progresión del negocio">
+    <span class="hoy__progresion-label">Tu progreso</span>
+    <div class="hoy__progresion-steps">
+      @for (m of estado.modulosProgresion; track m.id; let i = $index) {
+        @if (i > 0) {
+          <span class="hoy__progresion-sep" aria-hidden="true">→</span>
+        }
+        <a [routerLink]="m.route"
+           class="hoy__progresion-step hoy__progresion-step--{{ m.estado }}"
+           [attr.aria-label]="m.label + ' — ' + m.estado">
+          <span class="hoy__progresion-icono" aria-hidden="true">{{ m.icono }}</span>
+          <span class="hoy__progresion-texto">{{ m.label }}</span>
+        </a>
+      }
+    </div>
   </nav>
 
 </div>

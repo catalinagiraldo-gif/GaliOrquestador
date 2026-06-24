@@ -6,18 +6,39 @@
   max-width: 880px;
   margin: 0 auto;
   padding: $size-8 $size-6 $size-10;
+  display: flex;
+  flex-direction: column;
+  gap: $size-8;
 
-  &__head { margin-bottom: $size-6; }
-  &__title { margin: 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; letter-spacing: -0.02em; }
-  &__sub { margin: 6px 0 $size-3; font-size: $font-sm; color: $gray-500; max-width: 560px; line-height: 1.5; }
-  &__bar {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: $size-3; margin-bottom: $size-4;
+  // ── Toast ──
+  &__toast {
+    position: fixed;
+    bottom: $size-6;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $gray-900;
+    color: #fff;
+    font-size: $font-sm;
+    padding: $size-3 $size-5;
+    border-radius: $radius-lg;
+    z-index: 900;
+    animation: fadeUp 0.3s ease;
+    white-space: nowrap;
+    pointer-events: none;
   }
-  &__count { display: flex; gap: $size-3; }
-  &__count-ok { font-size: $font-xs; font-weight: $font-semibold; color: #16a34a; }
+
+  // ── Section layout ──
+  &__section { display: flex; flex-direction: column; gap: $size-4; }
+  &__section-hdr { display: flex; align-items: baseline; gap: $size-3; flex-wrap: wrap; }
+  &__section-title { margin: 0; font-size: $font-lg; font-weight: $font-bold; color: $gray-900; }
+  &__section-sub { margin: 0; font-size: $font-xs; color: $gray-500; }
+
+  // ── Count bar ──
+  &__count { display: flex; gap: $size-3; margin-left: auto; }
+  &__count-ok   { font-size: $font-xs; font-weight: $font-semibold; color: #16a34a; }
   &__count-warn { font-size: $font-xs; font-weight: $font-semibold; color: #dc2626; }
 
+  // ── Glosario chips ──
   &__glos { display: flex; align-items: center; gap: $size-2; flex-wrap: wrap; }
   &__glos-label { font-size: 11px; color: $gray-400; }
   &__glos-tag {
@@ -26,14 +47,61 @@
     cursor: help; border: 1px solid rgba($primary-500, 0.15);
   }
 
+  // ── MCP grid ──
   &__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: $size-4; }
 
-  &__more { margin-top: $size-6; padding-top: $size-5; border-top: 1px solid $gray-100; }
-  &__more-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: $gray-400; font-weight: $font-semibold; }
-  &__more-chips { display: flex; flex-wrap: wrap; gap: $size-2; margin-top: $size-3; }
-  &__chip { font-size: $font-xs; color: $gray-500; background: $gray-100; padding: 4px 10px; border-radius: $radius-full; }
+  // ── Nube list ──
+  &__nube-list { display: flex; flex-direction: column; gap: $size-2; }
+
+  // ── Dropzone ──
+  &__dropzone {
+    display: flex; align-items: center; gap: $size-3;
+    border: 2px dashed $gray-200; border-radius: $radius-lg;
+    padding: $size-5 $size-6; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: $gray-50;
+    &:hover, &--over {
+      border-color: $primary-400; background: rgba($primary-500, 0.04);
+    }
+  }
+  &__dropzone-icon { font-size: $font-xl; color: $gray-400; }
+  &__dropzone-label { font-size: $font-sm; color: $gray-600; flex: 1; }
+  &__dropzone-cta {
+    font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+    background: rgba($primary-500, 0.1); padding: $size-2 $size-4; border-radius: $radius-md;
+  }
+
+  // ── File list ──
+  &__files { display: flex; flex-direction: column; gap: $size-2; }
+  &__file-row {
+    display: flex; align-items: center; gap: $size-3;
+    padding: $size-3 $size-4; background: #fff; border: 1px solid $gray-100;
+    border-radius: $radius-md; box-shadow: $shadow-small;
+  }
+  &__file-icon { color: $primary-500; font-size: $font-sm; }
+  &__file-info { flex: 1; min-width: 0; }
+  &__file-name { display: block; font-size: $font-sm; font-weight: $font-semibold; color: $gray-800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__file-meta { font-size: 11px; color: $gray-400; }
+  &__file-del {
+    border: none; background: none; color: $gray-400; cursor: pointer; font-size: $font-md;
+    line-height: 1; padding: 0 $size-1; border-radius: $radius-sm;
+    &:hover { color: #dc2626; background: rgba(#dc2626, 0.06); }
+  }
+
+  // ── Footer marketplace ──
+  &__footer { padding-top: $size-5; border-top: 1px solid $gray-100; }
+  &__footer-link {
+    display: inline-flex; align-items: center; gap: $size-2;
+    font-size: $font-sm; font-weight: $font-semibold; color: $primary-600;
+    text-decoration: none;
+    &:hover { color: $primary-700; }
+  }
+  &__footer-icon { font-size: $font-md; }
+  &__footer-arrow { font-size: $font-sm; transition: transform 0.15s; }
+  &__footer-link:hover &__footer-arrow { transform: translateX(3px); }
 }
 
+// ── MCP cards ──
 .mcp {
   background: #fff;
   border: 1px solid $gray-100;
@@ -50,10 +118,10 @@
     margin-left: auto; width: 9px; height: 9px; border-radius: 50%;
     &[data-estado='conectado'] { background: #16a34a; }
     &[data-estado='pendiente'] { background: $primary-500; }
-    &[data-estado='urgente'] { background: #dc2626; }
+    &[data-estado='urgente']   { background: #dc2626; }
   }
 
-  &__dato { margin: 0; font-size: $font-xs; color: $gray-600; line-height: 1.45; }
+  &__dato    { margin: 0; font-size: $font-xs; color: $gray-600; line-height: 1.45; }
   &__contexto { margin: 0; font-size: $font-xs; color: $gray-500; line-height: 1.45; span { color: $primary-500; } }
 
   &__cta {
@@ -61,16 +129,50 @@
     border: none; cursor: pointer; padding: $size-2 $size-4; border-radius: $radius-md;
     font-size: $font-xs; font-weight: $font-semibold;
     background: $gray-100; color: $gray-700;
-    &[data-estado='urgente'] { background: #dc2626; color: #fff; }
-    &[data-estado='pendiente'] { background: $primary-500; color: #fff; }
+    &[data-estado='urgente']  { background: #dc2626; color: #fff; }
+    &[data-estado='pendiente']{ background: $primary-500; color: #fff; }
     &:hover { filter: brightness(0.97); }
   }
 }
 
+// ── Nube items ──
+.nube-item {
+  display: flex; align-items: center; gap: $size-3;
+  padding: $size-3 $size-5; background: #fff;
+  border: 1px solid $gray-100; border-radius: $radius-md;
+  box-shadow: $shadow-small;
+
+  &[data-estado='pendiente'] { border-color: $gray-200; }
+  &[data-estado='proximamente'] { opacity: 0.55; }
+
+  &__glyph { font-size: $font-lg; color: $gray-400; }
+  &__info   { flex: 1; }
+  &__nombre { display: block; font-size: $font-sm; font-weight: $font-semibold; color: $gray-800; }
+  &__estado-label { font-size: 11px; color: $gray-400; display: flex; align-items: center; gap: $size-1; }
+
+  &__btn {
+    border: none; cursor: pointer; padding: $size-2 $size-4; border-radius: $radius-md;
+    font-size: $font-xs; font-weight: $font-semibold;
+    background: $gray-100; color: $gray-700;
+    &[data-estado='pendiente'] { background: $primary-500; color: #fff; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:not(:disabled):hover { filter: brightness(0.97); }
+  }
+}
+
+.nube-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  &--ok { background: #16a34a; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
 @media (max-width: 1023px) { .cnx__grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .cnx__grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px)  { .cnx__grid { grid-template-columns: 1fr; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .mcp__cta { transition: none; }
-  .mcp__dot { animation: none; }
+  .cnx__toast { animation: none; }
 }

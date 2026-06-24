@@ -4,8 +4,8 @@ import { Router, RouterModule } from '@angular/router';
 import {
   MOCK_HOY_ESTADO,
   HoyEstado,
-  AccesoRapido,
-  KpiHoy,
+  AgenteActivo,
+  AlertaCola,
 } from '../../../../../mocks/gali-v6/hoy-estado';
 
 @Component({
@@ -20,11 +20,22 @@ export class Gali6HoyHomeComponent {
 
   readonly estado: HoyEstado = MOCK_HOY_ESTADO;
   readonly decision = this.estado.decision_urgente;
-  readonly kpis: KpiHoy[] = this.estado.kpis;
-  readonly accesos: AccesoRapido[] = this.estado.accesos_rapidos;
 
   readonly decisionDismissed = signal(false);
   readonly toastMsg = signal<string | null>(null);
+  readonly verAporte = signal(false);
+
+  readonly pedidosPct = computed(() =>
+    Math.min(100, Math.round((this.estado.pedidosActual / this.estado.pedidosMeta) * 100))
+  );
+
+  readonly sparkMax = computed(() =>
+    Math.max(...this.estado.sparkPoints.map(p => p.v), 1)
+  );
+
+  getSparkHeight(v: number): number {
+    return Math.round((v / this.sparkMax()) * 22);
+  }
 
   getDecisionClass(): string {
     const map: Record<string, string> = {
@@ -45,9 +56,9 @@ export class Gali6HoyHomeComponent {
 
   getProcesoClass(): string {
     const map: Record<string, string> = {
-      deterministico: 'chip-proceso--deterministic',
-      'ia-ligera': 'chip-proceso--ia-ligera',
-      'ia-compleja': 'chip-proceso--ia-compleja',
+      deterministico:  'chip-proceso--deterministic',
+      'ia-ligera':     'chip-proceso--ia-ligera',
+      'ia-compleja':   'chip-proceso--ia-compleja',
     };
     return map[this.decision.procesaTipo] ?? 'chip-proceso--deterministic';
   }
@@ -70,18 +81,19 @@ export class Gali6HoyHomeComponent {
     }, 2500);
   }
 
-  onAcceso(ar: AccesoRapido): void {
-    if (ar.route) {
-      this.router.navigate([ar.route]);
-    } else if (ar.abrePanel) {
-      this.toastMsg.set('✦ Panel de Gali próximamente');
-      setTimeout(() => this.toastMsg.set(null), 2500);
-    }
+  onAlertaClick(a: AlertaCola): void {
+    this.router.navigate(['/gali-6/senales'], { queryParams: { signalId: a.senalId } });
   }
 
-  onKpiClick(kpi: KpiHoy): void {
-    if (kpi.detailRoute) {
-      this.router.navigate([kpi.detailRoute]);
-    }
+  onAgenteClick(_a: AgenteActivo): void {
+    this.router.navigate(['/gali-6/agentes']);
+  }
+
+  toggleAporte(): void {
+    this.verAporte.update(v => !v);
+  }
+
+  irAChateaPro(): void {
+    this.router.navigate(['/gali-6/marketing/chatea-pro']);
   }
 }

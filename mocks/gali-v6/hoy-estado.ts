@@ -48,10 +48,60 @@ export interface AccesoRapido {
   panelContexto?: string;
 }
 
+export interface SparkPoint { v: number; }
+
+export interface ImpactoSemana {
+  label: string;
+  acciones: number;
+  accionesAutonomas: number;
+  pesosAhorrados: string;
+  novedadesEvitadas: number;
+  horasLibradas: number;
+  pctAccionesGali: number;
+}
+
+export interface AgenteActivo {
+  id: string;
+  nombre: string;
+  nombreCorto: string;
+  icono: string;
+  colorAvatar: string;
+  estado: 'activo' | 'pausado';
+  autopilot: boolean;
+}
+
+export interface ModuloProgresion {
+  id: string;
+  label: string;
+  icono: string;
+  route: string;
+  estado: 'bloqueado' | 'activo' | 'completado';
+}
+
+export interface AlertaCola {
+  id: string;
+  titulo: string;
+  tipo: 'critical' | 'warning';
+  senalId: string;
+}
+
 export interface HoyEstado {
+  semanaLabel: string;
+  pedidosActual: number;
+  pedidosMeta: number;
+  sparkPoints: SparkPoint[];
+  galiDelta: string;
+  galiDeltaPositivo: boolean;
   decision_urgente: DecisionUrgente;
   kpis: KpiHoy[];
   accesos_rapidos: AccesoRapido[];
+  impactoSemana: ImpactoSemana;
+  agentesActivos: AgenteActivo[];
+  alertasCola: AlertaCola[];
+  modulosProgresion: ModuloProgresion[];
+  palancaTexto: string;
+  palancaDias: number;
+  palancaRoute: string;
   /** Para el modo zero-state (usuario nuevo sin datos) */
   esZeroState?: boolean;
   zeroState?: HoyZeroState;
@@ -65,6 +115,41 @@ export interface HoyZeroState {
 }
 
 export const MOCK_HOY_ESTADO: HoyEstado = {
+  semanaLabel: 'Semana 24',
+  pedidosActual: 47,
+  pedidosMeta: 100,
+  sparkPoints: [
+    { v: 38 }, { v: 42 }, { v: 40 }, { v: 45 }, { v: 43 }, { v: 47 }, { v: 47 },
+  ],
+  galiDelta: '+3 pedidos esta semana gracias a Gali',
+  galiDeltaPositivo: true,
+  impactoSemana: {
+    label: 'Esta semana',
+    acciones: 127,
+    accionesAutonomas: 58,
+    pesosAhorrados: '$420k',
+    novedadesEvitadas: 11,
+    horasLibradas: 41,
+    pctAccionesGali: 46,
+  },
+  agentesActivos: [
+    { id: 'roas-tracker', nombre: 'ROAS Tracker', nombreCorto: 'ROAS', icono: '📊', colorAvatar: '#f97316', estado: 'activo', autopilot: true },
+    { id: 'stock-guardian', nombre: 'Stock Guardian', nombreCorto: 'Stock', icono: '📦', colorAvatar: '#60a5fa', estado: 'activo', autopilot: true },
+    { id: 'vigilante', nombre: 'Vigilante', nombreCorto: 'Logística', icono: '🚚', colorAvatar: '#fbbf24', estado: 'activo', autopilot: false },
+  ],
+  alertasCola: [
+    { id: 'a1', titulo: 'ROAS caído en Meta — Licuadora Portátil', tipo: 'critical', senalId: 'sen-004' },
+    { id: 'a2', titulo: 'Stock bajo · 3 días para agotarse — Collar GPS', tipo: 'warning', senalId: 'sen-002' },
+  ],
+  modulosProgresion: [
+    { id: 'conectar',  label: 'Conectar',  icono: '⬡', route: '/gali-6/conexiones',       estado: 'completado' },
+    { id: 'operar',   label: 'Operar',    icono: '▸', route: '/gali-6/mi-negocio',         estado: 'activo'     },
+    { id: 'escalar',  label: 'Escalar',   icono: '↑', route: '/gali-6/proyectos',           estado: 'activo'     },
+    { id: 'optimizar',label: 'Optimizar', icono: '◎', route: '/gali-6/reportes/dashboard', estado: 'bloqueado'  },
+  ],
+  palancaTexto: 'Lanza una campaña de Difusor Aromaterapia en Meta Ads con $40k/día para llegar a 100 pedidos esta semana.',
+  palancaDias: 10,
+  palancaRoute: '/gali-6/proyectos/nuevo',
   decision_urgente: {
     titulo: 'Oportunidad de escala — Collar GPS está listo para subir presupuesto',
     descripcion:
@@ -142,6 +227,24 @@ export const MOCK_HOY_ESTADO: HoyEstado = {
 /** Estado de "Hoy" para usuario nuevo (zero-state) — sin datos reales */
 export const MOCK_HOY_ZERO: HoyEstado = {
   esZeroState: true,
+  semanaLabel: 'Semana 24',
+  pedidosActual: 0,
+  pedidosMeta: 100,
+  sparkPoints: [{ v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }, { v: 0 }],
+  galiDelta: 'Tu primer día con Gali',
+  galiDeltaPositivo: true,
+  impactoSemana: { label: 'Esta semana', acciones: 0, accionesAutonomas: 0, pesosAhorrados: '$0', novedadesEvitadas: 0, horasLibradas: 0, pctAccionesGali: 0 },
+  agentesActivos: [],
+  alertasCola: [],
+  modulosProgresion: [
+    { id: 'conectar', label: 'Conectar', icono: '⬡', route: '/gali-6/conexiones', estado: 'activo' },
+    { id: 'operar',   label: 'Operar',   icono: '▸', route: '/gali-6/mi-negocio', estado: 'bloqueado' },
+    { id: 'escalar',  label: 'Escalar',  icono: '↑', route: '/gali-6/proyectos',  estado: 'bloqueado' },
+    { id: 'optimizar',label: 'Optimizar',icono: '◎', route: '/gali-6/reportes/dashboard', estado: 'bloqueado' },
+  ],
+  palancaTexto: 'Conecta Meta Ads o sube tu catálogo para que Gali empiece a operar.',
+  palancaDias: 0,
+  palancaRoute: '/gali-6/conexiones',
   decision_urgente: {
     titulo: 'Tu primer proyecto está activo',
     descripcion:

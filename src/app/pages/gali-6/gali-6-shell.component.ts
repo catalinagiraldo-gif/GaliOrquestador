@@ -63,17 +63,7 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   readonly hasSectionPanel = signal(true);
   readonly sectionCollapsed = signal(localStorage.getItem('gali-6-section-collapsed') === 'true');
 
-  readonly modo = signal<'basico' | 'experto'>(
-    (localStorage.getItem('gali-6-modo') as 'basico' | 'experto') ?? 'basico',
-  );
-
-  readonly filteredPanel = computed<SectionPanel>(() => {
-    const panel = this.sectionPanel();
-    if (this.modo() === 'basico') {
-      return { ...panel, items: panel.items.filter(i => i.id !== 'centro-gali') };
-    }
-    return panel;
-  });
+  readonly filteredPanel = computed<SectionPanel>(() => this.sectionPanel());
 
   readonly objetivoMeta = signal<number>(Number(localStorage.getItem('gali-6-objetivo-meta') ?? 100));
   readonly objetivoActual = (KPIS as any).pedidos_sem_total?.valor ?? 70;
@@ -183,22 +173,6 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
     localStorage.setItem('gali-6-section-collapsed', String(next));
   }
 
-  readonly expertoOnboarding = signal(false);
-
-  toggleModo(): void {
-    const next = this.modo() === 'basico' ? 'experto' : 'basico';
-    this.modo.set(next);
-    localStorage.setItem('gali-6-modo', next);
-    if (next === 'experto' && !localStorage.getItem('gali-6-experto-visto')) {
-      this.expertoOnboarding.set(true);
-    }
-  }
-
-  cerrarExpertoOnboarding(): void {
-    localStorage.setItem('gali-6-experto-visto', 'true');
-    this.expertoOnboarding.set(false);
-  }
-
   toggleNav(): void {
     this.navOpen.update(v => !v);
   }
@@ -219,9 +193,7 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   zeroComplete(): void {
     localStorage.setItem('gali-6-objetivo-meta', String(this.zeroPedidos()));
     localStorage.setItem('gali-6-onboarding-done', 'true');
-    localStorage.setItem('gali-6-modo', 'basico');
     this.objetivoMeta.set(this.zeroPedidos());
-    this.modo.set('basico');
     this.zeroRespuesta.set(this.buildZeroRespuesta());
     this.zeroStep.set(3); // paso de confirmación
   }
@@ -234,7 +206,6 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
-      if (this.expertoOnboarding()) { this.cerrarExpertoOnboarding(); return; }
       if (this.zeroOpen()) { this.zeroClose(); return; }
       if (this.navOpen()) { this.navOpen.set(false); return; }
     }

@@ -28,7 +28,7 @@ export class Gali6AgentesComponent {
   readonly tierLabel = TIER_LABEL;
 
   readonly agentesActivos = computed(() =>
-    this.todosLosAgentes.filter(a => a.estado === 'activo')
+    this.agentesEstado().filter(a => a.estado === 'activo')
   );
 
   readonly agentesDisponibles = computed(() =>
@@ -36,21 +36,91 @@ export class Gali6AgentesComponent {
   );
 
   readonly expandedAgenteId = signal<string | null>(null);
+  readonly showCrearModal = signal(false);
+  readonly toastMsg = signal<string | null>(null);
+
+  /** Mutable copy of agentes with extra interactive state */
+  readonly agentesEstado = signal(
+    AGENTES_ESPECIALIZADOS.map(ag => ({
+      ...ag,
+      estado: ag.estado as 'activo' | 'pausado' | 'disponible',
+      autonomiaPct: 60,
+      skills: ag.skillsDefecto.map(sk => ({ ...sk, activa: true })),
+      reglas: ag.reglasDefecto.map((r, i) => ({ ...r, id: `${ag.id}-r${i}`, activa: true })),
+    }))
+  );
 
   toggleDetalle(id: string): void {
     this.expandedAgenteId.update(cur => (cur === id ? null : id));
   }
 
-  getProcesoClass(tipo: AgenteProcesoTipo): string {
-    const map: Record<AgenteProcesoTipo, string> = {
-      deterministico: 'tipo--deterministic',
-      'ia-ligera': 'tipo--ia-ligera',
-      'ia-compleja': 'tipo--ia-compleja',
-    };
-    return map[tipo];
+  toggleSkill(agenteId: string, skillId: string): void {
+    this.agentesEstado.update(list =>
+      list.map(ag => ag.id === agenteId
+        ? { ...ag, skills: ag.skills.map(sk => sk.id === skillId ? { ...sk, activa: !sk.activa } : sk) }
+        : ag
+      )
+    );
+  }
+
+  setAutonomia(agenteId: string, pct: number): void {
+    this.agentesEstado.update(list =>
+      list.map(ag => ag.id === agenteId ? { ...ag, autonomiaPct: pct } : ag)
+    );
+  }
+
+  onAutonomiaInput(agenteId: string, event: Event): void {
+    const v = parseInt((event.target as HTMLInputElement).value, 10);
+    this.setAutonomia(agenteId, v);
+  }
+
+  eliminarRegla(agenteId: string, reglaId: string): void {
+    this.agentesEstado.update(list =>
+      list.map(ag => ag.id === agenteId
+        ? { ...ag, reglas: ag.reglas.filter(r => r.id !== reglaId) }
+        : ag
+      )
+    );
+  }
+
+  desactivarAgente(agenteId: string): void {
+    this.agentesEstado.update(list =>
+      list.map(ag => ag.id === agenteId ? { ...ag, estado: 'pausado' as const } : ag)
+    );
+    this.expandedAgenteId.set(null);
+    this.showToast('Agente pausado. Puedes reactivarlo desde Marketplace.');
+  }
+
+  crearAgente(): void {
+    this.showCrearModal.set(true);
+  }
+
+  cerrarCrearModal(): void {
+    this.showCrearModal.set(false);
   }
 
   irAMarketplace(): void {
     this.router.navigate(['/gali-6/marketplace']);
+  }
+
+  getProcesoClass(tipo: AgenteProcesoTipo): string {
+    const map: Record<AgenteProcesoTipo, string> = {
+      deterministico:  'tipo--deterministic',
+      'ia-ligera':     'tipo--ia-ligera',
+      'ia-compleja':   'tipo--ia-compleja',
+    };
+    return map[tipo];
+  }
+
+  getAutonomiaLabel(pct: number): string {
+    if (pct <= 20) return 'Solo notifica';
+    if (pct <= 45) return 'Pide aprobación';
+    if (pct <= 70) return 'Opera con límites';
+    return 'Autopilot total';
+  }
+
+  private showToast(msg: string): void {
+    this.toastMsg.set(msg);
+    setTimeout(() => this.toastMsg.set(null), 3000);
   }
 }

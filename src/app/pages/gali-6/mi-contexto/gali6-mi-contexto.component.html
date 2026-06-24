@@ -3,16 +3,11 @@
     sub="Todo el contexto de tu negocio que Gali usa para operar." />
 
   <!-- ── Tabs ── -->
-  <div class="ctx-tabs" role="tablist" aria-label="Secciones de Mi Contexto">
+  <div class="ctx-tabs" role="tablist" aria-label="Secciones de Mi Negocio">
     <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'senales'"
             [attr.aria-selected]="activeTab() === 'senales'"
             (click)="setTab('senales')">
       Señales
-    </button>
-    <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'conexiones'"
-            [attr.aria-selected]="activeTab() === 'conexiones'"
-            (click)="setTab('conexiones')">
-      Conexiones
     </button>
     <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'impacto'"
             [attr.aria-selected]="activeTab() === 'impacto'"
@@ -83,80 +78,6 @@
       </section>
 
       <a routerLink="/gali-6/senales" class="ctx-ver-mas">Ver panel completo de señales →</a>
-    </div>
-  }
-
-  <!-- ══════════════ TAB: Conexiones ══════════════ -->
-  @if (activeTab() === 'conexiones') {
-    <div class="ctx-body" role="tabpanel" aria-label="Conexiones">
-
-      <!-- Sección A: Activas -->
-      <section class="con-seccion">
-        <span class="con-seccion__titulo">Conexiones activas</span>
-        <div class="con-activas">
-          @for (c of conexionesActivas; track c.id) {
-            <div class="con-card" [attr.data-estado]="c.estado">
-              <span class="con-card__icono">{{ c.icono }}</span>
-              <span class="con-card__nombre">{{ c.nombre }}</span>
-              <span class="con-card__estado" [attr.data-estado]="c.estado">
-                {{ c.estado === 'conectado' ? '● Conectado' : '○ Pendiente' }}
-              </span>
-            </div>
-          }
-        </div>
-      </section>
-
-      <!-- Sección B: Marketplace de integraciones -->
-      <section class="con-seccion">
-        <div class="con-seccion__head">
-          <span class="con-seccion__titulo">Explorar integraciones</span>
-          <a routerLink="/gali-6/marketplace" class="con-seccion__ver-mas">Ver marketplace completo →</a>
-        </div>
-        <div class="int-grid">
-          @for (int of integraciones; track int.id) {
-            <div class="int-card" [class.int-card--disabled]="!int.disponible">
-              <span class="int-card__tipo">{{ int.tipo }}</span>
-              <span class="int-card__nombre">{{ int.nombre }}</span>
-              @if (int.disponible) {
-                <button class="int-card__btn">Activar</button>
-              } @else {
-                <span class="int-card__pronto">Próximamente</span>
-              }
-            </div>
-          }
-        </div>
-      </section>
-
-      <!-- Sección C: Archivos y contexto -->
-      <section class="con-seccion">
-        <span class="con-seccion__titulo">Archivos y contexto</span>
-
-        <div class="archivos-drop"
-             [class.archivos-drop--drag]="isDragging()"
-             (dragover)="onDragOver($event)"
-             (dragleave)="onDragLeave()"
-             (drop)="onDrop($event)">
-          <span class="archivos-drop__icono">↑</span>
-          <span class="archivos-drop__texto">Arrastra un archivo o haz clic para subirlo</span>
-          <span class="archivos-drop__sub">CSV, XLSX, PDF · máx 10 MB</span>
-        </div>
-
-        <div class="archivos-lista">
-          @for (f of archivosSubidos; track f.id) {
-            <div class="archivo-item">
-              <span class="archivo-item__icono">◆</span>
-              <div class="archivo-item__info">
-                <span class="archivo-item__nombre">{{ f.nombre }}</span>
-                <span class="archivo-item__meta">{{ f.tamanio }} · {{ f.fecha }}</span>
-              </div>
-            </div>
-          }
-        </div>
-
-        <button class="ctx-btn-sec">
-          ⬡ Conectar Google Sheets
-        </button>
-      </section>
     </div>
   }
 
@@ -248,6 +169,8 @@
           }
         </ul>
       </section>
+
+      <a routerLink="/gali-6/impacto" class="ctx-ver-mas">Ver historial completo de impacto →</a>
 
     </div>
   }

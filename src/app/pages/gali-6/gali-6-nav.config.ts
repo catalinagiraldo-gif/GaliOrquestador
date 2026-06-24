@@ -4,7 +4,6 @@ export interface Gali6NavItem {
   icon: string;
   route?: string;
   children?: Gali6NavItem[];
-  expertOnly?: boolean;
 }
 
 export const GALI_6_NAV: Gali6NavItem[] = [
@@ -81,7 +80,6 @@ export const GALI_6_NAV: Gali6NavItem[] = [
     id: 'centro-gali',
     label: 'Centro de Gali',
     icon: '⚙',
-    expertOnly: true,
     children: [
       { id: 'agentes',    label: 'Agentes',     icon: '', route: '/gali-6/agentes' },
       { id: 'skills',     label: 'Skills',      icon: '', route: '/gali-6/skills' },

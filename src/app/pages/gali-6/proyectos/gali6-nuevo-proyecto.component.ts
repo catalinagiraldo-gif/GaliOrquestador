@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { getObjetivo, G6Objetivo, TIPO_LABEL } from '../../../../../mocks/gali-v6/objetivo';
 import { SUGERENCIAS_CAMPANA_NUEVO_PROYECTO, SugerenciaCampana } from '../../../../../mocks/gali-v6/campanas.mock';
 
@@ -40,6 +40,17 @@ const ROAS_HISTORICO = 1.93;
 })
 export class Gali6NuevoProyectoComponent {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  readonly modoCampana = signal(false);
+  readonly proyectoIdParam = signal<string | null>(null);
+
+  constructor() {
+    this.route.queryParamMap.subscribe(params => {
+      this.modoCampana.set(params.get('modo') === 'campana');
+      this.proyectoIdParam.set(params.get('proyectoId'));
+    });
+  }
 
   readonly step = signal<Step>('producto');
   readonly objetivo: G6Objetivo = getObjetivo();
@@ -250,13 +261,17 @@ export class Gali6NuevoProyectoComponent {
 
     setTimeout(() => {
       this.isLaunching.set(false);
-      // I10: redirige al proyecto recién lanzado con flag ?recien=1
-      import('../../../../../mocks/gali-v5/projects.json').then(m => {
-        const projects = m.default as any[];
-        const activo = projects.find(p => p.estado === 'recien_lanzado' || p.estado === 'activo');
-        const id = activo?.id ?? 'proj-001';
-        this.router.navigate(['/gali-6/proyecto', id], { queryParams: { recien: '1' } });
-      });
+      const pid = this.proyectoIdParam();
+      if (this.modoCampana() && pid) {
+        this.router.navigate(['/gali-6/proyecto', pid], { queryParams: { nuevaCampana: '1' } });
+      } else {
+        import('../../../../../mocks/gali-v5/projects.json').then(m => {
+          const projects = m.default as any[];
+          const activo = projects.find(p => p.estado === 'recien_lanzado' || p.estado === 'activo');
+          const id = activo?.id ?? 'proj-001';
+          this.router.navigate(['/gali-6/proyecto', id], { queryParams: { recien: '1' } });
+        });
+      }
     }, 2500);
   }
 

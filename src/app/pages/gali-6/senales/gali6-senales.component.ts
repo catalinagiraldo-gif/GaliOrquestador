@@ -16,21 +16,8 @@ import {
   PROCESO_TIPO_TOOLTIP,
 } from '../../../../../mocks/gali-v6/agentes-especializados';
 
-/** Tabs principales de la página */
-type MainTab = 'senales-activas' | 'fuentes-conexiones';
-/** Filtro por tipo de señal dentro de tab señales */
 type SignalFiltro = 'todas' | 'dato-real' | 'analisis-ia' | 'alertas';
-/** Filtro por agente */
 type AgenteFiltro = 'todos' | string;
-
-interface FuenteDropi {
-  id: string;
-  label: string;
-  descripcion: string;
-  activa: boolean;
-  tipo: 'dropi-base' | 'conexion-usuario' | 'archivo-contexto';
-  senalesCount?: number;
-}
 
 @Component({
   selector: 'app-gali6-senales',
@@ -47,7 +34,6 @@ export class Gali6SenalesComponent implements OnInit {
   // Estado de tabs y filtros
   // ─────────────────────────────────────────────────────────────
 
-  mainTab = signal<MainTab>('senales-activas');
   signalFiltro = signal<SignalFiltro>('todas');
   agenteFiltro = signal<AgenteFiltro>('todos');
   proyectoFiltro = signal<string | null>(null);
@@ -64,20 +50,6 @@ export class Gali6SenalesComponent implements OnInit {
   readonly procesoTipoLabel = PROCESO_TIPO_LABEL;
   readonly procesoTipoTooltip = PROCESO_TIPO_TOOLTIP;
 
-  /** Fuentes de datos disponibles — Bloque A (Dropi base) + B (conexiones usuario) + C (archivos) */
-  readonly fuentesDropi: FuenteDropi[] = [
-    // Grupo A — Dropi base (siempre activas, determinísticas)
-    { id: 'dropi-pedidos',   label: 'Pedidos',                  descripcion: 'Sincronización automática de pedidos', activa: true,  tipo: 'dropi-base', senalesCount: 2 },
-    { id: 'dropi-inventario',label: 'Inventario Dropi',          descripcion: 'Stock disponible por producto',         activa: true,  tipo: 'dropi-base', senalesCount: 1 },
-    { id: 'dropi-novedades', label: 'Novedades y garantías',     descripcion: 'Estado de novedades logísticas',        activa: true,  tipo: 'dropi-base', senalesCount: 1 },
-    { id: 'dropi-cartera',   label: 'Cartera y saldos',          descripcion: 'Historial financiero',                  activa: true,  tipo: 'dropi-base', senalesCount: 0 },
-    // Grupo B — Conexiones usuario
-    { id: 'conn-meta',       label: 'Meta Ads',                  descripcion: 'Datos de campañas Facebook/Instagram',  activa: true,  tipo: 'conexion-usuario', senalesCount: 3 },
-    { id: 'conn-tiktok',     label: 'TikTok Ads',                descripcion: 'Campañas en TikTok',                    activa: false, tipo: 'conexion-usuario', senalesCount: 0 },
-    { id: 'conn-google',     label: 'Google Analytics',          descripcion: 'Tráfico web y conversiones',            activa: false, tipo: 'conexion-usuario', senalesCount: 0 },
-    // Grupo C — Archivos de contexto
-    { id: 'file-precios',    label: 'Lista de precios.xlsx',     descripcion: 'Subido Jun 10, 2026',                   activa: true,  tipo: 'archivo-contexto', senalesCount: 0 },
-  ];
 
   // ─────────────────────────────────────────────────────────────
   // Computed: señales y alertas filtradas
@@ -186,10 +158,8 @@ export class Gali6SenalesComponent implements OnInit {
     const params = this.route.snapshot.queryParamMap;
     const signalId = params.get('signalId');
     const projectId = params.get('projectId');
-    const tab = params.get('tab') as MainTab | null;
 
     if (projectId) this.proyectoFiltro.set(projectId);
-    if (tab === 'fuentes-conexiones') this.mainTab.set('fuentes-conexiones');
 
     if (signalId) {
       this.selectedId.set(signalId);
@@ -203,8 +173,6 @@ export class Gali6SenalesComponent implements OnInit {
   // ─────────────────────────────────────────────────────────────
   // Handlers de estado
   // ─────────────────────────────────────────────────────────────
-
-  setMainTab(tab: MainTab) { this.mainTab.set(tab); }
 
   setFiltro(f: SignalFiltro) {
     this.signalFiltro.set(f);
@@ -296,14 +264,6 @@ export class Gali6SenalesComponent implements OnInit {
       ? 'Este dato viene directamente de Dropi. 100% confiable.'
       : 'Generado por IA — verifica antes de actuar.';
   }
-
-  getFuenteGrupoLabel(tipo: FuenteDropi['tipo']): string {
-    return { 'dropi-base': 'Dropi (incluido)', 'conexion-usuario': 'Tus conexiones', 'archivo-contexto': 'Archivos de contexto' }[tipo];
-  }
-
-  get fuentesDropiBase() { return this.fuentesDropi.filter(f => f.tipo === 'dropi-base'); }
-  get fuentesConexionUsuario() { return this.fuentesDropi.filter(f => f.tipo === 'conexion-usuario'); }
-  get fuentesArchivo() { return this.fuentesDropi.filter(f => f.tipo === 'archivo-contexto'); }
 
   private abrirModalConfirmacion(alerta: GaliAlerta) {
     this.confirmConfig.set({

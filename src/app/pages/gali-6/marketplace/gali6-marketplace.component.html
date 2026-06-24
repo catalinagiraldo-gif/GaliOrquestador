@@ -3,10 +3,21 @@
   <!-- ── HEADER ── -->
   <div class="g6-mkt__header">
     <div class="g6-mkt__header-text">
-      <h1 class="g6-mkt__title">Marketplace de agentes</h1>
-      <p class="g6-mkt__subtitle">Amplía lo que Gali puede hacer por ti. Elige agentes según tu negocio.</p>
+      <h1 class="g6-mkt__title">Marketplace de Gali</h1>
+      <p class="g6-mkt__subtitle">Amplía lo que Gali puede hacer por ti. Elige agentes, skills y conexiones.</p>
     </div>
   </div>
+
+  <!-- ── SECTION ANCHORS ── -->
+  <div class="g6-mkt__nav">
+    <a class="g6-mkt__nav-link" href="#sec-agentes">🤖 Agentes</a>
+    <a class="g6-mkt__nav-link" href="#sec-skills">⚡ Skills</a>
+    <a class="g6-mkt__nav-link" href="#sec-conexiones">🔗 Conexiones</a>
+  </div>
+
+  <!-- SECCIÓN AGENTES —— ID anchor -->
+  <h2 class="g6-mkt__sec-title" id="sec-agentes">🤖 Agentes</h2>
+  <p class="g6-mkt__sec-sub">Agentes especializados que operan en tu nombre, monitoreando y actuando.</p>
 
   <!-- ── FILTROS ── -->
   <div class="g6-mkt__filtros">
@@ -135,4 +146,79 @@
     </div>
   }
 
+  <!-- ══════════════════════════════════════════════
+       SECCIÓN 2 — SKILLS
+  ══════════════════════════════════════════════ -->
+  <h2 class="g6-mkt__sec-title" id="sec-skills">⚡ Skills</h2>
+  <p class="g6-mkt__sec-sub">Capacidades específicas que Gali y tus agentes pueden usar. Actívalas o desactívalas cuando quieras.</p>
+
+  <div class="g6-mkt__skills-grid">
+    @for (sk of skillsEstado(); track sk.id) {
+      <div class="g6-mkt-skill" [class.g6-mkt-skill--activa]="sk.activa">
+        <div class="g6-mkt-skill__top">
+          <span class="g6-mkt-skill__icono" aria-hidden="true">{{ sk.icono }}</span>
+          <div class="g6-mkt-skill__info">
+            <span class="g6-mkt-skill__nombre">{{ sk.nombre }}</span>
+            <span class="g6-mkt-skill__tipo {{ getProcesoClass(sk.tipo) }}">{{ procesoTipoLabel[sk.tipo] }}</span>
+          </div>
+          @if (sk.tier === 'free') {
+            <span class="g6-mkt-badge g6-mkt-badge--free" style="margin-left: auto">FREE</span>
+          } @else if (sk.tier === 'paid') {
+            <span class="g6-mkt-badge g6-mkt-badge--paid" style="margin-left: auto">${{ (sk.precioCopMes ?? 0) | number }}/mes</span>
+          } @else {
+            <span class="g6-mkt-badge g6-mkt-badge--tokens" style="margin-left: auto">🪙 {{ sk.tokensUso }}</span>
+          }
+        </div>
+        <p class="g6-mkt-skill__desc">{{ sk.descripcion }}</p>
+        <div class="g6-mkt-skill__footer">
+          @if (sk.activa) {
+            <span class="g6-mkt-skill__estado g6-mkt-skill__estado--activa">✓ Activa</span>
+            <button class="g6-mkt-skill__btn g6-mkt-skill__btn--desactivar" (click)="toggleSkill(sk.id)">
+              Desactivar
+            </button>
+          } @else {
+            <span class="g6-mkt-skill__estado g6-mkt-skill__estado--off">Inactiva</span>
+            <button class="g6-mkt-skill__btn g6-mkt-skill__btn--activar" (click)="toggleSkill(sk.id)">
+              @if (sk.tier === 'free') { Activar }
+              @if (sk.tier === 'paid') { Suscribirse }
+              @if (sk.tier === 'tokens') { Usar →}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECCIÓN 3 — CONEXIONES
+  ══════════════════════════════════════════════ -->
+  <h2 class="g6-mkt__sec-title" id="sec-conexiones">🔗 Conexiones e integraciones</h2>
+  <p class="g6-mkt__sec-sub">Fuentes que Gali usa como contexto para analizar y actuar.</p>
+
+  <div class="g6-mkt__cnx-grid">
+    @for (cnx of conexionesPreview; track cnx.id) {
+      <div class="g6-mkt-cnx" [attr.data-estado]="cnx.estado">
+        <span class="g6-mkt-cnx__glyph" aria-hidden="true">{{ cnx.glyph }}</span>
+        <span class="g6-mkt-cnx__nombre">{{ cnx.nombre }}</span>
+        <span class="g6-mkt-cnx__dot" [attr.data-estado]="cnx.estado"></span>
+        <span class="g6-mkt-cnx__label">
+          @if (cnx.estado === 'conectado') { Conectado }
+          @else if (cnx.estado === 'pendiente') { Sin conectar }
+          @else { Próximamente }
+        </span>
+      </div>
+    }
+  </div>
+
+  <div class="g6-mkt__cnx-footer">
+    <button class="g6-mkt__cnx-cta" (click)="irAConexiones()">
+      Gestionar todas mis conexiones →
+    </button>
+  </div>
+
 </div>
+
+<!-- Toast -->
+@if (toastMsg()) {
+  <div class="g6-mkt__toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
+}

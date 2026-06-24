@@ -26,29 +26,10 @@
     </div>
   </div>
 
-  <!-- ── MAIN TABS ── -->
-  <div class="g6-senales__main-tabs">
-    <button
-      class="g6-main-tab"
-      [class.g6-main-tab--active]="mainTab() === 'senales-activas'"
-      (click)="setMainTab('senales-activas')">
-      Señales activas
-      @if (totalActivas() > 0) {
-        <span class="g6-main-tab__badge">{{ totalActivas() }}</span>
-      }
-    </button>
-    <button
-      class="g6-main-tab"
-      [class.g6-main-tab--active]="mainTab() === 'fuentes-conexiones'"
-      (click)="setMainTab('fuentes-conexiones')">
-      Fuentes y Conexiones
-    </button>
-  </div>
-
   <!-- ═══════════════════════════════════════════════
-       TAB 1: SEÑALES ACTIVAS
+       SEÑALES ACTIVAS
   ════════════════════════════════════════════════ -->
-  @if (mainTab() === 'senales-activas') {
+  @if (true) {
 
     <!-- Filtro proyecto activo -->
     @if (proyectoFiltro()) {
@@ -227,108 +208,6 @@
 
   }<!-- /tab senales-activas -->
 
-  <!-- ═══════════════════════════════════════════════
-       TAB 2: FUENTES Y CONEXIONES
-  ════════════════════════════════════════════════ -->
-  @if (mainTab() === 'fuentes-conexiones') {
-    <div class="g6-fuentes">
-
-      <!-- Grupo A: Datos base de Dropi -->
-      <div class="g6-fuentes__grupo">
-        <div class="g6-fuentes__grupo-hdr">
-          <span class="g6-fuentes__grupo-icon">🗄️</span>
-          <div>
-            <p class="g6-fuentes__grupo-titulo">Datos de Dropi</p>
-            <p class="g6-fuentes__grupo-sub">Siempre activos — datos determinísticos, 100% confiables</p>
-          </div>
-        </div>
-        <div class="g6-fuentes__items">
-          @for (f of fuentesDropiBase; track f.id) {
-            <div class="g6-fuente-item g6-fuente-item--base">
-              <div class="g6-fuente-item__status g6-fuente-item__status--activa"></div>
-              <div class="g6-fuente-item__info">
-                <span class="g6-fuente-item__label">{{ f.label }}</span>
-                <span class="g6-fuente-item__desc">{{ f.descripcion }}</span>
-              </div>
-              <div class="g6-fuente-item__right">
-                @if (f.senalesCount && f.senalesCount > 0) {
-                  <span class="g6-fuente-badge">{{ f.senalesCount }} señales</span>
-                }
-                <span class="g6-fuente-tag g6-fuente-tag--dropi">Incluido en Dropi</span>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Grupo B: Conexiones del usuario -->
-      <div class="g6-fuentes__grupo">
-        <div class="g6-fuentes__grupo-hdr">
-          <span class="g6-fuentes__grupo-icon">🔌</span>
-          <div>
-            <p class="g6-fuentes__grupo-titulo">Tus conexiones</p>
-            <p class="g6-fuentes__grupo-sub">Integraciones externas que amplían lo que Gali puede monitorear</p>
-          </div>
-        </div>
-        <div class="g6-fuentes__items">
-          @for (f of fuentesConexionUsuario; track f.id) {
-            <div class="g6-fuente-item" [class.g6-fuente-item--inactiva]="!f.activa">
-              <div class="g6-fuente-item__status" [class.g6-fuente-item__status--activa]="f.activa"></div>
-              <div class="g6-fuente-item__info">
-                <span class="g6-fuente-item__label">{{ f.label }}</span>
-                <span class="g6-fuente-item__desc">{{ f.descripcion }}</span>
-              </div>
-              <div class="g6-fuente-item__right">
-                @if (f.activa) {
-                  @if (f.senalesCount && f.senalesCount > 0) {
-                    <span class="g6-fuente-badge">{{ f.senalesCount }} señales</span>
-                  }
-                  <button class="g6-fuente-btn g6-fuente-btn--config">Configurar</button>
-                } @else {
-                  <button class="g6-fuente-btn g6-fuente-btn--connect">Conectar</button>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Grupo C: Archivos de contexto -->
-      <div class="g6-fuentes__grupo">
-        <div class="g6-fuentes__grupo-hdr">
-          <span class="g6-fuentes__grupo-icon">📄</span>
-          <div>
-            <p class="g6-fuentes__grupo-titulo">Archivos de contexto</p>
-            <p class="g6-fuentes__grupo-sub">Archivos que subiste para que Gali entienda mejor tu negocio</p>
-          </div>
-        </div>
-        <div class="g6-fuentes__items">
-          @for (f of fuentesArchivo; track f.id) {
-            <div class="g6-fuente-item" [class.g6-fuente-item--inactiva]="!f.activa">
-              <div class="g6-fuente-item__status" [class.g6-fuente-item__status--activa]="f.activa"></div>
-              <div class="g6-fuente-item__info">
-                <span class="g6-fuente-item__label">{{ f.label }}</span>
-                <span class="g6-fuente-item__desc">{{ f.descripcion }}</span>
-              </div>
-              <div class="g6-fuente-item__right">
-                <button class="g6-fuente-btn g6-fuente-btn--config">Reemplazar</button>
-              </div>
-            </div>
-          }
-          <!-- CTA para subir nuevo archivo -->
-          <div class="g6-fuente-item g6-fuente-item--add">
-            <span class="g6-fuente-add-icon">+</span>
-            <span class="g6-fuente-add-label">Subir archivo de contexto</span>
-          </div>
-        </div>
-        <p class="g6-fuentes__cta-marketplace">
-          Agregar más conexiones en
-          <a (click)="router.navigate(['/gali-6/marketplace'])" style="cursor:pointer;">Marketplace →</a>
-        </p>
-      </div>
-
-    </div><!-- /fuentes -->
-  }<!-- /tab fuentes-conexiones -->
 
 </div><!-- /g6-senales -->
 

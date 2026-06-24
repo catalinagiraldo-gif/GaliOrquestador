@@ -1481,6 +1481,16 @@
     white-space: nowrap;
   }
 
+  &__productos {
+    font-size: 10px;
+    font-weight: $font-medium;
+    color: $primary-500;
+    background: rgba($primary-400, 0.1);
+    padding: 1px 6px;
+    border-radius: $radius-full;
+    white-space: nowrap;
+  }
+
   &__metrics {
     display: flex;
     align-items: center;

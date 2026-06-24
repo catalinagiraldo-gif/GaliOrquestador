@@ -207,6 +207,9 @@
                         </span>
                         <span class="campana-row__nombre">{{ c.nombre }}</span>
                         <span class="campana-row__canal">{{ c.canalLabel }}</span>
+                        @if (c.productos.length > 1) {
+                          <span class="campana-row__productos">{{ c.productos.length }} productos</span>
+                        }
                       </div>
                       <div class="campana-row__metrics">
                         @if (c.roasActualLabel) {

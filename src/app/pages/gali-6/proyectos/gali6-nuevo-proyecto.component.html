@@ -13,7 +13,9 @@
   <!-- ── PASO 1: Producto ── -->
   @if (step() === 'producto') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">Elige un producto</h1>
+      <h1 class="wizard__title">
+        @if (modoCampana()) { Nueva campaña — elige tu producto } @else { Elige un producto }
+      </h1>
       <p class="wizard__sub">ADA Spy analizó {{ productos.length * 240 | number }} productos esta semana. Estas son las mejores oportunidades.</p>
 
       <!-- Buscador libre (I9) -->
@@ -270,7 +272,9 @@
     <div class="wizard__body gali-stagger-in">
 
       @if (!launched()) {
-        <h1 class="wizard__title">Listo para lanzar</h1>
+        <h1 class="wizard__title">
+          @if (modoCampana()) { Lista para lanzar la campaña } @else { Listo para lanzar }
+        </h1>
 
         <div class="resumen">
           <div class="resumen__item">
@@ -312,7 +316,9 @@
         </div>
 
         <button class="wizard__launch" [disabled]="isLaunching()" (click)="launch()">
-          @if (isLaunching()) { Lanzando… } @else { 🚀 Lanzar proyecto }
+          @if (isLaunching()) { Lanzando… }
+          @else if (modoCampana()) { 🚀 Lanzar campaña }
+          @else { 🚀 Lanzar proyecto }
         </button>
 
         @if (isLaunching()) {
@@ -342,7 +348,9 @@
       } @else {
         <div class="launch-success gali-stagger-in">
           <div class="launch-success__icon">🚀</div>
-          <h2 class="launch-success__title">¡Proyecto lanzado!</h2>
+          <h2 class="launch-success__title">
+            @if (modoCampana()) { ¡Campaña lanzada! } @else { ¡Proyecto lanzado! }
+          </h2>
           <p class="launch-success__sub">
             <strong>{{ selectedProducto()?.nombre }}</strong> está activo.
             Roax comenzó la campaña con ${{ presupuestoDiario() | number }}/día.

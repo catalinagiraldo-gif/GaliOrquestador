@@ -73,32 +73,82 @@
                 </div>
               }
 
+              <!-- Skills con toggle ON/OFF -->
               <div class="g6-agente-card__skills">
-                <span class="g6-agente-card__skills-label">Skills activas</span>
-                @for (sk of ag.skillsDefecto; track sk.id) {
-                  <div class="g6-agente-skill">
+                <div class="g6-agente-card__skills-hdr">
+                  <span class="g6-agente-card__skills-label">Skills activas</span>
+                </div>
+                @for (sk of ag.skills; track sk.id) {
+                  <div class="g6-agente-skill" [class.g6-agente-skill--off]="!sk.activa">
                     <span class="g6-agente-skill__tipo {{ getProcesoClass(sk.tipo) }}">
                       {{ procesoTipoLabel[sk.tipo] }}
                     </span>
                     <span class="g6-agente-skill__label">{{ sk.label }}</span>
+                    <button
+                      class="g6-skill-toggle"
+                      [class.g6-skill-toggle--on]="sk.activa"
+                      [class.g6-skill-toggle--off]="!sk.activa"
+                      (click)="$event.stopPropagation(); toggleSkill(ag.id, sk.id)"
+                      [title]="sk.activa ? 'Desactivar skill' : 'Activar skill'">
+                      <span class="g6-skill-toggle__dot"></span>
+                    </button>
                   </div>
                 }
+                <button class="g6-agente-card__add-skill" data-proto-skip>
+                  + Agregar skill →
+                </button>
               </div>
 
-              @if (ag.reglasDefecto.length > 0) {
+              <!-- Reglas con eliminar -->
+              @if (ag.reglas.length > 0) {
                 <div class="g6-agente-card__reglas">
                   <span class="g6-agente-card__reglas-label">Reglas activas</span>
-                  @for (r of ag.reglasDefecto; track r.condicion) {
+                  @for (r of ag.reglas; track r.id) {
                     <div class="g6-agente-regla">
                       <span class="g6-agente-regla__si">Si</span>
                       <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
                       <span class="g6-agente-regla__entonces">→</span>
                       <span class="g6-agente-regla__accion">{{ r.accion }}</span>
+                      <button class="g6-agente-regla__del"
+                              (click)="$event.stopPropagation(); eliminarRegla(ag.id, r.id)"
+                              title="Eliminar regla">×</button>
                     </div>
                   }
+                  <button class="g6-agente-card__add-skill" data-proto-skip>
+                    + Nueva regla →
+                  </button>
                 </div>
               }
-            </div>
+
+              <!-- Autonomía slider -->
+              <div class="g6-agente-card__autonomia">
+                <div class="g6-autonomia-hdr">
+                  <span class="g6-autonomia-label">Autonomía</span>
+                  <span class="g6-autonomia-nivel">{{ ag.autonomiaPct }}% — {{ getAutonomiaLabel(ag.autonomiaPct) }}</span>
+                </div>
+                <input
+                  type="range"
+                  class="g6-autonomia-slider"
+                  min="0" max="100" step="5"
+                  [value]="ag.autonomiaPct"
+                  (input)="onAutonomiaInput(ag.id, $event)"
+                  (click)="$event.stopPropagation()" />
+                <div class="g6-autonomia-markers">
+                  <span>Solo notifica</span>
+                  <span>Pide aprobación</span>
+                  <span>Autopilot</span>
+                </div>
+              </div>
+
+              <!-- CTA desactivar -->
+              <div class="g6-agente-card__footer-actions">
+                <button class="g6-agente-card__desactivar"
+                        (click)="$event.stopPropagation(); desactivarAgente(ag.id)">
+                  Pausar agente
+                </button>
+              </div>
+
+            </div><!-- /detalle -->
           }
         </div>
       }
@@ -131,7 +181,7 @@
                     {{ procesoTipoLabel[ag.tipo] }}
                   </span>
                   @if (ag.tipo === 'ia-compleja') {
-                    <span class="g6-agente-card__ia-warn" title="{{ ag.advertenciaIA }}">⚠️ IA</span>
+                    <span class="g6-agente-card__ia-warn" [title]="ag.advertenciaIA ?? ''">⚠️ IA</span>
                   }
                   @if (ag.tier === 'paid') {
                     <span class="g6-agente-card__tier g6-agente-card__tier--paid">
@@ -156,4 +206,52 @@
     </section>
   }
 
+  <!-- ── CREAR AGENTE PERSONALIZADO ── -->
+  <div class="g6-agentes__crear-row">
+    <button class="g6-agentes__crear-btn" (click)="crearAgente()">
+      <span class="g6-agentes__crear-icon" aria-hidden="true">+</span>
+      Crear agente personalizado
+    </button>
+  </div>
+
 </div>
+
+<!-- ── MODAL CREAR AGENTE ── -->
+@if (showCrearModal()) {
+  <div class="g6-crear-backdrop" (click)="cerrarCrearModal()" role="dialog" aria-label="Crear agente personalizado">
+    <div class="g6-crear-modal" (click)="$event.stopPropagation()">
+      <div class="g6-crear-modal__header">
+        <span class="g6-crear-modal__title">Crear agente personalizado</span>
+        <button class="g6-crear-modal__close" (click)="cerrarCrearModal()">×</button>
+      </div>
+      <div class="g6-crear-modal__body">
+        <p class="g6-crear-modal__coming">
+          <span class="g6-crear-modal__spark" aria-hidden="true">✦</span>
+          Los agentes personalizados están en construcción. Pronto podrás definir tu propio conjunto de skills, reglas y autonomía.
+        </p>
+        <div class="g6-crear-modal__preview">
+          <div class="g6-crear-preview-row">
+            <span>1. Elige un nombre y propósito</span>
+          </div>
+          <div class="g6-crear-preview-row">
+            <span>2. Selecciona skills del marketplace</span>
+          </div>
+          <div class="g6-crear-preview-row">
+            <span>3. Define reglas de acción</span>
+          </div>
+          <div class="g6-crear-preview-row">
+            <span>4. Configura autonomía</span>
+          </div>
+        </div>
+      </div>
+      <div class="g6-crear-modal__footer">
+        <button class="g6-crear-modal__cta" (click)="cerrarCrearModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Toast -->
+@if (toastMsg()) {
+  <div class="g6-toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
+}

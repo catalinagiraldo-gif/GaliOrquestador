@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
 import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
 
@@ -7,55 +8,19 @@ interface Mcp {
   nombre: string; glyph: string; estado: 'conectado' | 'pendiente' | 'urgente';
   dato: string; contexto: string;
 }
+interface NubeItem {
+  id: string; nombre: string; glyph: string;
+  estado: 'conectado' | 'pendiente' | 'proximamente';
+}
+interface ArchivoLocal {
+  id: string; nombre: string; tamano: string; fecha: string;
+}
 
 @Component({
   selector: 'app-gali6-conexiones-casa',
   standalone: true,
-  imports: [CommonModule, GaliGlosarioDirective, Gali6PageHeaderComponent],
-  template: `
-    <div class="cnx gali-stagger-in">
-      <app-g6-page-header
-        [breadcrumbs]="['Conexiones']"
-        title="Conexiones"
-        sub="Lo que conectas es lo que Gali usa para decidir por ti. Estas 5 fuentes le dan el contexto de tu negocio." />
-      <div class="cnx__bar">
-        <div class="cnx__count">
-          <span class="cnx__count-ok">{{ conectadas }} conectadas</span>
-          <span class="cnx__count-warn">{{ urgentes }} requieren atención</span>
-        </div>
-        <div class="cnx__glos">
-          <span class="cnx__glos-label">Métricas que Gali calcula:</span>
-          <span galiGlosario="ROAS" class="cnx__glos-tag">ROAS</span>
-          <span galiGlosario="CPA" class="cnx__glos-tag">CPA</span>
-          <span galiGlosario="novedad" class="cnx__glos-tag">Novedad</span>
-        </div>
-      </div>
-      <div class="cnx__grid">
-        @for (m of mcps; track m.nombre) {
-          <article class="mcp" [attr.data-estado]="m.estado">
-            <div class="mcp__top">
-              <span class="mcp__glyph" aria-hidden="true">{{ m.glyph }}</span>
-              <span class="mcp__name">{{ m.nombre }}</span>
-              <span class="mcp__dot" [attr.data-estado]="m.estado"></span>
-            </div>
-            <p class="mcp__dato">{{ m.dato }}</p>
-            <p class="mcp__contexto"><span aria-hidden="true">✦</span> Le da contexto a Gali para: {{ m.contexto }}</p>
-            <button class="mcp__cta" [attr.data-estado]="m.estado" data-proto-skip>
-              {{ m.estado === 'conectado' ? 'Gestionar' : m.estado === 'urgente' ? 'Reconectar ahora' : 'Conectar' }}
-            </button>
-          </article>
-        }
-      </div>
-      <footer class="cnx__more">
-        <span class="cnx__more-label">Próximamente</span>
-        <div class="cnx__more-chips">
-          @for (x of proximamente; track x) {
-            <span class="cnx__chip">{{ x }}</span>
-          }
-        </div>
-      </footer>
-    </div>
-  `,
+  imports: [CommonModule, RouterModule, GaliGlosarioDirective, Gali6PageHeaderComponent],
+  templateUrl: './gali6-conexiones-casa.component.html',
   styleUrl: './gali6-conexiones-casa.component.scss',
 })
 export class Gali6ConexionesCasaComponent {
@@ -67,7 +32,72 @@ export class Gali6ConexionesCasaComponent {
     { nombre: 'Siigo', glyph: '▣', estado: 'urgente', dato: '$450k sin facturar · 6 días sin sync · riesgo tributario.', contexto: 'registrar cada venta en contabilidad y evitar inconsistencias tributarias.' },
     { nombre: 'TikTok Ads', glyph: '♪', estado: 'pendiente', dato: 'Métricas de campañas y audiencias de TikTok.', contexto: 'comparar canales y diversificar dónde inviertes tu pauta.' },
   ];
-  readonly proximamente = ['TikTok Shop', 'Notion', 'Google Sheets', 'Page Pilot'];
+
+  readonly archivosNube: NubeItem[] = [
+    { id: 'drive',  nombre: 'Google Drive',  glyph: '▦', estado: 'conectado'     },
+    { id: 'sheets', nombre: 'Google Sheets', glyph: '▤', estado: 'pendiente'     },
+    { id: 'notion', nombre: 'Notion',        glyph: '▣', estado: 'proximamente'  },
+  ];
+
+  archivosLocales = signal<ArchivoLocal[]>([
+    { id: 'f1', nombre: 'lista-costos.xlsx',   tamano: '45 KB',  fecha: 'Jun 20, 2026' },
+    { id: 'f2', nombre: 'catalogo-Q2.csv',     tamano: '120 KB', fecha: 'Jun 18, 2026' },
+    { id: 'f3', nombre: 'precios-mayo.xlsx',   tamano: '32 KB',  fecha: 'Jun 12, 2026' },
+  ]);
+
+  isDragOver = signal(false);
+  uploadToast = signal<string | null>(null);
+
   get conectadas(): number { return this.mcps.filter(m => m.estado === 'conectado').length; }
-  get urgentes(): number { return this.mcps.filter(m => m.estado === 'urgente').length; }
+  get urgentes(): number   { return this.mcps.filter(m => m.estado === 'urgente').length; }
+
+  @HostListener('dragover', ['$event'])
+  onGlobalDragOver(e: DragEvent) { e.preventDefault(); }
+
+  onDropZoneDragEnter() { this.isDragOver.set(true); }
+  onDropZoneDragLeave() { this.isDragOver.set(false); }
+
+  onDrop(e: DragEvent): void {
+    e.preventDefault();
+    this.isDragOver.set(false);
+    const files = Array.from(e.dataTransfer?.files ?? []);
+    this.processFiles(files);
+  }
+
+  onFileInput(e: Event): void {
+    const input = e.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    this.processFiles(files);
+    input.value = '';
+  }
+
+  private processFiles(files: File[]): void {
+    if (!files.length) return;
+    const nuevos: ArchivoLocal[] = files.map(f => ({
+      id: 'f' + Date.now() + Math.random(),
+      nombre: f.name,
+      tamano: this.formatSize(f.size),
+      fecha: 'Jun 24, 2026',
+    }));
+    this.archivosLocales.update(prev => [...nuevos, ...prev]);
+    const label = files.length === 1
+      ? `✦ Gali procesó "${files[0].name}". Ya está disponible como contexto.`
+      : `✦ Gali procesó ${files.length} archivos. Ya están disponibles como contexto.`;
+    this.uploadToast.set(label);
+    setTimeout(() => this.uploadToast.set(null), 4000);
+  }
+
+  eliminarArchivo(id: string): void {
+    this.archivosLocales.update(prev => prev.filter(f => f.id !== id));
+  }
+
+  private formatSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  getNubeCtaLabel(estado: NubeItem['estado']): string {
+    return { conectado: 'Gestionar', pendiente: 'Conectar', proximamente: 'Próximamente' }[estado];
+  }
 }

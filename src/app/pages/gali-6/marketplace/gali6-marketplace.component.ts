@@ -14,6 +14,25 @@ import {
 type TierFiltro = 'todos' | AgenteTier;
 type TipoFiltro = 'todos' | AgenteProcesoTipo;
 
+interface SkillMkt {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  tipo: AgenteProcesoTipo;
+  tier: AgenteTier;
+  precioCopMes?: number;
+  tokensUso?: number;
+  activa: boolean;
+  icono: string;
+}
+
+interface ConexionPreview {
+  id: string;
+  nombre: string;
+  glyph: string;
+  estado: 'conectado' | 'pendiente' | 'proximamente';
+}
+
 @Component({
   selector: 'app-gali6-marketplace',
   standalone: true,
@@ -31,6 +50,7 @@ export class Gali6MarketplaceComponent {
 
   readonly tierFiltro = signal<TierFiltro>('todos');
   readonly tipoFiltro = signal<TipoFiltro>('todos');
+  readonly toastMsg = signal<string | null>(null);
 
   readonly tierTabs: { value: TierFiltro; label: string }[] = [
     { value: 'todos',  label: 'Todos' },
@@ -40,10 +60,10 @@ export class Gali6MarketplaceComponent {
   ];
 
   readonly tipoTabs: { value: TipoFiltro; label: string }[] = [
-    { value: 'todos',        label: 'Todos los tipos' },
-    { value: 'deterministico', label: '📊 Determinístico' },
-    { value: 'ia-ligera',    label: '🤖 IA ligera' },
-    { value: 'ia-compleja',  label: '✨ IA compleja' },
+    { value: 'todos',         label: 'Todos los tipos' },
+    { value: 'deterministico',label: '📊 Determinístico' },
+    { value: 'ia-ligera',     label: '🤖 IA ligera' },
+    { value: 'ia-compleja',   label: '✨ IA compleja' },
   ];
 
   readonly agentesFiltrados = computed(() => {
@@ -55,6 +75,27 @@ export class Gali6MarketplaceComponent {
       return matchTier && matchTipo;
     });
   });
+
+  /** Skills marketplace */
+  readonly skillsEstado = signal<SkillMkt[]>([
+    { id: 'sk-brujula',   nombre: 'Brújula financiera',    descripcion: 'Calcula P&L real por campaña: ingresos, costos, flete, novedades y garantías.',    tipo: 'deterministico', tier: 'free',   activa: true,  icono: '🧭' },
+    { id: 'sk-roi',       nombre: 'Análisis ROI',           descripcion: 'ROI por producto y canal con datos reales de Dropi.',                               tipo: 'deterministico', tier: 'free',   activa: true,  icono: '📊' },
+    { id: 'sk-angulos',   nombre: 'Ángulos de venta',       descripcion: 'Genera variaciones de copy y creativos usando IA basada en tus ventas.',           tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: '✍️' },
+    { id: 'sk-logopt',    nombre: 'Optimización logística', descripcion: 'Sugiere transportadora según tasa de novedad histórica por ciudad.',                tipo: 'deterministico', tier: 'paid',   precioCopMes: 15000, activa: false, icono: '🚚' },
+    { id: 'sk-copyad',    nombre: 'Copy publicitario',      descripcion: 'Crea copies para Meta y TikTok Ads adaptados a tus mejores productos.',            tipo: 'ia-compleja',    tier: 'tokens', tokensUso: 3, activa: false, icono: '📢' },
+    { id: 'sk-forecast',  nombre: 'Forecast de demanda',    descripcion: 'Predice pedidos de la próxima semana usando tendencias y estacionalidad.',         tipo: 'ia-ligera',      tier: 'paid',   precioCopMes: 20000, activa: false, icono: '🔮' },
+    { id: 'sk-cxaudit',   nombre: 'Auditoría de CX',        descripcion: 'Detecta patrones de queja en WhatsApp y propone mejoras de proceso.',              tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: '🔍' },
+  ]);
+
+  /** Conexiones preview */
+  readonly conexionesPreview: ConexionPreview[] = [
+    { id: 'meta',   nombre: 'Meta Ads',      glyph: '◈', estado: 'conectado'    },
+    { id: 'shopify',nombre: 'Shopify',       glyph: '▤', estado: 'conectado'    },
+    { id: 'drive',  nombre: 'Google Drive',  glyph: '▦', estado: 'conectado'    },
+    { id: 'sheets', nombre: 'Google Sheets', glyph: '▤', estado: 'pendiente'    },
+    { id: 'notion', nombre: 'Notion',        glyph: '▣', estado: 'proximamente' },
+    { id: 'tiktok', nombre: 'TikTok Ads',    glyph: '♪', estado: 'pendiente'    },
+  ];
 
   setTierFiltro(v: TierFiltro): void { this.tierFiltro.set(v); }
   setTipoFiltro(v: TipoFiltro): void { this.tipoFiltro.set(v); }
@@ -69,7 +110,25 @@ export class Gali6MarketplaceComponent {
   }
 
   activarAgente(ag: AgenteEspecializado): void {
-    // Mock: navegar a agentes (en prototipo real abriría modal de confirmación/pago)
     this.router.navigate(['/gali-6/agentes']);
+  }
+
+  toggleSkill(skillId: string): void {
+    this.skillsEstado.update(list =>
+      list.map(sk => sk.id === skillId ? { ...sk, activa: !sk.activa } : sk)
+    );
+    const sk = this.skillsEstado().find(s => s.id === skillId);
+    if (sk) {
+      this.showToast(sk.activa ? `✦ Skill "${sk.nombre}" activada` : `Skill "${sk.nombre}" desactivada`);
+    }
+  }
+
+  irAConexiones(): void {
+    this.router.navigate(['/gali-6/conexiones']);
+  }
+
+  private showToast(msg: string): void {
+    this.toastMsg.set(msg);
+    setTimeout(() => this.toastMsg.set(null), 2500);
   }
 }

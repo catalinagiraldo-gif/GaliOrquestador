@@ -1,0 +1,137 @@
+<div class="cnx gali-stagger-in">
+
+  <app-g6-page-header
+    [breadcrumbs]="['Conexiones']"
+    title="Conexiones"
+    sub="Lo que conectas es lo que Gali usa para decidir por ti. Cada fuente le da contexto real de tu negocio." />
+
+  <!-- ── Toast post-upload ── -->
+  @if (uploadToast()) {
+    <div class="cnx__toast" role="status" aria-live="polite">
+      {{ uploadToast() }}
+    </div>
+  }
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 1 — MCPs activos
+  ═══════════════════════════════════════════ -->
+  <section class="cnx__section">
+    <div class="cnx__section-hdr">
+      <h2 class="cnx__section-title">Conexiones activas</h2>
+      <div class="cnx__count">
+        <span class="cnx__count-ok">{{ conectadas }} conectadas</span>
+        @if (urgentes > 0) {
+          <span class="cnx__count-warn">{{ urgentes }} requieren atención</span>
+        }
+      </div>
+    </div>
+
+    <div class="cnx__glos">
+      <span class="cnx__glos-label">Métricas que Gali calcula con estas fuentes:</span>
+      <span galiGlosario="ROAS" class="cnx__glos-tag">ROAS</span>
+      <span galiGlosario="CPA" class="cnx__glos-tag">CPA</span>
+      <span galiGlosario="novedad" class="cnx__glos-tag">Novedad</span>
+    </div>
+
+    <div class="cnx__grid">
+      @for (m of mcps; track m.nombre) {
+        <article class="mcp" [attr.data-estado]="m.estado">
+          <div class="mcp__top">
+            <span class="mcp__glyph" aria-hidden="true">{{ m.glyph }}</span>
+            <span class="mcp__name">{{ m.nombre }}</span>
+            <span class="mcp__dot" [attr.data-estado]="m.estado"></span>
+          </div>
+          <p class="mcp__dato">{{ m.dato }}</p>
+          <p class="mcp__contexto"><span aria-hidden="true">✦</span> Le da contexto a Gali para: {{ m.contexto }}</p>
+          <button class="mcp__cta" [attr.data-estado]="m.estado" data-proto-skip>
+            {{ m.estado === 'conectado' ? 'Gestionar' : m.estado === 'urgente' ? 'Reconectar ahora' : 'Conectar' }}
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 2 — Archivos en nube
+  ═══════════════════════════════════════════ -->
+  <section class="cnx__section">
+    <div class="cnx__section-hdr">
+      <h2 class="cnx__section-title">Archivos en la nube</h2>
+      <p class="cnx__section-sub">Gali lee tus documentos para usar tu propia data como contexto.</p>
+    </div>
+    <div class="cnx__nube-list">
+      @for (n of archivosNube; track n.id) {
+        <div class="nube-item" [attr.data-estado]="n.estado">
+          <span class="nube-item__glyph" aria-hidden="true">{{ n.glyph }}</span>
+          <div class="nube-item__info">
+            <span class="nube-item__nombre">{{ n.nombre }}</span>
+            <span class="nube-item__estado-label">
+              @if (n.estado === 'conectado') { <span class="nube-dot nube-dot--ok"></span> Conectado }
+              @else if (n.estado === 'pendiente') { Sin conectar }
+              @else { Próximamente }
+            </span>
+          </div>
+          <button
+            class="nube-item__btn"
+            [attr.data-estado]="n.estado"
+            [disabled]="n.estado === 'proximamente'"
+            data-proto-skip>
+            {{ getNubeCtaLabel(n.estado) }}
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECCIÓN 3 — Archivos subidos localmente
+  ═══════════════════════════════════════════ -->
+  <section class="cnx__section">
+    <div class="cnx__section-hdr">
+      <h2 class="cnx__section-title">Archivos de contexto</h2>
+      <p class="cnx__section-sub">Sube listas de costos, catálogos o cualquier referencia. Gali los usa al analizarte.</p>
+    </div>
+
+    <!-- Drop zone -->
+    <label
+      class="cnx__dropzone"
+      [class.cnx__dropzone--over]="isDragOver()"
+      (dragenter)="onDropZoneDragEnter()"
+      (dragleave)="onDropZoneDragLeave()"
+      (drop)="onDrop($event)"
+      for="cnx-file-input">
+      <span class="cnx__dropzone-icon" aria-hidden="true">↑</span>
+      <span class="cnx__dropzone-label">Arrastra CSV, XLSX o PDF · máx 10 MB</span>
+      <span class="cnx__dropzone-cta">Seleccionar archivo</span>
+      <input id="cnx-file-input" type="file" accept=".csv,.xlsx,.pdf" multiple hidden (change)="onFileInput($event)" />
+    </label>
+
+    <!-- Lista de archivos -->
+    @if (archivosLocales().length > 0) {
+      <div class="cnx__files">
+        @for (f of archivosLocales(); track f.id) {
+          <div class="cnx__file-row">
+            <span class="cnx__file-icon" aria-hidden="true">◆</span>
+            <div class="cnx__file-info">
+              <span class="cnx__file-name">{{ f.nombre }}</span>
+              <span class="cnx__file-meta">{{ f.tamano }} · {{ f.fecha }}</span>
+            </div>
+            <button class="cnx__file-del" (click)="eliminarArchivo(f.id)" title="Eliminar archivo">×</button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER — Marketplace
+  ═══════════════════════════════════════════ -->
+  <footer class="cnx__footer">
+    <a routerLink="/gali-6/marketplace" class="cnx__footer-link">
+      <span class="cnx__footer-icon" aria-hidden="true">⬡</span>
+      Explorar marketplace de conexiones
+      <span class="cnx__footer-arrow" aria-hidden="true">→</span>
+    </a>
+  </footer>
+
+</div>
