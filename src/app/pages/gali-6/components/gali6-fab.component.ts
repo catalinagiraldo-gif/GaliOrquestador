@@ -15,7 +15,7 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
   { prefix: '/gali-6/proyectos',   btn: { icon: '+', label: 'Nuevo proyecto', route: '/gali-6/proyectos/nuevo' } },
   { prefix: '/gali-6/senales',     btn: { icon: '◎', label: 'Ver proyectos', route: '/gali-6/proyectos' } },
   { prefix: '/gali-6/impacto',     btn: { icon: '◇', label: 'Ver proyectos', route: '/gali-6/proyectos' } },
-  { prefix: '/gali-6/marketing',   btn: { icon: '⚡', label: 'Ver alertas', route: '/gali-6/senales' } },
+  { prefix: '/gali-6/marketing',   btn: { icon: '◎', label: 'Ver alertas', route: '/gali-6/senales' } },
 ];
 
 @Component({
@@ -53,7 +53,7 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
           </div>
           <div class="g6-fab__decision-footer">
             <button class="g6-fab__decision-chat" type="button" (click)="openChat()">
-              💬 Hablar con Gali
+              <i class="pi pi-comments"></i> Hablar con Gali
             </button>
             <button class="g6-fab__decision-link" type="button" (click)="goToDecisions()">
               Ver inicio →

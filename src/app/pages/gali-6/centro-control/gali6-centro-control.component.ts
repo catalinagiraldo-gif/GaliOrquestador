@@ -174,7 +174,7 @@ export class Gali6CentroControlComponent {
 
   readonly agentes = signal<Agente[]>([
     {
-      id: 'roax', nombre: 'Roax', subtitulo: 'Ads Manager', glyph: '⚡', color: '#f59e0b',
+      id: 'roax', nombre: 'Roax', subtitulo: 'Ads Manager', glyph: '◎', color: '#f59e0b',
       on: true, tasaExito: 87,
       ultimaAccion: 'Escaló Video B +$15k/día · hace 12 min',
       desc: 'Optimiza campañas de Meta Ads de forma autónoma — ajusta presupuesto, pausa creativos saturados y escala lo que convierte.',

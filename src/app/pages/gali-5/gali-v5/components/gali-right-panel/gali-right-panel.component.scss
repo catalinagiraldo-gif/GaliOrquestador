@@ -751,34 +751,39 @@ $panel-info:     #3b82f6;
 }
 
 // ── Signal item ──────────────────────────────────────────
+// ── Signal items — lenguaje visual consistente con /gali-6/senales ──────────
+
 .signal-item {
   display: flex;
-  align-items: flex-start;
-  gap: $size-3;
-  padding: $size-3;
-  border-radius: $radius-md;
-  border-left: 3px solid transparent;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid $panel-border;
+  border-left: 3px solid $panel-border;
   background: $panel-surface;
+  transition: background 0.12s ease;
 
-  &--critica {
-    border-left-color: $panel-danger;
-    background: rgba(239, 68, 68, 0.06);
-  }
+  &:hover { background: darken($panel-surface, 1.5%); }
 
-  &--sugerencia {
-    border-left-color: $panel-warning;
-    background: rgba(245, 158, 11, 0.06);
-  }
+  // Border-left colors — espejo del panel /senales
+  &--critical   { border-left-color: #f87171; background: rgba(239, 68, 68, 0.03); }
+  &--warning    { border-left-color: #fbbf24; background: rgba(251, 191, 36, 0.03); }
+  &--scale      { border-left-color: #818cf8; }
+  &--trend      { border-left-color: #34d399; }
+  &--opportunity { border-left-color: #fbbf24; }
 
-  &--info {
-    border-left-color: $panel-success;
-    background: rgba(16, 185, 129, 0.06);
-  }
-
-  &__emoji {
-    font-size: 14px;
+  // Dot — 7px círculo como en panel principal
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
     flex-shrink: 0;
-    margin-top: 1px;
+    background: $panel-border;
+
+    &--critical { background: #f87171; box-shadow: 0 0 5px rgba(248, 113, 113, 0.5); }
+    &--warning  { background: #fbbf24; }
+    &--senal    { background: #818cf8; }
   }
 
   &__body {
@@ -788,21 +793,51 @@ $panel-info:     #3b82f6;
 
   &__msg {
     font-family: $font-primary;
-    font-size: $font-xs;
+    font-size: 12px;
+    font-weight: 500;
     color: $panel-text;
     line-height: 1.4;
-    margin: 0 0 3px;
+    margin: 0 0 4px;
   }
 
-  &__time {
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__agente {
     font-size: 10px;
     color: $panel-caption;
   }
 
+  // Badge de urgencia — espejo del panel /senales
+  &__urgencia-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 100px;
+    background: rgba(0,0,0,0.05);
+    color: $panel-caption;
+
+    &--urgent {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+    }
+    &--warn {
+      background: rgba(251, 191, 36, 0.15);
+      color: #b45309;
+    }
+    &--dias {
+      background: rgba(129, 140, 248, 0.12);
+      color: #4f46e5;
+    }
+  }
+
   &__cta {
     flex-shrink: 0;
-    padding: 4px $size-2;
-    border: 1px solid $panel-border;
+    padding: 4px 8px;
+    border: 1px solid rgba($primary-500, 0.35);
     border-radius: $radius-sm;
     background: transparent;
     color: $panel-accent;
@@ -811,11 +846,14 @@ $panel-info:     #3b82f6;
     font-weight: $font-medium;
     cursor: pointer;
     white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
     transition: all 0.15s ease;
 
     &:hover {
-      background: rgba($primary-500, 0.1);
-      border-color: rgba($primary-500, 0.5);
+      background: rgba($primary-500, 0.08);
+      border-color: rgba($primary-500, 0.6);
     }
   }
 }

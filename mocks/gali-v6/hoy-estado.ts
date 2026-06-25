@@ -117,6 +117,8 @@ export interface SenalHoy {
   agente: string;
   agenteColor: string;
   tipo: 'oportunidad' | 'warning' | 'info';
+  urgencia?: 'critica' | 'media' | 'info';
+  diasRestantes?: number;
 }
 
 export interface ProyectoContrib {
@@ -179,6 +181,7 @@ export const MOCK_HOY_ESTADO: HoyEstado = {
       agente: 'ROAS Tracker',
       agenteColor: '#f97316',
       tipo: 'oportunidad' as const,
+      urgencia: 'info' as const,
     },
     {
       id: 'sn2',
@@ -187,6 +190,8 @@ export const MOCK_HOY_ESTADO: HoyEstado = {
       agente: 'Stock Guardian',
       agenteColor: '#60a5fa',
       tipo: 'warning' as const,
+      urgencia: 'critica' as const,
+      diasRestantes: 3,
     },
     {
       id: 'sn3',
@@ -195,6 +200,7 @@ export const MOCK_HOY_ESTADO: HoyEstado = {
       agente: 'Vigilante',
       agenteColor: '#fbbf24',
       tipo: 'info' as const,
+      urgencia: 'media' as const,
     },
   ],
   proyectoContribuciones: [

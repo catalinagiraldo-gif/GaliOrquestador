@@ -113,7 +113,7 @@ export class Gali6ReportesDashboardComponent {
   }
 
   getFuenteLabel(s: GaliSignal): string {
-    return s.fuente === 'deterministico' ? '📊 Dato real' : '🤖 Análisis Gali';
+    return s.fuente === 'deterministico' ? 'Dato real' : 'Análisis Gali';
   }
 
   getFuenteClass(s: GaliSignal): string {

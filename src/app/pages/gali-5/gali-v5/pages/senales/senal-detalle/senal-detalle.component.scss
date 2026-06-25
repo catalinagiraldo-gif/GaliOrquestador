@@ -358,15 +358,15 @@
 .opciones-lista {
   display: flex;
   flex-direction: column;
-  gap: $size-2;
-  margin-bottom: $size-4;
+  gap: $size-3;
+  margin-bottom: $size-5;
 }
 
 .opcion-card {
   display: flex;
   align-items: flex-start;
   gap: $size-3;
-  padding: $size-3 $size-4;
+  padding: $size-4 $size-4;
   border: 2px solid var(--surface-200);
   border-radius: $radius-sm;
   cursor: pointer;
@@ -437,15 +437,21 @@
   font-family: Inter, sans-serif;
   cursor: pointer;
   border: none;
-  background: var(--primary-500, #f49a3d);
-  color: white;
-  transition: background 120ms ease;
+  background: #f49a3d;
+  color: #fff;
+  transition: background 120ms ease, opacity 120ms ease;
 
-  &:hover { background: var(--primary-600, #e8870a); }
+  &:hover:not(:disabled) { background: #e8870a; }
+
+  &:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+  }
 
   &--critical {
-    background: var(--red-600);
-    &:hover { background: var(--red-700); }
+    background: #dc2626;
+    &:hover:not(:disabled) { background: #b91c1c; }
   }
 }
 
@@ -486,3 +492,91 @@
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+// ── Bloque "Resultado ejecutado" (loop closure) ──────────────────────────────
+
+.resultado-ejecutado {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid #bbf7d0;
+  border-left: 3px solid #16a34a;
+  border-radius: $radius-sm;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  animation: gali-fade-up 300ms ease-out both;
+
+  &__icon {
+    font-size: 14px;
+    color: #16a34a;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+  &__titulo {
+    font-size: 12px;
+    font-weight: 700;
+    color: #15803d;
+    margin: 0 0 2px;
+    font-family: Inter, sans-serif;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: #166534;
+    line-height: 1.5;
+    margin: 0;
+    font-family: Inter, sans-serif;
+  }
+
+  &__metrica {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #15803d;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: Inter, sans-serif;
+  }
+}
+
+// ── Bloque "Qué va a pasar" ───────────────────────────────────────────────────
+
+.que-va-a-pasar {
+  background: #fff7ed;
+  border: 1px solid #ffedd5;
+  border-left: 3px solid #f49a3d;
+  border-radius: $radius-sm;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.qvp-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #e8870a;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-family: Inter, sans-serif;
+  margin: 0 0 6px;
+}
+
+.qvp-lista {
+  font-size: 12px;
+  color: #374151;
+  margin: 0;
+  padding-left: 16px;
+  line-height: 1.8;
+  font-family: Inter, sans-serif;
+}

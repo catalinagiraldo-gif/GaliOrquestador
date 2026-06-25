@@ -11,16 +11,16 @@
     <p class="g6-detalle__subobjetivo">{{ pv.descripcion }}</p>
     <div class="g6-detalle__meta-row">
       @if (pv.pedidosSem > 0) {
-        <span class="g6-detalle__meta-item">📦 {{ pv.pedidosSem }}/sem</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-box"></i> {{ pv.pedidosSem }}/sem</span>
       }
       @if (pv.roasPromedio) {
-        <span class="g6-detalle__meta-item">📊 ROAS {{ pv.roasPromedio }}x</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-chart-bar"></i> ROAS {{ pv.roasPromedio }}x</span>
       }
       @if (pv.presupuestoTotal > 0) {
-        <span class="g6-detalle__meta-item">💰 ${{ pv.presupuestoTotal | number }}/día total</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-wallet"></i> ${{ pv.presupuestoTotal | number }}/día total</span>
       }
       @if (pv.campanas.length > 0) {
-        <span class="g6-detalle__meta-item">📣 {{ pv.campanas.length }} campaña{{ pv.campanas.length !== 1 ? 's' : '' }}</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-megaphone"></i> {{ pv.campanas.length }} campaña{{ pv.campanas.length !== 1 ? 's' : '' }}</span>
       }
     </div>
 
@@ -34,7 +34,7 @@
         }
         @if (pv.proyeccionSemanas) {
           <span class="g6-detalle__proyeccion-chip">
-            📈 A este ritmo, alcanzas la meta en <strong>{{ pv.proyeccionSemanas }} semanas</strong>
+            <i class="pi pi-chart-line"></i> A este ritmo, alcanzas la meta en <strong>{{ pv.proyeccionSemanas }} semanas</strong>
           </span>
         }
       </div>
@@ -43,7 +43,7 @@
     <!-- Alerta Gali -->
     @if (alertaGali()) {
       <div class="g6-detalle__alerta-gali" [class.g6-detalle__alerta-gali--riesgo]="pv.estado === 'en_riesgo'">
-        <span class="g6-detalle__alerta-icon">{{ pv.estado === 'en_riesgo' ? '⚠️' : '✦' }}</span>
+        <i class="g6-detalle__alerta-icon pi" [class.pi-exclamation-triangle]="pv.estado === 'en_riesgo'" [class.pi-sparkles]="pv.estado !== 'en_riesgo'"></i>
         <span>{{ alertaGali() }}</span>
       </div>
     }
@@ -112,27 +112,27 @@
       } @else {
         <div class="g6-canvas__kpis">
           <div class="g6-kpi">
-            <span class="g6-kpi__label">📦 Pedidos/sem</span>
+            <span class="g6-kpi__label"><i class="pi pi-box"></i> Pedidos/sem</span>
             <span class="g6-kpi__val">{{ pv.pedidosSem || '—' }}</span>
           </div>
           <div class="g6-kpi">
-            <span class="g6-kpi__label">📊 ROAS promedio</span>
+            <span class="g6-kpi__label"><i class="pi pi-chart-bar"></i> ROAS promedio</span>
             <span class="g6-kpi__val" [class.g6-kpi__val--ok]="(pv.roasPromedio ?? 0) >= 1.5">{{ pv.roasPromedio ? pv.roasPromedio + 'x' : '—' }}</span>
           </div>
           <div class="g6-kpi">
-            <span class="g6-kpi__label">💰 Presupuesto total</span>
+            <span class="g6-kpi__label"><i class="pi pi-wallet"></i> Presupuesto total</span>
             <span class="g6-kpi__val">${{ pv.presupuestoTotal | number }}/día</span>
           </div>
           <div class="g6-kpi">
-            <span class="g6-kpi__label">🎯 Contribución</span>
+            <span class="g6-kpi__label"><i class="pi pi-target"></i> Contribución</span>
             <span class="g6-kpi__val">{{ pv.contribucionPct || 0 }}% del meta</span>
           </div>
           <div class="g6-kpi">
-            <span class="g6-kpi__label">📣 Campañas activas</span>
+            <span class="g6-kpi__label"><i class="pi pi-megaphone"></i> Campañas activas</span>
             <span class="g6-kpi__val">{{ campanasCounts().activa }}</span>
           </div>
           <div class="g6-kpi">
-            <span class="g6-kpi__label">🤖 Agentes</span>
+            <span class="g6-kpi__label"><i class="pi pi-microchip-ai"></i> Agentes</span>
             <span class="g6-kpi__val">{{ pv.agentes.length }}</span>
           </div>
         </div>
@@ -150,7 +150,7 @@
 
               <!-- Canal + estado -->
               <div class="g6-campana-card__top">
-                <span class="g6-campana-card__canal-icon">{{ getCanalPvIcon(c.canal) }}</span>
+                <i [class]="'g6-campana-card__canal-icon pi ' + getCanalPvIcon(c.canal)"></i>
                 <div class="g6-campana-card__nombres">
                   <span class="g6-campana-card__nombre">{{ c.nombre }}</span>
                   <span class="g6-campana-card__canal-label" [style.color]="c.canalColor">{{ c.canalLabel }}</span>
@@ -163,10 +163,10 @@
               <!-- Producto -->
               <div class="g6-campana-card__producto-row">
                 @if (c.producto) {
-                  <span class="g6-campana-card__producto-chip">📦 {{ c.producto }}</span>
+                  <span class="g6-campana-card__producto-chip"><i class="pi pi-box"></i> {{ c.producto }}</span>
                 } @else {
                   <button class="g6-campana-card__sin-producto" (click)="nuevaCampana()">
-                    ⚠️ Sin producto — agregar →
+                    <i class="pi pi-exclamation-triangle"></i> Sin producto — agregar →
                   </button>
                 }
               </div>
@@ -203,7 +203,7 @@
                       <button class="g6-campana-card__agente-avatar"
                               title="{{ agId }}"
                               (click)="router.navigate(['/gali-6/agentes'])">
-                        {{ getAgenteIcon(agId) }}
+                        <i [class]="'pi ' + getAgenteIcon(agId)"></i>
                       </button>
                     }
                     <button class="g6-campana-card__agentes-link" (click)="router.navigate(['/gali-6/agentes'])">
@@ -223,7 +223,7 @@
                       <button class="g6-campana-card__cnx-avatar"
                               title="{{ cnx }}"
                               (click)="router.navigate(['/gali-6/conexiones'])">
-                        {{ getConexionIcon(cnx) }}
+                        <i [class]="'pi ' + getConexionIcon(cnx)"></i>
                       </button>
                     }
                     <button class="g6-campana-card__cnx-link" (click)="router.navigate(['/gali-6/conexiones'])">
@@ -266,7 +266,7 @@
         </div>
       } @else {
         <div class="g6-campanas-empty">
-          <span class="g6-campanas-empty__icon">📣</span>
+          <i class="pi pi-megaphone g6-campanas-empty__icon"></i>
           <p>Todavía no hay campañas en este proyecto.</p>
           <button class="g6-campanas-empty__nueva" (click)="nuevaCampana()">+ Crear primera campaña</button>
         </div>
@@ -280,7 +280,7 @@
       @if (pv.agentes.length > 0) {
         @for (agId of pv.agentes; track agId) {
           <div class="g6-agente-row">
-            <div class="g6-agente-row__icon">{{ getAgenteIcon(agId) }}</div>
+            <div class="g6-agente-row__icon"><i [class]="'pi ' + getAgenteIcon(agId)"></i></div>
             <div class="g6-agente-row__info">
               <span class="g6-agente-row__nombre">{{ agId }}</span>
             </div>
@@ -326,13 +326,13 @@
       <span class="g6-detalle__estado" [attr.data-estado]="p.estado">{{ estadoLabel() }}</span>
     </div>
     <div class="g6-detalle__meta-row">
-      <span class="g6-detalle__meta-item">📦 {{ p.pedidos_sem_label ?? '—' }}/sem</span>
-      <span class="g6-detalle__meta-item">📊 ROAS {{ p.roas_real_label ?? '—' }}</span>
+      <span class="g6-detalle__meta-item"><i class="pi pi-box"></i> {{ p.pedidos_sem_label ?? '—' }}/sem</span>
+      <span class="g6-detalle__meta-item"><i class="pi pi-chart-bar"></i> ROAS {{ p.roas_real_label ?? '—' }}</span>
       @if (p.pauta_diaria_label) {
-        <span class="g6-detalle__meta-item">💰 {{ p.pauta_diaria_label }}</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-wallet"></i> {{ p.pauta_diaria_label }}</span>
       }
       @if (campanas().length > 0) {
-        <span class="g6-detalle__meta-item">📣 {{ campanas().length }} campaña{{ campanas().length !== 1 ? 's' : '' }}</span>
+        <span class="g6-detalle__meta-item"><i class="pi pi-megaphone"></i> {{ campanas().length }} campaña{{ campanas().length !== 1 ? 's' : '' }}</span>
       }
     </div>
     @if (p.gali_nota) {
@@ -374,27 +374,27 @@
       <!-- KPIs -->
       <div class="g6-canvas__kpis">
         <div class="g6-kpi">
-          <span class="g6-kpi__label">📦 Pedidos/sem</span>
+          <span class="g6-kpi__label"><i class="pi pi-box"></i> Pedidos/sem</span>
           <span class="g6-kpi__val">{{ p.pedidos_sem_label ?? '—' }}</span>
         </div>
         <div class="g6-kpi">
-          <span class="g6-kpi__label">📊 ROAS real</span>
+          <span class="g6-kpi__label"><i class="pi pi-chart-bar"></i> ROAS real</span>
           <span class="g6-kpi__val" [class.g6-kpi__val--ok]="p.roas_real >= 1.5">{{ p.roas_real_label ?? '—' }}</span>
         </div>
         <div class="g6-kpi">
-          <span class="g6-kpi__label">💰 Pauta/día</span>
+          <span class="g6-kpi__label"><i class="pi pi-wallet"></i> Pauta/día</span>
           <span class="g6-kpi__val">{{ p.pauta_diaria_label ?? '—' }}</span>
         </div>
         <div class="g6-kpi">
-          <span class="g6-kpi__label">📈 Margen</span>
+          <span class="g6-kpi__label"><i class="pi pi-chart-line"></i> Margen</span>
           <span class="g6-kpi__val">{{ p.margen_neto_pct_label ?? '—' }}</span>
         </div>
         <div class="g6-kpi">
-          <span class="g6-kpi__label">🚛 Novedad</span>
+          <span class="g6-kpi__label"><i class="pi pi-truck"></i> Novedad</span>
           <span class="g6-kpi__val" [class.g6-kpi__val--warn]="p.tasa_novedad_pct > 15">{{ p.tasa_novedad_label ?? '—' }}</span>
         </div>
         <div class="g6-kpi">
-          <span class="g6-kpi__label">💵 Ganancia/sem</span>
+          <span class="g6-kpi__label"><i class="pi pi-dollar"></i> Ganancia/sem</span>
           <span class="g6-kpi__val">{{ p.ganancia_neta_semanal_label ?? '—' }}</span>
         </div>
       </div>
@@ -402,7 +402,7 @@
       <!-- Alerta activa -->
       @if (p.alerta_activa && p.alerta_mensaje) {
         <div class="g6-canvas__alerta">
-          <span class="g6-canvas__alerta-icon">⚠️</span>
+          <i class="pi pi-exclamation-triangle g6-canvas__alerta-icon"></i>
           <p class="g6-canvas__alerta-texto">{{ p.alerta_mensaje }}</p>
           <button class="g6-canvas__alerta-cta" (click)="irASenales()">Ver señal →</button>
         </div>
@@ -412,12 +412,12 @@
       @if (campanas().length > 0) {
         <div class="g6-canvas__campanas-preview">
           <div class="g6-canvas__campanas-head">
-            <span class="g6-canvas__campanas-title">📣 Campañas activas</span>
+            <span class="g6-canvas__campanas-title"><i class="pi pi-megaphone"></i> Campañas activas</span>
             <button class="g6-canvas__campanas-ver" (click)="setTab('campanas')">Ver todas →</button>
           </div>
           @for (c of campanas().slice(0, 2); track c.id) {
             <div class="g6-campana-preview-row">
-              <span>{{ getCanalIcon(c.canal) }}</span>
+              <i [class]="'pi ' + getCanalIcon(c.canal)"></i>
               <span class="g6-campana-preview-row__nombre">{{ c.nombre }}</span>
               <span class="g6-campana-preview-row__estado" [attr.data-estado]="c.estado">{{ getCampanaEstadoLabel(c.estado) }}</span>
               @if (c.roasActualLabel) {
@@ -491,7 +491,7 @@
           @for (c of campanasFiltradas(); track c.id) {
             <div class="g6-campana-card g6-campana-card--{{ c.estado }}">
               <div class="g6-campana-card__header">
-                <span class="g6-campana-card__canal-icon">{{ getCanalIcon(c.canal) }}</span>
+                <i [class]="'g6-campana-card__canal-icon pi ' + getCanalIcon(c.canal)"></i>
                 <div class="g6-campana-card__title-block">
                   <h3 class="g6-campana-card__nombre">{{ c.nombre }}</h3>
                   <span class="g6-campana-card__canal">{{ c.canalLabel }}</span>
@@ -559,7 +559,7 @@
         </div>
       } @else {
         <div class="g6-campanas-empty">
-          <span class="g6-campanas-empty__icon">📣</span>
+          <i class="pi pi-megaphone g6-campanas-empty__icon"></i>
           <p>No hay campañas en este estado.</p>
           @if (campanaFiltro() !== 'todas') {
             <button class="g6-campanas-empty__ver-todas" (click)="setCampanaFiltro('todas')">Ver todas</button>

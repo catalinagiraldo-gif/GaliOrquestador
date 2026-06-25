@@ -1,77 +1,78 @@
 <div class="hoy gali-stagger-in">
 
   <!-- ══════════════════════════════════════════════
-       BLOQUE A — STATUS + OBJETIVO
+       BLOQUE A — HEADER: saludo + semana + objetivos
   ══════════════════════════════════════════════ -->
   <header class="hoy__status">
-    <div class="hoy__status-left">
-      <h1 class="hoy__status-saludo">
-        <span class="hoy__status-spark" aria-hidden="true">✦</span>
-        Hola Cata. Gali tiene el timón.
-      </h1>
-      <div class="hoy__status-meta">
-        <span class="hoy__status-semana">{{ estado.semanaLabel }}</span>
-        <span class="hoy__status-sep" aria-hidden="true">·</span>
-        <span class="hoy__status-pedidos">
-          <strong>{{ estado.pedidosActual }}</strong>/{{ estado.pedidosMeta }} pedidos
-        </span>
-        @if (estado.galiDeltaPositivo) {
-          <span class="hoy__status-delta hoy__status-delta--pos">
-            <span aria-hidden="true">✦</span> {{ estado.galiDelta }}
-          </span>
+    <h1 class="hoy__status-saludo">
+      <span class="hoy__status-spark" aria-hidden="true">✦</span>
+      Hola Cata. Gali tiene el timón.
+    </h1>
+    <p class="hoy__status-semana">
+      Semana {{ semanaDeObjetivo().semana }} de {{ semanaDeObjetivo().total }} del objetivo
+    </p>
+
+    <!-- Objetivo general + mini-barras por objetivo -->
+    <div class="hoy__objetivo-bloque">
+      <p class="hoy__objetivo-texto">{{ objetivoV2().resumen }}</p>
+
+      <div class="hoy__objetivos-mini">
+        @for (obj of (objetivoV2().objetivos ?? []).slice(0, 3); track obj.id) {
+          <div class="hoy__obj-mini">
+            <span class="hoy__obj-mini-label">{{ obj.titulo }}</span>
+            <div class="hoy__obj-mini-track">
+              <div class="hoy__obj-mini-fill"
+                   [style.width.%]="obj.progreso_pct"
+                   [class.hoy__obj-mini-fill--logrado]="obj.progreso_pct >= 90">
+              </div>
+            </div>
+            <span class="hoy__obj-mini-val">{{ obj.actualValor }}{{ obj.unidad }}</span>
+            @if (obj.sugerenciaGali) {
+              <span class="hoy__obj-mini-dot" [title]="obj.sugerenciaGali.texto" aria-label="Gali tiene una sugerencia">✦</span>
+            }
+          </div>
         }
       </div>
 
-      <!-- Objetivo con texto completo -->
-      <div class="hoy__objetivo-bloque">
-        <p class="hoy__objetivo-texto">{{ objetivo().texto }}</p>
-        <div class="hoy__objetivo-progreso">
-          <span class="hoy__objetivo-pct-badge">{{ pedidosPct() }}%</span>
-          <span class="hoy__objetivo-track">
-            <span class="hoy__objetivo-fill" [style.width.%]="pedidosPct()"></span>
-          </span>
-          <span class="hoy__objetivo-sub">
-            {{ estado.pedidosActual }} de {{ estado.pedidosMeta }} ped · {{ estado.semanaLabel }}
-          </span>
-        </div>
-        <div class="hoy__objetivo-acciones">
-          <button class="hoy__objetivo-edit" (click)="irAMiContextoObjetivo()">
-            editar objetivo →
-          </button>
-          <a routerLink="/gali-6/proyectos" class="hoy__objetivo-proyectos">
-            Ver proyectos →
-          </a>
-        </div>
+      <div class="hoy__objetivo-acciones">
+        <button class="hoy__objetivo-edit" (click)="irAMiContextoObjetivo()">
+          Editar objetivos →
+        </button>
+        <a routerLink="/gali-6/proyectos" class="hoy__objetivo-proyectos">
+          Ver proyectos →
+        </a>
       </div>
-    </div>
-    <div class="hoy__status-right">
-      <!-- Sparkline -->
-      <div class="hoy__spark" aria-label="Tendencia de pedidos esta semana" role="img">
-        @for (p of estado.sparkPoints; track $index) {
-          <span class="hoy__spark-bar" [style.height.px]="getSparkHeight(p.v)"></span>
-        }
-      </div>
-      <span class="hoy__status-pct">{{ pedidosPct() }}%</span>
     </div>
   </header>
 
   <!-- ══════════════════════════════════════════════
        BLOQUE B — SEÑALES DEL DÍA
   ══════════════════════════════════════════════ -->
-  @if (estado.senalesHoy?.length) {
+  @if (senalesVisibles().length) {
     <section class="hoy__senales">
       <div class="hoy__senales-hdr">
         <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Señales del día</span>
         <a routerLink="/gali-6/senales" class="hoy__ver-mas">Ver todas →</a>
       </div>
       <div class="hoy__senales-grid">
-        @for (s of estado.senalesHoy; track s.id) {
-          <article class="hoy__senal-card hoy__senal-card--{{ s.tipo }}">
+        @for (s of senalesVisibles(); track s.id) {
+          <article class="hoy__senal-card hoy__senal-card--{{ s.tipo }}"
+                   [class.hoy__senal-card--critica]="s.urgencia === 'critica'"
+                   [class.hoy__senal-card--media]="s.urgencia === 'media'">
+            <button class="hoy__senal-dismiss" (click)="descartarSenal(s.id)" aria-label="Descartar señal">×</button>
             <p class="hoy__senal-evento">{{ s.senal }}</p>
             <p class="hoy__senal-accion"><span aria-hidden="true">→</span> {{ s.accion }}</p>
-            <div class="hoy__senal-agente">
-              <span class="hoy__senal-dot" [style.background]="s.agenteColor"></span>
-              <span class="hoy__senal-quien">{{ s.agente }}</span>
+            <div class="hoy__senal-footer">
+              <div class="hoy__senal-agente">
+                <span class="hoy__senal-dot" [style.background]="s.agenteColor"></span>
+                <span class="hoy__senal-quien">{{ s.agente }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                @if (s.diasRestantes) {
+                  <span class="hoy__senal-urgencia"><i class="pi pi-clock"></i> {{ s.diasRestantes }}d</span>
+                }
+                <a routerLink="/gali-6/senales" class="hoy__senal-ver">Ver →</a>
+              </div>
             </div>
           </article>
         }
@@ -80,87 +81,67 @@
   }
 
   <!-- ══════════════════════════════════════════════
-       LAYOUT 2 COLUMNAS
+       BLOQUE C — GALI HIZO POR TI (full-width)
+  ══════════════════════════════════════════════ -->
+  <section class="hoy__aporte">
+    <div class="hoy__aporte-hdr">
+      <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
+      <button class="hoy__aporte-toggle" (click)="toggleAporte()">
+        {{ verAporte() ? 'Ocultar ↑' : 'Ver desglose ↓' }}
+      </button>
+    </div>
+
+    <!-- Preview siempre visible: 3 números clave -->
+    <div class="hoy__aporte-preview-row">
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.acciones }}</span>
+      <span class="hoy__aporte-preview-lbl">acciones</span>
+      <span class="hoy__aporte-sep" aria-hidden="true">·</span>
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.pesosAhorrados }}</span>
+      <span class="hoy__aporte-preview-lbl">ahorrados</span>
+      <span class="hoy__aporte-sep" aria-hidden="true">·</span>
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.horasLibradas }}h</span>
+      <span class="hoy__aporte-preview-lbl">libres</span>
+    </div>
+
+    <!-- Desglose expandible -->
+    @if (verAporte()) {
+      <div class="hoy__aporte-body">
+        <div class="hoy__aporte-grid">
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.acciones }}</span>
+            <span class="hoy__aporte-lbl">acciones · <em>{{ estado.impactoSemana.accionesAutonomas }} autónomas</em></span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.pesosAhorrados }}</span>
+            <span class="hoy__aporte-lbl">ahorrados esta semana</span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.novedadesEvitadas }}</span>
+            <span class="hoy__aporte-lbl">novedades evitadas</span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.horasLibradas }}h</span>
+            <span class="hoy__aporte-lbl">que no operaste tú</span>
+          </div>
+        </div>
+        <div class="hoy__aporte-bar">
+          <span class="hoy__aporte-bar-lbl">Acciones iniciadas por Gali</span>
+          <span class="hoy__aporte-bar-track">
+            <span class="hoy__aporte-bar-fill" [style.width.%]="estado.impactoSemana.pctAccionesGali"></span>
+          </span>
+          <span class="hoy__aporte-bar-val">{{ estado.impactoSemana.pctAccionesGali }}%</span>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE D — BOTTOM 2-COL: Asistentes + Novedades
   ══════════════════════════════════════════════ -->
   <div class="hoy__cols">
 
-    <!-- ─────────── COLUMNA IZQUIERDA ─────────── -->
+    <!-- Asistentes activos -->
     <div class="hoy__col hoy__col--izq">
-
-      <!-- BLOQUE C — DECISIÓN DE HOY -->
-      @if (!decisionDismissed()) {
-        <section class="hoy__hero {{ getDecisionClass() }}">
-          <div class="hoy__hero-header">
-            <div class="hoy__hero-meta">
-              <span class="hoy__hero-agente">{{ decision.agenteName }}</span>
-              <span class="hoy__chip-proceso {{ getProcesoClass() }}">{{ getProcesoLabel() }}</span>
-            </div>
-            <button class="hoy__hero-dismiss" (click)="onDismiss()" title="Recordar más tarde">×</button>
-          </div>
-          <h2 class="hoy__hero-titulo">{{ decision.titulo }}</h2>
-          <p class="hoy__hero-desc">{{ decision.descripcion }}</p>
-          <div class="hoy__hero-actions">
-            <button class="hoy__cta-primario" (click)="onCtaPrincipal()">
-              {{ decision.ctaPrincipal }} →
-            </button>
-            @if (decision.ctaSecundario) {
-              <button class="hoy__cta-secundario" (click)="onDismiss()">
-                {{ decision.ctaSecundario }}
-              </button>
-            }
-          </div>
-        </section>
-      }
-
-      <!-- GALI HIZO POR TI -->
-      <section class="hoy__aporte">
-        <div class="hoy__aporte-hdr">
-          <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
-          <button class="hoy__aporte-toggle" (click)="toggleAporte()">
-            {{ verAporte() ? 'Ocultar' : 'Ver aporte' }}
-          </button>
-        </div>
-        @if (verAporte()) {
-          <div class="hoy__aporte-body">
-            <div class="hoy__aporte-grid">
-              <div class="hoy__aporte-stat">
-                <span class="hoy__aporte-val">{{ estado.impactoSemana.acciones }}</span>
-                <span class="hoy__aporte-lbl">acciones · <em>{{ estado.impactoSemana.accionesAutonomas }} autónomas</em></span>
-              </div>
-              <div class="hoy__aporte-stat">
-                <span class="hoy__aporte-val">{{ estado.impactoSemana.pesosAhorrados }}</span>
-                <span class="hoy__aporte-lbl">ahorrados esta semana</span>
-              </div>
-              <div class="hoy__aporte-stat">
-                <span class="hoy__aporte-val">{{ estado.impactoSemana.novedadesEvitadas }}</span>
-                <span class="hoy__aporte-lbl">novedades evitadas</span>
-              </div>
-              <div class="hoy__aporte-stat">
-                <span class="hoy__aporte-val">{{ estado.impactoSemana.horasLibradas }}h</span>
-                <span class="hoy__aporte-lbl">que no operaste tú</span>
-              </div>
-            </div>
-            <div class="hoy__aporte-bar">
-              <span class="hoy__aporte-bar-lbl">Acciones iniciadas por Gali</span>
-              <span class="hoy__aporte-bar-track">
-                <span class="hoy__aporte-bar-fill" [style.width.%]="estado.impactoSemana.pctAccionesGali"></span>
-              </span>
-              <span class="hoy__aporte-bar-val">{{ estado.impactoSemana.pctAccionesGali }}%</span>
-            </div>
-          </div>
-        } @else {
-          <p class="hoy__aporte-preview">
-            {{ estado.impactoSemana.acciones }} acciones · {{ estado.impactoSemana.pesosAhorrados }} ahorrados · {{ estado.impactoSemana.horasLibradas }}h libres
-          </p>
-        }
-      </section>
-
-    </div><!-- /col-izq -->
-
-    <!-- ─────────── COLUMNA DERECHA ─────────── -->
-    <div class="hoy__col hoy__col--der">
-
-      <!-- BLOQUE D — ASISTENTES ACTIVOS -->
       <section class="hoy__asistentes">
         <span class="hoy__section-eyebrow">Asistentes activos</span>
         <div class="hoy__asistentes-cards">
@@ -182,11 +163,13 @@
         </div>
         <a routerLink="/gali-6/agentes" class="hoy__ver-mas">Gestionar asistentes →</a>
       </section>
+    </div>
 
-      <!-- BLOQUE E — NOVEDADES DE CLIENTES / CHATEA PRO -->
+    <!-- Novedades de clientes -->
+    <div class="hoy__col hoy__col--der">
       @if (estado.chatProResumen) {
         <section class="hoy__chatea">
-          <span class="hoy__section-eyebrow">💬 Novedades de clientes</span>
+          <span class="hoy__section-eyebrow"><i class="pi pi-comments"></i> Novedades de clientes</span>
           <p class="hoy__chatea-resumen">
             <strong>{{ estado.chatProResumen.mensajes }}</strong> mensajes sin responder
             @if (estado.chatProResumen.urgentes > 0) {
@@ -198,14 +181,12 @@
           </a>
         </section>
       }
-
-    </div><!-- /col-der -->
+    </div>
 
   </div><!-- /cols -->
 
 </div>
 
-<!-- Toast de feedback -->
 @if (toastMsg()) {
   <div class="hoy__toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
 }

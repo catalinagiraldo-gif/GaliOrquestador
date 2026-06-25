@@ -22,7 +22,7 @@
 
       <div class="wizard__inicio-cards">
         <button class="wizard__inicio-card" (click)="elegirDesdeProducto()">
-          <div class="wizard__inicio-card-icon">📦</div>
+          <div class="wizard__inicio-card-icon"><i class="pi pi-box"></i></div>
           <div class="wizard__inicio-card-body">
             <strong class="wizard__inicio-card-title">Tengo un producto en mente</strong>
             <p class="wizard__inicio-card-desc">Elige el producto, calcula el precio con Brújula y lanza tu campaña.</p>
@@ -31,7 +31,7 @@
         </button>
 
         <button class="wizard__inicio-card" (click)="elegirDesdeProblema()">
-          <div class="wizard__inicio-card-icon">🎯</div>
+          <div class="wizard__inicio-card-icon"><i class="pi pi-target"></i></div>
           <div class="wizard__inicio-card-body">
             <strong class="wizard__inicio-card-title">Quiero resolver un problema de ventas</strong>
             <p class="wizard__inicio-card-desc">Describe el problema y Gali sugiere los mejores productos para atacarlo.</p>
@@ -58,7 +58,7 @@
           <button class="wizard__problema-card"
                   [class.wizard__problema-card--selected]="problemaSeleccionado()?.id === prob.id"
                   (click)="seleccionarProblema(prob)">
-            <span class="wizard__problema-icon">{{ prob.icon }}</span>
+            <i [class]="'wizard__problema-icon pi ' + prob.icon"></i>
             <span class="wizard__problema-label">{{ prob.label }}</span>
             @if (problemaSeleccionado()?.id === prob.id) {
               <span class="wizard__problema-check" aria-hidden="true">✓</span>
@@ -151,7 +151,7 @@
   <!-- ── PASO 2: Brújula ampliada ── -->
   @if (step() === 'brujula') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">🧭 Brújula de precio</h1>
+      <h1 class="wizard__title"><i class="pi pi-compass"></i> Brújula de precio</h1>
       <p class="wizard__sub">Ingresa el costo del producto. Flete y comisión están calculados automáticamente por Gali.</p>
 
       <!-- Solo costo editable; flete y comisión son read-only (I9) -->
@@ -396,14 +396,14 @@
 
         <button class="wizard__launch" [disabled]="isLaunching()" (click)="launch()">
           @if (isLaunching()) { Lanzando… }
-          @else if (modoCampana()) { 🚀 Lanzar campaña }
-          @else { 🚀 Lanzar proyecto }
+          @else if (modoCampana()) { <i class="pi pi-send"></i> Lanzar campaña }
+          @else { <i class="pi pi-send"></i> Lanzar proyecto }
         </button>
 
         @if (isLaunching()) {
           <div class="launch-overlay">
             <div class="launch-overlay__content">
-              <div class="launch-overlay__rocket">🚀</div>
+              <i class="pi pi-send launch-overlay__rocket"></i>
               <div class="launch-overlay__bar-wrap">
                 <div class="launch-overlay__bar" [style.width.%]="launchProgress()"></div>
               </div>
@@ -426,7 +426,7 @@
 
       } @else {
         <div class="launch-success gali-stagger-in">
-          <div class="launch-success__icon">🚀</div>
+          <i class="pi pi-check-circle launch-success__icon"></i>
           <h2 class="launch-success__title">
             @if (modoCampana()) { ¡Campaña lanzada! } @else { ¡Proyecto lanzado! }
           </h2>

@@ -42,14 +42,46 @@
       }
     </div>
 
+    <!-- ─────── RESULTADO EJECUTADO (loop closure) ─────── -->
+    @if (accionTomada && s.resultadoEjecutado) {
+      <div class="resultado-ejecutado">
+        <span class="resultado-ejecutado__icon">✦</span>
+        <div class="resultado-ejecutado__body">
+          <p class="resultado-ejecutado__titulo">Gali lo ejecutó · {{ s.resultadoEjecutado.fecha }}</p>
+          <p class="resultado-ejecutado__desc">{{ s.resultadoEjecutado.descripcion }}</p>
+          @if (s.resultadoEjecutado.metrica) {
+            <span class="resultado-ejecutado__metrica">{{ s.resultadoEjecutado.metrica }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ─────── QUÉ VA A PASAR ─────── -->
+    @if (s.tipo !== 'completed' && !accionTomada) {
+      <div class="que-va-a-pasar">
+        <p class="qvp-label">✦ Gali ejecutará</p>
+        <ul class="qvp-lista">
+          <li>{{ s.recomendacion.length > 80 ? (s.recomendacion | slice:0:80) + '...' : s.recomendacion }}</li>
+          <li>Lo gestiona {{ s.agenteOrigenNombre || s.agente }} — resultado en minutos</li>
+          <li>Puedes revertir desde la sección Historial</li>
+        </ul>
+      </div>
+    }
+
     <!-- ─────── CTAs ─────── -->
     <div class="detalle-actions">
-      <button class="btn-cta btn-cta--primary" (click)="ctaPrimario.emit(item)">
-        {{ s.ctaPrincipal }}
-      </button>
-      <button class="btn-cta btn-cta--secondary" (click)="ctaSecundario.emit(item)">
-        {{ s.ctaSecundario }}
-      </button>
+      @if (accionTomada && s.resultadoEjecutado) {
+        <button class="btn-cta btn-cta--secondary" (click)="ctaSecundario.emit(item)">
+          Ver resultado en dashboard →
+        </button>
+      } @else {
+        <button class="btn-cta btn-cta--primary" (click)="ctaPrimario.emit(item)">
+          {{ s.ctaPrincipal }}
+        </button>
+        <button class="btn-cta btn-cta--secondary" (click)="ctaSecundario.emit(item)">
+          {{ s.ctaSecundario }}
+        </button>
+      }
     </div>
 
     <!-- ─────── ACCIONES SECUNDARIAS ─────── -->
@@ -114,15 +146,15 @@
     <!-- ─────── DECISIÓN MULTI-OPCIÓN ─────── -->
     @if (a.opciones && a.opciones.length > 0 && !accionConfirmada()) {
       <div class="opciones-picker">
-        <p class="opciones-titulo">¿Cómo quieres actuar?</p>
+        <p class="opciones-titulo">Elige cómo actuar</p>
         <div class="opciones-lista">
           @for (op of a.opciones; track op.id) {
-            <label class="opcion-card" [class.is-selected]="getOpcionSeleccionada(a) === op.id">
+            <label class="opcion-card" [class.is-selected]="opcionSeleccionada() === op.id">
               <input type="radio" name="opcion-{{ a.id }}" [value]="op.id"
-                     [checked]="getOpcionSeleccionada(a) === op.id"
+                     [checked]="opcionSeleccionada() === op.id"
                      (change)="selectOpcion(op.id)" class="sr-only">
               <div class="opcion-card__check">
-                @if (getOpcionSeleccionada(a) === op.id) { ◉ } @else { ○ }
+                @if (opcionSeleccionada() === op.id) { ◉ } @else { ○ }
               </div>
               <div class="opcion-card__body">
                 <span class="opcion-card__label">{{ op.label }}</span>
@@ -135,8 +167,9 @@
           }
         </div>
         <button class="btn-confirmar" [class.btn-confirmar--critical]="a.tipo === 'critical'"
+                [disabled]="!opcionSeleccionada()"
                 (click)="confirmarOpcion(a)">
-          Confirmar acción →
+          @if (opcionSeleccionada()) { Aplicar cambio → } @else { Selecciona una opción primero }
         </button>
       </div>
     }
@@ -145,8 +178,8 @@
       <div class="accion-confirmada">
         <span class="accion-confirmada__icon">✦</span>
         <div>
-          <p class="accion-confirmada__titulo">Gali está ejecutando la acción</p>
-          <p class="accion-confirmada__desc">Recibirás una notificación cuando esté lista. Vigilante monitoreará el resultado.</p>
+          <p class="accion-confirmada__titulo">Cambio aplicado</p>
+          <p class="accion-confirmada__desc">Gali está ejecutando. Te avisaremos cuando haya resultado visible.</p>
         </div>
       </div>
     }

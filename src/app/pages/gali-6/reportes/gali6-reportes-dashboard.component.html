@@ -8,7 +8,7 @@
       <div class="dash__banner-meta">
         <span class="dash__banner-avatar">✦</span>
         <span class="dash__banner-label">Gali dice</span>
-        <span class="dash__chip dash__chip--ia-ligera">🤖 IA guiada</span>
+        <span class="dash__chip dash__chip--ia-ligera"><i class="pi pi-microchip-ai"></i> IA guiada</span>
       </div>
       <p class="dash__banner-texto">
         Semana sólida. Tu ROAS efectivo fue 1.91x — ligeramente por debajo del objetivo pero con
@@ -44,7 +44,7 @@
         <div class="dash__kpi-header">
           <span class="dash__kpi-label">{{ kpi.label }}</span>
           @if (kpi.deterministico) {
-            <span class="dash__kpi-fuente" title="Dato directo de Dropi. 100% confiable.">📊</span>
+            <i class="pi pi-verified dash__kpi-fuente" title="Dato directo de Dropi. 100% confiable."></i>
           }
         </div>
         <span class="dash__kpi-valor">{{ kpi.valor }}</span>
@@ -62,7 +62,7 @@
   <section class="dash__seccion">
     <h2 class="dash__seccion-titulo">
       Rendimiento por proyecto
-      <span class="dash__chip dash__chip--deterministic">📊 Datos reales</span>
+      <span class="dash__chip dash__chip--deterministic"><i class="pi pi-database"></i> Datos reales</span>
     </h2>
     <div class="dash__tabla-wrap">
       <table class="dash__tabla" aria-label="Rendimiento por proyecto">
@@ -84,7 +84,7 @@
               <td class="dash__td-nombre">
                 {{ p.nombre }}
                 @if (p.alertaActiva) {
-                  <span class="dash__alerta-dot" title="Tiene alerta activa">⚠️</span>
+                  <i class="pi pi-exclamation-circle dash__alerta-dot" title="Tiene alerta activa"></i>
                 }
               </td>
               <td><span class="dash__badge {{ getEstadoClass(p.estado) }}">{{ getEstadoLabel(p.estado) }}</span></td>
@@ -135,14 +135,14 @@
     <div class="dash__graficos-grid">
       <div class="dash__grafico-placeholder">
         <div class="dash__grafico-placeholder-inner">
-          <span class="dash__grafico-placeholder-icon">📈</span>
+          <i class="pi pi-chart-line dash__grafico-placeholder-icon"></i>
           <span class="dash__grafico-placeholder-label">ROAS por día</span>
           <span class="dash__grafico-placeholder-nota">Próximamente</span>
         </div>
       </div>
       <div class="dash__grafico-placeholder">
         <div class="dash__grafico-placeholder-inner">
-          <span class="dash__grafico-placeholder-icon">📦</span>
+          <i class="pi pi-box dash__grafico-placeholder-icon"></i>
           <span class="dash__grafico-placeholder-label">Pedidos por canal</span>
           <span class="dash__grafico-placeholder-nota">Próximamente</span>
         </div>

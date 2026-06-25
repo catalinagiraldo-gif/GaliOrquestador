@@ -477,6 +477,22 @@
   }
   &__health-num { font-size: 11px; color: $gray-500; font-weight: $font-semibold; width: 32px; text-align: right; }
 
+  &__signal-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(255, 97, 2, 0.1);
+    color: #ff6102;
+    border: 1px solid rgba(255, 97, 2, 0.2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.12s, border-color 0.12s;
+    &:hover { background: rgba(255, 97, 2, 0.18); border-color: rgba(255, 97, 2, 0.35); }
+  }
+
   &__actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
   &__edit-btn {
     background: none; border: 1px solid $gray-200; border-radius: $radius-sm; cursor: pointer;

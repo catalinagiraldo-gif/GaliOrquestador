@@ -51,13 +51,13 @@
     <h2 class="cd__section-title">Productos en esta campaña</h2>
     @if (c.producto) {
       <div class="cd__producto-card">
-        <span class="cd__producto-icon">📦</span>
+        <i class="pi pi-box cd__producto-icon"></i>
         <span class="cd__producto-nombre">{{ c.producto }}</span>
         <button class="cd__producto-cambiar">Cambiar →</button>
       </div>
     } @else {
       <div class="cd__sin-producto">
-        <span>⚠️ Sin producto asignado</span>
+        <i class="pi pi-exclamation-triangle"></i> Sin producto asignado
         <button class="cd__agregar-producto">+ Agregar producto</button>
       </div>
     }
@@ -70,7 +70,7 @@
       <div class="cd__agentes-list">
         @for (agId of c.agentes; track agId) {
           <div class="cd__agente-row">
-            <div class="cd__agente-avatar">{{ getAgenteInfo(agId).icono }}</div>
+            <div class="cd__agente-avatar"><i [class]="'pi ' + getAgenteInfo(agId).icono"></i></div>
             <div class="cd__agente-info">
               <span class="cd__agente-nombre">{{ getAgenteInfo(agId).label }}</span>
               <span class="cd__agente-modo">
@@ -103,7 +103,7 @@
       <div class="cd__conexiones-list">
         @for (cnxId of c.conexiones; track cnxId) {
           <div class="cd__conexion-row">
-            <span class="cd__conexion-icon">{{ getConexionInfo(cnxId).icono }}</span>
+            <i [class]="'cd__conexion-icon pi ' + getConexionInfo(cnxId).icono"></i>
             <span class="cd__conexion-nombre">{{ getConexionInfo(cnxId).label }}</span>
             <span class="cd__conexion-estado">{{ getConexionInfo(cnxId).estado }}</span>
             <button class="cd__conexion-btn" (click)="router.navigate(['/gali-6/conexiones'])">

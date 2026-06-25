@@ -5,7 +5,7 @@ import { GaliStateService } from '../../services/gali-state.service';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { loadAutopilotScope } from '../gali-autopilot-config/gali-autopilot-config.component';
 import { DropiPanelSplitterComponent } from '../dropi-panel-splitter/dropi-panel-splitter.component';
-import { MOCK_ALERTAS, GaliAlerta } from '../../../../../../../mocks/gali-v5/senales.mock';
+import { MOCK_ALERTAS, MOCK_SENALES, GaliAlerta } from '../../../../../../../mocks/gali-v5/senales.mock';
 
 type PanelTab = 'chat' | 'agentes' | 'senales' | 'live' | 'memory' | 'files';
 
@@ -68,7 +68,7 @@ export class GaliRightPanelComponent implements AfterViewChecked {
   private ngZone = inject(NgZone);
   private shouldScrollChat = false;
   readonly Math = Math;
-  private router = inject(Router);
+  readonly router = inject(Router);
 
   activeTab = signal<PanelTab>('chat');
   chatInput = signal('');
@@ -792,6 +792,35 @@ export class GaliRightPanelComponent implements AfterViewChecked {
 
   // I3: Señales del panel usan MOCK_ALERTAS (mismos que /senales)
   readonly panelAlertas: GaliAlerta[] = MOCK_ALERTAS.filter((a: GaliAlerta) => a.tipo === 'critical' || a.tipo === 'warning');
+
+  // Lista priorizada para tab Señales: alertas críticas → warning → señales activas por urgencia
+  readonly panelItems = [
+    ...MOCK_ALERTAS
+      .filter(a => a.tipo === 'critical' || a.tipo === 'warning')
+      .sort((a, b) => (a.tipo === 'critical' ? 0 : 1) - (b.tipo === 'critical' ? 0 : 1))
+      .map(a => ({
+        id: a.id,
+        titulo: a.titulo,
+        agente: (a.agente ?? a.agenteOrigenNombre ?? '').toLowerCase(),
+        tipoCat: a.tipo as string,      // 'critical' | 'warning'
+        categoria: 'alerta' as const,
+        cta: a.ctaPrincipal ?? null,
+        dias: null as number | null,
+      })),
+    ...MOCK_SENALES
+      .filter(s => s.tipo !== 'completed')
+      .sort((a, b) => a.ventanaDias - b.ventanaDias)
+      .slice(0, 3)
+      .map(s => ({
+        id: s.id,
+        titulo: s.titulo,
+        agente: (s.agenteOrigenNombre ?? s.agente ?? '').toLowerCase(),
+        tipoCat: s.tipo as string,      // 'scale' | 'trend' | 'opportunity' | 'risk'
+        categoria: 'senal' as const,
+        cta: s.ctaPrincipal ?? null,
+        dias: s.ventanaDias,
+      })),
+  ];
 
   readonly esExperto = computed(() => {
     try { return localStorage.getItem('gali-6-modo') === 'experto'; } catch { return false; }

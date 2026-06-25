@@ -7,7 +7,7 @@ import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
 import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
 import PROJECTS from '../../../../../mocks/gali-v5/projects.json';
 import KPIS from '../../../../../mocks/gali-v5/kpis-global.json';
-import { MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
+import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
 import {
   G6Objetivo, SubMeta, ObjetivoTipo, TIPO_LABEL,
   getObjetivo, saveObjetivo, syncLegacyKeys,
@@ -53,6 +53,12 @@ interface GaliCheckin {
   proyectoId?: string;
   accion?: 'nuevo' | 'ver';
 }
+
+// Mapeo de IDs internos del portafolio → proyectoId del mock de señales
+const PROYECTO_SENAL_MAP: Record<string, string> = {
+  'pv-003': 'collar-gps-2026',
+  'pv-004': 'skincare-kbeauty',
+};
 
 const PROJ_OVERRIDES_KEY = 'gali-6-proyecto-overrides';
 const PROTO_DATE = '2026-06-15';
@@ -672,6 +678,18 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
   getCampanas(proyectoId: string): Campana[] {
     return MOCK_CAMPANAS.filter(c => c.proyectoId === proyectoId);
+  }
+
+  getSignalCount(proyectoId: string): number {
+    const senalId = PROYECTO_SENAL_MAP[proyectoId];
+    if (!senalId) return 0;
+    const senales = MOCK_SENALES.filter(s => s.proyectoId === senalId && s.tipo !== 'completed').length;
+    const alertas = MOCK_ALERTAS.filter(a => a.proyectoId === senalId).length;
+    return senales + alertas;
+  }
+
+  getProyectoSenalId(proyectoId: string): string | null {
+    return PROYECTO_SENAL_MAP[proyectoId] ?? null;
   }
 
   getCampanaEstadoLabel(estado: string): string {

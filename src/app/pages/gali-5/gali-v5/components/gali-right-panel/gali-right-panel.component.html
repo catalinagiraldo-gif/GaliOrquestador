@@ -216,7 +216,7 @@
     <span class="gali-panel__tab-hint">
       @switch (activeTab()) {
         @case ('chat') { Escríbele a Gali }
-        @case ('senales') { Decisiones pendientes }
+        @case ('senales') { Ordenadas por urgencia }
         @case ('agentes') { Todos los agentes activos }
         @case ('live') { Log del autopilot en tiempo real }
         @case ('memory') { Lo que Gali recuerda de ti }
@@ -766,17 +766,41 @@
   <!-- ── TAB: Señales ── -->
   @if (activeTab() === 'senales') {
     <div class="gali-panel__content gali-panel__senales">
-      @for (alerta of panelAlertas; track alerta.id) {
+      @for (item of panelItems; track item.id) {
         <div class="signal-item"
-          [class.signal-item--critica]="alerta.tipo === 'critical'"
-          [class.signal-item--sugerencia]="alerta.tipo === 'warning'">
-          <span class="signal-item__emoji">{{ alerta.tipo === 'critical' ? '◎' : '⚠' }}</span>
+          [class.signal-item--critical]="item.tipoCat === 'critical'"
+          [class.signal-item--warning]="item.tipoCat === 'warning'"
+          [class.signal-item--scale]="item.tipoCat === 'scale'"
+          [class.signal-item--trend]="item.tipoCat === 'trend'"
+          [class.signal-item--opportunity]="item.tipoCat === 'opportunity'">
+
+          <!-- Dot de urgencia — consistente con panel principal -->
+          <span class="signal-item__dot"
+            [class.signal-item__dot--critical]="item.tipoCat === 'critical'"
+            [class.signal-item__dot--warning]="item.tipoCat === 'warning'"
+            [class.signal-item__dot--senal]="item.categoria === 'senal'"></span>
+
           <div class="signal-item__body">
-            <p class="signal-item__msg">{{ alerta.titulo }}</p>
-            <span class="signal-item__time">{{ alerta.agente }}</span>
+            <p class="signal-item__msg">{{ item.titulo }}</p>
+            <div class="signal-item__meta">
+              <span class="signal-item__agente">{{ item.agente }}</span>
+              <!-- Badge de urgencia — consistente con panel principal -->
+              <span class="signal-item__urgencia-badge"
+                [class.signal-item__urgencia-badge--urgent]="item.tipoCat === 'critical'"
+                [class.signal-item__urgencia-badge--warn]="item.tipoCat === 'warning'"
+                [class.signal-item__urgencia-badge--dias]="item.categoria === 'senal'">
+                @if (item.tipoCat === 'critical') { Urgente }
+                @else if (item.tipoCat === 'warning') { Pendiente }
+                @else if (item.dias !== null) { {{ item.dias }}d }
+              </span>
+            </div>
           </div>
-          @if (alerta.ctaPrincipal) {
-            <button class="signal-item__cta" type="button" data-proto-skip>{{ alerta.ctaPrincipal }}</button>
+
+          @if (item.cta) {
+            <button class="signal-item__cta" type="button" data-proto-skip
+                    (click)="router.navigate(['/gali-6/senales'], { queryParams: { signalId: item.id } }); close()">
+              {{ item.cta }}
+            </button>
           }
         </div>
       }

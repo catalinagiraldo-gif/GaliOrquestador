@@ -9,21 +9,11 @@
       <div class="g6-senales__pills">
         <span class="g6-pill g6-pill--count">{{ totalActivas() }} activas</span>
       </div>
+      <button class="g6-ver-dashboard-btn" (click)="irADashboard()">
+        <i class="pi pi-chart-bar"></i> Ver dashboard
+      </button>
     </div>
     <p class="g6-senales__subtitle">Lo que Gali y tus agentes detectaron antes de que lo vieras tú</p>
-
-    <!-- Botones modo rápido -->
-    <div class="g6-senales__mode-actions">
-      <button class="g6-mode-btn g6-mode-btn--operar" (click)="onOperar()">
-        <i class="pi pi-bolt"></i> Operar
-      </button>
-      <button class="g6-mode-btn g6-mode-btn--lanzar" (click)="onLanzar()">
-        <i class="pi pi-rocket"></i> Lanzar
-      </button>
-      <button class="g6-mode-btn g6-mode-btn--medir" (click)="onMedir()">
-        <i class="pi pi-chart-line"></i> Medir
-      </button>
-    </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════
@@ -34,7 +24,7 @@
     <!-- Filtro proyecto activo -->
     @if (proyectoFiltro()) {
       <div class="g6-filter-bar g6-filter-bar--proyecto">
-        <span class="g6-filter-bar__icon">🎯</span>
+        <i class="pi pi-filter g6-filter-bar__icon"></i>
         <span>Señales de <strong>{{ proyectoFiltro() }}</strong></span>
         <button type="button" (click)="proyectoFiltro.set(null)">Ver todas ×</button>
       </div>
@@ -42,35 +32,39 @@
 
     <!-- Toolbar: filtros por fuente + por agente -->
     <div class="g6-senales__toolbar">
-      <div class="g6-filtro-tabs">
-        @for (f of filtroTabs; track f.value) {
-          <button
-            class="g6-filtro-btn"
-            [class.g6-filtro-btn--active]="signalFiltro() === f.value"
-            (click)="setFiltro(f.value)">
-            {{ f.label }}
-          </button>
-        }
+      <div class="g6-senales__toolbar-row">
+        <div class="g6-filtro-tabs">
+          @for (f of filtroTabs; track f.value) {
+            <button
+              class="g6-filtro-btn"
+              [class.g6-filtro-btn--active]="signalFiltro() === f.value"
+              (click)="setFiltro(f.value)">
+              <i class="pi {{ f.icon }}"></i> {{ f.label }}
+            </button>
+          }
+        </div>
       </div>
 
       <!-- Filtro por agente -->
       @if (agentesConSenales().length > 1) {
-        <div class="g6-agente-filtro">
-          <button
-            class="g6-agente-btn"
-            [class.g6-agente-btn--active]="agenteFiltro() === 'todos'"
-            (click)="setAgenteFiltro('todos')">
-            Todos
-          </button>
-          @for (a of agentesConSenales(); track a.id) {
+        <div class="g6-senales__toolbar-row">
+          <div class="g6-agente-filtro">
             <button
               class="g6-agente-btn"
-              [class.g6-agente-btn--active]="agenteFiltro() === a.id"
-              (click)="setAgenteFiltro(a.id)"
-              [title]="a.descripcionCorta">
-              {{ a.nombreCorto }}
+              [class.g6-agente-btn--active]="agenteFiltro() === 'todos'"
+              (click)="setAgenteFiltro('todos')">
+              Todos
             </button>
-          }
+            @for (a of agentesConSenales(); track a.id) {
+              <button
+                class="g6-agente-btn"
+                [class.g6-agente-btn--active]="agenteFiltro() === a.id"
+                (click)="setAgenteFiltro(a.id)"
+                [title]="a.descripcionCorta">
+                {{ a.nombreCorto }}
+              </button>
+            }
+          </div>
         </div>
       }
     </div>
@@ -81,11 +75,56 @@
       <!-- LISTA IZQUIERDA -->
       <div class="g6-senales__list-panel">
 
-        <!-- Señales predictivas -->
+        <!-- Alertas reactivas — primero, son lo más urgente -->
+        @if (alertasVisibles().length > 0) {
+          <div class="g6-list-section g6-list-section--alertas">
+            <div class="g6-list-section__hdr">
+              <span><i class="pi pi-bell"></i> Alertas</span>
+              <span class="g6-list-section__count g6-list-section__count--alerta">{{ alertasVisibles().length }}</span>
+            </div>
+            <div class="g6-alert-items">
+              @for (a of alertasVisibles(); track a.id; let i = $index) {
+                <button
+                  class="g6-alert-item g6-alert-item--{{ a.tipo }}"
+                  [class.g6-alert-item--selected]="selectedId() === a.id"
+                  [class.g6-alert-item--highlighted]="highlightId() === a.id"
+                  (click)="selectAlert(a.id)"
+                  [style.animation-delay]="(i * 60) + 'ms'">
+
+                  <div class="g6-alert-item__top">
+                    <span class="g6-urgency-dot g6-urgency-dot--{{ a.tipo }}"></span>
+                    <span class="g6-alert-type-label">
+                      <i class="pi" [class.pi-exclamation-circle]="a.tipo === 'critical'" [class.pi-exclamation-triangle]="a.tipo !== 'critical'"></i>
+                      {{ a.tipo === 'critical' ? 'Crítico' : 'Advertencia' }}
+                    </span>
+                    <span
+                      class="g6-chip-fuente {{ getFuenteClass(a.fuente) }}"
+                      [title]="getFuenteTooltip(a.fuente)">
+                      {{ getFuenteLabel(a.fuente) }}
+                    </span>
+                  </div>
+
+                  <p class="g6-item-titulo">{{ a.titulo }}</p>
+
+                  <div class="g6-item-meta">
+                    @if (a.agenteOrigenNombre) {
+                      <span class="g6-item-agente">{{ a.agenteOrigenNombre }}</span>
+                    }
+                    @if (a.pedidosAfectados && a.pedidosAfectados > 0) {
+                      <span class="g6-item-afectados">{{ a.pedidosAfectados }} pedidos</span>
+                    }
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Señales predictivas — después de alertas -->
         @if (senalesVisibles().length > 0) {
           <div class="g6-list-section g6-list-section--senales">
             <div class="g6-list-section__hdr">
-              <span>🔮 Señales</span>
+              <span><i class="pi pi-eye"></i> Señales</span>
               <span class="g6-list-section__count">{{ senalesVisibles().length }}</span>
             </div>
             <div class="g6-signal-items">
@@ -98,8 +137,7 @@
                   [style.animation-delay]="(i * 60) + 'ms'">
 
                   <div class="g6-signal-item__top">
-                    <span class="g6-item-icon">{{ getTipoIcon(s.tipo) }}</span>
-                    <!-- Chip fuente — punto clave del riesgo determinístico vs IA -->
+                    <i class="g6-item-icon pi {{ getTipoIconClass(s.tipo) }}"></i>
                     <span
                       class="g6-chip-fuente {{ getFuenteClass(s.fuente) }}"
                       [title]="getFuenteTooltip(s.fuente)">
@@ -129,49 +167,6 @@
           </div>
         }
 
-        <!-- Alertas reactivas -->
-        @if (alertasVisibles().length > 0) {
-          <div class="g6-list-section g6-list-section--alertas">
-            <div class="g6-list-section__hdr">
-              <span>🚨 Alertas</span>
-              <span class="g6-list-section__count g6-list-section__count--alerta">{{ alertasVisibles().length }}</span>
-            </div>
-            <div class="g6-alert-items">
-              @for (a of alertasVisibles(); track a.id; let i = $index) {
-                <button
-                  class="g6-alert-item g6-alert-item--{{ a.tipo }}"
-                  [class.g6-alert-item--selected]="selectedId() === a.id"
-                  [class.g6-alert-item--highlighted]="highlightId() === a.id"
-                  (click)="selectAlert(a.id)"
-                  [style.animation-delay]="(i * 60) + 'ms'">
-
-                  <div class="g6-alert-item__top">
-                    <span class="g6-urgency-dot g6-urgency-dot--{{ a.tipo }}"></span>
-                    <span class="g6-alert-type-label">{{ a.tipo === 'critical' ? '🔴 Crítico' : '🟡 Advertencia' }}</span>
-                    <!-- Chip fuente en alertas también -->
-                    <span
-                      class="g6-chip-fuente {{ getFuenteClass(a.fuente) }}"
-                      [title]="getFuenteTooltip(a.fuente)">
-                      {{ getFuenteLabel(a.fuente) }}
-                    </span>
-                  </div>
-
-                  <p class="g6-item-titulo">{{ a.titulo }}</p>
-
-                  <div class="g6-item-meta">
-                    @if (a.agenteOrigenNombre) {
-                      <span class="g6-item-agente">{{ a.agenteOrigenNombre }}</span>
-                    }
-                    @if (a.pedidosAfectados && a.pedidosAfectados > 0) {
-                      <span class="g6-item-afectados">{{ a.pedidosAfectados }} pedidos</span>
-                    }
-                  </div>
-                </button>
-              }
-            </div>
-          </div>
-        }
-
         <!-- Estado vacío -->
         @if (senalesVisibles().length === 0 && alertasVisibles().length === 0) {
           <div class="g6-list-empty">
@@ -189,6 +184,7 @@
           <app-senal-detalle
             [item]="item"
             [isAlerta]="isAlertSelected()"
+            [accionTomada]="accionesTomadas().has(item.data.id)"
             (ctaPrimario)="onCtaPrimario(item)"
             (ctaSecundario)="onCtaSecundario(item)"
             (ignorar)="onIgnorar(item)"
@@ -197,7 +193,7 @@
           </app-senal-detalle>
         } @else {
           <div class="g6-detail-empty">
-            <div class="g6-detail-empty__icon">🔭</div>
+            <i class="g6-detail-empty__icon pi pi-eye"></i>
             <p class="g6-detail-empty__title">Selecciona una señal</p>
             <p class="g6-detail-empty__sub">Ve el análisis completo, los datos de Dropi y la acción recomendada.</p>
           </div>
@@ -210,6 +206,14 @@
 
 
 </div><!-- /g6-senales -->
+
+<!-- Toast de ejecución -->
+@if (toastVisible()) {
+  <div class="g6-exec-toast">
+    <span class="g6-exec-toast__icon">✦</span>
+    <p class="g6-exec-toast__msg">{{ toastMsg() }}</p>
+  </div>
+}
 
 <!-- Modal de confirmación -->
 @if (showConfirmModal() && confirmConfig()) {

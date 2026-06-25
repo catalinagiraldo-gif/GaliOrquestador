@@ -17,6 +17,7 @@ export class SenalDetalleComponent implements OnChanges {
 
   @Input() item!: SelectedItem;
   @Input() isAlerta = false;
+  @Input() accionTomada = false;
 
   @Output() ctaPrimario = new EventEmitter<SelectedItem>();
   @Output() ctaSecundario = new EventEmitter<SelectedItem>();
@@ -55,11 +56,8 @@ export class SenalDetalleComponent implements OnChanges {
     return 'var(--green-600)';
   }
 
-  getOpcionSeleccionada(a: GaliAlerta): string {
-    const sel = this.opcionSeleccionada();
-    if (sel) return sel;
-    // Default: la opción primaria
-    return a.opciones?.find(o => o.isPrimary)?.id ?? a.opciones?.[0]?.id ?? '';
+  getOpcionSeleccionada(_a: GaliAlerta): string | null {
+    return this.opcionSeleccionada();
   }
 
   selectOpcion(id: string): void {
@@ -68,7 +66,8 @@ export class SenalDetalleComponent implements OnChanges {
   }
 
   confirmarOpcion(a: GaliAlerta): void {
-    const opcionId = this.getOpcionSeleccionada(a);
+    const opcionId = this.opcionSeleccionada();
+    if (!opcionId) return;
     this.opcionElegida.emit({ alertaId: a.id, opcionId });
     this.accionConfirmada.set(true);
   }

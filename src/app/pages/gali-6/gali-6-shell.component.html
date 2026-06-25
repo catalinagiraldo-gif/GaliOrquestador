@@ -53,7 +53,7 @@
       <!-- Strip contextual de Gali en Negociaciones -->
       @if (isOnNego() && !gali.galiNegoPanelOpen()) {
         <div class="g6-prov-strip g6-prov-strip--nego" role="complementary" aria-label="Gali detectó oportunidad de negociación">
-          <span class="g6-prov-strip__icon" aria-hidden="true">⚡</span>
+          <span class="g6-prov-strip__icon" aria-hidden="true"><i class="pi pi-lightbulb"></i></span>
           <div class="g6-prov-strip__text">
             <strong>Gali detectó margen de negociación con 2 proveedores</strong>
             <span>Pedido consolidado posible · ahorro estimado $180.000 en costos flete</span>
@@ -82,21 +82,6 @@
         </div>
       }
 
-      <!-- Strip contextual de Gali en Señales -->
-      @if (isOnSenales() && !gali.galiSenalesPanelOpen() && alertasCriticasCount > 0) {
-        <div class="g6-prov-strip g6-prov-strip--senales" role="complementary" aria-label="Decisiones pendientes en Señales">
-          <span class="g6-prov-strip__icon" aria-hidden="true">⚠</span>
-          <div class="g6-prov-strip__text">
-            <strong>{{ alertasCriticasCount }} señal{{ alertasCriticasCount > 1 ? 'es' : '' }} que necesitan tu decisión</strong>
-            <span>Gali las interceptó y filtró las más urgentes para ti</span>
-          </div>
-          <button class="g6-prov-strip__cta" type="button" (click)="gali.openSenalesPanel()">
-            Ver decisión de Gali →
-          </button>
-          <button class="g6-prov-strip__dismiss" type="button"
-            aria-label="Cerrar sugerencia" (click)="gali.closeSenalesPanel()">×</button>
-        </div>
-      }
 
       <!-- Strip contextual de Gali en Proveedores -->
       @if (isOnProveedores() && !gali.galiProveedoresPanelOpen()) {
@@ -315,49 +300,58 @@
 }
 
 <!-- ── Panel contextual de Gali desde Señales ── -->
-@if (gali.galiSenalesPanelOpen() && alertaTopSenales) {
+@if (gali.galiSenalesPanelOpen()) {
   <div class="g6-cat-panel-bg" (click)="gali.closeSenalesPanel()" aria-hidden="true"></div>
   <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
          aria-labelledby="sen-panel-title">
     <div class="g6-cat-panel__head">
-      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">⚠</span> Decisión urgente</span>
+      <span class="g6-cat-panel__eyebrow"><i class="pi pi-bell" aria-hidden="true"></i> Señales activas</span>
       <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
               (click)="gali.closeSenalesPanel()">×</button>
     </div>
     <div class="g6-cat-panel__body">
       <p class="g6-cat-panel__context">
-        Alertas activas · {{ alertasCriticasCount }} con prioridad alta entre {{ alertasCriticasCount + 4 }} detectadas
+        {{ alertasCriticasCount }} con decisión pendiente · ordenadas por urgencia
       </p>
       <h3 id="sen-panel-title" class="g6-cat-panel__title">
-        {{ alertaTopSenales.agente | titlecase }} necesita tu decisión ahora
+        Acciones que Gali tiene listas para ti
       </h3>
 
-      <div class="g6-cat-card g6-cat-card--senales">
-        <div class="g6-cat-card__badge g6-cat-card__badge--urgente">
-          <span class="g6-cat-card__badge-dot"
-                [style.background]="alertaTopSenales.agenteColor ?? '#f49a3d'"></span>
-          {{ alertaTopSenales.tipo === 'critical' ? 'Urgente' : 'Pendiente' }}
-        </div>
-        <strong class="g6-cat-card__product">{{ alertaTopSenales.titulo }}</strong>
-        @if (alertaTopSenales.opciones?.length) {
-          <div class="g6-cat-card__stats g6-cat-card__stats--options">
-            @for (op of alertaTopSenales.opciones!; track op.id) {
-              <div class="g6-cat-card__stat" [class.g6-cat-card__stat--primary]="op.isPrimary">
-                <span class="g6-cat-card__val">{{ op.label }}</span>
-                @if (op.description) {
-                  <span class="g6-cat-card__lbl">{{ op.description }}</span>
-                }
-              </div>
-            }
-          </div>
+      <div class="g6-sen-mini-list">
+        @for (item of senalesPanelItems; track item.id) {
+          <button class="g6-sen-mini-item"
+                  [class.g6-sen-mini-item--critical]="item.tipo === 'critical'"
+                  [class.g6-sen-mini-item--warning]="item.tipo === 'warning'"
+                  [class.g6-sen-mini-item--scale]="item.tipo === 'scale'"
+                  [class.g6-sen-mini-item--trend]="item.tipo === 'trend'"
+                  [class.g6-sen-mini-item--opportunity]="item.tipo === 'opportunity'"
+                  type="button"
+                  (click)="irADecisionDirecta(item.id); gali.closeSenalesPanel()">
+            <span class="g6-sen-mini-item__dot"
+                  [class.g6-sen-mini-item__dot--critical]="item.tipo === 'critical'"
+                  [class.g6-sen-mini-item__dot--warning]="item.tipo === 'warning'"
+                  [class.g6-sen-mini-item__dot--senal]="item.categoria === 'senal'"></span>
+            <div class="g6-sen-mini-item__body">
+              <span class="g6-sen-mini-item__titulo">{{ item.titulo }}</span>
+              <span class="g6-sen-mini-item__meta">{{ item.agente }}</span>
+            </div>
+            <span class="g6-sen-mini-item__badge"
+                  [class.g6-sen-mini-item__badge--urgent]="item.tipo === 'critical'"
+                  [class.g6-sen-mini-item__badge--dias]="item.categoria === 'senal'">
+              @if (item.tipo === 'critical') { Urgente }
+              @else if (item.tipo === 'warning') { Pendiente }
+              @else if (item.dias !== null) { {{ item.dias }}d }
+            </span>
+          </button>
         }
       </div>
 
-      <button class="g6-cat-panel__cta" type="button" (click)="irAHomeDesdeSenales()">
-        Decidir en el inicio →
+      <button class="g6-cat-panel__cta" type="button"
+              (click)="router.navigate(['/gali-6/senales']); gali.closeSenalesPanel()">
+        Ver todas las señales →
       </button>
       <button class="g6-cat-panel__sec" type="button" (click)="gali.closeSenalesPanel()">
-        Ver todas las alertas →
+        Cerrar
       </button>
     </div>
   </aside>
@@ -416,7 +410,7 @@
   <aside class="g6-cat-panel gali-panel-slide-in" role="dialog" aria-modal="true"
          aria-labelledby="nego-panel-title">
     <div class="g6-cat-panel__head">
-      <span class="g6-cat-panel__eyebrow"><span aria-hidden="true">⚡</span> Gali detectó</span>
+      <span class="g6-cat-panel__eyebrow"><i class="pi pi-lightbulb" aria-hidden="true"></i> Gali detectó</span>
       <button class="g6-cat-panel__close" type="button" aria-label="Cerrar panel"
               (click)="gali.closeNegoPanel()">×</button>
     </div>
@@ -429,7 +423,7 @@
       </h3>
 
       <div class="g6-cat-card g6-cat-card--nego">
-        <div class="g6-cat-card__badge g6-cat-card__badge--nego">⚡ Oportunidad detectada</div>
+        <div class="g6-cat-card__badge g6-cat-card__badge--nego"><i class="pi pi-star-fill"></i> Oportunidad detectada</div>
         <strong class="g6-cat-card__product">Consolidar envíos con Proveedor A y B</strong>
         <p class="g6-cat-card__why">
           Tienes 2 pedidos separados esta semana a proveedores en la misma zona. Si los consolidas en uno,

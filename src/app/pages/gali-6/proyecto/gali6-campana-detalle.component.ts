@@ -4,18 +4,18 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PROYECTOS_MOCK, CampanaProyecto, ProyectoDetalle } from '../../../../../mocks/gali-v6/proyectos.mock';
 
 const AGENTE_LABEL: Record<string, { label: string; icono: string; autopilot: boolean }> = {
-  'roax-ads':            { label: 'ROAS Tracker',         icono: '📊', autopilot: true  },
-  'stock-guardian':      { label: 'Stock Guardian',        icono: '📦', autopilot: true  },
-  'vigilante-logistico': { label: 'Vigilante Logístico',  icono: '🚛', autopilot: false },
-  'ada-spy':             { label: 'ADA Spy',              icono: '🔍', autopilot: false },
-  'chatea-pro':          { label: 'Chatea Pro',           icono: '💬', autopilot: true  },
+  'roax-ads':            { label: 'ROAS Tracker',         icono: 'pi-chart-bar',  autopilot: true  },
+  'stock-guardian':      { label: 'Stock Guardian',        icono: 'pi-box',        autopilot: true  },
+  'vigilante-logistico': { label: 'Vigilante Logístico',  icono: 'pi-truck',      autopilot: false },
+  'ada-spy':             { label: 'ADA Spy',              icono: 'pi-search',     autopilot: false },
+  'chatea-pro':          { label: 'Chatea Pro',           icono: 'pi-comments',   autopilot: true  },
 };
 
 const CONEXION_LABEL: Record<string, { label: string; icono: string; estado: string }> = {
-  'tiktok-ads':  { label: 'TikTok Ads',  icono: '🎵', estado: 'Conectado' },
-  'meta-ads':    { label: 'Meta Ads',    icono: '📘', estado: 'Conectado' },
-  'google-ads':  { label: 'Google Ads', icono: '🔍', estado: 'Conectado' },
-  'whatsapp':    { label: 'WhatsApp',    icono: '💬', estado: 'Conectado' },
+  'tiktok-ads':  { label: 'TikTok Ads',  icono: 'pi-tiktok',    estado: 'Conectado' },
+  'meta-ads':    { label: 'Meta Ads',    icono: 'pi-facebook',  estado: 'Conectado' },
+  'google-ads':  { label: 'Google Ads', icono: 'pi-google',    estado: 'Conectado' },
+  'whatsapp':    { label: 'WhatsApp',    icono: 'pi-whatsapp',  estado: 'Conectado' },
 };
 
 interface HistorialItem {
@@ -75,7 +75,7 @@ export class Gali6CampanaDetalleComponent implements OnInit {
     setTimeout(() => this.toastMsg.set(null), 2000);
   }
 
-  getAgenteInfo(id: string) { return AGENTE_LABEL[id] ?? { label: id, icono: '🤖', autopilot: false }; }
+  getAgenteInfo(id: string) { return AGENTE_LABEL[id] ?? { label: id, icono: 'pi-microchip-ai', autopilot: false }; }
   getConexionInfo(id: string) { return CONEXION_LABEL[id] ?? { label: id, icono: '🔌', estado: 'Conectado' }; }
 
   getRoasClass(c: CampanaProyecto): string {

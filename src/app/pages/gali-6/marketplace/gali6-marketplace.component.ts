@@ -76,16 +76,16 @@ export class Gali6MarketplaceComponent {
 
   readonly tierTabs: { value: TierFiltro; label: string }[] = [
     { value: 'todos',  label: 'Todos' },
-    { value: 'free',   label: '🟢 Gratis' },
-    { value: 'paid',   label: '💳 Pago' },
-    { value: 'tokens', label: '🪙 Tokens' },
+    { value: 'free',   label: 'Gratis' },
+    { value: 'paid',   label: 'Pago' },
+    { value: 'tokens', label: 'Tokens' },
   ];
 
   readonly tipoTabs: { value: TipoFiltro; label: string }[] = [
     { value: 'todos',         label: 'Todos los tipos' },
-    { value: 'deterministico',label: '📊 Determinístico' },
-    { value: 'ia-ligera',     label: '🤖 IA ligera' },
-    { value: 'ia-compleja',   label: '✨ IA compleja' },
+    { value: 'deterministico',label: 'Determinístico' },
+    { value: 'ia-ligera',     label: 'IA ligera' },
+    { value: 'ia-compleja',   label: 'IA compleja' },
   ];
 
   readonly agentesFiltrados = computed(() => {
@@ -119,13 +119,13 @@ export class Gali6MarketplaceComponent {
 
   /** Skills marketplace */
   readonly skillsEstado = signal<SkillMkt[]>([
-    { id: 'sk-brujula',   nombre: 'Brújula financiera',    descripcion: 'Calcula P&L real por campaña: ingresos, costos, flete, novedades y garantías.',    tipo: 'deterministico', tier: 'free',   activa: true,  icono: '🧭' },
-    { id: 'sk-roi',       nombre: 'Análisis ROI',           descripcion: 'ROI por producto y canal con datos reales de Dropi.',                               tipo: 'deterministico', tier: 'free',   activa: true,  icono: '📊' },
-    { id: 'sk-angulos',   nombre: 'Ángulos de venta',       descripcion: 'Genera variaciones de copy y creativos usando IA basada en tus ventas.',           tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: '✍️' },
-    { id: 'sk-logopt',    nombre: 'Optimización logística', descripcion: 'Sugiere transportadora según tasa de novedad histórica por ciudad.',                tipo: 'deterministico', tier: 'paid',   precioCopMes: 15000, activa: false, icono: '🚚' },
-    { id: 'sk-copyad',    nombre: 'Copy publicitario',      descripcion: 'Crea copies para Meta y TikTok Ads adaptados a tus mejores productos.',            tipo: 'ia-compleja',    tier: 'tokens', tokensUso: 3, activa: false, icono: '📢' },
-    { id: 'sk-forecast',  nombre: 'Forecast de demanda',    descripcion: 'Predice pedidos de la próxima semana usando tendencias y estacionalidad.',         tipo: 'ia-ligera',      tier: 'paid',   precioCopMes: 20000, activa: false, icono: '🔮' },
-    { id: 'sk-cxaudit',   nombre: 'Auditoría de CX',        descripcion: 'Detecta patrones de queja en WhatsApp y propone mejoras de proceso.',              tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: '🔍' },
+    { id: 'sk-brujula',   nombre: 'Brújula financiera',    descripcion: 'Calcula P&L real por campaña: ingresos, costos, flete, novedades y garantías.',    tipo: 'deterministico', tier: 'free',   activa: true,  icono: 'pi pi-compass' },
+    { id: 'sk-roi',       nombre: 'Análisis ROI',           descripcion: 'ROI por producto y canal con datos reales de Dropi.',                               tipo: 'deterministico', tier: 'free',   activa: true,  icono: 'pi pi-chart-bar' },
+    { id: 'sk-angulos',   nombre: 'Ángulos de venta',       descripcion: 'Genera variaciones de copy y creativos usando IA basada en tus ventas.',           tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: 'pi pi-pen-to-square' },
+    { id: 'sk-logopt',    nombre: 'Optimización logística', descripcion: 'Sugiere transportadora según tasa de novedad histórica por ciudad.',                tipo: 'deterministico', tier: 'paid',   precioCopMes: 15000, activa: false, icono: 'pi pi-truck' },
+    { id: 'sk-copyad',    nombre: 'Copy publicitario',      descripcion: 'Crea copies para Meta y TikTok Ads adaptados a tus mejores productos.',            tipo: 'ia-compleja',    tier: 'tokens', tokensUso: 3, activa: false, icono: 'pi pi-bullhorn' },
+    { id: 'sk-forecast',  nombre: 'Forecast de demanda',    descripcion: 'Predice pedidos de la próxima semana usando tendencias y estacionalidad.',         tipo: 'ia-ligera',      tier: 'paid',   precioCopMes: 20000, activa: false, icono: 'pi pi-wave-pulse' },
+    { id: 'sk-cxaudit',   nombre: 'Auditoría de CX',        descripcion: 'Detecta patrones de queja en WhatsApp y propone mejoras de proceso.',              tipo: 'ia-ligera',      tier: 'free',   activa: false, icono: 'pi pi-search' },
   ]);
 
   /** Conexiones preview */

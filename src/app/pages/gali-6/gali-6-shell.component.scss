@@ -643,3 +643,94 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.65; }
 }
+
+// ── Mini-lista de señales en panel lateral ───────────────────────────────────
+
+.g6-sen-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: $size-4;
+}
+
+.g6-sen-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid $gray-200;
+  background: $gray-50;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  border-left: 3px solid $gray-300;
+
+  &:hover {
+    background: $gray-100;
+    border-color: $gray-300;
+  }
+
+  // Colores por tipo — consistentes con main panel
+  &--critical { border-left-color: #f87171; background: rgba(239, 68, 68, 0.03); }
+  &--warning  { border-left-color: #fbbf24; background: rgba(251, 191, 36, 0.03); }
+  &--scale    { border-left-color: #818cf8; }
+  &--trend    { border-left-color: #34d399; }
+  &--opportunity { border-left-color: #fbbf24; }
+
+  &__dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: $gray-400;
+
+    &--critical { background: #f87171; box-shadow: 0 0 5px rgba(248, 113, 113, 0.5); }
+    &--warning  { background: #fbbf24; }
+    &--senal    { background: #818cf8; }
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__titulo {
+    font-size: 12px;
+    font-weight: 500;
+    color: $gray-800;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__meta {
+    font-size: 11px;
+    color: $gray-500;
+  }
+
+  &__badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: $gray-100;
+    color: $gray-500;
+
+    &--urgent {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+
+    &--dias {
+      background: rgba(129, 140, 248, 0.12);
+      color: #6366f1;
+    }
+  }
+}

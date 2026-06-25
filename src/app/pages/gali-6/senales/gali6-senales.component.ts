@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TooltipModule } from 'primeng/tooltip';
 import {
   MOCK_SENALES,
   MOCK_ALERTAS,
@@ -22,7 +23,7 @@ type AgenteFiltro = 'todos' | string;
 @Component({
   selector: 'app-gali6-senales',
   standalone: true,
-  imports: [CommonModule, SenalDetalleComponent, ConfirmActionModalComponent],
+  imports: [CommonModule, TooltipModule, SenalDetalleComponent, ConfirmActionModalComponent],
   templateUrl: './gali6-senales.component.html',
   styleUrls: ['./gali6-senales.component.scss'],
 })
@@ -39,6 +40,7 @@ export class Gali6SenalesComponent implements OnInit {
   proyectoFiltro = signal<string | null>(null);
   selectedId = signal<string | null>(null);
   highlightId = signal<string | null>(null);
+  accionesTomadas = signal<Set<string>>(new Set());
 
   // ─────────────────────────────────────────────────────────────
   // Datos
@@ -78,30 +80,31 @@ export class Gali6SenalesComponent implements OnInit {
     else if (filtro === 'alertas') return [];
 
     if (agente !== 'todos') items = items.filter(s => s.agenteOrigenId === agente);
-    return items;
+
+    // Priorizar: menos días restantes primero (más urgente)
+    return [...items].sort((a, b) => a.ventanaDias - b.ventanaDias);
   });
 
   alertasVisibles = computed(() => {
-    if (this.signalFiltro() === 'dato-real' || this.signalFiltro() === 'analisis-ia') {
-      // Para filtros de fuente, también mostramos alertas del mismo tipo
-      const filtro = this.signalFiltro();
-      let items = this.alertasBase();
-      if (filtro === 'dato-real') items = items.filter(a => a.fuente === 'deterministico');
-      if (filtro === 'analisis-ia') items = items.filter(a => a.fuente === 'ia');
-      const agente = this.agenteFiltro();
-      if (agente !== 'todos') items = items.filter(a => a.agenteOrigenId === agente);
-      return items;
-    }
-    if (this.signalFiltro() === 'alertas') {
-      const items = this.alertasBase();
-      const agente = this.agenteFiltro();
-      if (agente !== 'todos') return items.filter(a => a.agenteOrigenId === agente);
-      return items;
-    }
-    const items = this.alertasBase();
+    let items = this.alertasBase();
+    const filtro = this.signalFiltro();
+
+    if (filtro === 'dato-real') items = items.filter(a => a.fuente === 'deterministico');
+    else if (filtro === 'analisis-ia') items = items.filter(a => a.fuente === 'ia');
+
     const agente = this.agenteFiltro();
-    if (agente !== 'todos') return items.filter(a => a.agenteOrigenId === agente);
-    return items;
+    if (agente !== 'todos') items = items.filter(a => a.agenteOrigenId === agente);
+
+    if (filtro === 'analisis-ia' || filtro === 'dato-real') {
+      return [...items].sort((a, b) => (a.tipo === 'critical' ? 0 : 1) - (b.tipo === 'critical' ? 0 : 1));
+    }
+
+    // Priorizar: críticas primero, luego warning
+    return [...items].sort((a, b) => {
+      const prioA = a.tipo === 'critical' ? 0 : 1;
+      const prioB = b.tipo === 'critical' ? 0 : 1;
+      return prioA - prioB;
+    });
   });
 
   totalActivas = computed(() => this.senalesVisibles().length + this.alertasVisibles().length);
@@ -128,10 +131,10 @@ export class Gali6SenalesComponent implements OnInit {
   // ─────────────────────────────────────────────────────────────
 
   readonly filtroTabs = [
-    { value: 'todas' as SignalFiltro,       label: 'Todas' },
-    { value: 'dato-real' as SignalFiltro,   label: '📊 Datos reales' },
-    { value: 'analisis-ia' as SignalFiltro, label: '🤖 Análisis Gali' },
-    { value: 'alertas' as SignalFiltro,     label: '⚠️ Alertas' },
+    { value: 'todas' as SignalFiltro,       label: 'Todas',                icon: 'pi-list' },
+    { value: 'alertas' as SignalFiltro,     label: 'Alertas',              icon: 'pi-bell' },
+    { value: 'analisis-ia' as SignalFiltro, label: 'Predicciones de Gali', icon: 'pi-eye' },
+    { value: 'dato-real' as SignalFiltro,   label: 'De mis pedidos',       icon: 'pi-chart-bar' },
   ];
 
   /** Agentes únicos que han generado señales */
@@ -142,6 +145,22 @@ export class Gali6SenalesComponent implements OnInit {
     ]);
     return this.agentesEspecializados.filter(a => ids.has(a.id));
   });
+
+  // ─────────────────────────────────────────────────────────────
+  // Toast de ejecución
+  // ─────────────────────────────────────────────────────────────
+
+  toastVisible = signal(false);
+  toastMsg = signal('');
+
+  private mostrarToast(msg: string, senalId?: string): void {
+    this.toastMsg.set(msg);
+    this.toastVisible.set(true);
+    if (senalId) {
+      this.accionesTomadas.update(set => new Set([...set, senalId]));
+    }
+    setTimeout(() => this.toastVisible.set(false), 4500);
+  }
 
   // ─────────────────────────────────────────────────────────────
   // Modal de confirmación
@@ -197,28 +216,68 @@ export class Gali6SenalesComponent implements OnInit {
   // Handlers de CTA
   // ─────────────────────────────────────────────────────────────
 
+  private readonly toastsPorSenal: Record<string, string> = {
+    'sen-001': 'ROAS Tracker está escalando la pauta de Collar GPS a $86k/día — verás el resultado en 24h',
+    'sen-003': 'Roax está actualizando la segmentación — Medellín agregada a tu campaña de K-Beauty',
+    'sen-005': 'Roax reactivó Bandas de Fitness con $20k/día',
+    'sen-006': 'Proyecto Cali en preparación. Roax generará el primer creative esta semana.',
+    'sen-007': 'Creative B activado. Roax pausó el creative saturado automáticamente.',
+  };
+
   onCtaPrimario(item: SelectedItem) {
-    if (item.kind === 'alerta' && item.data.tipo === 'critical') {
-      this.abrirModalConfirmacion(item.data);
+    if (item.kind === 'alerta') {
+      if (item.data.tipo === 'critical' || item.data.tipo === 'warning') {
+        this.abrirModalConfirmacion(item.data);
+      }
+      return;
+    }
+    // Señales que navegan directamente a una vista de Gali 6
+    const navPrimario: Record<string, () => void> = {
+      'sen-002': () => this.router.navigate(['/gali-6/productos/catalogo'], { queryParams: { q: 'difusor aromaterapia' } }),
+      'sen-004': () => this.router.navigate(['/gali-6/productos/proveedores'], { queryParams: { categoria: 'mascotas' } }),
+    };
+    if (navPrimario[item.data.id]) {
+      navPrimario[item.data.id]();
+      return;
+    }
+    // Señales con canLaunch → crear proyecto
+    if (item.data.canLaunch) {
+      this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { signalId: item.data.id } });
+      return;
+    }
+    // Resto → toast de confirmación de ejecución
+    const msg = this.toastsPorSenal[item.data.id] ??
+      `✦ Gali está procesando — ${item.data.agenteOrigenNombre ?? item.data.agente} te notificará en minutos`;
+    this.mostrarToast(msg, item.data.id);
+  }
+
+  onCtaSecundario(item: SelectedItem) {
+    const id = item.data.id;
+    const rutas: Record<string, () => void> = {
+      // Señales
+      'sen-001': () => this.router.navigate(['/gali-6/reportes/dashboard']),
+      'sen-002': () => this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { signalId: 'sen-002' } }),
+      'sen-003': () => this.router.navigate(['/gali-6/marketing/roax-informes']),
+      'sen-004': () => this.router.navigate(['/gali-6/productos/proveedores'], { queryParams: { categoria: 'mascotas' } }),
+      'sen-005': () => this.router.navigate(['/gali-6/proyectos']),
+      'sen-006': () => this.router.navigate(['/gali-6/reportes/dashboard']),
+      'sen-007': () => this.router.navigate(['/gali-6/marketing/roax-informes']),
+      // Alertas
+      'alt-001': () => this.router.navigate(['/gali-6/mis-pedidos/mis-pedidos']),
+      'alt-002': () => this.router.navigate(['/gali-6/financiero/historial-de-cartera']),
+      'alt-003': () => this.router.navigate(['/gali-6/marketing/roax-informes']),
+      'alt-004': () => this.router.navigate(['/gali-6/productos/proveedores']),
+      'alt-005': () => this.router.navigate(['/gali-6/marketing/roax-informes']),
+    };
+    const navFn = rutas[id];
+    if (navFn) {
+      navFn();
+    } else {
+      this.mostrarToast('Abriendo análisis completo...');
     }
   }
 
-  onCtaSecundario(_item: SelectedItem) {}
-
-  onLanzar() {
-    const selected = this.selectedItem();
-    this.router.navigate(['/gali-6/proyectos/nuevo'], {
-      queryParams: selected ? { signalId: selected.data.id } : {},
-    });
-  }
-
-  onOperar() {
-    this.signalFiltro.set('alertas');
-    const primera = this.alertasVisibles()[0];
-    if (primera) this.selectedId.set(primera.id);
-  }
-
-  onMedir() {
+  irADashboard() {
     this.router.navigate(['/gali-6/reportes/dashboard']);
   }
 
@@ -247,12 +306,21 @@ export class Gali6SenalesComponent implements OnInit {
   // Helpers de UI
   // ─────────────────────────────────────────────────────────────
 
-  getTipoIcon(tipo: string): string {
-    return ({ scale: '⚡', trend: '🔭', opportunity: '💎', risk: '⚠️', completed: '✅' } as Record<string, string>)[tipo] ?? '•';
+  getTipoIconClass(tipo: string): string {
+    return ({
+      scale:       'pi-arrow-up-right',
+      trend:       'pi-chart-line',
+      opportunity: 'pi-star',
+      risk:        'pi-exclamation-triangle',
+      completed:   'pi-check-circle',
+    } as Record<string, string>)[tipo] ?? 'pi-circle';
   }
 
+  /** @deprecated use getTipoIconClass */
+  getTipoIcon(tipo: string): string { return this.getTipoIconClass(tipo); }
+
   getFuenteLabel(fuente: SignalFuenteTipo): string {
-    return fuente === 'deterministico' ? '📊 Dato real' : '🤖 Análisis Gali';
+    return fuente === 'deterministico' ? 'De tus pedidos' : 'Predicción de Gali';
   }
 
   getFuenteClass(fuente: SignalFuenteTipo): string {
@@ -261,8 +329,8 @@ export class Gali6SenalesComponent implements OnInit {
 
   getFuenteTooltip(fuente: SignalFuenteTipo): string {
     return fuente === 'deterministico'
-      ? 'Este dato viene directamente de Dropi. 100% confiable.'
-      : 'Generado por IA — verifica antes de actuar.';
+      ? 'Calculado desde tus pedidos y datos reales en Dropi — 100% confiable.'
+      : 'Predicción de Gali basada en tendencias — contrasta con tus métricas antes de actuar.';
   }
 
   private abrirModalConfirmacion(alerta: GaliAlerta) {

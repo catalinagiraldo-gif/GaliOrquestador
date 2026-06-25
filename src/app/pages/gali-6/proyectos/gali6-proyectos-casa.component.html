@@ -156,6 +156,16 @@
               <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
               <span class="port__name">{{ p.nombre }}</span>
 
+              @if (getSignalCount(p.id) > 0) {
+                <a class="port__signal-badge"
+                   [routerLink]="['/gali-6/senales']"
+                   [queryParams]="{ projectId: getProyectoSenalId(p.id) }"
+                   (click)="$event.stopPropagation()"
+                   [title]="getSignalCount(p.id) + ' señales activas'">
+                  <i class="pi pi-bell"></i> {{ getSignalCount(p.id) }}
+                </a>
+              }
+
               <span class="port__health">
                 <span class="port__health-track">
                   <span class="port__health-fill"
@@ -173,7 +183,7 @@
                           (click)="toggleCampanas(p.id, $event)"
                           [attr.aria-label]="'Ver campañas de ' + p.nombre"
                           [attr.aria-expanded]="isCampanasExpanded(p.id)">
-                    📣 {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
+                    <i class="pi pi-megaphone"></i> {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
                     <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
                   </button>
                 }
@@ -286,12 +296,12 @@
           <div class="obj-gali-header__context">
             <span class="obj-gali-header__label">Gali analizó tu negocio</span>
             <div class="obj-gali-header__chips">
-              <span class="obj-gali-chip">📦 {{ pedidosActual }} ped/sem</span>
-              <span class="obj-gali-chip">📊 ROAS 1.91x</span>
-              <span class="obj-gali-chip">🚀 2 campañas</span>
+              <span class="obj-gali-chip"><i class="pi pi-box"></i> {{ pedidosActual }} ped/sem</span>
+              <span class="obj-gali-chip"><i class="pi pi-chart-bar"></i> ROAS 1.91x</span>
+              <span class="obj-gali-chip"><i class="pi pi-send"></i> 2 campañas</span>
             </div>
           </div>
-          <span class="obj-gali-header__badge">🤖 IA ligera</span>
+          <span class="obj-gali-header__badge"><i class="pi pi-microchip-ai"></i> IA ligera</span>
         </div>
 
         <div class="obj-sugerencias">
@@ -388,7 +398,7 @@
             <div class="obj-propuesta__hdr">
               <span class="obj-propuesta__spark" aria-hidden="true">✦</span>
               <span class="obj-propuesta__label">Gali propone</span>
-              <span class="obj-propuesta__badge">🤖 IA</span>
+              <span class="obj-propuesta__badge"><i class="pi pi-microchip-ai"></i> IA</span>
             </div>
             <p class="obj-propuesta__texto">{{ galiPropuestaTexto() }}</p>
             <div class="obj-propuesta__kpi">
@@ -415,7 +425,7 @@
 
         @if (draftSubMetas().length === 0) {
           <div class="obj-submetas-empty">
-            <span class="obj-submetas-empty__icon">🎯</span>
+            <i class="pi pi-target obj-submetas-empty__icon"></i>
             <p class="obj-submetas-empty__text">Sin hitos aún. Divide tu objetivo en pasos para medir el progreso.</p>
           </div>
         }
@@ -642,7 +652,7 @@
                 Ver cómo lo calculó ▸
               </button>
               <button class="nuevo-preview__btn-launch" type="button" (click)="confirmarAutoProyecto()">
-                🚀 Lanzar →
+                <i class="pi pi-send"></i> Lanzar →
               </button>
             </div>
           </div>

@@ -51,6 +51,12 @@ export interface GaliSignal {
   canLaunch?: boolean;
   /** Pedidos semanales estimados si se lanza este proyecto */
   pedidosEstimados?: number;
+  /** Resultado real después de que el usuario aprobó la acción */
+  resultadoEjecutado?: {
+    fecha: string;
+    descripcion: string;
+    metrica?: string;
+  };
 }
 
 export interface AlertaOpcion {
@@ -130,6 +136,11 @@ export const MOCK_SENALES: GaliSignal[] = [
       { label: 'Pedidos/sem est.', val: '~61 (+14)' },
     ],
     canLaunch: false,
+    resultadoEjecutado: {
+      fecha: '24 Jun',
+      descripcion: 'ROAS Tracker escaló Collar GPS de $66k → $86k/día. Pauta activa con nuevo presupuesto.',
+      metrica: '+$105k proyectados esta semana · ROAS en 2.0x a las 24h',
+    },
   },
   {
     id: 'sen-002',

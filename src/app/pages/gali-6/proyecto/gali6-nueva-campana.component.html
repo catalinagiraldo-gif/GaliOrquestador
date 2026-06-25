@@ -33,15 +33,15 @@
         <label class="nc-label">Canal</label>
         <div class="nc-canal-grid">
           @for (c of [
-            { id: 'tiktok', label: 'TikTok', icon: '🎵' },
-            { id: 'meta',   label: 'Meta',   icon: '📘' },
-            { id: 'whatsapp', label: 'WhatsApp', icon: '💬' },
-            { id: 'google', label: 'Google', icon: '🔍' }
+            { id: 'tiktok', label: 'TikTok', icon: 'pi-tiktok' },
+            { id: 'meta',   label: 'Meta',   icon: 'pi-facebook' },
+            { id: 'whatsapp', label: 'WhatsApp', icon: 'pi-whatsapp' },
+            { id: 'google', label: 'Google', icon: 'pi-google' }
           ]; track c.id) {
             <button class="nc-canal-btn"
                     [class.nc-canal-btn--active]="canal() === c.id"
                     (click)="seleccionarCanal($any(c.id))">
-              <span class="nc-canal-icon">{{ c.icon }}</span>
+              <i [class]="'nc-canal-icon pi ' + c.icon"></i>
               <span class="nc-canal-label">{{ c.label }}</span>
             </button>
           }
@@ -53,7 +53,7 @@
         <label class="nc-label">Producto</label>
         @if (producto()) {
           <div class="nc-producto-chip">
-            <span>📦 {{ producto()!.nombre }}</span>
+            <span><i class="pi pi-box"></i> {{ producto()!.nombre }}</span>
             <span class="nc-producto-meta">{{ producto()!.precio }} · {{ producto()!.margen }} margen</span>
             <button class="nc-producto-quitar" (click)="quitarProducto()" aria-label="Quitar producto">×</button>
           </div>

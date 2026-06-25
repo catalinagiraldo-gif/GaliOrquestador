@@ -47,7 +47,7 @@ import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
         <div class="acum__top">
           <span class="acum__label">{{ a.label_periodo }}</span>
           @if (a.hito_alcanzado) {
-            <span class="acum__badge-hito">🏆 Hito alcanzado</span>
+            <span class="acum__badge-hito"><i class="pi pi-trophy"></i> Hito alcanzado</span>
           }
         </div>
         <div class="acum__stats">

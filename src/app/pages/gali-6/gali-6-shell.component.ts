@@ -12,7 +12,7 @@ import { GaliStateService } from '../gali-5/gali-v5/services/gali-state.service'
 import { SectionPanel } from '../gali-5/gali-v5/dropi-sections.config';
 import { resolveG6SectionPanel, GALI_6_MISSION_PANEL } from './gali-6-sections.config';
 import KPIS from '../../../../mocks/gali-v5/kpis-global.json';
-import { MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mock';
+import { MOCK_ALERTAS, MOCK_SENALES } from '../../../../mocks/gali-v5/senales.mock';
 
 type Friccion = 'stock' | 'ads' | 'pedidos' | 'otro';
 type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
@@ -40,7 +40,7 @@ type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
   styleUrl: './gali-6-shell.component.scss',
 })
 export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
-  private router = inject(Router);
+  readonly router = inject(Router);
   readonly gali = inject(GaliStateService);
 
   readonly navOpen = signal(false);
@@ -74,6 +74,33 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   readonly alertaTopSenales = MOCK_ALERTAS.find(a => a.tipo === 'critical' || a.tipo === 'warning');
   readonly alertasCriticasCount = MOCK_ALERTAS.filter(a => a.tipo === 'critical' || a.tipo === 'warning').length;
   readonly alertCount = MOCK_ALERTAS.filter(a => a.tipo === 'critical').length;
+
+  // Lista priorizada para el mini-panel: alertas críticas → warning → señales urgentes
+  readonly senalesPanelItems = [
+    ...MOCK_ALERTAS
+      .filter(a => a.tipo === 'critical' || a.tipo === 'warning')
+      .sort((a, b) => (a.tipo === 'critical' ? 0 : 1) - (b.tipo === 'critical' ? 0 : 1))
+      .map(a => ({
+        id: a.id,
+        titulo: a.titulo,
+        agente: a.agente ?? a.agenteOrigenNombre ?? '',
+        tipo: a.tipo as string,
+        categoria: 'alerta' as 'alerta' | 'senal',
+        dias: null as number | null,
+      })),
+    ...MOCK_SENALES
+      .filter(s => s.tipo !== 'completed')
+      .sort((a, b) => a.ventanaDias - b.ventanaDias)
+      .slice(0, 2)
+      .map(s => ({
+        id: s.id,
+        titulo: s.titulo,
+        agente: s.agenteOrigenNombre ?? s.agente ?? '',
+        tipo: s.tipo as string,
+        categoria: 'senal' as 'alerta' | 'senal',
+        dias: s.ventanaDias,
+      })),
+  ].slice(0, 5);
   readonly galiIsActing = signal(false);
 
   onGaliActing(): void {
@@ -238,6 +265,11 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   irAHomeDesdeSenales(): void {
     this.gali.closeSenalesPanel();
     this.router.navigate(['/gali-6']);
+  }
+
+  irADecisionDirecta(alertaId: string): void {
+    this.gali.closeSenalesPanel();
+    this.router.navigate(['/gali-6/senales'], { queryParams: { signalId: alertaId } });
   }
 
   lanzarProyectoDesdeADA(): void {

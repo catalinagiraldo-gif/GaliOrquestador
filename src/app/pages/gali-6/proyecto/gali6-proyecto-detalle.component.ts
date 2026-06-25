@@ -17,13 +17,13 @@ const ESTADO_LABEL: Record<string, string> = {
 };
 
 const CONEXION_ICONS: Record<string, string> = {
-  'meta-ads': '📘', 'tiktok-ads': '🎵', 'google-ads': '🔍',
-  'whatsapp': '💬', 'shopify': '🛒', 'tiktok': '🎵', 'meta': '📘',
+  'meta-ads': 'pi-facebook', 'tiktok-ads': 'pi-tiktok', 'google-ads': 'pi-google',
+  'whatsapp': 'pi-whatsapp', 'shopify': 'pi-shopping-bag', 'tiktok': 'pi-tiktok', 'meta': 'pi-facebook',
 };
 
 const AGENTE_ICONS: Record<string, string> = {
-  'roax-ads': '📊', 'stock-guardian': '📦', 'vigilante-logistico': '🚛',
-  'ada-spy': '🔍', 'chatea-pro': '💬',
+  'roax-ads': 'pi-chart-bar', 'stock-guardian': 'pi-box', 'vigilante-logistico': 'pi-truck',
+  'ada-spy': 'pi-search', 'chatea-pro': 'pi-comments',
 };
 
 @Component({
@@ -126,7 +126,7 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
     const nuevo = this.proyectoNuevo();
     if (nuevo) {
       return nuevo.agentes.map(id => ({
-        id, icono: AGENTE_ICONS[id] ?? '🤖',
+        id, icono: AGENTE_ICONS[id] ?? 'pi-microchip-ai',
         nombre: id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
         descripcionCorta: '',
         nombreCorto: id,
@@ -216,19 +216,19 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
   }
 
   getCanalIcon(canal: string): string {
-    const m: Record<string, string> = { 'meta-ads': '📘', 'tiktok-ads': '🎵', 'google-ads': '🔍', organico: '🌱', whatsapp: '💬' };
-    return m[canal] ?? '📣';
+    const m: Record<string, string> = { 'meta-ads': 'pi-facebook', 'tiktok-ads': 'pi-tiktok', 'google-ads': 'pi-google', organico: 'pi-leaf', whatsapp: 'pi-whatsapp' };
+    return m[canal] ?? 'pi-megaphone';
   }
 
   getCanalPvIcon(canal: string): string {
-    return { meta: '📘', tiktok: '🎵', whatsapp: '💬', google: '🔍' }[canal] ?? '📣';
+    return ({ meta: 'pi-facebook', tiktok: 'pi-tiktok', whatsapp: 'pi-whatsapp', google: 'pi-google' } as Record<string,string>)[canal] ?? 'pi-megaphone';
   }
 
   getConexionIcon(cnx: string): string {
-    return CONEXION_ICONS[cnx] ?? '🔌';
+    return CONEXION_ICONS[cnx] ?? 'pi-link';
   }
 
   getAgenteIcon(id: string): string {
-    return AGENTE_ICONS[id] ?? '🤖';
+    return AGENTE_ICONS[id] ?? 'pi-microchip-ai';
   }
 }

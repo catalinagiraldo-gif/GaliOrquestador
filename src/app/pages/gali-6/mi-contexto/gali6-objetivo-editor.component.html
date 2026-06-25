@@ -1,142 +1,282 @@
 <div class="oe gali-stagger-in">
 
-  <!-- ── NAV ── -->
+  <!-- ── TOPBAR ── -->
   <div class="oe__topbar">
     <button class="oe__back" (click)="volver()">← Mi Negocio</button>
-    <h1 class="oe__titulo">Editar objetivo</h1>
+    <h1 class="oe__titulo">
+      {{ modo() === 'lista' ? 'Mis objetivos' : 'Agregar objetivo' }}
+    </h1>
   </div>
 
-  <!-- ── LAYOUT 2 COLUMNAS ── -->
-  <div class="oe__cols">
+  <!-- ══════════════════════════════════════════════
+       MODO LISTA — ver y gestionar objetivos
+  ══════════════════════════════════════════════ -->
+  @if (modo() === 'lista') {
+    <div class="oe__lista-container">
 
-    <!-- ─── IZQUIERDA: Chat con Gali ─── -->
-    <div class="oe__chat-col">
-      <div class="oe__chat-label">
-        <span class="oe__chat-spark" aria-hidden="true">✦</span>
-        Gali te ayuda a construir tu objetivo
+      <!-- Resumen general -->
+      <div class="oe__resumen">
+        <span class="oe__resumen-eyebrow">✦ Objetivo general</span>
+        <p class="oe__resumen-texto">{{ objetivoGeneral().resumen }}</p>
+        <div class="oe__resumen-barra-wrap">
+          <div class="oe__resumen-barra">
+            <div class="oe__resumen-fill" [style.width.%]="objetivoGeneral().progreso_pct"></div>
+          </div>
+          <span class="oe__resumen-pct">{{ objetivoGeneral().progreso_pct }}% completado</span>
+        </div>
       </div>
 
-      <!-- Mensajes -->
-      <div class="oe__chat-mensajes" #chatContainer>
-        @for (m of mensajes(); track $index) {
-          <div class="oe__mensaje oe__mensaje--{{ m.rol }}">
-            @if (m.rol === 'gali') {
-              <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
+      <!-- Lista de objetivos -->
+      <div class="oe__objetivos-lista">
+        @for (obj of (objetivoGeneral().objetivos ?? []); track obj.id; let idx = $index) {
+          <div class="oe__objetivo-card">
+            <div class="oe__obj-header">
+              <div class="oe__obj-titulo-wrap">
+                <span class="oe__obj-titulo">{{ obj.titulo }}</span>
+                <span class="oe__obj-tipo">{{ metricaLabel[obj.metrica] }}</span>
+              </div>
+              <div class="oe__obj-acciones-btn">
+                <button class="oe__obj-btn oe__obj-btn--editar"
+                        (click)="iniciarEdicion(obj)"
+                        title="Editar objetivo">✎</button>
+                <button class="oe__obj-btn oe__obj-btn--eliminar"
+                        (click)="eliminarObjetivo(idx)"
+                        title="Eliminar objetivo">×</button>
+              </div>
+            </div>
+
+            <!-- Formulario de edición inline -->
+            @if (editandoId() === obj.id) {
+              <div class="oe__edit-form">
+                <div class="oe__edit-campo">
+                  <label class="oe__edit-label">Nombre del objetivo</label>
+                  <input class="oe__edit-input"
+                         type="text"
+                         [value]="editBorrador().titulo ?? obj.titulo"
+                         (input)="onEditTitulo($any($event.target).value)"
+                         placeholder="Nombre del objetivo" />
+                </div>
+                <div class="oe__edit-row">
+                  <div class="oe__edit-campo">
+                    <label class="oe__edit-label">Meta ({{ obj.unidad }})</label>
+                    <input class="oe__edit-input oe__edit-input--num"
+                           type="number"
+                           [value]="editBorrador().metaValor ?? obj.metaValor"
+                           (input)="onEditMeta($any($event.target).value)"
+                           min="0" />
+                  </div>
+                  <div class="oe__edit-campo">
+                    <label class="oe__edit-label">Plazo (semanas)</label>
+                    <input class="oe__edit-input oe__edit-input--num"
+                           type="number"
+                           [value]="editBorrador().plazo_semanas ?? obj.plazo_semanas"
+                           (input)="onEditPlazo($any($event.target).value)"
+                           min="1" max="52" />
+                  </div>
+                </div>
+                <div class="oe__edit-btns">
+                  <button class="oe__edit-btn oe__edit-btn--guardar" (click)="guardarEdicion(obj)">
+                    Guardar cambios
+                  </button>
+                  <button class="oe__edit-btn oe__edit-btn--cancelar" (click)="cancelarEdicion()">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
             }
-            <div class="oe__mensaje-burbuja">
-              <p class="oe__mensaje-texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
-              <span class="oe__mensaje-hora">{{ m.timestamp }}</span>
-            </div>
-          </div>
-        }
 
-        @if (escribiendo()) {
-          <div class="oe__mensaje oe__mensaje--gali">
-            <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
-            <div class="oe__typing">
-              <span></span><span></span><span></span>
+            <!-- Progreso (solo cuando no se edita) -->
+            @if (editandoId() !== obj.id) {
+            <div class="oe__obj-progreso">
+              <div class="oe__obj-barra">
+                <div class="oe__obj-fill"
+                     [style.width.%]="obj.progreso_pct"
+                     [class.oe__obj-fill--logrado]="obj.progreso_pct >= 90">
+                </div>
+              </div>
+              <div class="oe__obj-nums">
+                <span class="oe__obj-actual">{{ obj.actualValor }}{{ obj.unidad }}</span>
+                <span class="oe__obj-sep">de</span>
+                <span class="oe__obj-meta">{{ obj.metaValor }}{{ obj.unidad }}</span>
+                <span class="oe__obj-pct-badge" [class.oe__obj-pct-badge--logrado]="obj.progreso_pct >= 90">
+                  {{ obj.progreso_pct }}%
+                </span>
+              </div>
             </div>
+            }
+
+            <!-- Sugerencia de Gali (si existe) -->
+            @if (obj.sugerenciaGali) {
+              <div class="oe__sugerencia-gali">
+                <div class="oe__sug-hdr">
+                  <span class="oe__sug-spark">✦</span>
+                  <span class="oe__sug-titulo">Gali sugiere</span>
+                  <span class="oe__sug-chip oe__sug-chip--{{ obj.sugerenciaGali.confianza }}">
+                    {{ confianzaLabel(obj.sugerenciaGali.confianza) }}
+                  </span>
+                </div>
+                <p class="oe__sug-texto">"{{ obj.sugerenciaGali.texto }}"</p>
+                <p class="oe__sug-evidencia">Basado en: {{ obj.sugerenciaGali.evidencia }}</p>
+                <div class="oe__sug-acciones">
+                  <button class="oe__sug-btn oe__sug-btn--aplicar" (click)="aplicarSugerencia(obj)">
+                    Aplicar sugerencia
+                  </button>
+                  <button class="oe__sug-btn oe__sug-btn--ignorar" (click)="ignorarSugerencia(obj)">
+                    Ignorar
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>
 
-      <!-- Input -->
-      @if (!chatTerminado) {
-        <div class="oe__chat-input-row">
-          <textarea class="oe__chat-input"
-                    rows="2"
-                    [value]="inputUsuario()"
-                    (input)="inputUsuario.set($any($event.target).value)"
-                    [placeholder]="placeholderActual"
-                    (keydown.enter)="onEnter($event)">
-          </textarea>
-          <button class="oe__chat-send"
-                  [disabled]="!inputUsuario().trim() || escribiendo()"
-                  (click)="enviarMensaje()">
-            →
-          </button>
-        </div>
-      }
+      <!-- CTA agregar -->
+      <button class="oe__agregar-btn" (click)="abrirModoAgregar()">
+        <span class="oe__agregar-ico" aria-hidden="true">+</span>
+        Agregar un objetivo con Gali
+      </button>
 
-      @if (chatTerminado && !guardado()) {
-        <div class="oe__chat-acciones">
-          <button class="oe__btn oe__btn--usar" (click)="usarObjetivo()">
-            ✦ Sí, usar este objetivo
-          </button>
-          <button class="oe__btn oe__btn--ajustar" (click)="ajustarObjetivo()">
-            Ajustarlo →
-          </button>
-        </div>
-      }
-
-      @if (guardado()) {
-        <div class="oe__guardado">
-          <span class="oe__guardado-icon">✦</span>
-          ¡Objetivo guardado! Volviendo…
-        </div>
-      }
     </div>
+  }
 
-    <!-- ─── DERECHA: Objetivo en construcción ─── -->
-    <div class="oe__preview-col">
-      <div class="oe__preview-card">
-        <div class="oe__preview-hdr">
-          <span class="oe__preview-eyebrow">Objetivo en construcción</span>
+  <!-- ══════════════════════════════════════════════
+       MODO AÑADIR — chat con Gali 2-col
+  ══════════════════════════════════════════════ -->
+  @if (modo() === 'agregar') {
+    <div class="oe__cols">
+
+      <!-- Chat col -->
+      <div class="oe__chat-col">
+        <div class="oe__chat-label">
+          <span class="oe__chat-spark" aria-hidden="true">✦</span>
+          Gali te ayuda a definir el objetivo
         </div>
 
-        <div class="oe__preview-campo">
-          <label class="oe__preview-label">¿Qué quieres lograr?</label>
-          <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().texto">
-            {{ borrador().texto || 'Escribe tu respuesta a Gali →' }}
-          </p>
-        </div>
-
-        <div class="oe__preview-row">
-          <div class="oe__preview-campo">
-            <label class="oe__preview-label">Meta de pedidos/sem</label>
-            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().meta_pedidos_sem">
-              {{ borrador().meta_pedidos_sem ? borrador().meta_pedidos_sem + ' pedidos' : '—' }}
-            </p>
-          </div>
-          <div class="oe__preview-campo">
-            <label class="oe__preview-label">Plazo</label>
-            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borrador().plazo_semanas">
-              {{ borrador().plazo_semanas ? borrador().plazo_semanas + ' semanas' : '—' }}
-            </p>
-          </div>
-        </div>
-
-        @if (objetivoFinal()) {
-          <div class="oe__preview-progreso">
-            <div class="oe__preview-barra">
-              <div class="oe__preview-barra-fill" style="width: 47%"></div>
+        <div class="oe__chat-mensajes">
+          @for (m of mensajes(); track $index) {
+            <div class="oe__mensaje oe__mensaje--{{ m.rol }}">
+              @if (m.rol === 'gali') {
+                <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
+              }
+              <div class="oe__mensaje-burbuja">
+                <p class="oe__mensaje-texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
+                <span class="oe__mensaje-hora">{{ m.timestamp }}</span>
+              </div>
             </div>
-            <span class="oe__preview-barra-label">47% del camino · en progreso</span>
+          }
+
+          @if (escribiendo()) {
+            <div class="oe__mensaje oe__mensaje--gali">
+              <div class="oe__mensaje-avatar oe__mensaje-avatar--gali">G</div>
+              <div class="oe__typing"><span></span><span></span><span></span></div>
+            </div>
+          }
+        </div>
+
+        <!-- Selector de tipo -->
+        @if (agregarPaso() === 'tipo') {
+          <div class="oe__tipo-chips">
+            @for (m of metricas; track m) {
+              <button class="oe__tipo-chip" (click)="seleccionarMetrica(m)">
+                {{ metricaLabel[m] }}
+              </button>
+            }
           </div>
         }
 
-        @if (objetivo()) {
-          <div class="oe__preview-actual">
-            <span class="oe__preview-actual-label">Objetivo actual guardado:</span>
-            <p class="oe__preview-actual-texto">{{ objetivo()!.texto }}</p>
+        <!-- Input de respuesta -->
+        @if (agregarPaso() === 'meta' || agregarPaso() === 'plazo') {
+          <div class="oe__chat-input-row">
+            <textarea class="oe__chat-input"
+                      rows="2"
+                      [value]="inputUsuario()"
+                      (input)="inputUsuario.set($any($event.target).value)"
+                      [placeholder]="agregarPaso() === 'meta' ? 'Ej: 100 · 2x · $5M COP' : 'Ej: 8 semanas'"
+                      (keydown.enter)="onEnter($event)">
+            </textarea>
+            <button class="oe__chat-send"
+                    [disabled]="!inputUsuario().trim() || escribiendo()"
+                    (click)="enviarMensaje()">→</button>
           </div>
         }
+
+        <!-- CTAs finales -->
+        @if (chatTerminado && !guardado()) {
+          <div class="oe__chat-acciones">
+            <button class="oe__btn oe__btn--usar" (click)="confirmarAgregar()">✦ Sí, agregar este objetivo</button>
+            <button class="oe__btn oe__btn--ajustar" (click)="abrirModoAgregar()">Empezar de nuevo →</button>
+          </div>
+        }
+
+        @if (guardado()) {
+          <div class="oe__guardado">
+            <span class="oe__guardado-icon">✦</span>
+            ¡Objetivo agregado! Volviendo a la lista…
+          </div>
+        }
+
+        <button class="oe__cancel-link" (click)="cancelarAgregar()">← Volver sin agregar</button>
       </div>
 
-      <!-- Sugerencia de Gali -->
-      @if (objetivoFinal() && chatTerminado) {
-        <div class="oe__sugerencia">
-          <span class="oe__sugerencia-spark" aria-hidden="true">✦</span>
-          <p class="oe__sugerencia-texto">
-            Según tus datos actuales, vas en buen camino.
-            Si escalas TikTok un 20%, puedes llegar a
-            <strong>{{ (objetivoFinal()!.meta_pedidos_sem ?? 100) + 30 }} pedidos/sem</strong>
-            antes del plazo.
-          </p>
-        </div>
-      }
-    </div>
+      <!-- Preview col -->
+      <div class="oe__preview-col">
+        <div class="oe__preview-card">
+          <div class="oe__preview-hdr">
+            <span class="oe__preview-eyebrow">Objetivo en construcción</span>
+          </div>
 
-  </div><!-- /cols -->
+          <div class="oe__preview-campo">
+            <label class="oe__preview-label">Tipo</label>
+            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!metricaSeleccionada()">
+              {{ metricaSeleccionada() ? metricaLabel[metricaSeleccionada()!] : 'Elige el tipo →' }}
+            </p>
+          </div>
+
+          <div class="oe__preview-campo">
+            <label class="oe__preview-label">Objetivo</label>
+            <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borradorNuevo().titulo">
+              {{ borradorNuevo().titulo || 'Tu respuesta a Gali' }}
+            </p>
+          </div>
+
+          <div class="oe__preview-row">
+            <div class="oe__preview-campo">
+              <label class="oe__preview-label">Meta</label>
+              <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borradorNuevo().metaValor">
+                {{ borradorNuevo().metaValor ? (borradorNuevo().metaValor + (borradorNuevo().unidad ?? '')) : '—' }}
+              </p>
+            </div>
+            <div class="oe__preview-campo">
+              <label class="oe__preview-label">Plazo</label>
+              <p class="oe__preview-valor" [class.oe__preview-valor--vacio]="!borradorNuevo().plazo_semanas">
+                {{ borradorNuevo().plazo_semanas ? (borradorNuevo().plazo_semanas + ' semanas') : '—' }}
+              </p>
+            </div>
+          </div>
+
+          @if (objetivoFinal()) {
+            <div class="oe__preview-progreso">
+              <div class="oe__preview-barra">
+                <div class="oe__preview-barra-fill" style="width: 0%"></div>
+              </div>
+              <span class="oe__preview-barra-label">0% · inicio desde hoy</span>
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
 
 </div>
+
+<!-- Toast -->
+@if (toastMsg()) {
+  <div class="oe__toast" role="status" aria-live="polite">
+    {{ toastMsg() }}
+    @if (objetivoEliminadoUndo()) {
+      <button class="oe__toast-undo" (click)="undoEliminar()">Deshacer</button>
+    }
+  </div>
+}

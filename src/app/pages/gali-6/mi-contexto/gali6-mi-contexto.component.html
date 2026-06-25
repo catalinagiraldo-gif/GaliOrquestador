@@ -1,388 +1,773 @@
-<div class="mi-contexto gali-stagger-in">
-  <app-g6-page-header [breadcrumbs]="['Mi Negocio', 'Mi Contexto']" title="Mi Contexto"
-    sub="Todo el contexto de tu negocio que Gali usa para operar." />
+<div class="mc gali-stagger-in">
+  <app-g6-page-header
+    [breadcrumbs]="['Mi Negocio', 'Mi Contexto']"
+    title="Mi Contexto"
+    sub="El contexto de tu negocio que Gali usa para operar." />
 
-  <!-- ── Tabs ── -->
-  <div class="ctx-tabs" role="tablist" aria-label="Secciones de Mi Negocio">
-    <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'senales'"
-            [attr.aria-selected]="activeTab() === 'senales'"
-            (click)="setTab('senales')">
-      Señales
-    </button>
-    <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'impacto'"
-            [attr.aria-selected]="activeTab() === 'impacto'"
-            (click)="setTab('impacto')">
-      Impacto
-    </button>
-    <button class="ctx-tab" role="tab" [class.ctx-tab--active]="activeTab() === 'operacion'"
-            [attr.aria-selected]="activeTab() === 'operacion'"
-            (click)="setTab('operacion')">
-      Mi Operación
-    </button>
-  </div>
+  <!-- ══════════════════════════════════════════════════════
+       BLOQUE 1: MIS OBJETIVOS — izq lista / der detalle
+  ══════════════════════════════════════════════════════ -->
+  <div class="mc-bloque mc-bloque--objetivos">
 
-  <!-- ══════════════ TAB: Señales ══════════════ -->
-  @if (activeTab() === 'senales') {
-    <div class="ctx-body" role="tabpanel" aria-label="Señales">
+    <!-- ─── COLUMNA IZQUIERDA ─────────────────────────────── -->
+    <div class="mc-izq">
 
-      @if (alertasCriticas.length > 0) {
-        <section class="senales-grupo">
-          <span class="senales-grupo__label senales-grupo__label--critica">
-            ◎ Críticas ({{ alertasCriticas.length }})
+      <!-- Sección objetivos -->
+      <section class="mc-seccion">
+        <div class="mc-seccion__hdr">
+          <span class="mc-seccion__titulo">
+            <span class="mc-spark" aria-hidden="true">✦</span> Mis objetivos
           </span>
-          @for (a of alertasCriticas; track a.id) {
-            <article class="senal-item senal-item--critica">
-              <span class="senal-item__dot" [style.background]="a.agenteColor"></span>
-              <div class="senal-item__body">
-                <span class="senal-item__agente">{{ a.agente }}</span>
-                <span class="senal-item__titulo">{{ a.titulo }}</span>
-                @if (a.impacto) {
-                  <span class="senal-item__impacto">{{ a.impacto }}</span>
-                }
+        </div>
+
+        <!-- Objetivo general → abre resumen de todos los sub-objetivos -->
+        <button class="mc-obj-general"
+                [class.mc-obj-general--activo]="panelModo() === 'general'"
+                (click)="verResumenGeneral()">
+          <div class="mc-obj-general__izq">
+            <span class="mc-obj-general__eyebrow">Objetivo general · ver resumen →</span>
+            <p class="mc-obj-general__resumen">{{ objetivoV2().resumen }}</p>
+          </div>
+          <div class="mc-obj-general__der">
+            <span class="mc-obj-general__pct">{{ objetivoV2().progreso_pct }}%</span>
+            <div class="mc-obj-general__track">
+              <div class="mc-obj-general__fill" [style.width.%]="objetivoV2().progreso_pct"></div>
+            </div>
+          </div>
+        </button>
+
+        <!-- Tarjetas de objetivos específicos -->
+        <div class="mc-obj-lista">
+          @for (obj of (objetivoV2().objetivos ?? []); track obj.id) {
+            <div class="mc-obj-card-wrapper">
+              <!-- Card principal -->
+              <div class="mc-obj-card"
+                   role="button"
+                   tabindex="0"
+                   [class.mc-obj-card--activo]="objetivoDetalleId() === obj.id && panelModo() === 'detalle'"
+                   [class.mc-obj-card--destacado]="esDestacado(obj.id)"
+                   [class.mc-obj-card--pendiente-borrar]="pendingDelete() === obj.id"
+                   (click)="abrirDetalle(obj.id)"
+                   (keydown.enter)="abrirDetalle(obj.id)">
+                <div class="mc-obj-card__hdr">
+                  <span class="mc-obj-card__tipo">{{ metricaLabel[obj.metrica] }}</span>
+                  <div class="mc-obj-card__hdr-acciones">
+                    @if (obj.sugerenciaGali) {
+                      <span class="mc-obj-card__dot" aria-label="Gali sugiere">✦</span>
+                    }
+                    <button class="mc-obj-card__star"
+                            [class.mc-obj-card__star--on]="esDestacado(obj.id)"
+                            (click)="toggleDestacar(obj.id); $event.stopPropagation()"
+                            [title]="esDestacado(obj.id) ? 'Quitar destaque' : 'Destacar objetivo'">
+                      {{ esDestacado(obj.id) ? '★' : '☆' }}
+                    </button>
+                  </div>
+                </div>
+                <span class="mc-obj-card__titulo">{{ obj.titulo }}</span>
+                <div class="mc-obj-card__progress">
+                  <div class="mc-obj-card__track">
+                    <div class="mc-obj-card__fill"
+                         [style.width.%]="obj.progreso_pct"
+                         [class.mc-obj-card__fill--logrado]="obj.progreso_pct >= 90"></div>
+                  </div>
+                  <div class="mc-obj-card__nums">
+                    <span class="mc-obj-card__actual">{{ obj.actualValor }}{{ obj.unidad }}</span>
+                    <span class="mc-obj-card__meta"> / {{ obj.metaValor }}{{ obj.unidad }}</span>
+                  </div>
+                </div>
+
+                <!-- Footer de acciones: visible en hover, siempre visible si está en pendiente borrar -->
+                <div class="mc-obj-card__footer">
+                  <button class="mc-obj-card__btn-eliminar"
+                          (click)="solicitarEliminar(obj.id, $event)">
+                    <img src="assets/icons/pedidos/trash.svg"
+                         alt=""
+                         aria-hidden="true"
+                         class="mc-icon-trash" />
+                    Eliminar objetivo
+                  </button>
+                </div>
               </div>
-              <span class="senal-item__badge senal-item__badge--critica">Urgente</span>
-            </article>
+
+              <!-- Confirmación de borrado con impacto en objetivo general -->
+              @if (pendingDelete() === obj.id && impactoDelete(); as imp) {
+                <div class="mc-obj-card__confirm">
+                  <p class="mc-obj-card__confirm-titulo">¿Eliminar este objetivo?</p>
+                  <p class="mc-obj-card__confirm-impacto">
+                    Tu progreso general pasará de
+                    <strong>{{ objetivoV2().progreso_pct }}%</strong>
+                    a
+                    <strong>{{ imp.nuevoProgreso }}%</strong>
+                    ({{ imp.progresoDelta > 0 ? '+' : '' }}{{ imp.progresoDelta }}pp).
+                    @if (imp.tienesSugerencia) {
+                      La sugerencia activa de Gali para este objetivo también se perderá.
+                    }
+                  </p>
+                  <div class="mc-obj-card__confirm-btns">
+                    <button class="mc-btn-eliminar" (click)="confirmarEliminar($event)">
+                      Sí, eliminar
+                    </button>
+                    <button class="mc-btn-ghost mc-btn-ghost--sm" (click)="cancelarEliminar($event)">
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
           }
-        </section>
+        </div>
+      </section>
+
+      <!-- CTA: Agregar objetivo (al fondo, después de la lista) -->
+      <button class="mc-btn-agregar" (click)="iniciarAgregar()">
+        <span class="mc-btn-agregar__ico">+</span>
+        Agregar objetivo
+      </button>
+
+    </div><!-- /mc-izq -->
+
+    <!-- ─── COLUMNA DERECHA — Detalle / Edición / Agregar ─── -->
+    <div class="mc-der">
+
+      <!-- Estado vacío -->
+      @if (!objetivoDetalleId() && panelModo() !== 'agregar' && panelModo() !== 'general' && panelModo() !== 'editar-general') {
+        <div class="mc-der-vacio">
+          <span class="mc-der-vacio__ico" aria-hidden="true">◎</span>
+          <p class="mc-der-vacio__texto">Selecciona el objetivo general para ver un resumen, o un sub-objetivo para el análisis detallado</p>
+        </div>
       }
 
-      @if (alertasDiagnostico.length > 0) {
-        <section class="senales-grupo">
-          <span class="senales-grupo__label">⚠ Diagnóstico ({{ alertasDiagnostico.length }})</span>
-          @for (a of alertasDiagnostico; track a.id) {
-            <article class="senal-item senal-item--warning">
-              <span class="senal-item__dot" [style.background]="a.agenteColor"></span>
-              <div class="senal-item__body">
-                <span class="senal-item__agente">{{ a.agente }}</span>
-                <span class="senal-item__titulo">{{ a.titulo }}</span>
-              </div>
-              <span class="senal-item__badge senal-item__badge--warning">Pendiente</span>
-            </article>
-          }
-        </section>
-      }
+      <!-- PANEL RESUMEN GENERAL -->
+      @if (panelModo() === 'general') {
+        <div class="mc-resumen-general">
 
-      <!-- Actividad reciente de Gali -->
-      <section class="actividad-reciente">
-        <span class="actividad-reciente__eyebrow"><span aria-hidden="true">✦</span> Actividad reciente de Gali</span>
-        @for (ac of actividadReciente; track ac.id) {
-          <div class="actividad-item">
-            <span class="actividad-item__agente">{{ ac.agente }}</span>
-            <div class="actividad-item__body">
-              <span class="actividad-item__accion">{{ ac.accion }}</span>
-              <span class="actividad-item__impacto">{{ ac.impacto }}</span>
+          <!-- Header: objetivo general -->
+          <div class="mc-resumen-general__hdr">
+            <div class="mc-resumen-general__hdr-izq">
+              <span class="mc-resumen-general__eyebrow">Objetivo general</span>
+              <h2 class="mc-resumen-general__titulo">{{ objetivoV2().resumen }}</h2>
             </div>
-            <span class="actividad-item__hora">{{ ac.hora }}</span>
+            <span class="mc-resumen-general__pct">{{ objetivoV2().progreso_pct }}%</span>
           </div>
-        }
-      </section>
-
-      <a routerLink="/gali-6/senales" class="ctx-ver-mas">Ver panel completo de señales →</a>
-    </div>
-  }
-
-  <!-- ══════════════ TAB: Impacto ══════════════ -->
-  @if (activeTab() === 'impacto') {
-    <div class="ctx-body" role="tabpanel" aria-label="Impacto de Gali">
-
-      <!-- Resumen de la semana -->
-      <section class="imp-card">
-        <div class="imp-card__head">
-          <span class="imp-card__periodo">{{ impactoSemana.label_periodo }}</span>
-          <span class="imp-card__delta" [class.is-up]="impactoSemana.delta_ok">
-            ↑{{ impactoSemana.delta_vs_semana_anterior_pct }}% vs semana pasada
-          </span>
-        </div>
-        <div class="imp-grid">
-          <div class="imp-stat imp-stat--hero">
-            <span class="imp-stat__v">{{ impactoSemana.pesos_ahorrados_label }}</span>
-            <span class="imp-stat__l">ahorrados esta semana</span>
+          <div class="mc-resumen-general__track">
+            <div class="mc-resumen-general__fill" [style.width.%]="objetivoV2().progreso_pct"></div>
           </div>
-          <div class="imp-stat">
-            <span class="imp-stat__v">{{ impactoSemana.acciones_totales }}</span>
-            <span class="imp-stat__l">acciones · <em>{{ impactoSemana.acciones_autonomas }} autónomas</em></span>
+
+          <!-- Gali: resumen dinámico -->
+          <div class="mc-resumen-general__gali">
+            <span class="mc-spark" aria-hidden="true">✦</span>
+            <p>{{ galiResumenGeneral() }}</p>
           </div>
-          <div class="imp-stat">
-            <span class="imp-stat__v">{{ impactoSemana.novedades_evitadas }}</span>
-            <span class="imp-stat__l">novedades evitadas</span>
-          </div>
-          <div class="imp-stat">
-            <span class="imp-stat__v">{{ impactoSemana.campanas_escaladas }}</span>
-            <span class="imp-stat__l">campañas escaladas</span>
-          </div>
-          <div class="imp-stat">
-            <span class="imp-stat__v">{{ impactoSemana.senales_detectadas }}</span>
-            <span class="imp-stat__l">alertas detectadas</span>
-          </div>
-          <div class="imp-stat">
-            <span class="imp-stat__v">{{ impactoSemana.horas_libradas }}h</span>
-            <span class="imp-stat__l">que no operaste tú</span>
-          </div>
-        </div>
-        <div class="imp-bars">
-          <div class="imp-bar">
-            <span class="imp-bar__l">Acciones iniciadas por Gali</span>
-            <span class="imp-bar__track">
-              <span class="imp-bar__fill" [style.width.%]="impactoSemana.pct_acciones_gali"></span>
-            </span>
-            <span class="imp-bar__v">{{ impactoSemana.pct_acciones_gali }}% <em>(meta >40%)</em></span>
-          </div>
-          <div class="imp-bar">
-            <span class="imp-bar__l">Decisiones con resultado visible</span>
-            <span class="imp-bar__track">
-              <span class="imp-bar__fill" [style.width.%]="impactoSemana.pct_loops_con_resultado"></span>
-            </span>
-            <span class="imp-bar__v">{{ impactoSemana.pct_loops_con_resultado }}% <em>(meta >80%)</em></span>
-          </div>
-        </div>
-      </section>
 
-      <!-- Acumulado -->
-      <section class="imp-acum" [class.imp-acum--hito]="impactoAcum.hito_alcanzado">
-        <div class="imp-acum__top">
-          <span class="imp-acum__label">{{ impactoAcum.label_periodo }}</span>
-          @if (impactoAcum.hito_alcanzado) {
-            <span class="imp-acum__badge">🏆 Hito alcanzado</span>
-          }
-        </div>
-        <div class="imp-acum__stats">
-          <span><strong>{{ impactoAcum.pesos_ahorrados_label }}</strong> ahorrados</span>
-          <span><strong>{{ impactoAcum.acciones_totales }}</strong> acciones</span>
-          <span><strong>{{ impactoAcum.novedades_evitadas }}</strong> novedades evitadas</span>
-          <span><strong>{{ impactoAcum.horas_libradas }}h</strong> libres</span>
-        </div>
-        <span class="imp-acum__hito">{{ impactoAcum.hito_proximo_label }}</span>
-      </section>
-
-      <!-- Feed de actividad reciente -->
-      <section class="imp-feed">
-        <span class="imp-feed__eyebrow">Actividad reciente de Gali</span>
-        <ul class="imp-feed__list">
-          @for (ev of impactoActions; track ev.id) {
-            <li class="imp-feed__item">
-              <span class="imp-feed__dot" [style.background]="ev.agente_color"></span>
-              <div class="imp-feed__body">
-                <span class="imp-feed__desc">{{ ev.descripcion }}</span>
-                <span class="imp-feed__meta">{{ ev.agente }} · {{ ev.impacto_label }}</span>
-              </div>
-            </li>
-          }
-        </ul>
-      </section>
-
-      <a routerLink="/gali-6/impacto" class="ctx-ver-mas">Ver historial completo de impacto →</a>
-
-    </div>
-  }
-
-  <!-- ══════════════ TAB: Mi Operación ══════════════ -->
-  @if (activeTab() === 'operacion') {
-    <div class="ctx-body" role="tabpanel" aria-label="Mi Operación">
-
-      <!-- Objetivo con gráfico de contribuciones -->
-      <section class="op-seccion op-seccion--objetivo">
-        <div class="op-seccion__hdr">
-          <span class="op-seccion__titulo">Objetivo de negocio</span>
-          <button class="op-btn-edit" (click)="openEdit()">Editar objetivo →</button>
-        </div>
-
-        <div class="op-objetivo">
-          <p class="op-objetivo__texto">{{ objetivo() }}</p>
-          <div class="op-objetivo__progress">
-            <div class="op-objetivo__track">
-              <div class="op-objetivo__fill" [style.width.%]="metaPct()"></div>
-            </div>
-            <span class="op-objetivo__pct">{{ metaPct() }}% del objetivo</span>
-          </div>
-        </div>
-
-        <!-- Gráfico de contribuciones por proyecto -->
-        @if (proyectoContribuciones.length) {
-          <div class="op-contrib" aria-label="Aporte de proyectos al objetivo">
-            <span class="op-contrib__label">Cómo llegan tus pedidos a la meta</span>
-            <div class="op-contrib-bar" role="img">
-              @for (p of proyectoContribuciones; track p.id) {
-                <span class="op-contrib-seg"
-                      [style.width.%]="getContribPct(p)"
-                      [style.background]="p.color"
-                      [title]="p.nombre + ': ' + p.pedidosSem + ' ped/sem'"></span>
-              }
-              <span class="op-contrib-seg op-contrib-seg--gap" [style.width.%]="getContribGap()"></span>
-            </div>
-            <div class="op-contrib-legend">
-              @for (p of proyectoContribuciones; track p.id) {
-                <span class="op-contrib-dot" [style.background]="p.color"></span>
-                <span class="op-contrib-name">{{ p.nombre }} ({{ p.pedidosSem }})</span>
-              }
-              <span class="op-contrib-dot op-contrib-dot--gap"></span>
-              <span class="op-contrib-name">Por alcanzar ({{ getGapCount() }})</span>
-            </div>
-          </div>
-        }
-
-        <!-- Sub-metas -->
-        <div class="op-submetas">
-          <span class="op-submetas__eyebrow">Hitos del objetivo</span>
-          @for (sm of subMetas(); track sm.id) {
-            <button class="op-submeta" [class.op-submeta--lograda]="sm.lograda" (click)="toggleSubMeta(sm.id)">
-              <span class="op-submeta__check" aria-hidden="true">{{ sm.lograda ? '✓' : '○' }}</span>
-              <span class="op-submeta__label">{{ sm.label }}</span>
-            </button>
-          }
-        </div>
-      </section>
-
-      <!-- Mayor fricción -->
-      <section class="op-seccion">
-        <span class="op-seccion__titulo">Mayor fricción hoy</span>
-        <div class="op-chips" role="group" aria-label="Mayor fricción">
-          @for (f of friccionOpts; track f.id) {
-            <button class="op-chip" [class.op-chip--active]="mayorFriccion() === f.id"
-                    [attr.aria-pressed]="mayorFriccion() === f.id"
-                    (click)="mayorFriccion.set(f.id)">{{ f.label }}</button>
-          }
-        </div>
-      </section>
-
-      <!-- Canal principal -->
-      <section class="op-seccion">
-        <span class="op-seccion__titulo">Canal principal de pauta</span>
-        <div class="op-chips" role="group" aria-label="Canal principal">
-          @for (c of canalOpts; track c.id) {
-            <button class="op-chip" [class.op-chip--active]="canalPrincipal() === c.id"
-                    [attr.aria-pressed]="canalPrincipal() === c.id"
-                    (click)="canalPrincipal.set(c.id)">{{ c.label }}</button>
-          }
-        </div>
-      </section>
-
-      <!-- Facturación -->
-      <section class="op-seccion">
-        <span class="op-seccion__titulo">Facturación</span>
-        <div class="op-siigo">
-          <span class="op-siigo__label">Siigo</span>
-          <span class="op-siigo__estado" [class.op-siigo__estado--on]="siigoCon()">
-            {{ siigoCon() ? '● Conectado' : '○ No conectado' }}
-          </span>
-          @if (!siigoCon()) {
-            <button class="op-btn-sec" (click)="siigoCon.set(true)">Conectar →</button>
-          }
-        </div>
-      </section>
-
-    </div>
-  }
-
-</div>
-
-<!-- ═══════════════════════════════════════
-     MODAL: Editar objetivo
-════════════════════════════════════════ -->
-@if (editOpen()) {
-  <div class="ctx-modal-overlay" role="dialog" aria-label="Editar objetivo de negocio" (click)="closeEdit()">
-    <div class="ctx-modal" (click)="$event.stopPropagation()">
-
-      <div class="ctx-modal__hdr">
-        <h2 class="ctx-modal__title">Objetivo de negocio</h2>
-        <button class="ctx-modal__close" (click)="closeEdit()" aria-label="Cerrar">×</button>
-      </div>
-
-      <!-- Tabs del modal -->
-      <div class="ctx-modal__tabs" role="tablist">
-        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'gali'"
-                (click)="editTab.set('gali')">✦ Gali sugiere</button>
-        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'manual'"
-                (click)="editTab.set('manual')">Mi objetivo</button>
-        <button class="ctx-modal__tab" [class.ctx-modal__tab--active]="editTab() === 'sub'"
-                (click)="editTab.set('sub')">Hitos</button>
-      </div>
-
-      <!-- Tab Gali sugiere -->
-      @if (editTab() === 'gali') {
-        <div class="ctx-modal__body">
-          <p class="ctx-modal__hint">Describe en lenguaje natural qué quieres lograr. Gali lo convierte en un objetivo estructurado.</p>
-          <textarea class="ctx-modal__textarea" rows="3"
-                    [ngModel]="objetivoTextoEdit()"
-                    (ngModelChange)="objetivoTextoEdit.set($event)"
-                    placeholder="Ej. quiero vender más collar GPS sin depender solo de Meta"></textarea>
-          <button class="ctx-modal__btn-gali"
-                  [disabled]="galiMejorandoObjetivo()"
-                  (click)="mejorarConGali()">
-            @if (galiMejorandoObjetivo()) {
-              <span class="ctx-modal__spinner" aria-hidden="true"></span> Analizando…
-            } @else {
-              ✦ Que Gali lo estructure
-            }
+          <!-- CTA: editar objetivo general -->
+          <button class="mc-det__editar" (click)="iniciarEditarGeneral()">
+            ✦ Cambiar objetivo principal con Gali
           </button>
-          @if (objetivoMejorado()) {
-            <div class="ctx-modal__propuesta" role="status" aria-live="polite">
-              <span class="ctx-modal__propuesta-eyebrow">✦ Propuesta de Gali</span>
-              <p class="ctx-modal__propuesta-texto">{{ objetivoMejorado() }}</p>
-              <div class="ctx-modal__propuesta-btns">
-                <button class="ctx-modal__btn-accept" (click)="aceptarObjetivoGali()">Usar esta propuesta →</button>
-                <button class="ctx-modal__btn-sec" (click)="objetivoMejorado.set(null)">Reformular</button>
-              </div>
-            </div>
-          }
-        </div>
-      }
 
-      <!-- Tab Mi objetivo -->
-      @if (editTab() === 'manual') {
-        <div class="ctx-modal__body">
-          <p class="ctx-modal__hint">Escribe tu objetivo directamente. Puedes ser tan específico o general como quieras.</p>
-          <textarea class="ctx-modal__textarea" rows="4"
-                    [ngModel]="objetivoTextoEdit()"
-                    (ngModelChange)="objetivoTextoEdit.set($event)"
-                    placeholder="Ej. Llegar a 100 pedidos por semana con margen > 25%"></textarea>
-          <div class="ctx-modal__footer-btns">
-            <button class="ctx-modal__btn-accept" (click)="saveEdit()">Guardar objetivo →</button>
-            <button class="ctx-modal__btn-sec" (click)="closeEdit()">Cancelar</button>
-          </div>
-        </div>
-      }
-
-      <!-- Tab Hitos -->
-      @if (editTab() === 'sub') {
-        <div class="ctx-modal__body">
-          <div class="ctx-modal__submetas">
-            @for (sm of subMetas(); track sm.id) {
-              <button class="op-submeta" [class.op-submeta--lograda]="sm.lograda" (click)="toggleSubMeta(sm.id)">
-                <span class="op-submeta__check" aria-hidden="true">{{ sm.lograda ? '✓' : '○' }}</span>
-                <span class="op-submeta__label">{{ sm.label }}</span>
-              </button>
-            }
-          </div>
-          <!-- Agregar hito con Gali -->
-          <div class="ctx-modal__nuevo-hito">
-            <p class="ctx-modal__hint">Describe un hito que quieras alcanzar. Gali lo convierte en algo medible.</p>
-            <textarea class="ctx-modal__textarea ctx-modal__textarea--sm" rows="2"
-                      [ngModel]="nuevaSubMetaTexto()"
-                      (ngModelChange)="nuevaSubMetaTexto.set($event)"
-                      placeholder="Ej. quiero tener mi primera campaña rentable en TikTok"></textarea>
-            <button class="ctx-modal__btn-gali"
-                    [disabled]="galiDefiniendoHito() || !nuevaSubMetaTexto().trim()"
-                    (click)="definirHitoConGali()">
-              @if (galiDefiniendoHito()) {
-                <span class="ctx-modal__spinner" aria-hidden="true"></span> Definiendo…
-              } @else {
-                + Agregar hito con ayuda de Gali
-              }
-            </button>
-            @if (hitoPropuesto()) {
-              <div class="ctx-modal__propuesta" role="status" aria-live="polite">
-                <span class="ctx-modal__propuesta-eyebrow">✦ Gali propone este hito</span>
-                <p class="ctx-modal__propuesta-texto">{{ hitoPropuesto() }}</p>
-                <div class="ctx-modal__propuesta-btns">
-                  <button class="ctx-modal__btn-accept" (click)="aceptarHito()">Agregar →</button>
-                  <button class="ctx-modal__btn-sec" (click)="hitoPropuesto.set(null)">Descartar</button>
+          <!-- Lista de sub-objetivos con estado -->
+          <div class="mc-resumen-general__lista">
+            <span class="mc-resumen-general__lista-titulo">Estado de cada objetivo</span>
+            @for (obj of objetivoV2().objetivos; track obj.id) {
+              <div class="mc-resumen-row"
+                   role="button"
+                   tabindex="0"
+                   (click)="abrirDetalle(obj.id)"
+                   (keydown.enter)="abrirDetalle(obj.id)">
+                <div class="mc-resumen-row__izq">
+                  <div class="mc-resumen-row__meta-row">
+                    <span class="mc-resumen-row__tipo">{{ metricaLabel[obj.metrica] }}</span>
+                    @if (obj.sugerenciaGali) {
+                      <span class="mc-chip mc-chip--{{ obj.sugerenciaGali.confianza }} mc-chip--xs">
+                        ✦ {{ confianzaLabel(obj.sugerenciaGali.confianza) }}
+                      </span>
+                    }
+                  </div>
+                  <p class="mc-resumen-row__titulo">{{ obj.titulo }}</p>
+                  <div class="mc-resumen-row__barra">
+                    <div class="mc-resumen-row__fill"
+                         [style.width.%]="obj.progreso_pct"
+                         [class.mc-resumen-row__fill--logrado]="obj.progreso_pct >= 90"
+                         [class.mc-resumen-row__fill--riesgo]="obj.progreso_pct < 40"></div>
+                  </div>
+                </div>
+                <div class="mc-resumen-row__der">
+                  <span class="mc-resumen-row__val">{{ obj.actualValor }}{{ obj.unidad }}</span>
+                  <span class="mc-resumen-row__meta-val">/ {{ obj.metaValor }}{{ obj.unidad }}</span>
+                  <span class="mc-resumen-row__pct"
+                        [class.mc-resumen-row__pct--verde]="obj.progreso_pct >= 90"
+                        [class.mc-resumen-row__pct--rojo]="obj.progreso_pct < 40">
+                    {{ obj.progreso_pct }}%
+                  </span>
+                  <span class="mc-resumen-row__flecha" aria-hidden="true">→</span>
                 </div>
               </div>
             }
           </div>
+
+          <button class="mc-btn-agregar" (click)="iniciarAgregar()">
+            <span class="mc-btn-agregar__ico">+</span> Agregar objetivo
+          </button>
+
         </div>
       }
 
-    </div>
-  </div>
+      @if (objetivoDetalleObj(); as obj) {
+
+        <!-- MODO DETALLE -->
+        @if (panelModo() === 'detalle') {
+          <div class="mc-det">
+            <div class="mc-det__hdr">
+              <div class="mc-det__hdr-izq">
+                <span class="mc-det__eyebrow">{{ metricaLabel[obj.metrica] }}</span>
+                <h2 class="mc-det__titulo">{{ obj.titulo }}</h2>
+              </div>
+              <div class="mc-det__hdr-acciones">
+                <button class="mc-det__star"
+                        [class.mc-det__star--on]="esDestacado(obj.id)"
+                        (click)="toggleDestacar(obj.id)"
+                        [title]="esDestacado(obj.id) ? 'Quitar destaque' : 'Destacar objetivo'">
+                  {{ esDestacado(obj.id) ? '★' : '☆' }}
+                </button>
+                <button class="mc-det__editar" (click)="iniciarEditChat()">
+                  ✦ Editar con Gali
+                </button>
+              </div>
+            </div>
+
+            <!-- Progreso -->
+            <div class="mc-det-progreso">
+              <div class="mc-det-progreso__nums">
+                <span class="mc-det-progreso__actual">{{ obj.actualValor }}{{ obj.unidad }}</span>
+                <span class="mc-det-progreso__sep">de</span>
+                <span class="mc-det-progreso__meta">{{ obj.metaValor }}{{ obj.unidad }}</span>
+                <span class="mc-det-progreso__pct"
+                      [class.mc-det-progreso__pct--logrado]="obj.progreso_pct >= 90">
+                  {{ obj.progreso_pct }}%
+                </span>
+              </div>
+              <div class="mc-det-progreso__track">
+                <div class="mc-det-progreso__fill"
+                     [style.width.%]="obj.progreso_pct"
+                     [class.mc-det-progreso__fill--logrado]="obj.progreso_pct >= 90"></div>
+              </div>
+            </div>
+
+            @if (objetivoDetalleData(); as det) {
+              <!-- Sparkline historial + proyección -->
+              <div class="mc-det-spark">
+                <span class="mc-det-spark__label">Semana a semana</span>
+                <div [class]="'mc-det-spark__chart mc-det-spark__chart--' + (det.tipoGrafico ?? 'barras')">
+                  @for (p of det.historial; track p.semana) {
+                    <div class="mc-det-spark__bar mc-det-spark__bar--real"
+                         [style.height.px]="sparkH(p.valor, obj.metaValor * 1.15)"
+                         [title]="'Sem ' + p.semana + ': ' + p.valor + obj.unidad"></div>
+                  }
+                  <div class="mc-det-spark__div" aria-hidden="true"></div>
+                  @for (p of det.proyeccion; track p.semana) {
+                    <div class="mc-det-spark__bar mc-det-spark__bar--proj"
+                         [style.height.px]="sparkH(p.valor, obj.metaValor * 1.15)"
+                         [title]="'Sem ' + p.semana + ' (proy): ' + p.valor + obj.unidad"></div>
+                  }
+                </div>
+                <div [class]="'mc-det-spark__legend mc-det-spark__legend--' + (det.tipoGrafico ?? 'barras')">
+                  <span class="mc-det-spark__leg mc-det-spark__leg--real">Real (sem 1-6)</span>
+                  <span class="mc-det-spark__leg mc-det-spark__leg--proj">Proyección Gali (sem 7-12)</span>
+                </div>
+              </div>
+
+              <!-- Análisis Gali -->
+              <div class="mc-det-gali">
+                <div class="mc-det-gali__hdr">
+                  <span class="mc-spark" aria-hidden="true">✦</span>
+                  <span class="mc-det-gali__titulo">Análisis de Gali</span>
+                  @if (obj.sugerenciaGali) {
+                    <span class="mc-chip mc-chip--{{ obj.sugerenciaGali.confianza }}">
+                      {{ confianzaLabel(obj.sugerenciaGali.confianza) }}
+                    </span>
+                  }
+                </div>
+                <p class="mc-det-gali__texto">{{ det.analisisGali }}</p>
+                <p class="mc-det-gali__fuente">Basado en: {{ det.fuente }}</p>
+              </div>
+
+              <!-- Desglose -->
+              <div class="mc-det-breakdown">
+                <span class="mc-det-breakdown__titulo">Desglose</span>
+                @for (b of det.breakdown; track b.label) {
+                  <div class="mc-det-breakdown__item">
+                    <span class="mc-det-breakdown__dot" [style.background]="b.color"></span>
+                    <span class="mc-det-breakdown__label">{{ b.label }}</span>
+                    <span class="mc-det-breakdown__val">{{ b.valor }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Sugerencia de actualizar objetivo general -->
+            @if (sugerenciaGeneral()) {
+              <div class="mc-sug-general">
+                <div class="mc-sug-general__hdr">
+                  <span class="mc-spark" aria-hidden="true">✦</span>
+                  Gali sugiere actualizar el objetivo general
+                </div>
+                <p class="mc-sug-general__texto">"{{ sugerenciaGeneral() }}"</p>
+                <div class="mc-sug-general__btns">
+                  <button class="mc-btn-primary" (click)="aplicarSugerenciaGeneral()">
+                    Actualizar objetivo general
+                  </button>
+                  <button class="mc-btn-ghost" (click)="ignorarSugerenciaGeneral()">
+                    Mantener actual
+                  </button>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- MODO EDICIÓN CON CHAT -->
+        @if (panelModo() === 'editar') {
+          <div class="mc-edit">
+            <div class="mc-edit__hdr">
+              <div class="mc-edit__hdr-izq">
+                <span class="mc-edit__eyebrow">Editando</span>
+                <h2 class="mc-edit__titulo">{{ obj.titulo }}</h2>
+              </div>
+              <button class="mc-edit__cancelar" (click)="cancelarEditChat()">← Volver</button>
+            </div>
+
+            <div class="mc-edit__chat">
+              @for (m of editMensajes(); track $index) {
+                <div class="mc-edit-msg mc-edit-msg--{{ m.rol }}">
+                  @if (m.rol === 'gali') {
+                    <div class="mc-edit-msg__avatar">✦</div>
+                  }
+                  <div class="mc-edit-msg__burbuja">
+                    <p class="mc-edit-msg__texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
+                  </div>
+                </div>
+              }
+              @if (editEscribiendo()) {
+                <div class="mc-edit-msg mc-edit-msg--gali">
+                  <div class="mc-edit-msg__avatar">✦</div>
+                  <div class="mc-typing"><span></span><span></span><span></span></div>
+                </div>
+              }
+            </div>
+
+            <!-- Propuesta de Gali: confirmar o ajustar -->
+            @if (editPropuesta() && !editEscribiendo() && !editConfirmado()) {
+              <div class="mc-edit__propuesta-btns">
+                <button class="mc-btn-primary" (click)="confirmarEditChat()">
+                  ✦ Confirmar cambio
+                </button>
+                <button class="mc-btn-ghost" (click)="ajustarMas()">Ajustar más →</button>
+              </div>
+            }
+
+            @if (editConfirmado() && !sugerenciaGeneral()) {
+              <div class="mc-edit__confirmado">
+                <span class="mc-spark" aria-hidden="true">✦</span> Objetivo actualizado — volviendo al detalle…
+              </div>
+            }
+
+            <!-- Propuesta inline de actualizar objetivo general (AI-UX: preview-then-confirm en el mismo flujo) -->
+            @if (editConfirmado() && sugerenciaGeneral()) {
+              <div class="mc-sug-general mc-sug-general--edit">
+                <div class="mc-sug-general__hdr">
+                  <span class="mc-spark" aria-hidden="true">✦</span>
+                  ¿Actualizamos también el objetivo general?
+                </div>
+                <p class="mc-sug-general__propuesta">"{{ sugerenciaGeneral() }}"</p>
+                <div class="mc-sug-general__btns">
+                  <button class="mc-btn-primary" (click)="aplicarSugerenciaGeneral()">
+                    Sí, actualizar objetivo general
+                  </button>
+                  <button class="mc-btn-ghost" (click)="ignorarSugerenciaGeneral()">
+                    Mantener el resumen actual
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Input de respuesta -->
+            @if (!editConfirmado()) {
+              <div class="mc-edit__input-row">
+                <textarea class="mc-edit__input"
+                          rows="2"
+                          [value]="editInput()"
+                          (input)="onEditInput($any($event.target).value)"
+                          (keydown.enter)="onEnterEdit($event)"
+                          placeholder="Describe el cambio que quieres hacer…"></textarea>
+                <button class="mc-edit__send"
+                        [disabled]="!editInput().trim() || editEscribiendo()"
+                        (click)="enviarMensajeEdit()">→</button>
+              </div>
+            }
+          </div>
+        }
+
+      }
+
+      <!-- MODO AGREGAR OBJETIVO -->
+      @if (panelModo() === 'agregar') {
+        <div class="mc-agregar">
+          <button class="mc-agregar__cancelar" (click)="cancelarAgregar()">← Cancelar</button>
+
+          <div class="mc-agregar__hdr">
+            <span class="mc-spark" aria-hidden="true">✦</span>
+            Gali te ayuda a definir el objetivo
+          </div>
+
+          <!-- Chat -->
+          <div class="mc-agregar__chat">
+            @for (m of agrMensajes(); track $index) {
+              <div class="mc-edit-msg mc-edit-msg--{{ m.rol }}">
+                @if (m.rol === 'gali') {
+                  <div class="mc-edit-msg__avatar">✦</div>
+                }
+                <div class="mc-edit-msg__burbuja">
+                  <p class="mc-edit-msg__texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
+                </div>
+              </div>
+            }
+            @if (agrEscribiendo()) {
+              <div class="mc-edit-msg mc-edit-msg--gali">
+                <div class="mc-edit-msg__avatar">✦</div>
+                <div class="mc-typing"><span></span><span></span><span></span></div>
+              </div>
+            }
+          </div>
+
+          <!-- Preview en construcción -->
+          @if (agrBorrador().metrica) {
+            <div class="mc-agregar__preview">
+              <span class="mc-agregar__preview-titulo">Objetivo en construcción</span>
+              <span class="mc-agregar__preview-val">
+                {{ metricaLabel[agrBorrador().metrica!] }}
+                @if (agrBorrador().metaValor !== undefined) {
+                  · Meta: {{ agrBorrador().metaValor }}{{ agrBorrador().unidad }}
+                }
+                @if (agrBorrador().plazo_semanas) {
+                  · {{ agrBorrador().plazo_semanas }} semanas
+                }
+              </span>
+            </div>
+          }
+
+          <!-- Input libre (descripcion y propuesta) -->
+          @if ((agrPaso() === 'descripcion' || agrPaso() === 'propuesta') && !agrChatTerminado()) {
+            <div class="mc-agregar__input-row">
+              <textarea class="mc-agregar__input"
+                        rows="2"
+                        [value]="agrInputUsuario()"
+                        (input)="agrOnInput($any($event.target).value)"
+                        (keydown.enter)="agrOnEnter($event)"
+                        [placeholder]="agrPaso() === 'descripcion'
+                          ? 'Ej: quiero llegar a 100 pedidos por semana en 3 meses...'
+                          : 'Sí, así está bien · o cuéntame qué quieres ajustar'">
+              </textarea>
+              <button class="mc-agregar__send"
+                      [disabled]="!agrInputUsuario().trim() || agrEscribiendo()"
+                      (click)="agrEnviarMensaje()">→</button>
+            </div>
+          }
+
+          <!-- CTAs finales -->
+          @if (agrChatTerminado() && !agrGuardado()) {
+            <div class="mc-agregar__ctas">
+              <button class="mc-btn-primary" (click)="agrConfirmarAgregar()">
+                ✦ Sí, agregar este objetivo
+              </button>
+              <button class="mc-btn-ghost" (click)="agrReiniciar()">Empezar de nuevo</button>
+            </div>
+          }
+
+          @if (agrGuardado()) {
+            <div class="mc-agregar__confirmado">
+              <span class="mc-spark" aria-hidden="true">✦</span>
+              ¡Objetivo agregado! Abriendo detalle…
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- MODO EDITAR OBJETIVO GENERAL — asesoría estratégica -->
+      @if (panelModo() === 'editar-general') {
+        <div class="mc-edit">
+          <div class="mc-edit__hdr">
+            <div class="mc-edit__hdr-izq">
+              <span class="mc-edit__eyebrow">Objetivo principal</span>
+              <h2 class="mc-edit__titulo">Asesoría estratégica de Gali</h2>
+            </div>
+            <button class="mc-edit__cancelar" (click)="cancelarEditarGeneral()">← Volver</button>
+          </div>
+
+          <!-- Chat -->
+          <div class="mc-edit__chat">
+            @for (m of editGenMensajes(); track $index) {
+              <div class="mc-edit-msg mc-edit-msg--{{ m.rol }}">
+                @if (m.rol === 'gali') {
+                  <div class="mc-edit-msg__avatar">✦</div>
+                }
+                <div class="mc-edit-msg__burbuja">
+                  <p class="mc-edit-msg__texto" [style.white-space]="'pre-line'">{{ m.texto }}</p>
+                </div>
+              </div>
+            }
+            @if (editGenEscribiendo()) {
+              <div class="mc-edit-msg mc-edit-msg--gali">
+                <div class="mc-edit-msg__avatar">✦</div>
+                <div class="mc-typing"><span></span><span></span><span></span></div>
+              </div>
+            }
+          </div>
+
+          <!-- Panel de impacto visual — visible en confirmación -->
+          @if (editGenPaso() === 'confirmacion') {
+            <div class="mc-impact">
+              <div class="mc-impact__hdr">
+                <span class="mc-impact__hdr-ico">↗</span>
+                <span class="mc-impact__hdr-texto">Así cambian tus objetivos</span>
+              </div>
+
+              @if (editGenAfectados().length > 0) {
+                <div class="mc-impact__afectados">
+                  @for (item of editGenAfectados(); track item.obj.id) {
+                    <div class="mc-impact__obj">
+                      <div class="mc-impact__obj-hdr">
+                        <span class="mc-impact__obj-titulo">{{ item.obj.titulo }}</span>
+                        <span class="mc-impact__obj-chip">cambia</span>
+                      </div>
+                      <div class="mc-impact__barras">
+                        <div class="mc-impact__barra-row">
+                          <span class="mc-impact__barra-lbl">Hoy</span>
+                          <div class="mc-impact__barra-track">
+                            <div class="mc-impact__barra-fill mc-impact__barra-fill--antes"
+                                 [style.width.%]="item.obj.progreso_pct"></div>
+                          </div>
+                          <span class="mc-impact__barra-pct">{{ item.obj.progreso_pct }}%</span>
+                        </div>
+                        <div class="mc-impact__barra-row mc-impact__barra-row--nuevo">
+                          <span class="mc-impact__barra-lbl">Nuevo</span>
+                          <div class="mc-impact__barra-track">
+                            <div class="mc-impact__barra-fill mc-impact__barra-fill--despues"
+                                 [style.width.%]="item.nuevoProgreso"></div>
+                          </div>
+                          <span class="mc-impact__barra-pct mc-impact__barra-pct--nuevo">{{ item.nuevoProgreso }}%</span>
+                        </div>
+                      </div>
+                      <div class="mc-impact__cambio-valor">
+                        @if (item.nuevaMeta) {
+                          <span class="mc-impact__val-antes">{{ item.obj.metaValor }}{{ item.obj.unidad }}</span>
+                          <span class="mc-impact__val-flecha">→</span>
+                          <span class="mc-impact__val-nuevo">{{ item.nuevaMeta }}{{ item.obj.unidad }}</span>
+                        }
+                        @if (item.nuevoPlazo) {
+                          <span class="mc-impact__val-antes">{{ item.obj.plazo_semanas }} sem</span>
+                          <span class="mc-impact__val-flecha">→</span>
+                          <span class="mc-impact__val-nuevo">{{ item.nuevoPlazo }} sem</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (editGenNoAfectados().length > 0) {
+                <div class="mc-impact__sin-cambio">
+                  <span class="mc-impact__sin-cambio-lbl">Sin cambio</span>
+                  <div class="mc-impact__sin-cambio-lista">
+                    @for (obj of editGenNoAfectados(); track obj.id) {
+                      <div class="mc-impact__sin-cambio-item">
+                        <span class="mc-impact__check">✓</span>
+                        <span>{{ obj.titulo }}</span>
+                        <span class="mc-impact__sin-cambio-pct">{{ obj.progreso_pct }}%</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- CTAs en paso confirmacion -->
+          @if (editGenPaso() === 'confirmacion' && !editGenConfirmado()) {
+            <div class="mc-edit__propuesta-btns">
+              <button class="mc-btn-primary" (click)="confirmarEditGeneral()">
+                ✦ Sí, actualizar objetivo
+              </button>
+              <button class="mc-btn-ghost" (click)="cancelarEditarGeneral()">
+                Mantener objetivo actual
+              </button>
+            </div>
+          }
+
+          @if (editGenConfirmado()) {
+            <div class="mc-edit__confirmado">
+              <span class="mc-spark" aria-hidden="true">✦</span> Objetivo principal actualizado — volviendo…
+            </div>
+          }
+
+          <!-- Input — visible mientras el usuario puede seguir escribiendo -->
+          @if (!editGenConfirmado() && editGenPaso() !== 'confirmacion') {
+            <div class="mc-edit__input-row">
+              <textarea class="mc-edit__input"
+                        rows="2"
+                        [value]="editGenInput()"
+                        (input)="onEditGenInput($any($event.target).value)"
+                        (keydown.enter)="onEditGenEnter($event)"
+                        placeholder="Describe el cambio que quieres hacer…"></textarea>
+              <button class="mc-edit__send"
+                      [disabled]="!editGenInput().trim() || editGenEscribiendo()"
+                      (click)="enviarMensajeEditGen()">→</button>
+            </div>
+          }
+        </div>
+      }
+
+    </div><!-- /mc-der -->
+
+  </div><!-- /mc-bloque--objetivos -->
+
+  <!-- ══════════════════════════════════════════════════════
+       BLOQUE 2: CONTEXTO OPERACIONAL
+  ══════════════════════════════════════════════════════ -->
+  <div class="mc-bloque mc-bloque--operacional">
+
+    <!-- Mayor fricción -->
+    <section class="mc-seccion mc-seccion--friccion">
+      <div class="mc-seccion__hdr">
+        <span class="mc-seccion__titulo">Mayor fricción hoy</span>
+      </div>
+
+      <div [class]="'mc-friccion-gali' + (friccionReanalizando() ? ' mc-friccion-gali--reanalizando' : '')">
+        @if (friccionReanalizando()) {
+          <div class="mc-friccion-gali__skeleton">
+            <div class="mc-friccion-gali__skel-line mc-friccion-gali__skel-line--wide"></div>
+            <div class="mc-friccion-gali__skel-line"></div>
+            <div class="mc-friccion-gali__skel-line mc-friccion-gali__skel-line--short"></div>
+          </div>
+        } @else {
+          <div class="mc-friccion-gali__hdr">
+            <span class="mc-spark" aria-hidden="true">✦</span>
+            <span class="mc-friccion-gali__titulo">Gali identifica</span>
+            <span [class]="'mc-chip mc-chip--' + friccionGaliActual().confianza">
+              {{ confianzaLabel(friccionGaliActual().confianza) }}
+            </span>
+          </div>
+          <p class="mc-friccion-gali__texto">{{ friccionGaliActual().descripcion }}</p>
+          <p class="mc-friccion-gali__impacto">{{ friccionGaliActual().impacto }}</p>
+          <a [routerLink]="friccionGaliActual().accionRuta" class="mc-btn-accion">
+            {{ friccionGaliActual().accionLabel }} →
+          </a>
+        }
+      </div>
+
+      <!-- Perspectiva del usuario: input directo, sin acumulación -->
+      <div class="mc-friccion-user">
+        <span class="mc-friccion-user__label">Tu perspectiva</span>
+        <div class="mc-friccion-user__input-row">
+          <input class="mc-input"
+                 type="text"
+                 [value]="friccionUserInput()"
+                 (input)="onFriccionInput($any($event.target).value)"
+                 (keydown.enter)="onFriccionEnter($event)"
+                 [disabled]="friccionReanalizando()"
+                 placeholder="¿Qué sientes que frena más tu operación?" />
+          <button class="mc-btn-send"
+                  [disabled]="!friccionUserInput().trim() || friccionReanalizando()"
+                  (click)="agregarFriccionUser()">→</button>
+        </div>
+        <p class="mc-friccion-user__hint">Gali actualizará el análisis con tu perspectiva</p>
+      </div>
+    </section>
+
+    <!-- Datos financieros clave -->
+    <section class="mc-seccion">
+      <div class="mc-seccion__hdr">
+        <span class="mc-seccion__titulo">Datos financieros clave</span>
+        <a routerLink="/historial-de-cartera" class="mc-btn-link">Ver reporte →</a>
+      </div>
+
+      <div class="mc-fin-grid">
+        <div class="mc-fin-bloque">
+          <span class="mc-fin-bloque__periodo">Esta semana</span>
+          <div class="mc-fin-kpi">
+            <span class="mc-fin-kpi__val">{{ financiero.ingresosSemana }}</span>
+            <span class="mc-fin-kpi__lbl">ingresos</span>
+            <span class="mc-fin-kpi__delta" [class.mc-fin-kpi__delta--up]="financiero.deltaPositivo">
+              {{ financiero.deltaIngresos }} vs sem. ant.
+            </span>
+          </div>
+          <div class="mc-fin-row">
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.margenBruto }}</span>
+              <span class="mc-fin-item__lbl">margen bruto</span>
+            </div>
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.pedidosFact }}</span>
+              <span class="mc-fin-item__lbl">pedidos fact.</span>
+            </div>
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.roasPromedio }}</span>
+              <span class="mc-fin-item__lbl">ROAS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-fin-bloque mc-fin-bloque--mes">
+          <span class="mc-fin-bloque__periodo">Este mes</span>
+          <div class="mc-fin-row">
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.ingresosMes }}</span>
+              <span class="mc-fin-item__lbl">ingresos</span>
+            </div>
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.margenMes }}</span>
+              <span class="mc-fin-item__lbl">margen</span>
+            </div>
+            <div class="mc-fin-item">
+              <span class="mc-fin-item__val">{{ financiero.pedidosMes }}</span>
+              <span class="mc-fin-item__lbl">pedidos fact.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canal de venta -->
+      <div class="mc-canal">
+        <div class="mc-canal__encabezado">
+          <span class="mc-canal__label">Mix de canales</span>
+          <a routerLink="/gali-6/proyectos" class="mc-canal__link">Configurar →</a>
+        </div>
+        <div class="mc-canal__item">
+          <div class="mc-canal__item-info">
+            <span class="mc-canal__tag mc-canal__tag--principal">{{ financiero.canalPrincipal }}</span>
+            <span class="mc-canal__pct">{{ financiero.canalPct }}</span>
+          </div>
+          <div class="mc-canal__barra">
+            <div class="mc-canal__barra-fill mc-canal__barra-fill--principal" style="width: 78%"></div>
+          </div>
+        </div>
+        <div class="mc-canal__item">
+          <div class="mc-canal__item-info">
+            <span class="mc-canal__tag">{{ financiero.canalAlt }}</span>
+            <span class="mc-canal__pct mc-canal__pct--alt">{{ financiero.canalAltPct }}</span>
+          </div>
+          <div class="mc-canal__barra">
+            <div class="mc-canal__barra-fill" style="width: 22%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /mc-bloque--operacional -->
+
+</div>
+
+<!-- Toast -->
+@if (toastMsg()) {
+  <div class="mc-toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
 }

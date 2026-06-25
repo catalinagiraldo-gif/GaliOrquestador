@@ -10,6 +10,7 @@ import {
   PROCESO_TIPO_TOOLTIP,
   TIER_LABEL,
 } from '../../../../../mocks/gali-v6/agentes-especializados';
+import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
 
 type AgenteDetallTab = 'config' | 'historial';
 
@@ -109,6 +110,17 @@ export class Gali6AgentesComponent {
 
   getHistorial(agenteId: string): HistorialItem[] {
     return HISTORIAL_POR_AGENTE[agenteId] ?? [];
+  }
+
+  getSenalesDelAgente(nombreAgente: string): Array<{ id: string; titulo: string; ventanaDias: number }> {
+    const nombre = nombreAgente.toLowerCase();
+    const senales = MOCK_SENALES
+      .filter(s => s.agente.toLowerCase() === nombre || (s.agenteOrigenNombre ?? '').toLowerCase() === nombre)
+      .map(s => ({ id: s.id, titulo: s.titulo, ventanaDias: s.ventanaDias }));
+    const alertas = MOCK_ALERTAS
+      .filter(a => a.agente.toLowerCase() === nombre)
+      .map(a => ({ id: a.id, titulo: a.titulo, ventanaDias: 0 }));
+    return [...senales, ...alertas].slice(0, 3);
   }
 
   getProyectosActivos(agenteId: string): Array<{ nombre: string; estado: string; id: string }> {

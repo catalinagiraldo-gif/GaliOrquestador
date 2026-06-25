@@ -4,7 +4,7 @@
   <div class="g6-agentes__paquete-banner">
     <div class="g6-agentes__paquete-head">
       <div class="g6-agentes__paquete-title-row">
-        <span class="g6-agentes__paquete-icon">🛡️</span>
+        <i class="pi pi-shield g6-agentes__paquete-icon"></i>
         <div>
           <h2 class="g6-agentes__paquete-title">Tu paquete básico está activo</h2>
           <p class="g6-agentes__paquete-sub">3 agentes monitoreando tu negocio, sin costo adicional</p>
@@ -114,6 +114,24 @@
                 <div class="g6-agente-card__ejemplo">
                   <span class="g6-agente-card__ejemplo-label">Ejemplo de señal</span>
                   <p class="g6-agente-card__ejemplo-texto">{{ ag.ejemploSenal }}</p>
+                </div>
+              }
+
+              <!-- Señales detectadas por este agente -->
+              @if (getSenalesDelAgente(ag.nombre).length > 0) {
+                <div class="ag-senales-section">
+                  <p class="ag-senales-label">✦ Últimas detecciones</p>
+                  @for (s of getSenalesDelAgente(ag.nombre); track s.id) {
+                    <a class="ag-senal-item"
+                       [routerLink]="['/gali-6/senales']"
+                       [queryParams]="{ signalId: s.id }"
+                       (click)="$event.stopPropagation()">
+                      <span class="ag-senal-titulo">{{ s.titulo }}</span>
+                      @if (s.ventanaDias > 0) {
+                        <span class="ag-senal-dias">{{ s.ventanaDias }}d →</span>
+                      }
+                    </a>
+                  }
                 </div>
               }
 
@@ -292,7 +310,7 @@
                   }
                   @if (ag.tier === 'tokens') {
                     <span class="g6-agente-card__tier g6-agente-card__tier--tokens">
-                      🪙 {{ ag.tokensUso }}
+                      <i class="pi pi-circle-fill"></i> {{ ag.tokensUso }}
                     </span>
                   }
                 </div>

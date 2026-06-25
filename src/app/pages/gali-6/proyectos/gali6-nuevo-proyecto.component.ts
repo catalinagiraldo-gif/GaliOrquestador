@@ -19,28 +19,28 @@ const PROBLEMAS: ProblemaOption[] = [
   {
     id: 'saturacion',
     label: 'Mi producto principal se está saturando',
-    icon: '📉',
+    icon: 'pi-chart-line',
     galiSugerencia: 'ADA detecta productos con tendencia creciente en tu categoría. Te recomiendo diversificar con un producto emergente.',
     productosIds: ['rodillo-jade', 'masajeador-cuello'],
   },
   {
     id: 'margen',
     label: 'Mi margen es demasiado bajo',
-    icon: '💸',
+    icon: 'pi-arrow-down',
     galiSugerencia: 'Para mejorar margen, busca productos con bajo costo de flete y alta percepción de valor. ADA encontró estas opciones.',
     productosIds: ['rodillo-jade', 'difusor-v2'],
   },
   {
     id: 'clientes',
     label: 'Quiero llegar a nuevos clientes',
-    icon: '🎯',
+    icon: 'pi-target',
     galiSugerencia: 'Productos de regalo y salud personal tienen mayor alcance en nuevas audiencias. Mira estas oportunidades.',
     productosIds: ['difusor-v2', 'termo-xl'],
   },
   {
     id: 'escalado',
     label: 'Quiero escalar lo que ya funciona',
-    icon: '🚀',
+    icon: 'pi-send',
     galiSugerencia: 'Los productos con score ADA >80 son ideales para escalar. ADA encontró estos complementos a tu catálogo actual.',
     productosIds: ['difusor-v2', 'rodillo-jade'],
   },
@@ -291,10 +291,10 @@ export class Gali6NuevoProyectoComponent {
     recomendado: boolean;
     razon: string;
   }> = [
-    { id: 'roax',      icon: '⚡', nombre: 'Roax Ads',     desc: 'Optimiza pauta en Meta y TikTok. Escala cuando el ROAS supera el umbral y pausa cuando baja.',         recomendado: true,  razon: 'Pre-seleccionado — indispensable para cualquier proyecto de pauta' },
-    { id: 'vigilante', icon: '🛡', nombre: 'Vigilante',    desc: 'Monitorea novedad, garantías y logística. Alerta si un pedido lleva más de X días sin actualizar.',   recomendado: true,  razon: 'Recomendado para este nicho — alta tasa de novedad en categoría' },
-    { id: 'ada',       icon: '🔍', nombre: 'ADA Spy',      desc: 'Analiza competencia y detecta tendencias. Sugiere ajustes de precio cuando detecta movimientos.',   recomendado: false, razon: '' },
-    { id: 'chatea',    icon: '💬', nombre: 'Chatea Pro',   desc: 'Gestión de preguntas, posventa y recuperación de pedidos abandonados.',                               recomendado: false, razon: '' },
+    { id: 'roax',      icon: 'pi-bolt',      nombre: 'Roax Ads',     desc: 'Optimiza pauta en Meta y TikTok. Escala cuando el ROAS supera el umbral y pausa cuando baja.',         recomendado: true,  razon: 'Pre-seleccionado — indispensable para cualquier proyecto de pauta' },
+    { id: 'vigilante', icon: 'pi-shield',    nombre: 'Vigilante',    desc: 'Monitorea novedad, garantías y logística. Alerta si un pedido lleva más de X días sin actualizar.',   recomendado: true,  razon: 'Recomendado para este nicho — alta tasa de novedad en categoría' },
+    { id: 'ada',       icon: 'pi-search',    nombre: 'ADA Spy',      desc: 'Analiza competencia y detecta tendencias. Sugiere ajustes de precio cuando detecta movimientos.',   recomendado: false, razon: '' },
+    { id: 'chatea',    icon: 'pi-comments',  nombre: 'Chatea Pro',   desc: 'Gestión de preguntas, posventa y recuperación de pedidos abandonados.',                               recomendado: false, razon: '' },
   ];
 
   toggleAgente(key: keyof { roax: boolean; vigilante: boolean; ada: boolean; chatea: boolean }): void {

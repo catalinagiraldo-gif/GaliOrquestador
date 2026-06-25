@@ -10,18 +10,18 @@
 
   <!-- ── SECTION ANCHORS ── -->
   <div class="g6-mkt__nav">
-    <a class="g6-mkt__nav-link" href="#sec-agentes">🤖 Agentes</a>
-    <a class="g6-mkt__nav-link" href="#sec-skills">⚡ Skills</a>
-    <a class="g6-mkt__nav-link" href="#sec-conexiones">🔗 Conexiones</a>
+    <a class="g6-mkt__nav-link" href="#sec-agentes"><i class="pi pi-microchip-ai"></i> Agentes</a>
+    <a class="g6-mkt__nav-link" href="#sec-skills"><i class="pi pi-bolt"></i> Skills</a>
+    <a class="g6-mkt__nav-link" href="#sec-conexiones"><i class="pi pi-link"></i> Conexiones</a>
   </div>
 
   <!-- SECCIÓN AGENTES —— ID anchor -->
-  <h2 class="g6-mkt__sec-title" id="sec-agentes">🤖 Agentes</h2>
+  <h2 class="g6-mkt__sec-title" id="sec-agentes"><i class="pi pi-microchip-ai"></i> Agentes</h2>
   <p class="g6-mkt__sec-sub">Agentes especializados que operan en tu nombre, monitoreando y actuando.</p>
 
   <!-- ── BUSCADOR ── -->
   <div class="g6-mkt__search-wrap">
-    <span class="g6-mkt__search-icon" aria-hidden="true">🔍</span>
+    <i class="pi pi-search g6-mkt__search-icon" aria-hidden="true"></i>
     <input class="g6-mkt__search"
            type="search"
            placeholder="Buscar agentes por nombre o función…"
@@ -36,21 +36,21 @@
   <!-- ── TABS DE SECCIÓN ── -->
   <div class="g6-mkt__sec-tabs" role="tablist" aria-label="Secciones del marketplace">
     <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'todos'"
-            (click)="seccionTab.set('todos')">🤖 Catálogo Dropi</button>
+            (click)="seccionTab.set('todos')"><i class="pi pi-microchip-ai"></i> Catálogo Dropi</button>
     <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'mis-agentes'"
             (click)="seccionTab.set('mis-agentes')">
       ✦ Mis agentes
       <span class="g6-mkt__sec-tab-count">{{ agentesActivos().length }}</span>
     </button>
     <button class="g6-mkt__sec-tab" [class.g6-mkt__sec-tab--active]="seccionTab() === 'comunidad'"
-            (click)="seccionTab.set('comunidad')">👥 Comunidad</button>
+            (click)="seccionTab.set('comunidad')"><i class="pi pi-users"></i> Comunidad</button>
   </div>
 
   <!-- ── MIS AGENTES ── -->
   @if (seccionTab() === 'mis-agentes') {
     @if (agentesActivos().length === 0) {
       <div class="g6-mkt__empty">
-        <span class="g6-mkt__empty-icon">🤖</span>
+        <i class="pi pi-microchip-ai g6-mkt__empty-icon"></i>
         <p>Aún no tienes agentes activos. Explora el catálogo para activar uno.</p>
         <button class="g6-mkt__empty-reset" (click)="seccionTab.set('todos')">Ver catálogo →</button>
       </div>
@@ -168,7 +168,7 @@
             }
             @if (ag.tipo === 'ia-compleja') {
               <span class="g6-mkt-badge g6-mkt-badge--ia-warn"
-                    [title]="ag.advertenciaIA ?? ''">⚠️ IA</span>
+                    [title]="ag.advertenciaIA ?? ''"><i class="pi pi-exclamation-triangle"></i> IA</span>
             }
             @if (ag.estado === 'activo') {
               <span class="g6-mkt-badge g6-mkt-badge--activo">Activo</span>
@@ -204,7 +204,7 @@
             <!-- Advertencia IA si aplica -->
             @if (ag.advertenciaIA) {
               <div class="g6-mkt-card__advertencia">
-                <span>⚠️</span>
+                <i class="pi pi-exclamation-triangle"></i>
                 <p>{{ ag.advertenciaIA }}</p>
               </div>
             }
@@ -244,7 +244,7 @@
     </div>
   } @else {
     <div class="g6-mkt__empty">
-      <span class="g6-mkt__empty-icon">🔍</span>
+      <i class="pi pi-search g6-mkt__empty-icon"></i>
       <p>No hay agentes con estos filtros.</p>
       <button class="g6-mkt__empty-reset" (click)="setTierFiltro('todos'); setTipoFiltro('todos')">
         Ver todos
@@ -255,14 +255,14 @@
   <!-- ══════════════════════════════════════════════
        SECCIÓN 2 — SKILLS
   ══════════════════════════════════════════════ -->
-  <h2 class="g6-mkt__sec-title" id="sec-skills">⚡ Skills</h2>
+  <h2 class="g6-mkt__sec-title" id="sec-skills"><i class="pi pi-bolt"></i> Skills</h2>
   <p class="g6-mkt__sec-sub">Capacidades específicas que Gali y tus agentes pueden usar. Actívalas o desactívalas cuando quieras.</p>
 
   <div class="g6-mkt__skills-grid">
     @for (sk of skillsEstado(); track sk.id) {
       <div class="g6-mkt-skill" [class.g6-mkt-skill--activa]="sk.activa">
         <div class="g6-mkt-skill__top">
-          <span class="g6-mkt-skill__icono" aria-hidden="true">{{ sk.icono }}</span>
+          <i [class]="'g6-mkt-skill__icono ' + sk.icono" aria-hidden="true"></i>
           <div class="g6-mkt-skill__info">
             <span class="g6-mkt-skill__nombre">{{ sk.nombre }}</span>
             <span class="g6-mkt-skill__tipo {{ getProcesoClass(sk.tipo) }}">{{ procesoTipoLabel[sk.tipo] }}</span>
@@ -272,7 +272,7 @@
           } @else if (sk.tier === 'paid') {
             <span class="g6-mkt-badge g6-mkt-badge--paid" style="margin-left: auto">${{ (sk.precioCopMes ?? 0) | number }}/mes</span>
           } @else {
-            <span class="g6-mkt-badge g6-mkt-badge--tokens" style="margin-left: auto">🪙 {{ sk.tokensUso }}</span>
+            <span class="g6-mkt-badge g6-mkt-badge--tokens" style="margin-left: auto"><i class="pi pi-circle-fill"></i> {{ sk.tokensUso }}</span>
           }
         </div>
         <p class="g6-mkt-skill__desc">{{ sk.descripcion }}</p>
@@ -298,7 +298,7 @@
   <!-- ══════════════════════════════════════════════
        SECCIÓN 3 — CONEXIONES
   ══════════════════════════════════════════════ -->
-  <h2 class="g6-mkt__sec-title" id="sec-conexiones">🔗 Conexiones e integraciones</h2>
+  <h2 class="g6-mkt__sec-title" id="sec-conexiones"><i class="pi pi-link"></i> Conexiones e integraciones</h2>
   <p class="g6-mkt__sec-sub">Fuentes que Gali usa como contexto para analizar y actuar.</p>
 
   <div class="g6-mkt__cnx-grid">
@@ -404,7 +404,7 @@
 
       @if (detalleAgente()!.advertenciaIA) {
         <div class="g6-mkt-card__advertencia">
-          <span>⚠️</span>
+          <i class="pi pi-exclamation-triangle"></i>
           <p>{{ detalleAgente()!.advertenciaIA }}</p>
         </div>
       }
