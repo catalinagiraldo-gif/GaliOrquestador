@@ -1,6 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import {
   AGENTES_ESPECIALIZADOS,
   PAQUETE_PRINCIPIANTES,
@@ -68,8 +68,16 @@ const PROYECTOS_POR_AGENTE: Record<string, Array<{ nombre: string; estado: strin
   templateUrl: './gali6-agentes.component.html',
   styleUrls: ['./gali6-agentes.component.scss'],
 })
-export class Gali6AgentesComponent {
+export class Gali6AgentesComponent implements OnInit {
   readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  ngOnInit(): void {
+    const crear = this.route.snapshot.queryParamMap.get('crear');
+    if (crear === 'true') {
+      setTimeout(() => this.crearAgente(), 300);
+    }
+  }
 
   readonly paqueteBasico = PAQUETE_PRINCIPIANTES;
   readonly todosLosAgentes = AGENTES_ESPECIALIZADOS;

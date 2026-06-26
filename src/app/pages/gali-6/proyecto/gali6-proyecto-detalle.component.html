@@ -136,6 +136,47 @@
             <span class="g6-kpi__val">{{ pv.agentes.length }}</span>
           </div>
         </div>
+
+        <!-- ── Métricas de productos en este proyecto ── -->
+        @if (productosMetrics().length > 0) {
+          <section class="pd__productos-metrics">
+            <h3 class="pd__metrics-title">Productos en este proyecto</h3>
+            <div class="pd__prod-grid">
+              @for (pm of productosMetrics(); track pm.productoId) {
+                <div class="pd__prod-card">
+                  <div class="pd__prod-header">
+                    <span class="pd__prod-nombre">{{ pm.nombre }}</span>
+                    <span class="pd__ada-badge" [ngClass]="adaColor(pm.adaScore)">ADA {{ pm.adaScore }}</span>
+                  </div>
+                  <div class="pd__metricas">
+                    <div class="pd__metrica">
+                      <span class="pd__met-label">Pedidos/sem</span>
+                      <span class="pd__met-val">{{ pm.pedidosSem }}</span>
+                    </div>
+                    <div class="pd__metrica">
+                      <span class="pd__met-label">Stock liberado</span>
+                      <span class="pd__met-val">{{ pm.stockLiberado }} und</span>
+                    </div>
+                    <div class="pd__metrica">
+                      <span class="pd__met-label">ROAS proyecto</span>
+                      <span class="pd__met-val pd__met-val--ok">{{ pm.roasProyecto }}x</span>
+                    </div>
+                    <div class="pd__metrica">
+                      <span class="pd__met-label">Aporte objetivo</span>
+                      <span class="pd__met-val">{{ pm.aporteObjetivoPct }}%</span>
+                    </div>
+                  </div>
+                  <div class="pd__sparkline">
+                    @for (v of pm.historialSemanas; track $index) {
+                      <div class="pd__spark-bar" [style.height.%]="(v / maxHistorial()) * 100"></div>
+                    }
+                  </div>
+                  <p class="pd__gali-nota">✦ {{ pm.notaGali }}</p>
+                </div>
+              }
+            </div>
+          </section>
+        }
       }
     </div>
   }

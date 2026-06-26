@@ -27,46 +27,32 @@
     </div>
   }
 
-  <!-- ── BLOQUE 5: Gali check-ins del portafolio ── -->
-  @if (galiCheckins().length > 0) {
-    <section class="checkins">
-      <span class="checkins__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tu portafolio</span>
-      <div class="checkins__list">
-        @for (ci of galiCheckins(); track ci.titulo) {
-          <article class="checkin" [attr.data-tipo]="ci.tipo">
-            <div class="checkin__icon">
-              @if (ci.tipo === 'atencion') { ⚠ }
-              @if (ci.tipo === 'sugerencia') { 💡 }
-              @if (ci.tipo === 'positivo') { ✦ }
+  <!-- ── Alertas unificadas ── -->
+  @if (alertasUnificadas().length > 0) {
+    <section class="alertas-unif">
+      <span class="alertas-unif__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tu portafolio</span>
+      <div class="alertas-unif__list">
+        @for (a of alertasUnificadas(); track a.titulo) {
+          <article class="alerta-item" [attr.data-tipo]="a.tipo">
+            <div class="alerta-item__icon" aria-hidden="true">
+              @if (a.tipo === 'atencion') { ⚠ }
+              @if (a.tipo === 'sugerencia') { 💡 }
+              @if (a.tipo === 'positivo') { ✦ }
             </div>
-            <div class="checkin__body">
-              <strong class="checkin__titulo">{{ ci.titulo }}</strong>
-              <p class="checkin__cuerpo">{{ ci.cuerpo }}</p>
+            <div class="alerta-item__body">
+              @if (a.agente) {
+                <span class="alerta-item__agente">{{ a.agente }}</span>
+              }
+              <strong class="alerta-item__titulo">{{ a.titulo }}</strong>
+              <p class="alerta-item__cuerpo">{{ a.cuerpo }}</p>
             </div>
-            <button class="checkin__cta" [attr.data-tipo]="ci.tipo" (click)="handleCheckinCta(ci)">
-              {{ ci.cta }}
+            <button class="alerta-item__cta" [attr.data-tipo]="a.tipo" (click)="handleCheckinCta(a)">
+              {{ a.cta }}
             </button>
           </article>
         }
       </div>
-    </section>
-  }
-
-  <!-- Gali recomienda para tu objetivo -->
-  @if (recomendaciones().length > 0) {
-    <section class="reco">
-      <span class="reco__eyebrow"><span aria-hidden="true">✦</span> Gali recomienda para cerrar tu objetivo</span>
-      <div class="reco__cards">
-        @for (r of recomendaciones(); track r.titulo) {
-          <article class="reco__card">
-            <span class="reco__window">{{ r.ventana }}</span>
-            <strong class="reco__title">{{ r.titulo }}</strong>
-            <p class="reco__porque">{{ r.porque }}</p>
-            <p class="reco__objetivo-tag">✦ {{ r.porqueObjetivo }}</p>
-            <button class="reco__cta" (click)="nuevo()">Crear proyecto →</button>
-          </article>
-        }
-      </div>
+      <a class="alertas-unif__ver-todas" routerLink="/gali-6/senales">Ver todas en Señales →</a>
     </section>
   }
 
@@ -75,6 +61,16 @@
     <div class="port__head">
       <span class="port__eyebrow">Salud del portafolio</span>
       <button class="port__new" (click)="nuevo()">+ Nuevo proyecto</button>
+    </div>
+
+    <!-- Filtros por tipo de proyecto -->
+    <div class="port__tipo-filtros">
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'todos'" (click)="tipoFiltro.set('todos')">Todos</button>
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'lanzar'" (click)="tipoFiltro.set('lanzar')">🚀 Lanzar</button>
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'escalar'" (click)="tipoFiltro.set('escalar')">📈 Escalar</button>
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'crm'" (click)="tipoFiltro.set('crm')">💬 CRM</button>
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'optimizar'" (click)="tipoFiltro.set('optimizar')">🔧 Optimizar</button>
+      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'experimentar'" (click)="tipoFiltro.set('experimentar')">🧪 Exp.</button>
     </div>
 
     <!-- Search bar (I8a) -->
@@ -137,7 +133,7 @@
               (keydown.space)="abrir(p.id); $event.preventDefault()">
             <span class="port__estado" data-estado="borrador">Borrador</span>
             <span class="port__name">{{ p.nombre }}</span>
-            <span class="port__borrador-hint">Falta elegir producto y precio</span>
+            <span class="port__borrador-hint">Proyecto en construcción</span>
             <span class="port__go">Completar →</span>
           </li>
         } @else {
@@ -153,7 +149,12 @@
                 (click)="abrir(p.id)"
                 (keydown.enter)="abrir(p.id)"
                 (keydown.space)="abrir(p.id); $event.preventDefault()">
-              <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+              <div class="port__estado-group">
+                <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+                @if (p.tipo) {
+                  <span class="port__tipo-chip port__tipo-chip--{{ p.tipo }}">{{ proyectoTipoLabel(p.tipo) }}</span>
+                }
+              </div>
               <span class="port__name">{{ p.nombre }}</span>
 
               @if (getSignalCount(p.id) > 0) {
@@ -186,6 +187,14 @@
                     <i class="pi pi-megaphone"></i> {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
                     <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
                   </button>
+                } @else if (p.estado !== 'cerrado' && p.campanaCount === 0) {
+                  <span class="port__sin-campanas">Sin campañas</span>
+                }
+                @if (p.estado === 'pausado') {
+                  <button class="port__accion-btn port__accion-btn--reactivar" (click)="reactivarProyecto(p.id, $event)">▶ Reactivar</button>
+                }
+                @if (['activo','en_riesgo','en_escala','pausado'].includes(p.estado)) {
+                  <button class="port__accion-btn port__accion-btn--cerrar" (click)="cerrarProyecto(p.id, $event)">✕ Cerrar</button>
                 }
                 <span class="port__go">
                   @if (p.estado === 'cerrado') { Ver postmortem → }
@@ -682,5 +691,53 @@
         <p class="nuevo-launch__pct">{{ lanzamientoPct() }}%</p>
       </div>
     }
+  </div>
+}
+
+<!-- ── Modal de confirmación de pausa ── -->
+@if (pausaModalOpen()) {
+  <div class="modal-bg" role="dialog" aria-modal="true" aria-label="Confirmar pausa de proyecto"
+       (click)="cancelarPausa()">
+    <div class="modal pausa-modal" (click)="$event.stopPropagation()">
+      <div class="pausa-modal__header">
+        <h2 class="pausa-modal__title">Pausar este proyecto</h2>
+        <button class="modal__close" (click)="cancelarPausa()" aria-label="Cerrar">×</button>
+      </div>
+
+      @if (campanasPausarPreview().length > 0) {
+        <p class="pausa-modal__desc">
+          Pausar este proyecto también pausará
+          <strong>{{ campanasPausarPreview().length }} campaña{{ campanasPausarPreview().length !== 1 ? 's' : '' }} activa{{ campanasPausarPreview().length !== 1 ? 's' : '' }}</strong>:
+        </p>
+
+        <ul class="pausa-modal__campanas">
+          @for (c of campanasPausarPreview(); track c.id) {
+            <li class="pausa-modal__campana-item">
+              <span class="pausa-modal__campana-nombre">{{ c.nombre }}</span>
+              <span class="pausa-modal__campana-tipo" [attr.data-tipo]="c.tipoCampana">
+                @if (c.tipoCampana === 'ads') { 📣 Ads }
+                @else if (c.tipoCampana === 'chatea') { 💬 Chatea Pro }
+                @else if (c.tipoCampana === 'hibrida') { ⚡ Híbrida }
+                @else { 🌱 Orgánica }
+              </span>
+            </li>
+          }
+        </ul>
+
+        @if (campanasChateaEnPausa().length > 0) {
+          <div class="pausa-modal__nota">
+            <span aria-hidden="true">💬</span>
+            <p>Las campañas de <strong>Chatea Pro</strong> seguirán activas hasta que las pauses manualmente. Solo las campañas de pauta (ads) se pausan automáticamente.</p>
+          </div>
+        }
+      } @else {
+        <p class="pausa-modal__desc">El proyecto no tiene campañas activas en este momento. Se marcará como pausado.</p>
+      }
+
+      <div class="pausa-modal__actions">
+        <button class="pausa-modal__btn-cancel" type="button" (click)="cancelarPausa()">Cancelar</button>
+        <button class="pausa-modal__btn-confirm" type="button" (click)="confirmarPausa()">Confirmar pausa</button>
+      </div>
+    </div>
   </div>
 }

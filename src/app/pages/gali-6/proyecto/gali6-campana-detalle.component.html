@@ -3,12 +3,35 @@
 
   <!-- ── HEADER ── -->
   <div class="cd__header">
-    <button class="cd__back" (click)="volver()">
+    <!-- Breadcrumb -->
+    <a class="cd__back" [routerLink]="['/gali-6/proyecto', proyectoId()]">
       ← {{ proyecto()?.nombre ?? 'Proyecto' }}
-    </button>
+    </a>
+
+    <!-- Prev/Next navegación entre campañas -->
+    <nav class="cd__nav" aria-label="Navegar entre campañas">
+      <button class="cd__nav-btn cd__nav-btn--prev"
+              [disabled]="!campanaAnterior()"
+              (click)="campanaAnterior() && irCampana(campanaAnterior()!.id)">
+        ← {{ campanaAnterior()?.nombre ?? '' }}
+      </button>
+      <span class="cd__nav-pos">{{ campanaIndex() + 1 }} / {{ todasCampanas().length }}</span>
+      <button class="cd__nav-btn cd__nav-btn--next"
+              [disabled]="!campanaSiguiente()"
+              (click)="campanaSiguiente() && irCampana(campanaSiguiente()!.id)">
+        {{ campanaSiguiente()?.nombre ?? '' }} →
+      </button>
+    </nav>
+
     <div class="cd__title-row">
       <h1 class="cd__titulo">{{ c.nombre }}</h1>
       <span class="cd__canal-tag" [style.color]="c.canalColor">{{ c.canalLabel }}</span>
+      <span class="cd__tipo-badge cd__tipo-badge--{{ c.tipoCampana }}">
+        @if (c.tipoCampana === 'ads') { 📣 Ads }
+        @else if (c.tipoCampana === 'chatea') { 💬 Chatea Pro }
+        @else if (c.tipoCampana === 'hibrida') { ⚡ Híbrida }
+        @else if (c.tipoCampana === 'organica') { 🌱 Orgánica }
+      </span>
       <span class="cd__estado"
             [class.cd__estado--activa]="!pausada() && c.estado === 'activa'"
             [class.cd__estado--pausada]="pausada() || c.estado === 'pausada'"
@@ -46,19 +69,42 @@
     }
   </div>
 
-  <!-- ── PRODUCTO ── -->
+  <!-- ── PRODUCTOS EN ESTA CAMPAÑA ── -->
   <section class="cd__section">
     <h2 class="cd__section-title">Productos en esta campaña</h2>
-    @if (c.producto) {
-      <div class="cd__producto-card">
-        <i class="pi pi-box cd__producto-icon"></i>
-        <span class="cd__producto-nombre">{{ c.producto }}</span>
-        <button class="cd__producto-cambiar">Cambiar →</button>
+
+    @if (c.tipoCampana === 'chatea' && productosEnCampana().length === 0) {
+      <p class="cd__chatea-nota">
+        💬 Esta es una campaña de Chatea Pro. No requiere producto asignado.
+      </p>
+    } @else if (productosEnCampana().length > 0) {
+      <div class="cd__productos-list">
+        @for (p of productosEnCampana(); track p.id) {
+          <div class="cd__prod-row">
+            <div class="cd__prod-icon"><i class="pi pi-box"></i></div>
+            <div class="cd__prod-info">
+              <span class="cd__prod-nombre">{{ p.nombre }}</span>
+              @if (p.precioVentaLabel) {
+                <span class="cd__prod-precio">{{ p.precioVentaLabel }}</span>
+              }
+              @if (p.margenPct > 0) {
+                <span class="cd__prod-margen" [class.cd__prod-margen--ok]="p.margenPct >= 30">
+                  {{ p.margenPct }}% margen
+                </span>
+              }
+            </div>
+            <button class="cd__btn-cambiar" (click)="abrirCambiarProducto(p.id)">
+              Cambiar →
+            </button>
+          </div>
+        }
       </div>
     } @else {
       <div class="cd__sin-producto">
         <i class="pi pi-exclamation-triangle"></i> Sin producto asignado
-        <button class="cd__agregar-producto">+ Agregar producto</button>
+        <button class="cd__agregar-producto" (click)="abrirCambiarProducto('')">
+          + Agregar producto
+        </button>
       </div>
     }
   </section>
@@ -144,6 +190,33 @@
   }
 
 </div>
+
+<!-- ── MODAL CAMBIAR PRODUCTO ── -->
+@if (cambiarProductoOpen()) {
+  <div class="cd__modal-bg" (click)="cerrarCambiarProducto()">
+    <div class="cd__modal" (click)="$event.stopPropagation()">
+      <div class="cd__modal-header">
+        <h3>{{ cambiarProductoTargetId() ? 'Cambiar producto' : 'Agregar producto' }}</h3>
+        <button class="cd__modal-close" (click)="cerrarCambiarProducto()">✕</button>
+      </div>
+      <p class="cd__modal-hint">
+        Selecciona un producto de tu catálogo para asignarlo a esta campaña.
+      </p>
+      <!-- Lista de productos disponibles (mock) -->
+      <div class="cd__modal-prod-list">
+        @for (nombre of ['Collar GPS para mascotas', 'Collar GPS Pro (v2)', 'Difusor de aromaterapia', 'Kit K-Beauty', 'Masajeador eléctrico']; track nombre) {
+          <button class="cd__modal-prod-item" (click)="cerrarCambiarProducto()">
+            <i class="pi pi-box"></i>
+            <span>{{ nombre }}</span>
+            <span class="cd__modal-prod-sel">Seleccionar</span>
+          </button>
+        }
+      </div>
+      <button class="cd__modal-cancel" (click)="cerrarCambiarProducto()">Cancelar</button>
+    </div>
+  </div>
+}
+
 } @else {
   <div class="cd cd--not-found">
     <button class="cd__back" (click)="volver()">← Volver</button>

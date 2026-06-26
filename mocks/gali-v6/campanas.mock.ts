@@ -6,6 +6,7 @@
 
 export type CampanaEstado = 'activa' | 'pausada' | 'borrador' | 'cerrada';
 export type CampanaCanal = 'meta-ads' | 'tiktok-ads' | 'google-ads' | 'organico' | 'whatsapp';
+export type TipoCampana = 'ads' | 'chatea' | 'hibrida' | 'organica';
 
 export interface ProductoRef {
   id: string;
@@ -30,6 +31,7 @@ export interface Campana {
   estado: CampanaEstado;
   canal: CampanaCanal;
   canalLabel: string;
+  tipoCampana: TipoCampana;
   productos: ProductoRef[];
   presupuestoDiario: number;
   presupuestoDiarioLabel: string;
@@ -56,6 +58,7 @@ export const MOCK_CAMPANAS: Campana[] = [
     estado: 'activa',
     canal: 'tiktok-ads',
     canalLabel: 'TikTok Ads',
+    tipoCampana: 'ads',
     productos: [
       {
         id: 'prod-collar-gps',
@@ -88,6 +91,7 @@ export const MOCK_CAMPANAS: Campana[] = [
     estado: 'activa',
     canal: 'meta-ads',
     canalLabel: 'Meta Ads',
+    tipoCampana: 'hibrida',
     productos: [
       {
         id: 'prod-collar-gps',
@@ -120,6 +124,7 @@ export const MOCK_CAMPANAS: Campana[] = [
     estado: 'activa',
     canal: 'meta-ads',
     canalLabel: 'Meta Ads',
+    tipoCampana: 'ads',
     productos: [
       {
         id: 'prod-difusor',
@@ -152,6 +157,7 @@ export const MOCK_CAMPANAS: Campana[] = [
     estado: 'borrador',
     canal: 'tiktok-ads',
     canalLabel: 'TikTok Ads',
+    tipoCampana: 'organica',
     productos: [
       {
         id: 'prod-difusor',
@@ -178,6 +184,7 @@ export const MOCK_CAMPANAS: Campana[] = [
     estado: 'pausada',
     canal: 'meta-ads',
     canalLabel: 'Meta Ads',
+    tipoCampana: 'ads',
     productos: [
       {
         id: 'prod-kbeauty-serum',
@@ -207,6 +214,29 @@ export const MOCK_CAMPANAS: Campana[] = [
     ],
     fechaInicio: '2026-05-28',
     notaGali: 'Pausado por ROAS < 1x por 3 días. Requiere revisión de creativos y segmentación.',
+  },
+
+  // Campaña Chatea Pro pura (sin pauta) — proyecto pv-005
+  {
+    id: 'camp-chatea-001',
+    proyectoId: 'pv-005',
+    nombre: 'Secuencia Reactivación Jun',
+    descripcion: 'Secuencia de 3 mensajes en WhatsApp para reactivar base de clientes inactivos',
+    estado: 'activa',
+    canal: 'whatsapp',
+    canalLabel: 'Chatea Pro',
+    tipoCampana: 'chatea',
+    productos: [],
+    presupuestoDiario: 0,
+    presupuestoDiarioLabel: '$0/día',
+    roasObjetivo: 0,
+    pedidosSem: 15,
+    agentesActivos: [
+      { agenteId: 'chatea-pro', nombre: 'Chatea Pro', activo: true },
+    ],
+    fechaInicio: '2026-06-10',
+    sugeridaPorGali: true,
+    notaGali: '820 contactos activos. Tasa de respuesta 34%. Gali recomienda un mensaje de seguimiento en 48h.',
   },
 ];
 
@@ -261,5 +291,68 @@ export const SUGERENCIAS_CAMPANA_NUEVO_PROYECTO: SugerenciaCampana[] = [
     roasObjetivoRecomendado: 1.7,
     agentesRecomendados: ['roas-tracker'],
     razonGali: 'TikTok funciona muy bien para productos de moda y hogar. Puedes lograr CPAs más bajos que en Meta con buenos creativos',
+  },
+];
+
+// ── Integraciones para nueva campaña ────────────────────────────────────────
+
+export type IntegracionId = 'meta-ads' | 'tiktok-ads' | 'shopify' | 'chatea-pro';
+
+export interface IntegracionStatus {
+  id: IntegracionId;
+  nombre: string;
+  descripcion: string;
+  estado: 'conectado' | 'pendiente';
+  pasosConexion: string[];
+}
+
+export const INTEGRACIONES_CAMPANA: IntegracionStatus[] = [
+  {
+    id: 'meta-ads',
+    nombre: 'Meta Ads',
+    descripcion: 'Facebook & Instagram Ads',
+    estado: 'conectado',
+    pasosConexion: [
+      'Crear cuenta en Meta Business Suite',
+      'Configurar el Píxel de Meta en tu sitio',
+      'Ir a Dropi › Conexiones › Meta Ads y autorizar',
+      'Verificar el dominio en Meta Business',
+    ],
+  },
+  {
+    id: 'tiktok-ads',
+    nombre: 'TikTok for Business',
+    descripcion: 'TikTok Ads — alcance orgánico y de pago',
+    estado: 'conectado',
+    pasosConexion: [
+      'Crear cuenta en TikTok Business Center',
+      'Instalar el Píxel de TikTok en tu sitio',
+      'Ir a Dropi › Conexiones › TikTok y autorizar',
+      'Verificar la cuenta de anunciante',
+    ],
+  },
+  {
+    id: 'shopify',
+    nombre: 'Shopify + DROPIFY',
+    descripcion: 'Tienda online con plugin Dropi integrado',
+    estado: 'conectado',
+    pasosConexion: [
+      'Crear una tienda en Shopify',
+      'Instalar la app DROPIFY desde el Shopify App Store',
+      'Configurar DROPIFY: vincular cuenta Dropi',
+      'Ir a Dropi › Conexiones › Shopify y autorizar',
+    ],
+  },
+  {
+    id: 'chatea-pro',
+    nombre: 'Chatea Pro',
+    descripcion: 'WhatsApp Business automatizado para ventas y soporte',
+    estado: 'pendiente',
+    pasosConexion: [
+      'Activar tu cuenta en Chatea Pro',
+      'Conectar tu número de WhatsApp Business',
+      'Configurar los flujos de bienvenida y confirmación',
+      'Ir a Dropi › Conexiones › Chatea Pro y autorizar',
+    ],
   },
 ];

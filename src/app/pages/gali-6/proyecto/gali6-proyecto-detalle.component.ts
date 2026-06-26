@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import PROJECTS from '../../../../../mocks/gali-v5/projects.json';
 import { MOCK_CAMPANAS, Campana } from '../../../../../mocks/gali-v6/campanas.mock';
 import { AGENTES_ESPECIALIZADOS } from '../../../../../mocks/gali-v6/agentes-especializados';
-import { PROYECTOS_MOCK, ProyectoDetalle, CampanaProyecto } from '../../../../../mocks/gali-v6/proyectos.mock';
+import { PROYECTOS_MOCK, ProyectoDetalle, CampanaProyecto, ProductoMetrics } from '../../../../../mocks/gali-v6/proyectos.mock';
 import { Gali6NuevaCampanaComponent, NuevaCampanaData } from './gali6-nueva-campana.component';
 
 type DetalleTab = 'canvas' | 'campanas' | 'agentes';
@@ -121,6 +121,22 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
   readonly totalCampanas = computed(() =>
     this.isNewProject() ? this.campanasPv().length : this.campanas().length
   );
+
+  // ── Métricas de productos ────────────────────────────────────────────────
+  readonly productosMetrics = computed<ProductoMetrics[]>(() =>
+    this.proyectoNuevo()?.productosMetrics ?? []
+  );
+
+  readonly maxHistorial = computed(() => {
+    const values = this.productosMetrics().flatMap(p => p.historialSemanas);
+    return values.length > 0 ? Math.max(...values) : 1;
+  });
+
+  adaColor(score: number): string {
+    if (score >= 80) return 'ada--high';
+    if (score >= 60) return 'ada--mid';
+    return 'ada--low';
+  }
 
   readonly agentesActivos = computed(() => {
     const nuevo = this.proyectoNuevo();

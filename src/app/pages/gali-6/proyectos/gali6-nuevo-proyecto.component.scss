@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 
 :host { display: block; width: 100%; }
 
@@ -34,7 +35,7 @@
 
   &__progress-fill {
     height: 100%;
-    background: $primary-500;
+    background: $os-accent;
     border-radius: $radius-full;
     transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -55,21 +56,21 @@
 
   &__next {
     align-self: flex-start;
-    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    background: $os-accent; color: #fff; border: none; cursor: pointer;
     padding: 12px $size-6; border-radius: $radius-md; font-size: $font-sm;
     font-weight: $font-semibold; font-family: $font-primary;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
     &:disabled { opacity: 0.5; cursor: not-allowed; }
     &--success { margin-top: $size-4; }
   }
 
   &__launch {
     align-self: stretch;
-    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    background: $os-accent; color: #fff; border: none; cursor: pointer;
     padding: 14px $size-6; border-radius: $radius-md; font-size: $font-md;
     font-weight: $font-bold; font-family: $font-primary; text-align: center;
     transition: background 120ms ease;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
   }
 }
@@ -79,7 +80,7 @@
 .obj-card {
   background: #fff;
   border: 1px solid $gray-100;
-  border-left: 4px solid $primary-500;
+  border-left: 4px solid $os-accent;
   border-radius: $radius-lg;
   padding: $size-5;
   display: flex;
@@ -89,8 +90,8 @@
   &__top { display: flex; align-items: center; justify-content: space-between; }
   &__tipo {
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
-    font-weight: $font-semibold; color: $primary-600;
-    background: rgba($primary-500, 0.1); padding: 2px 10px; border-radius: $radius-full;
+    font-weight: $font-semibold; color: $os-accent-dark;
+    background: rgba($os-accent, 0.1); padding: 2px 10px; border-radius: $radius-full;
   }
   &__estado {
     font-size: 11px; font-weight: $font-semibold; padding: 2px 10px; border-radius: $radius-full;
@@ -106,12 +107,12 @@
   }
   &__fill--actual {
     position: absolute; top: 0; left: 0; height: 100%;
-    background: $primary-500; border-radius: $radius-full;
+    background: $os-accent; border-radius: $radius-full;
     transition: width 400ms ease;
   }
   &__fill--nuevo {
     position: absolute; top: 0; height: 100%;
-    background: rgba($primary-500, 0.3); border-radius: $radius-full;
+    background: rgba($os-accent, 0.3); border-radius: $radius-full;
     transition: all 300ms ease;
   }
   &__num { font-size: $font-xs; font-weight: $font-semibold; color: $gray-600; white-space: nowrap; }
@@ -121,8 +122,8 @@
   }
   &__legend-dot {
     display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-    &--actual { background: $primary-500; }
-    &--nuevo { background: rgba($primary-500, 0.35); border: 1px solid $primary-500; }
+    &--actual { background: $os-accent; }
+    &--nuevo { background: rgba($os-accent, 0.35); border: 1px solid $os-accent; }
   }
 }
 
@@ -135,12 +136,12 @@
   &__row { display: flex; align-items: center; gap: $size-3; }
   &__num {
     width: 80px; border: 1px solid $gray-200; border-radius: $radius-md;
-    padding: $size-2 $size-3; font-size: $font-lg; font-weight: $font-bold; color: $primary-600;
+    padding: $size-2 $size-3; font-size: $font-lg; font-weight: $font-bold; color: $os-accent-dark;
     font-family: $font-primary; text-align: center;
-    &:focus { outline: none; border-color: $primary-500; }
+    &:focus { outline: none; border-color: $os-accent; }
   }
   &__unit { font-size: $font-sm; color: $gray-500; }
-  &__slider { width: 100%; accent-color: $primary-500; margin-top: 4px; cursor: pointer; }
+  &__slider { width: 100%; accent-color: $os-accent; margin-top: 4px; cursor: pointer; }
 }
 
 // ── Mensaje Gali ──────────────────────────────────────────────────────────
@@ -148,12 +149,12 @@
 .gali-msg {
   display: flex; align-items: flex-start; gap: $size-3;
   background: linear-gradient(135deg, #fff, #fffaf4);
-  border: 1px solid rgba($primary-500, 0.2); border-radius: $radius-md;
+  border: 1px solid rgba($os-accent, 0.2); border-radius: $radius-md;
   padding: $size-4;
 
-  &--launch { border-color: rgba($primary-500, 0.3); }
+  &--launch { border-color: rgba($os-accent, 0.3); }
 
-  &__icon { color: $primary-500; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  &__icon { color: $os-accent; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
   &__text { font-size: $font-sm; color: $gray-700; line-height: 1.55; margin: 0; }
 }
 
@@ -168,7 +169,7 @@
     font-size: $font-sm; font-family: $font-primary; color: $gray-800;
     background: $white; outline: none; transition: border-color 120ms ease;
     &::placeholder { color: $gray-400; }
-    &:focus { border-color: $primary-400; }
+    &:focus { border-color: rgba($os-accent, 0.7); }
   }
 
   &__empty {
@@ -198,8 +199,8 @@
   padding: $size-4; cursor: pointer;
   transition: border-color 120ms ease, transform 100ms ease;
 
-  &:hover { border-color: $primary-300; }
-  &.is-selected { border-color: $primary-500; background: rgba($primary-500, 0.03); }
+  &:hover { border-color: rgba($os-accent, 0.4); }
+  &.is-selected { border-color: $os-accent; background: rgba($os-accent, 0.03); }
 
   &__top { display: flex; align-items: flex-start; justify-content: space-between; gap: $size-3; margin-bottom: $size-2; }
   &__nombre { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; display: block; }
@@ -213,7 +214,7 @@
   &__metas { display: flex; flex-wrap: wrap; gap: $size-2; }
   &__meta {
     font-size: 11px; color: $gray-600; background: $gray-50; padding: 2px 8px; border-radius: $radius-full;
-    &--contrib { color: $primary-600; background: rgba($primary-500, 0.08); font-weight: $font-semibold; }
+    &--contrib { color: $os-accent-dark; background: rgba($os-accent, 0.08); font-weight: $font-semibold; }
   }
 }
 
@@ -233,7 +234,7 @@
     display: flex; align-items: center;
     border: 1px solid $gray-200; border-radius: $radius-md;
     overflow: hidden;
-    &:focus-within { border-color: $primary-500; }
+    &:focus-within { border-color: $os-accent; }
   }
   &__prefix {
     padding: 0 $size-3; font-size: $font-sm; color: $gray-500;
@@ -279,11 +280,11 @@
   &:last-child { border-bottom: none; padding-bottom: 0; }
 
   &--recomendado {
-    background: rgba($primary-500, 0.04);
+    background: rgba($os-accent, 0.04);
     margin: -$size-1 -$size-2;
     padding: $size-3 $size-2;
     border-radius: $radius-md;
-    border: 1px solid rgba($primary-500, 0.15);
+    border: 1px solid rgba($os-accent, 0.15);
   }
 
   &__label {
@@ -293,14 +294,14 @@
   &__hint { font-size: 10px; color: $gray-400; }
   &__tag {
     font-size: 10px; font-weight: $font-bold;
-    background: rgba($primary-500, 0.12); color: $primary-700;
+    background: rgba($os-accent, 0.12); color: $os-accent-dark;
     padding: 1px 6px; border-radius: $radius-full;
   }
   &__val {
     font-size: $font-lg; font-weight: $font-bold; white-space: nowrap;
     &--neutral { color: $gray-700; }
     &--warn { color: #d97706; }
-    &--primary { color: $primary-600; }
+    &--primary { color: $os-accent-dark; }
     &--green { color: #16a34a; }
   }
 
@@ -315,11 +316,11 @@
 .brujula-expectativa {
   display: flex; align-items: center; gap: $size-3;
   padding: $size-3 $size-4;
-  background: rgba($primary-500, 0.06);
-  border: 1px solid rgba($primary-500, 0.18);
+  background: rgba($os-accent, 0.06);
+  border: 1px solid rgba($os-accent, 0.18);
   border-radius: $radius-md;
 
-  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $primary-700; flex-shrink: 0; }
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $os-accent-dark; flex-shrink: 0; }
   &__val { font-size: $font-md; font-weight: $font-bold; color: $gray-900; flex: 1; }
   &__sub { font-size: 11px; color: $gray-500; }
 }
@@ -339,7 +340,7 @@
 }
 
 .brujula-slider {
-  width: 100%; accent-color: $primary-500; cursor: pointer; margin: 2px 0;
+  width: 100%; accent-color: $os-accent; cursor: pointer; margin: 2px 0;
 }
 
 .brujula-slider-labels {
@@ -349,11 +350,11 @@
 
 .brujula-btn-rec {
   align-self: flex-start;
-  background: none; border: 1px solid $primary-300; color: $primary-600;
+  background: none; border: 1px solid rgba($os-accent, 0.4); color: $os-accent-dark;
   padding: 6px 14px; border-radius: $radius-full;
   font-size: 12px; font-weight: $font-semibold; font-family: $font-primary;
   cursor: pointer; transition: all 120ms ease;
-  &:hover { background: rgba($primary-500, 0.06); }
+  &:hover { background: rgba($os-accent, 0.06); }
 }
 
 .brujula-margen {
@@ -380,7 +381,7 @@
 
 .gali-budget-badge {
   background: linear-gradient(135deg, #fff8f0, #fff);
-  border: 2px solid rgba($primary-500, 0.3);
+  border: 2px solid rgba($os-accent, 0.3);
   border-radius: $radius-lg;
   padding: $size-4 $size-5;
   display: flex;
@@ -390,17 +391,17 @@
   &__top {
     display: flex; align-items: center; gap: $size-2;
   }
-  &__spark { color: $primary-500; font-size: 16px; }
-  &__label { font-size: $font-xs; font-weight: $font-bold; color: $primary-600; text-transform: uppercase; letter-spacing: 0.06em; flex: 1; }
+  &__spark { color: $os-accent; font-size: 16px; }
+  &__label { font-size: $font-xs; font-weight: $font-bold; color: $os-accent-dark; text-transform: uppercase; letter-spacing: 0.06em; flex: 1; }
   &__val { font-size: $font-xl; font-weight: $font-bold; color: $gray-900; }
   &__ctx { font-size: 12px; color: $gray-600; line-height: 1.5; margin: 0; }
   &__cta {
     align-self: flex-start;
-    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    background: $os-accent; color: #fff; border: none; cursor: pointer;
     padding: 8px 18px; border-radius: $radius-full;
     font-size: 12px; font-weight: $font-semibold; font-family: $font-primary;
     transition: background 120ms ease;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 }
 
@@ -411,7 +412,7 @@
   &__budget-row { display: flex; align-items: baseline; gap: $size-3; }
   &__budget-val { font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; }
   &__budget-est { font-size: $font-xs; color: $gray-500; }
-  &__slider { width: 100%; accent-color: $primary-500; cursor: pointer; }
+  &__slider { width: 100%; accent-color: $os-accent; cursor: pointer; }
   &__slider-labels {
     display: flex; justify-content: space-between;
     font-size: 11px; color: $gray-400;
@@ -429,8 +430,8 @@
   overflow: hidden;
   transition: border-color 150ms ease;
 
-  &--active { border-color: $primary-300; background: rgba($primary-500, 0.015); }
-  &--locked { border-color: rgba($primary-500, 0.4); background: rgba($primary-500, 0.02); }
+  &--active { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.015); }
+  &--locked { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.02); }
 
   &__row {
     display: flex; align-items: center; gap: $size-3;
@@ -442,7 +443,7 @@
   &__badge {
     font-size: 10px; font-weight: $font-bold;
     padding: 1px 8px; border-radius: $radius-full;
-    background: rgba($primary-500, 0.1); color: $primary-700;
+    background: rgba($os-accent, 0.1); color: $os-accent-dark;
   }
   &__toggle {
     background: none; border: 1px solid $gray-200; border-radius: $radius-full;
@@ -454,8 +455,8 @@
     &--on { color: #16a34a; }
     &--off { color: $gray-500; }
 
-    .agente-card--active & { border-color: $primary-300; }
-    .agente-card--locked & { border-color: rgba($primary-500, 0.3); }
+    .agente-card--active & { border-color: rgba($os-accent, 0.4); }
+    .agente-card--locked & { border-color: rgba($os-accent, 0.3); }
     &:not(:disabled):hover { background: $gray-50; }
   }
   &__desc {
@@ -465,7 +466,7 @@
     animation: gali-fade-up 150ms ease-out both;
   }
   &__razon {
-    display: block; margin-top: 4px; font-size: 11px; color: $primary-600; font-style: normal;
+    display: block; margin-top: 4px; font-size: 11px; color: $os-accent-dark; font-style: normal;
   }
 }
 
@@ -495,7 +496,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   animation: gali-fade-up 200ms ease-out both;
 
   &__content {
@@ -525,7 +526,7 @@
 
   &__bar {
     height: 100%;
-    background: $primary-500;
+    background: $os-accent;
     border-radius: $radius-full;
     transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -573,7 +574,7 @@
     color: inherit;
 
     .done & { color: #16a34a; }
-    .active & { color: $primary-500; animation: gali-pulse-dot 1s ease-in-out infinite; }
+    .active & { color: $os-accent; animation: gali-pulse-dot 1s ease-in-out infinite; }
   }
 }
 
@@ -587,10 +588,10 @@
   &__title { margin: 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; }
   &__sub { margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.6; max-width: 440px; }
   &__contrib {
-    background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
+    background: rgba($os-accent, 0.08); border: 1px solid rgba($os-accent, 0.2);
     border-radius: $radius-md; padding: $size-4 $size-5;
     font-size: $font-sm; color: $gray-700;
-    strong { color: $primary-600; display: block; margin-top: 4px; font-size: $font-md; }
+    strong { color: $os-accent-dark; display: block; margin-top: 4px; font-size: $font-md; }
   }
 }
 
@@ -619,10 +620,10 @@
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease, transform 80ms ease;
 
-  &:hover { border-color: $primary-300; transform: translateX(2px); }
-  &--selected { border-color: $primary-500; background: rgba($primary-500, 0.04); }
+  &:hover { border-color: rgba($os-accent, 0.4); transform: translateX(2px); }
+  &--selected { border-color: $os-accent; background: rgba($os-accent, 0.04); }
   &--custom { border-style: dashed; border-color: $gray-200; }
-  &--custom.campana-sug-card--selected { border-color: $primary-400; border-style: solid; }
+  &--custom.campana-sug-card--selected { border-color: rgba($os-accent, 0.7); border-style: solid; }
 
   &__header {
     display: flex; align-items: center; gap: $size-2; margin-bottom: $size-2;
@@ -631,9 +632,9 @@
   &__check {
     width: 18px; height: 18px; border-radius: $radius-sm;
     border: 1px solid $gray-300; display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: $font-bold; color: $primary-600; flex-shrink: 0;
+    font-size: 11px; font-weight: $font-bold; color: $os-accent-dark; flex-shrink: 0;
     background: #fff;
-    .campana-sug-card--selected & { border-color: $primary-500; background: rgba($primary-500, 0.1); }
+    .campana-sug-card--selected & { border-color: $os-accent; background: rgba($os-accent, 0.1); }
   }
 
   &__canal {
@@ -642,7 +643,7 @@
   }
 
   &__presupuesto {
-    margin-left: auto; font-size: 11px; font-weight: $font-semibold; color: $primary-600;
+    margin-left: auto; font-size: 11px; font-weight: $font-semibold; color: $os-accent-dark;
   }
 
   &__nombre {
@@ -657,7 +658,7 @@
   &__gali {
     display: flex; align-items: flex-start; gap: 5px;
     font-size: 11px; color: $gray-600; line-height: 1.4;
-    .gali-spark { color: $primary-500; flex-shrink: 0; font-size: 10px; margin-top: 1px; }
+    .gali-spark { color: $os-accent; flex-shrink: 0; font-size: 10px; margin-top: 1px; }
   }
 }
 
@@ -666,7 +667,7 @@
   border: 1px solid $gray-200; border-radius: $radius-sm;
   font-size: $font-sm; font-family: $font-primary; color: $gray-800;
   background: #fff; outline: none;
-  &:focus { border-color: $primary-400; }
+  &:focus { border-color: rgba($os-accent, 0.7); }
   box-sizing: border-box;
 }
 
@@ -678,7 +679,7 @@
 
 .wizard__inicio-eyebrow {
   display: flex; align-items: center; gap: 6px;
-  font-size: $font-xs; font-weight: $font-semibold; color: $primary-500;
+  font-size: $font-xs; font-weight: $font-semibold; color: $os-accent;
   text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: $size-3;
 }
 
@@ -696,7 +697,7 @@
   font-family: $font-primary;
 
   &:hover {
-    border-color: $primary-400; box-shadow: 0 4px 16px rgba($primary-500, 0.12);
+    border-color: rgba($os-accent, 0.7); box-shadow: 0 4px 16px rgba($os-accent, 0.12);
     transform: translateY(-1px);
   }
 
@@ -717,7 +718,7 @@
   }
 
   &-arrow {
-    font-size: 18px; color: $primary-400; flex-shrink: 0;
+    font-size: 18px; color: rgba($os-accent, 0.7); flex-shrink: 0;
     transition: transform 0.15s;
   }
 
@@ -726,11 +727,11 @@
 
 .wizard__inicio-gali {
   display: flex; align-items: flex-start; gap: $size-2;
-  background: linear-gradient(135deg, rgba($primary-500, 0.04), rgba($primary-500, 0.02));
-  border: 1px solid rgba($primary-500, 0.15); border-radius: $radius-sm;
+  background: linear-gradient(135deg, rgba($os-accent, 0.04), rgba($os-accent, 0.02));
+  border: 1px solid rgba($os-accent, 0.15); border-radius: $radius-sm;
   padding: $size-3 $size-4; margin-top: $size-2;
 
-  &-spark { color: $primary-500; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
+  &-spark { color: $os-accent; font-size: 12px; margin-top: 2px; flex-shrink: 0; }
 
   &-texto { margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.5; }
 }
@@ -746,10 +747,10 @@
   padding: $size-3 $size-4; cursor: pointer; text-align: left;
   font-family: $font-primary; transition: border-color 0.15s, background 0.15s;
 
-  &:hover { border-color: $primary-300; background: rgba($primary-500, 0.02); }
+  &:hover { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.02); }
 
   &--selected {
-    border-color: $primary-500; background: rgba($primary-500, 0.05);
+    border-color: $os-accent; background: rgba($os-accent, 0.05);
   }
 }
 
@@ -762,7 +763,7 @@
 }
 
 .wizard__problema-check {
-  color: $primary-500; font-weight: $font-bold; font-size: $font-base;
+  color: $os-accent; font-weight: $font-bold; font-size: $font-base;
 }
 
 .wizard__gali-analizando {
@@ -771,18 +772,18 @@
 }
 
 .wizard__gali-spin {
-  display: inline-block; color: $primary-400;
+  display: inline-block; color: rgba($os-accent, 0.7);
   animation: gali-breathe 1s ease-in-out infinite;
 }
 
 .wizard__gali-respuesta {
-  background: linear-gradient(135deg, rgba($primary-500, 0.06), rgba($primary-500, 0.02));
-  border: 1.5px solid rgba($primary-500, 0.2); border-radius: $radius-md;
+  background: linear-gradient(135deg, rgba($os-accent, 0.06), rgba($os-accent, 0.02));
+  border: 1.5px solid rgba($os-accent, 0.2); border-radius: $radius-md;
   padding: $size-5; margin-top: $size-3;
 
   &-hdr {
     display: flex; align-items: center; gap: $size-2;
-    color: $primary-600; font-size: $font-sm; margin-bottom: $size-2;
+    color: $os-accent-dark; font-size: $font-sm; margin-bottom: $size-2;
     span { font-size: 12px; }
     strong { font-weight: $font-semibold; }
   }
@@ -802,4 +803,599 @@
   padding: $size-2 $size-4; font-size: $font-sm; font-weight: $font-medium;
   color: $gray-600; cursor: pointer; font-family: $font-primary;
   &:hover { border-color: $gray-300; color: $gray-800; }
+}
+
+// ── Eyebrow + Gali hint (compartidos) ─────────────────────────────────────
+.wizard__eyebrow {
+  display: flex; align-items: center; gap: $size-2;
+  font-size: $font-xs; font-weight: $font-bold; color: $os-accent-dark;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.wizard__gali-hint {
+  display: flex; align-items: flex-start; gap: $size-2;
+  background: linear-gradient(135deg, rgba($os-accent, 0.05), rgba($os-accent, 0.02));
+  border: 1px solid rgba($os-accent, 0.15); border-radius: $radius-sm;
+  padding: $size-3 $size-4;
+  font-size: 12px; color: $gray-600; line-height: 1.55;
+
+  span { color: $os-accent; font-size: 10px; margin-top: 2px; flex-shrink: 0; }
+
+  &.gali-fade-up { animation: gali-fade-up 200ms ease both; }
+}
+
+// Screen reader
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+// ── PASO: Tipo de proyecto ─────────────────────────────────────────────────
+.tipo-grid {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+}
+
+.tipo-card {
+  display: flex; align-items: flex-start; gap: $size-4;
+  background: #fff; border: 1.5px solid $gray-200; border-radius: $radius-md;
+  padding: $size-4 $size-5; cursor: pointer; text-align: left;
+  font-family: $font-primary; transition: border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
+
+  &:hover {
+    border-color: rgba($os-accent, 0.7);
+    box-shadow: 0 4px 16px rgba($os-accent, 0.1);
+    transform: translateY(-1px);
+  }
+
+  &__emoji { font-size: 28px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+  &__body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  &__titulo { font-size: $font-base; font-weight: $font-bold; color: $gray-900; display: block; }
+  &__desc { font-size: 12px; color: $gray-600; line-height: 1.45; margin: 2px 0 0; }
+  &__cuando {
+    font-size: 11px; color: $gray-400; font-style: italic; margin-top: 4px; line-height: 1.4;
+  }
+  &__arrow { font-size: 18px; color: rgba($os-accent, 0.4); flex-shrink: 0; margin-top: 4px; transition: transform 120ms ease; }
+  &:hover &__arrow { transform: translateX(3px); color: $os-accent; }
+}
+
+// ── PASO: Nombre ──────────────────────────────────────────────────────────
+.nombre-field {
+  display: flex; flex-direction: column; gap: $size-2;
+}
+
+.nombre-input {
+  width: 100%; padding: $size-3 $size-4;
+  border: 2px solid $gray-200; border-radius: $radius-md;
+  font-size: $font-lg; font-weight: $font-semibold; color: $gray-900;
+  font-family: $font-primary; outline: none; transition: border-color 150ms ease;
+  box-sizing: border-box;
+  &:focus { border-color: rgba($os-accent, 0.7); }
+  &::placeholder { color: $gray-300; font-weight: 400; font-size: $font-base; }
+}
+
+.nombre-reset {
+  align-self: flex-start;
+  background: none; border: 1px solid $primary-200; color: $os-accent-dark;
+  padding: 4px 12px; border-radius: $radius-full; font-size: 12px;
+  font-weight: $font-semibold; font-family: $font-primary; cursor: pointer;
+  transition: all 120ms ease;
+  &:hover { background: rgba($os-accent, 0.06); }
+}
+
+// ── PASO: Agentes (opt toggle style) ─────────────────────────────────────
+.agente-opt {
+  display: flex; align-items: flex-start; gap: $size-3;
+  background: #fff; border: 2px solid $gray-100; border-radius: $radius-md;
+  padding: $size-4; cursor: pointer; transition: border-color 150ms ease;
+
+  &.is-on { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.02); }
+  &.is-locked { border-color: rgba($os-accent, 0.3); background: rgba($os-accent, 0.015); cursor: default; }
+
+  &__dot {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+    border: 2px solid $gray-200; background: #fff; transition: all 150ms ease;
+    &.is-on { background: $os-accent; border-color: $os-accent; }
+  }
+
+  &__info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  &__nombre {
+    font-size: $font-sm; font-weight: $font-bold; color: $gray-900;
+    display: flex; align-items: center; gap: $size-2;
+    i { color: $os-accent; }
+  }
+  &__lock { font-size: 11px; color: $os-accent-dark; font-weight: $font-semibold; }
+  &__desc { font-size: 12px; color: $gray-500; line-height: 1.45; }
+  &__toggle {
+    font-size: 11px; font-weight: $font-bold; color: $gray-400; flex-shrink: 0; padding-top: 3px;
+    .agente-opt.is-on & { color: $os-accent-dark; }
+  }
+}
+
+.agente-crear-link {
+  align-self: flex-start;
+  background: none; border: none; cursor: pointer;
+  font-size: $font-sm; font-weight: $font-semibold; color: $os-accent-dark;
+  font-family: $font-primary; padding: $size-2 0;
+  text-decoration: underline; text-underline-offset: 3px;
+  &:hover { color: $os-accent-dark; }
+}
+
+// ── PASO: ¿Agregar campaña? ───────────────────────────────────────────────
+.agregar-cards {
+  display: flex; flex-direction: column; gap: $size-3;
+}
+
+.agregar-card {
+  display: flex; align-items: center; gap: $size-4;
+  background: #fff; border: 1.5px solid $gray-200; border-radius: $radius-md;
+  padding: $size-4 $size-5; cursor: pointer; text-align: left;
+  font-family: $font-primary; transition: border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
+
+  &:hover { border-color: rgba($os-accent, 0.7); box-shadow: 0 4px 12px rgba($os-accent, 0.1); transform: translateY(-1px); }
+
+  &--si { border-left: 4px solid rgba($os-accent, 0.7); }
+  &--no { border-left: 4px solid $gray-200; }
+
+  &__icon { font-size: 24px; color: $os-accent; flex-shrink: 0; }
+  &__body { flex: 1; }
+  &__titulo { display: block; font-size: $font-base; font-weight: $font-bold; color: $gray-900; margin-bottom: 4px; }
+  &__desc { font-size: $font-sm; color: $gray-500; line-height: 1.45; margin: 0; }
+  &__arrow { font-size: 18px; color: rgba($os-accent, 0.4); flex-shrink: 0; transition: transform 120ms ease; }
+  &:hover &__arrow { transform: translateX(3px); color: $os-accent; }
+}
+
+.launch-mini {
+  display: flex; flex-direction: column; align-items: center; gap: $size-3; padding: $size-8 0;
+
+  &__icon { font-size: 24px; color: $os-accent; animation: gali-breathe 1s ease-in-out infinite; }
+  &__text { font-size: $font-sm; color: $gray-600; margin: 0; }
+  &__bar {
+    width: 200px; height: 4px; background: $gray-100; border-radius: $radius-full; overflow: hidden;
+  }
+  &__fill {
+    height: 100%; background: $os-accent; border-radius: $radius-full;
+    transition: width 500ms cubic-bezier(0.4,0,0.2,1);
+  }
+}
+
+// ── CAMPAÑA: Integraciones ────────────────────────────────────────────────
+.integ-warning {
+  display: flex; align-items: flex-start; gap: $size-2;
+  background: #fffbeb; border: 1px solid #fde68a; border-radius: $radius-md;
+  padding: $size-3 $size-4; font-size: $font-sm; color: #92400e;
+
+  span { flex-shrink: 0; }
+}
+
+.integ-list { display: flex; flex-direction: column; gap: 0; }
+
+.integ-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: $size-2;
+  padding: $size-3 $size-4;
+  border: 1px solid $gray-100; border-radius: $radius-md; margin-bottom: $size-2;
+  background: #fff;
+
+  &__info { flex: 1; min-width: 140px; }
+  &__nombre { display: block; font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
+  &__desc { display: block; font-size: 11px; color: $gray-400; margin-top: 1px; }
+
+  &__badge {
+    font-size: 11px; font-weight: $font-semibold; padding: 3px 10px; border-radius: $radius-full;
+    &[data-estado='conectado'] { background: #f0fdf4; color: #16a34a; }
+    &[data-estado='pendiente'] { background: $gray-100; color: $gray-500; }
+  }
+
+  &__guide-btn {
+    background: none; border: 1px solid $gray-200; border-radius: $radius-full;
+    padding: 3px 10px; font-size: 11px; font-weight: $font-semibold; color: $gray-600;
+    cursor: pointer; font-family: $font-primary;
+    &:hover { border-color: rgba($os-accent, 0.4); color: $os-accent-dark; }
+  }
+}
+
+.integ-guide {
+  width: 100%; padding: $size-3 0 $size-2;
+
+  &__steps {
+    margin: 0; padding-left: $size-5;
+    li { font-size: $font-sm; color: $gray-600; line-height: 1.6; }
+  }
+
+  &__link {
+    display: inline-block; margin-top: $size-2;
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; font-weight: $font-semibold; color: $os-accent-dark;
+    font-family: $font-primary; text-decoration: underline; text-underline-offset: 3px;
+    padding: 0;
+    &:hover { color: $os-accent-dark; }
+  }
+}
+
+// ── CAMPAÑA: Enfoque ──────────────────────────────────────────────────────
+.enfoque-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: $size-3;
+}
+
+.enfoque-btn {
+  display: flex; align-items: center; gap: $size-2;
+  border: 1.5px solid $gray-200; border-radius: $radius-md;
+  background: #fff; padding: $size-3 $size-4;
+  font-size: $font-sm; font-weight: $font-semibold; color: $gray-700;
+  cursor: pointer; font-family: $font-primary;
+  transition: border-color 120ms ease, background 120ms ease;
+
+  &.is-active { border-color: $os-accent; background: rgba($os-accent, 0.05); color: $os-accent-dark; }
+  &:hover:not(.is-active) { border-color: rgba($os-accent, 0.4); }
+
+  i { color: rgba($os-accent, 0.7); font-size: $font-base; }
+  .is-active i { color: $os-accent-dark; }
+}
+
+.desc-field {
+  display: flex; flex-direction: column; gap: $size-2;
+
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+  &__opt { font-weight: 400; color: $gray-400; font-size: 11px; }
+  &__input {
+    width: 100%; resize: none; box-sizing: border-box;
+    border: 1px solid $gray-200; border-radius: $radius-md;
+    padding: $size-3; font-size: $font-sm; font-family: $font-primary; color: $gray-800;
+    outline: none; transition: border-color 120ms ease;
+    &:focus { border-color: rgba($os-accent, 0.7); }
+    &::placeholder { color: $gray-300; }
+  }
+}
+
+// ── CAMPAÑA: Productos (chips multi-select) ───────────────────────────────
+.prod-chips {
+  display: flex; flex-wrap: wrap; gap: $size-2;
+}
+
+.prod-chip {
+  display: inline-flex; align-items: center; gap: $size-1;
+  background: rgba($os-accent, 0.1); color: $os-accent-dark;
+  border: 1px solid rgba($os-accent, 0.25); border-radius: $radius-full;
+  padding: 3px 10px; font-size: 12px; font-weight: $font-semibold;
+
+  &__remove {
+    background: none; border: none; color: $os-accent; cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 0; margin-left: 2px;
+    &:hover { color: $os-accent-dark; }
+  }
+}
+
+.producto-card__check {
+  display: block; text-align: right; margin-top: $size-2;
+  font-size: 11px; font-weight: $font-bold; color: $os-accent-dark;
+}
+
+// ── CAMPAÑA: Presupuesto ──────────────────────────────────────────────────
+.presupuesto-insight {
+  display: flex; align-items: center; flex-wrap: wrap; gap: $size-2;
+  background: rgba($os-accent, 0.06); border: 1px solid rgba($os-accent, 0.15);
+  border-radius: $radius-md; padding: $size-3 $size-4;
+
+  &__label { font-size: $font-xs; font-weight: $font-bold; color: $os-accent-dark; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  &__val { font-size: $font-md; font-weight: $font-bold; color: $gray-900; }
+  &__sub { font-size: 11px; color: $gray-500; }
+}
+
+.presupuesto-aviso {
+  display: flex; align-items: flex-start; gap: $size-2;
+  font-size: 12px; color: $gray-500; line-height: 1.5;
+  padding: $size-2 0;
+}
+
+// ── CAMPAÑA: Brújula — fila pauta ─────────────────────────────────────────
+.brujula-metric--pauta {
+  border-left: 3px solid #d97706; padding-left: $size-3;
+  background: rgba(#d97706, 0.03);
+}
+
+// ── CAMPAÑA: Creativos ────────────────────────────────────────────────────
+.creativo-section {
+  background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
+  padding: $size-4; display: flex; flex-direction: column; gap: $size-3;
+
+  &.is-disabled { opacity: 0.6; }
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between; gap: $size-2;
+  }
+  &__title { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
+  &__req { font-size: 11px; color: $gray-400; }
+  &__disabled-msg { font-size: $font-sm; color: $gray-500; margin: 0; line-height: 1.5; }
+  &__link {
+    background: none; border: none; cursor: pointer;
+    color: $os-accent-dark; font-size: $font-sm; font-weight: $font-semibold;
+    font-family: $font-primary; text-decoration: underline; text-underline-offset: 3px;
+    padding: 0;
+    &:hover { color: $os-accent-dark; }
+  }
+}
+
+.creativo-checks { display: flex; flex-direction: column; gap: $size-2; }
+
+.creativo-check {
+  display: flex; align-items: flex-start; gap: $size-2;
+  font-size: $font-sm; color: $gray-700; cursor: pointer; line-height: 1.4;
+
+  input { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; accent-color: $os-accent; cursor: pointer; }
+
+  &--borrador {
+    font-size: 12px; color: $gray-500; font-style: italic;
+    border-top: 1px solid $gray-100; padding-top: $size-3; margin-top: $size-2;
+  }
+}
+
+// ── ÉXITO emoji ───────────────────────────────────────────────────────────
+.launch-success__emoji {
+  font-size: 56px; line-height: 1;
+}
+
+// ── PASO: Intent Chat ────────────────────────────────────────────────────
+.intent-chips {
+  display: flex; flex-wrap: wrap; gap: $size-2;
+}
+
+.intent-chip {
+  background: $gray-50; border: 1px solid $gray-200; border-radius: $radius-full;
+  padding: 8px $size-4; font-size: $font-sm; color: $gray-700; cursor: pointer;
+  font-family: $font-primary; transition: all 120ms ease;
+  text-align: left;
+
+  &:hover { background: rgba($os-accent, 0.06); border-color: rgba($os-accent, 0.3); color: $gray-900; }
+  &--selected { background: rgba($os-accent, 0.08); border-color: $os-accent; color: $os-accent; font-weight: $font-semibold; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.intent-field {
+  display: flex; flex-direction: column; gap: $size-2; position: relative;
+
+  &__input {
+    width: 100%; padding: $size-3 $size-4; border: 1px solid $gray-200; border-radius: $radius-md;
+    font-size: $font-sm; font-family: $font-primary; color: $gray-800; resize: none;
+    transition: border-color 120ms ease; outline: none;
+    &:focus { border-color: $os-accent; }
+    &::placeholder { color: $gray-400; }
+  }
+
+  &__send {
+    align-self: flex-start; background: none; border: 1px solid $gray-200; cursor: pointer;
+    font-size: 12px; color: $gray-500; font-family: $font-primary; border-radius: $radius-sm;
+    padding: 4px 10px; transition: all 120ms ease;
+    &:hover { border-color: $os-accent; color: $os-accent; }
+  }
+}
+
+.intent-gali-thinking {
+  display: flex; align-items: center; gap: $size-2;
+
+  &__dot {
+    width: 6px; height: 6px; border-radius: 50%; background: $os-accent;
+    animation: gali-pulse-dot 1.2s ease-in-out infinite;
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+
+  &__text { font-size: 12px; color: $gray-500; font-style: italic; }
+}
+
+.intent-gali-resp {
+  display: flex; align-items: flex-start; gap: $size-3;
+  background: rgba($os-accent, 0.04); border: 1px solid rgba($os-accent, 0.15);
+  border-left: 3px solid $os-accent; border-radius: $radius-md; padding: $size-4;
+
+  &__icon { color: $os-accent; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  &__body { display: flex; flex-direction: column; gap: $size-2; }
+  &__texto { font-size: $font-sm; color: $gray-700; line-height: 1.55; margin: 0; }
+  &__subobj {
+    display: flex; align-items: center; gap: $size-2; font-size: 12px;
+    &-label { color: $gray-500; }
+    strong { color: $gray-900; }
+  }
+}
+
+// ── PASO: Tipo de campaña ────────────────────────────────────────────────
+.camp-tipo-grid {
+  display: flex; flex-direction: column; gap: $size-3;
+}
+
+.camp-tipo-card {
+  display: flex; align-items: center; gap: $size-4;
+  background: #fff; border: 2px solid $gray-100; border-radius: $radius-md;
+  padding: $size-4; cursor: pointer; text-align: left;
+  transition: border-color 120ms ease, background 120ms ease;
+
+  &:hover { border-color: rgba($os-accent, 0.4); background: rgba($os-accent, 0.02); }
+  &.is-selected { border-color: $os-accent; background: rgba($os-accent, 0.04); }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+
+  &__emoji { font-size: 24px; flex-shrink: 0; }
+  &__body { flex: 1; }
+  &__label { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; display: block; margin-bottom: 2px; }
+  &__desc { font-size: 12px; color: $gray-500; margin: 0; }
+  &__check { color: $os-accent; font-weight: $font-bold; font-size: $font-md; }
+}
+
+// ── PASO: Ruta de venta ──────────────────────────────────────────────────
+.ruta-list {
+  display: flex; flex-direction: column; gap: $size-2;
+}
+
+.ruta-card {
+  display: flex; align-items: center; gap: $size-3;
+  background: #fff; border: 2px solid $gray-100; border-radius: $radius-md;
+  padding: $size-3 $size-4; cursor: pointer; text-align: left;
+  transition: border-color 120ms ease;
+
+  &:hover { border-color: rgba($os-accent, 0.35); }
+  &.is-selected { border-color: $os-accent; background: rgba($os-accent, 0.03); }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+
+  &__body { flex: 1; }
+  &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-900; display: block; }
+  &__desc { font-size: 12px; color: $gray-500; margin-top: 2px; }
+  &__check { color: $os-accent; font-weight: $font-bold; }
+}
+
+.ruta-integ {
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-md;
+  padding: $size-3 $size-4; display: flex; flex-direction: column; gap: $size-2;
+
+  &__label { font-size: 11px; font-weight: $font-semibold; color: $gray-600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  &__list { display: flex; flex-direction: column; gap: $size-1; }
+
+  &__row {
+    display: flex; align-items: center; gap: $size-2; font-size: $font-sm;
+  }
+
+  &__estado {
+    font-size: 12px; font-weight: $font-bold; width: 16px;
+    &[data-estado='conectado'] { color: #22c55e; }
+    &[data-estado='pendiente'] { color: $gray-400; }
+  }
+
+  &__nombre { flex: 1; color: $gray-700; }
+
+  &__link {
+    background: none; border: none; cursor: pointer; font-size: 12px;
+    color: $os-accent; font-family: $font-primary; padding: 0;
+    &:hover { text-decoration: underline; }
+  }
+
+  &__nota { font-size: 11px; color: $gray-500; margin: 0; border-top: 1px solid $gray-100; padding-top: $size-2; }
+}
+
+// ── PRODUCTOS: Tabs y secciones ──────────────────────────────────────────
+.prod-cats {
+  display: flex; gap: $size-1; flex-wrap: wrap; margin-bottom: $size-1;
+}
+
+.prod-cat-tab {
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-full;
+  padding: 4px 12px; font-size: 12px; color: $gray-600; cursor: pointer;
+  font-family: $font-primary; transition: all 120ms ease;
+
+  &:hover { background: $gray-100; }
+  &--active { background: rgba($os-accent, 0.08); border-color: $os-accent; color: $os-accent; font-weight: $font-semibold; }
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.prod-rec-section {
+  display: flex; flex-direction: column; gap: $size-2;
+
+  &__label {
+    font-size: 11px; font-weight: $font-semibold; color: $gray-500;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    span { color: $os-accent; }
+  }
+}
+
+.gali-analyzing {
+  display: flex; flex-direction: column; align-items: center; gap: $size-3;
+  padding: $size-8 0; text-align: center;
+
+  &__icon { font-size: 24px; color: $os-accent; animation: gali-breathe 1.5s ease-in-out infinite; }
+  &__text { font-size: $font-sm; color: $gray-500; }
+  &__bars {
+    display: flex; gap: 4px; align-items: flex-end;
+    span {
+      display: block; width: 8px; background: rgba($os-accent, 0.3); border-radius: 2px;
+      animation: gali-bar-grow 0.9s ease-in-out infinite alternate;
+      &:nth-child(1) { height: 16px; animation-delay: 0s; }
+      &:nth-child(2) { height: 24px; animation-delay: 0.15s; }
+      &:nth-child(3) { height: 12px; animation-delay: 0.3s; }
+    }
+  }
+}
+
+.producto-card--rec {
+  border-color: rgba($os-accent, 0.2);
+  background: rgba($os-accent, 0.015);
+}
+
+.producto-card__check-badge {
+  position: absolute;
+  top: $size-2; right: $size-2;
+  background: $os-accent; color: white; border-radius: $radius-full;
+  font-size: 10px; font-weight: $font-bold; padding: 2px 8px;
+}
+
+.producto-card {
+  position: relative;
+}
+
+// ── BRUJULA: Multi-producto ──────────────────────────────────────────────
+.brujula-multi {
+  display: flex; flex-direction: column; gap: $size-4;
+}
+
+.brujula-multi-row {
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-md; padding: $size-4;
+  display: flex; flex-direction: column; gap: $size-3;
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: $size-2;
+  }
+  &__nombre { font-size: $font-sm; font-weight: $font-semibold; color: $gray-900; }
+  &__costo { font-size: 12px; color: $gray-500; }
+
+  &__inputs { display: flex; align-items: center; gap: $size-4; flex-wrap: wrap; }
+  &__field { display: flex; flex-direction: column; gap: $size-1; }
+  &__label { font-size: 11px; color: $gray-600; font-weight: $font-semibold; }
+
+  &__margen {
+    font-size: $font-sm; font-weight: $font-bold; padding: 4px 12px; border-radius: $radius-full;
+    &[data-color='verde'] { background: #f0fdf4; color: #16a34a; }
+    &[data-color='ambar'] { background: #fffbeb; color: #d97706; }
+    &[data-color='rojo']  { background: #fef2f2; color: #dc2626; }
+  }
+}
+
+// ── Agente opt: badge de recomendado ────────────────────────────────────
+.agente-opt__rec {
+  display: inline-block; font-size: 10px; font-weight: $font-bold;
+  background: rgba($os-accent, 0.1); color: $os-accent;
+  border-radius: $radius-full; padding: 1px 6px; margin-left: $size-2;
+}
+
+// ── Focus visible global para botones interactivos del wizard ────────────
+.tipo-card,
+.agregar-card,
+.camp-tipo-card,
+.ruta-card,
+.prod-cat-tab {
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+.wizard__launch,
+.wizard__next,
+.brujula-btn-rec {
+  &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
+}
+
+// ── Keyframes faltantes ──────────────────────────────────────────────────
+@keyframes gali-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.8; }
+}
+
+@keyframes gali-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes gali-bar-grow {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+// ── Secondary button ────────────────────────────────────────────────────
+.wizard__next--secondary {
+  background: none; border: 1px solid $gray-200; color: $gray-600;
+  &:hover { border-color: $gray-300; background: $gray-50; color: $gray-800; }
 }

@@ -1,316 +1,473 @@
-<div class="wizard">
+<div class="wizard gali-stagger-in">
 
-  <!-- Header -->
-  <div class="wizard__header">
-    <button class="wizard__back" (click)="goBack()">← Atrás</button>
-    <div class="wizard__progress">
-      <div class="wizard__progress-fill"
-           [style.width.%]="((stepIndex(step()) + 1) / STEPS.length) * 100"></div>
-    </div>
-    <span class="wizard__step-hint">{{ STEPS[stepIndex(step())].label }}</span>
-  </div>
-
-  <!-- ── PASO 0: ¿Desde dónde arrancas? ── -->
-  @if (step() === 'inicio') {
-    <div class="wizard__body wizard__body--inicio gali-stagger-in">
-      <div class="wizard__inicio-eyebrow">
-        <span class="wizard__inicio-spark" aria-hidden="true">✦</span>
-        Nuevo proyecto
+  <!-- Header compartido -->
+  @if (step() !== 'exito') {
+    <div class="wizard__header">
+      <button class="wizard__back" type="button" (click)="goBack()">← Atrás</button>
+      <div class="wizard__progress" role="progressbar"
+           [attr.aria-valuenow]="progressPct()" aria-valuemin="0" aria-valuemax="100">
+        <div class="wizard__progress-fill" [style.width.%]="progressPct()"></div>
       </div>
-      <h1 class="wizard__title">¿Desde dónde arrancas?</h1>
-      <p class="wizard__sub">Gali te ayuda a construir tu estrategia desde cualquier punto de partida.</p>
-
-      <div class="wizard__inicio-cards">
-        <button class="wizard__inicio-card" (click)="elegirDesdeProducto()">
-          <div class="wizard__inicio-card-icon"><i class="pi pi-box"></i></div>
-          <div class="wizard__inicio-card-body">
-            <strong class="wizard__inicio-card-title">Tengo un producto en mente</strong>
-            <p class="wizard__inicio-card-desc">Elige el producto, calcula el precio con Brújula y lanza tu campaña.</p>
-          </div>
-          <span class="wizard__inicio-card-arrow">→</span>
-        </button>
-
-        <button class="wizard__inicio-card" (click)="elegirDesdeProblema()">
-          <div class="wizard__inicio-card-icon"><i class="pi pi-target"></i></div>
-          <div class="wizard__inicio-card-body">
-            <strong class="wizard__inicio-card-title">Quiero resolver un problema de ventas</strong>
-            <p class="wizard__inicio-card-desc">Describe el problema y Gali sugiere los mejores productos para atacarlo.</p>
-          </div>
-          <span class="wizard__inicio-card-arrow">→</span>
-        </button>
-      </div>
-
-      <div class="wizard__inicio-gali">
-        <span class="wizard__inicio-gali-spark" aria-hidden="true">✦</span>
-        <p class="wizard__inicio-gali-texto">Gali analizará tu objetivo actual para personalizar las recomendaciones de cada ruta.</p>
-      </div>
+      <span class="wizard__step-hint">{{ stepLabel() }}</span>
     </div>
   }
 
-  <!-- ── PASO 0b: Desde problema ── -->
-  @if (step() === 'problema') {
+  <!-- ── PASO 1: Tipo de proyecto ── -->
+  @if (step() === 'tipo') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">¿Cuál es el problema?</h1>
-      <p class="wizard__sub">Selecciona la situación que más se parece a lo que vives. Gali buscará las mejores oportunidades para resolverla.</p>
+      <div class="wizard__eyebrow"><span aria-hidden="true">✦</span> Nuevo proyecto</div>
+      <h1 class="wizard__title">¿Qué quieres lograr con este proyecto?</h1>
+      <p class="wizard__sub">Gali asignará los agentes y el enfoque según tu elección.</p>
 
-      <div class="wizard__problemas">
-        @for (prob of problemas; track prob.id) {
-          <button class="wizard__problema-card"
-                  [class.wizard__problema-card--selected]="problemaSeleccionado()?.id === prob.id"
-                  (click)="seleccionarProblema(prob)">
-            <i [class]="'wizard__problema-icon pi ' + prob.icon"></i>
-            <span class="wizard__problema-label">{{ prob.label }}</span>
-            @if (problemaSeleccionado()?.id === prob.id) {
-              <span class="wizard__problema-check" aria-hidden="true">✓</span>
+      <div class="tipo-grid">
+        @for (t of TIPOS_PROYECTO; track t.id) {
+          <button class="tipo-card" (click)="selectTipo(t.id)"
+                  [attr.aria-label]="t.titulo"
+                  type="button">
+            <span class="tipo-card__emoji" aria-hidden="true">{{ t.emoji }}</span>
+            <div class="tipo-card__body">
+              <strong class="tipo-card__titulo">{{ t.titulo }}</strong>
+              <p class="tipo-card__desc">{{ t.descripcion }}</p>
+              <p class="tipo-card__cuando">{{ t.cuandoUsar }}</p>
+            </div>
+            <span class="tipo-card__arrow" aria-hidden="true">→</span>
+          </button>
+        }
+      </div>
+
+      <p class="wizard__gali-hint">
+        <span aria-hidden="true">✦</span>
+        Gali personalizará señales, alertas y agentes según el tipo de proyecto.
+      </p>
+    </div>
+  }
+
+  <!-- ── PASO 1b: Intent Chat ── -->
+  @if (step() === 'intent-chat') {
+    <div class="wizard__body gali-stagger-in">
+      <div class="wizard__eyebrow">
+        <span aria-hidden="true">{{ getTipoEmoji(selectedTipo()) }}</span>
+        {{ getTipoLabel(selectedTipo()) }}
+      </div>
+      <h1 class="wizard__title">¿Qué tienes en mente?</h1>
+      <p class="wizard__sub">Cuéntale a Gali qué quieres lograr. Usará esto para personalizar todo el proyecto.</p>
+
+      <!-- Chips rápidos -->
+      <div class="intent-chips">
+        @for (op of intentOpciones(); track op) {
+          <button class="intent-chip"
+                  [class.intent-chip--selected]="intentTexto() === op"
+                  type="button"
+                  (click)="seleccionarIntent(op)">
+            {{ op }}
+          </button>
+        }
+      </div>
+
+      <!-- Campo de texto libre -->
+      <div class="intent-field">
+        <textarea class="intent-field__input"
+                  placeholder="O escribe tu propio objetivo..."
+                  rows="2"
+                  [ngModel]="intentTexto()"
+                  (ngModelChange)="intentTexto.set($event)"></textarea>
+        @if (intentTexto().trim() && !galiIntentRespuesta() && !intentAnalyzing()) {
+          <button class="intent-field__send" type="button" (click)="enviarIntent()">
+            Enviar ↵
+          </button>
+        }
+      </div>
+
+      <!-- Respuesta de Gali -->
+      @if (intentAnalyzing()) {
+        <div class="intent-gali-thinking" aria-live="polite">
+          <span class="intent-gali-thinking__dot"></span>
+          <span class="intent-gali-thinking__dot"></span>
+          <span class="intent-gali-thinking__dot"></span>
+          <span class="intent-gali-thinking__text">Gali está procesando...</span>
+        </div>
+      }
+      @if (galiIntentRespuesta()) {
+        <div class="intent-gali-resp gali-fade-up" aria-live="polite">
+          <span class="intent-gali-resp__icon" aria-hidden="true">✦</span>
+          <div class="intent-gali-resp__body">
+            <p class="intent-gali-resp__texto">{{ galiIntentRespuesta()!.texto }}</p>
+            <div class="intent-gali-resp__subobj">
+              <span class="intent-gali-resp__subobj-label">Sub-objetivo:</span>
+              <strong>{{ galiIntentRespuesta()!.subObjetivo }}</strong>
+            </div>
+          </div>
+        </div>
+      }
+
+      <button class="wizard__next"
+              [disabled]="!intentTexto().trim() || intentAnalyzing()"
+              (click)="confirmarIntent()">
+        Confirmar y continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 2: Nombre ── -->
+  @if (step() === 'nombre') {
+    <div class="wizard__body gali-stagger-in">
+      <div class="wizard__eyebrow">
+        <span aria-hidden="true">{{ getTipoEmoji(selectedTipo()) }}</span>
+        {{ getTipoLabel(selectedTipo()) }}
+      </div>
+      <h1 class="wizard__title">¿Cómo quieres llamar este proyecto?</h1>
+
+      <div class="nombre-field">
+        <input class="nombre-input" type="text"
+               placeholder="Nombre del proyecto..."
+               [ngModel]="nombreProyecto()"
+               (ngModelChange)="nombreProyecto.set($event)"
+               autofocus>
+        @if (nombreProyecto() !== nombreSugerido() && nombreSugerido()) {
+          <button class="nombre-reset" type="button" (click)="nombreProyecto.set(nombreSugerido())">
+            Usar sugerencia
+          </button>
+        }
+      </div>
+
+      <p class="wizard__gali-hint">
+        <span aria-hidden="true">✦</span>
+        Puedes cambiar el nombre en cualquier momento desde el detalle del proyecto.
+      </p>
+
+      <button class="wizard__next" [disabled]="!nombreProyecto().trim()" (click)="goTo('agentes')">
+        Continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 3: Agentes ── -->
+  @if (step() === 'agentes') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">¿Qué agentes monitorearán este proyecto?</h1>
+      <p class="wizard__sub">Gali los pre-seleccionó según el tipo de proyecto. Puedes cambiarlos.</p>
+
+      <div class="agentes-list">
+        @for (ag of AGENTES_INFO; track ag.id) {
+          <label class="agente-opt" [class.is-on]="agentes()[ag.id]"
+                 [class.is-locked]="isAgenteLocked(ag.id)">
+            <input type="checkbox"
+                   [checked]="agentes()[ag.id]"
+                   (change)="toggleAgente(ag.id)"
+                   [disabled]="isAgenteLocked(ag.id)"
+                   class="sr-only">
+            <span class="agente-opt__dot" [class.is-on]="agentes()[ag.id]"></span>
+            <div class="agente-opt__info">
+              <span class="agente-opt__nombre">
+                <i [class]="'pi ' + ag.icon"></i> {{ ag.nombre }}
+                @if (isAgenteLocked(ag.id)) {
+                  <span class="agente-opt__lock">🔒 Obligatorio</span>
+                }
+                @if (isAgenteRecomendado(ag.id) && !isAgenteLocked(ag.id)) {
+                  <span class="agente-opt__rec">✦ Recomendado</span>
+                }
+              </span>
+              <span class="agente-opt__desc">{{ ag.desc }}</span>
+            </div>
+            <span class="agente-opt__toggle">{{ agentes()[ag.id] ? 'ON' : 'OFF' }}</span>
+          </label>
+        }
+      </div>
+
+      <button class="agente-crear-link" type="button" (click)="irCrearAgente()">
+        + Crear agente personalizado →
+      </button>
+
+      <button class="wizard__next" (click)="goTo('agregar-campana')">
+        Continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── PASO 4: ¿Agregar campaña? ── -->
+  @if (step() === 'agregar-campana') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">¿Quieres añadir una campaña ahora?</h1>
+      <p class="wizard__sub">Un proyecto puede tener 0, 1 o N campañas de cualquier tipo.</p>
+
+      @if (isLaunching()) {
+        <div class="launch-mini" aria-live="polite">
+          <span class="launch-mini__icon" aria-hidden="true">✦</span>
+          <p class="launch-mini__text">Creando proyecto...</p>
+          <div class="launch-mini__bar">
+            <div class="launch-mini__fill" [style.width.%]="launchProgress()"></div>
+          </div>
+        </div>
+      } @else {
+        <div class="agregar-cards">
+          <button class="agregar-card agregar-card--si" type="button" (click)="elegirAgregarCampana(true)">
+            <i class="pi pi-megaphone agregar-card__icon"></i>
+            <div class="agregar-card__body">
+              <strong class="agregar-card__titulo">{{ campanaCtaCopy().si }}</strong>
+              <p class="agregar-card__desc">
+                Configura tipo de campaña, canal, productos y precio. El proyecto y la campaña se crean juntos.
+              </p>
+            </div>
+            <span class="agregar-card__arrow" aria-hidden="true">→</span>
+          </button>
+
+          <button class="agregar-card agregar-card--no" type="button" (click)="elegirAgregarCampana(false)">
+            <i class="pi pi-clock agregar-card__icon"></i>
+            <div class="agregar-card__body">
+              <strong class="agregar-card__titulo">{{ campanaCtaCopy().no }}</strong>
+              <p class="agregar-card__desc">
+                El proyecto queda en borrador. Puedes agregar campañas desde el detalle en cualquier momento.
+              </p>
+            </div>
+            <span class="agregar-card__arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <p class="wizard__gali-hint">
+          <span aria-hidden="true">✦</span>
+          Un proyecto puede existir sin campañas: CRM por Chatea, seguimiento de portafolio, o experimentos que no siempre necesitan pauta.
+        </p>
+      }
+    </div>
+  }
+
+  <!-- ── CAMPAÑA: Tipo de campaña ── -->
+  @if (step() === 'campana-tipo') {
+    <div class="wizard__body gali-stagger-in">
+      <div class="wizard__eyebrow">
+        <span aria-hidden="true">{{ getTipoEmoji(selectedTipo()) }}</span>
+        {{ getTipoLabel(selectedTipo()) }} › Nueva campaña
+      </div>
+      <h1 class="wizard__title">¿Qué tipo de campaña vas a crear?</h1>
+      <p class="wizard__sub">Gali pre-seleccionó el tipo más común para este proyecto. Puedes cambiarlo.</p>
+
+      <div class="camp-tipo-grid">
+        @for (ct of CAMP_TIPO_OPTIONS; track ct.id) {
+          <button class="camp-tipo-card"
+                  [class.is-selected]="tipoCampanaSeleccionado() === ct.id"
+                  type="button"
+                  (click)="selectTipoCampana(ct.id)">
+            <span class="camp-tipo-card__emoji" aria-hidden="true">{{ ct.emoji }}</span>
+            <div class="camp-tipo-card__body">
+              <strong class="camp-tipo-card__label">{{ ct.label }}</strong>
+              <p class="camp-tipo-card__desc">{{ ct.descripcion }}</p>
+            </div>
+            @if (tipoCampanaSeleccionado() === ct.id) {
+              <span class="camp-tipo-card__check" aria-hidden="true">✓</span>
             }
           </button>
         }
       </div>
 
-      @if (galiAnalizandoProblema()) {
-        <div class="wizard__gali-analizando">
-          <span class="wizard__gali-spin" aria-hidden="true">◌</span>
-          Gali está analizando tu situación…
-        </div>
-      }
-
-      @if (galiProblemaListo() && problemaSeleccionado()) {
-        <div class="wizard__gali-respuesta gali-fade-up">
-          <div class="wizard__gali-respuesta-hdr">
-            <span aria-hidden="true">✦</span>
-            <strong>Gali encontró oportunidades</strong>
-          </div>
-          <p class="wizard__gali-respuesta-texto">{{ problemaSeleccionado()!.galiSugerencia }}</p>
-          <button class="wizard__next" (click)="usarSugerenciaProblema()">
-            Ver productos sugeridos → Brújula
-          </button>
-        </div>
-      }
+      <p class="wizard__gali-hint">
+        <span aria-hidden="true">✦</span>
+        Chatea Pro y campañas orgánicas no requieren presupuesto de pauta. El paso de presupuesto se omitirá.
+      </p>
     </div>
   }
 
-  <!-- ── PASO 1: Producto ── -->
-  @if (step() === 'producto') {
+  <!-- ── CAMPAÑA: Ruta de venta (solo para ads/híbrida) ── -->
+  @if (step() === 'campana-ruta-venta') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">
-        @if (modoCampana()) { Nueva campaña — elige tu producto } @else { Elige un producto }
-      </h1>
-      <p class="wizard__sub">ADA Spy analizó {{ productos.length * 240 | number }} productos esta semana. Estas son las mejores oportunidades.</p>
+      <h1 class="wizard__title">¿Por dónde quieres vender?</h1>
+      <p class="wizard__sub">Selecciona la ruta de venta. Gali verificará las integraciones necesarias.</p>
 
-      <!-- Buscador libre (I9) -->
+      <div class="ruta-list">
+        @for (r of RUTAS_VENTA; track r.id) {
+          <button class="ruta-card"
+                  [class.is-selected]="rutaVentaSeleccionada() === r.id"
+                  type="button"
+                  (click)="selectRuta(r.id)">
+            <div class="ruta-card__body">
+              <strong class="ruta-card__label">{{ r.label }}</strong>
+              <p class="ruta-card__desc">{{ r.descripcion }}</p>
+            </div>
+            @if (rutaVentaSeleccionada() === r.id) {
+              <span class="ruta-card__check" aria-hidden="true">✓</span>
+            }
+          </button>
+        }
+      </div>
+
+      <!-- Integraciones requeridas para la ruta seleccionada -->
+      @if (rutaVentaSeleccionada() && integEstadoParaRuta().length > 0) {
+        <div class="ruta-integ gali-fade-up">
+          <span class="ruta-integ__label">Integraciones necesarias</span>
+          <div class="ruta-integ__list">
+            @for (integ of integEstadoParaRuta(); track integ.id) {
+              <div class="ruta-integ__row">
+                <span class="ruta-integ__estado" [attr.data-estado]="integ.estado">
+                  {{ integ.estado === 'conectado' ? '✓' : '○' }}
+                </span>
+                <span class="ruta-integ__nombre">{{ integ.nombre }}</span>
+                @if (integ.estado === 'pendiente') {
+                  <button class="ruta-integ__link" type="button" (click)="irConexiones()">
+                    Conectar →
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          <p class="ruta-integ__nota">
+            Puedes continuar aunque falten integraciones. La campaña quedará en borrador hasta que las conectes.
+          </p>
+        </div>
+      }
+
+      <button class="wizard__next" [disabled]="!rutaVentaSeleccionada()"
+              (click)="continuarDesdeRuta()">
+        Continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── CAMPAÑA: Productos ── -->
+  @if (step() === 'campana-productos') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">Selecciona los productos de la campaña</h1>
+      <p class="wizard__sub">ADA Spy analizó {{ 48000 | number }} productos esta semana. Puedes seleccionar uno o más.</p>
+
+      @if (selectedProductosList().length > 0) {
+        <div class="prod-chips" aria-label="Productos seleccionados">
+          @for (p of selectedProductosList(); track p.id) {
+            <span class="prod-chip">
+              {{ p.nombre }}
+              <button class="prod-chip__remove" type="button"
+                      (click)="removeProducto(p.id)"
+                      [attr.aria-label]="'Quitar ' + p.nombre">×</button>
+            </span>
+          }
+        </div>
+      }
+
+      <!-- Tabs de categoría -->
+      <div class="prod-cats" role="group" aria-label="Filtrar por categoría">
+        @for (cat of CATEGORIAS; track cat) {
+          <button class="prod-cat-tab"
+                  [class.prod-cat-tab--active]="categoriaFiltro() === cat"
+                  type="button"
+                  (click)="categoriaFiltro.set(cat)">
+            {{ cat }}
+          </button>
+        }
+      </div>
+
+      <!-- Search -->
       <div class="prod-search">
         <input type="search" class="prod-search__input"
-               placeholder="Buscar producto o categoría..."
+               placeholder="Buscar producto..."
                [ngModel]="productoSearch()"
                (ngModelChange)="productoSearch.set($event)">
       </div>
 
-      <div class="productos-list">
-        @for (p of productosFiltrados(); track p.id) {
-          <div class="producto-card"
-               [class.is-selected]="selectedProducto()?.id === p.id"
-               (click)="selectProducto(p)">
-            <div class="producto-card__top">
-              <div>
-                <strong class="producto-card__nombre">{{ p.nombre }}</strong>
-                <span class="producto-card__cat">{{ p.categoria }}</span>
-              </div>
-              <span class="producto-card__score" [class]="getScoreClass(p.adaScore)">
-                ADA {{ p.adaScore }}/100
-              </span>
-            </div>
-            <div class="producto-card__metas">
-              <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
-              <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
-              <span class="producto-card__meta">{{ p.tendencia }}</span>
-              <span class="producto-card__meta producto-card__meta--contrib">
-                ~{{ p.pedidosEstSem }} ped/sem
-              </span>
+      @if (productoAnalyzing()) {
+        <!-- Skeleton de análisis de Gali -->
+        <div class="gali-analyzing" aria-live="polite">
+          <span class="gali-analyzing__icon" aria-hidden="true">✦</span>
+          <p class="gali-analyzing__text">Gali analizando productos para tu proyecto...</p>
+          <div class="gali-analyzing__bars">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      } @else {
+        <!-- Sección recomendados de Gali -->
+        @if (categoriaFiltro() === 'Todos' && !productoSearch()) {
+          <div class="prod-rec-section">
+            <span class="prod-rec-section__label"><span aria-hidden="true">✦</span> Gali recomienda para este proyecto</span>
+            <div class="productos-list productos-list--rec">
+              @for (p of productosRecomendados(); track p.id) {
+                <button class="producto-card producto-card--rec"
+                        [class.is-selected]="selectedProductos().has(p.id)"
+                        type="button"
+                        (click)="toggleProducto(p)">
+                  <div class="producto-card__top">
+                    <div>
+                      <strong class="producto-card__nombre">{{ p.nombre }}</strong>
+                      <span class="producto-card__cat">{{ p.categoria }}</span>
+                    </div>
+                    <span class="producto-card__score" [class]="getScoreClass(p.adaScore)">
+                      ADA {{ p.adaScore }}/100
+                    </span>
+                  </div>
+                  <div class="producto-card__metas">
+                    <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
+                    <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
+                    <span class="producto-card__meta">{{ p.tendencia }}</span>
+                    <span class="producto-card__meta">~{{ p.pedidosEstSem }} ped/sem</span>
+                  </div>
+                  @if (selectedProductos().has(p.id)) {
+                    <span class="producto-card__check-badge" aria-hidden="true">✓</span>
+                  }
+                </button>
+              }
             </div>
           </div>
         }
-        @if (productosFiltrados().length === 0) {
-          <p class="prod-search__empty">Sin resultados para "{{ productoSearch() }}"</p>
-        }
-      </div>
 
-      <!-- Alerta ADA cuando score bajo (I9) -->
-      @if (adaRiskAlert()) {
-        <div class="ada-risk-alert">
-          <span class="ada-risk-alert__icon">⚠</span>
-          <p class="ada-risk-alert__text">{{ adaRiskAlert() }}</p>
+        <!-- Lista completa filtrada -->
+        <div class="productos-list">
+          @for (p of productosFiltrados(); track p.id) {
+            @if (!isProductoRecomendado(p.id) || categoriaFiltro() !== 'Todos' || !!productoSearch()) {
+              <button class="producto-card"
+                      [class.is-selected]="selectedProductos().has(p.id)"
+                      type="button"
+                      (click)="toggleProducto(p)">
+                <div class="producto-card__top">
+                  <div>
+                    <strong class="producto-card__nombre">{{ p.nombre }}</strong>
+                    <span class="producto-card__cat">{{ p.categoria }}</span>
+                  </div>
+                  <span class="producto-card__score" [class]="getScoreClass(p.adaScore)">
+                    ADA {{ p.adaScore }}/100
+                  </span>
+                </div>
+                <div class="producto-card__metas">
+                  <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
+                  <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
+                  <span class="producto-card__meta">{{ p.tendencia }}</span>
+                  <span class="producto-card__meta">~{{ p.pedidosEstSem }} ped/sem</span>
+                </div>
+                @if (selectedProductos().has(p.id)) {
+                  <span class="producto-card__check-badge" aria-hidden="true">✓</span>
+                }
+              </button>
+            }
+          }
+          @if (productosFiltrados().length === 0) {
+            <p class="prod-search__empty">Sin resultados para "{{ productoSearch() }}"</p>
+          }
         </div>
       }
 
-      <button class="wizard__next" [disabled]="!selectedProducto()" (click)="goTo('brujula')">
-        Continuar → Calculadora Brújula
+      @if (tipoCampanaSeleccionado() === 'chatea') {
+        <p class="wizard__gali-hint">
+          <span aria-hidden="true">✦</span>
+          Las campañas de Chatea Pro no necesitan productos asignados. Puedes continuar sin seleccionar.
+        </p>
+      }
+
+      <button class="wizard__next"
+              [disabled]="selectedProductos().size === 0 && tipoCampanaSeleccionado() !== 'chatea'"
+              (click)="rutaConAds() ? goTo('campana-presupuesto') : goTo('campana-brujula')">
+        @if (rutaConAds()) { Continuar → Presupuesto }
+        @else { Continuar → Brújula de precio }
       </button>
-    </div>
-  }
 
-  <!-- ── PASO 2: Brújula ampliada ── -->
-  @if (step() === 'brujula') {
-    <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title"><i class="pi pi-compass"></i> Brújula de precio</h1>
-      <p class="wizard__sub">Ingresa el costo del producto. Flete y comisión están calculados automáticamente por Gali.</p>
-
-      <!-- Solo costo editable; flete y comisión son read-only (I9) -->
-      <div class="brujula-inputs">
-        <div class="brujula-field">
-          <label class="brujula-field__label">Costo del producto</label>
-          <div class="brujula-field__row">
-            <span class="brujula-field__prefix">$</span>
-            <input class="brujula-field__input" type="number" min="1000" step="500"
-                   [value]="costoProd()"
-                   (input)="costoProd.set(+$any($event.target).value)">
-          </div>
-        </div>
-        <div class="brujula-field brujula-field--readonly">
-          <label class="brujula-field__label">Flete promedio <span class="brujula-field__readonly-tag">auto</span></label>
-          <div class="brujula-field__row">
-            <span class="brujula-field__prefix">$</span>
-            <span class="brujula-field__static">{{ FLETE_FIJO | number }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Outputs de la Brújula ampliada (I9) -->
-      <div class="brujula-outputs">
-        <div class="brujula-metric">
-          <span class="brujula-metric__label">Costo total (producto + flete)</span>
-          <span class="brujula-metric__val brujula-metric__val--neutral">${{ costoTotal() | number }}</span>
-        </div>
-        <div class="brujula-metric">
-          <span class="brujula-metric__label">Precio mínimo <span class="brujula-metric__hint">(break-even)</span></span>
-          <span class="brujula-metric__val brujula-metric__val--warn">${{ precioMinimo() | number }}</span>
-        </div>
-        <div class="brujula-metric brujula-metric--recomendado">
-          <span class="brujula-metric__label">
-            ✦ Precio recomendado
-            <span class="brujula-metric__tag">{{ margenObjetivo }}% margen objetivo</span>
-          </span>
-          <span class="brujula-metric__val brujula-metric__val--primary">${{ precioRecomendado() | number }}</span>
-        </div>
-        <div class="brujula-metric">
-          <span class="brujula-metric__label">Comisión Dropi ({{ COMISION_PCT }}%)</span>
-          <span class="brujula-metric__val brujula-metric__val--neutral">−${{ comisionDropi() | number }}</span>
-        </div>
-        <div class="brujula-metric brujula-metric--ganancia">
-          <span class="brujula-metric__label">Ganancia real por pedido</span>
-          <span class="brujula-metric__val brujula-metric__val--green">${{ gananciaReal() | number }}</span>
-        </div>
-      </div>
-
-      <!-- Ajuste de precio con slider -->
-      <div class="brujula-slider-section">
-        <div class="brujula-slider-header">
-          <label class="brujula-slider-header__label">Precio de venta</label>
-          <span class="brujula-price-final">${{ precioFinal() | number }}</span>
-        </div>
-        <input class="brujula-slider" type="range"
-               [min]="precioMinimo()"
-               [max]="precioRecomendado() * 1.5"
-               [step]="500"
-               [value]="precioFinal()"
-               (input)="precioSlider.set(+$any($event.target).value)">
-        <div class="brujula-slider-labels">
-          <span>Mínimo ${{ (precioMinimo() / 1000).toFixed(0) }}k</span>
-          <span>Recomendado ${{ (precioRecomendado() / 1000).toFixed(0) }}k</span>
-        </div>
-        <button class="brujula-btn-rec" (click)="usarPrecioRecomendado()">
-          Usar precio recomendado →
+      @if (tipoCampanaSeleccionado() === 'chatea' && selectedProductos().size === 0) {
+        <button class="wizard__next wizard__next--secondary" type="button"
+                (click)="goTo('campana-brujula')">
+          Continuar sin productos →
         </button>
-      </div>
-
-      <!-- Margen proyectado con semáforo -->
-      <div class="brujula-margen" [attr.data-semaforo]="margenSemaforo()">
-        <span class="brujula-margen__label">Margen proyectado</span>
-        <span class="brujula-margen__val">{{ margenFinal() }}%</span>
-        <span class="brujula-margen__desc">
-          @if (margenSemaforo() === 'verde') { Excelente — por encima del objetivo }
-          @else if (margenSemaforo() === 'ambar') { Aceptable — ajusta el precio si puedes }
-          @else { Bajo — considera subir el precio o negociar el costo }
-        </span>
-      </div>
-
-      <!-- Expectativa pedidos (I9) — output desde brújula → presupuesto -->
-      <div class="brujula-expectativa">
-        <span class="brujula-expectativa__label">✦ Expectativa de pedidos</span>
-        <span class="brujula-expectativa__val">~{{ expectativaPedidosSem() }} pedidos/sem</span>
-        <span class="brujula-expectativa__sub">Con el presupuesto actual y ROAS histórico de {{ 1.93 }}x</span>
-      </div>
-
-      <button class="wizard__next" (click)="goTo('campana')">
-        Continuar → Elige tu campaña
-      </button>
+      }
     </div>
   }
 
-  <!-- ── PASO 2.5: Campaña ── -->
-  @if (step() === 'campana') {
-    <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">¿Cómo vas a promocionar este producto?</h1>
-      <p class="wizard__sub">Selecciona una o más campañas. Puedes cambiarlas después.</p>
-
-      <!-- Sugerencias Gali -->
-      <div class="campana-sugerencias">
-        @for (sug of sugerenciasCampana; track sug.id) {
-          <div class="campana-sug-card"
-               [class.campana-sug-card--selected]="isCampanaSelected(sug.id)"
-               (click)="toggleCampanaSugerencia(sug.id)">
-            <div class="campana-sug-card__header">
-              <div class="campana-sug-card__check">
-                @if (isCampanaSelected(sug.id)) { ✓ }
-              </div>
-              <span class="campana-sug-card__canal">{{ sug.canalLabel }}</span>
-              <span class="campana-sug-card__presupuesto">{{ sug.presupuestoDiarioEstimadoLabel }}</span>
-            </div>
-            <h3 class="campana-sug-card__nombre">{{ sug.nombre }}</h3>
-            <p class="campana-sug-card__desc">{{ sug.descripcion }}</p>
-            <div class="campana-sug-card__gali">
-              <span class="gali-spark">✦</span>
-              <span>{{ sug.razonGali }}</span>
-            </div>
-          </div>
-        }
-
-        <!-- Campaña personalizada -->
-        <div class="campana-sug-card campana-sug-card--custom"
-             [class.campana-sug-card--selected]="showCampanaCustom()"
-             (click)="showCampanaCustom.set(!showCampanaCustom())">
-          <div class="campana-sug-card__header">
-            <div class="campana-sug-card__check">@if (showCampanaCustom()) { ✓ }</div>
-            <span class="campana-sug-card__canal">Personalizada</span>
-          </div>
-          <h3 class="campana-sug-card__nombre">Crear campaña personalizada</h3>
-          <p class="campana-sug-card__desc">Configura el canal, presupuesto y agentes a tu medida</p>
-          @if (showCampanaCustom()) {
-            <input class="campana-custom-input" type="text" placeholder="Nombre de la campaña..."
-                   [value]="campanaCustomNombre()"
-                   (input)="campanaCustomNombre.set($any($event.target).value)"
-                   (click)="$event.stopPropagation()">
-          }
-        </div>
-      </div>
-
-      <div class="wizard__nav-row">
-        <button class="wizard__back" (click)="goBack()">← Brújula</button>
-        <button class="wizard__next"
-                [disabled]="selectedCampanas().size === 0 && !showCampanaCustom()"
-                (click)="goTo('presupuesto')">
-          Continuar → Presupuesto
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ── PASO 3: Presupuesto ── -->
-  @if (step() === 'presupuesto') {
+  <!-- ── CAMPAÑA: Presupuesto (ANTES de brújula) ── -->
+  @if (step() === 'campana-presupuesto') {
     <div class="wizard__body gali-stagger-in">
       <h1 class="wizard__title">Presupuesto de pauta</h1>
-      <p class="wizard__sub">Define cuánto invertirás por día. Gali calcula la sugerencia basándose en tu objetivo y tu ROAS histórico.</p>
+      <p class="wizard__sub">Define cuánto invertirás por día. <strong>Este dato afecta el precio de venta</strong> — defínelo antes de calcular el precio.</p>
 
-      <!-- Badge Gali sugiere -->
       <div class="gali-budget-badge">
         <div class="gali-budget-badge__top">
           <span class="gali-budget-badge__spark">✦</span>
@@ -318,133 +475,410 @@
           <span class="gali-budget-badge__val">${{ galiSugerenciaPresupuesto().valor | number }}/día</span>
         </div>
         <p class="gali-budget-badge__ctx">{{ galiSugerenciaPresupuesto().contexto }}</p>
-        <button class="gali-budget-badge__cta" (click)="usarSugerenciaGali()">
+        <button class="gali-budget-badge__cta" type="button" (click)="usarSugerenciaGali()">
           Usar este →
         </button>
       </div>
 
       <div class="config-section">
-        <label class="config__label">Tu presupuesto diario</label>
         <div class="config__budget-row">
+          <span class="config__label">Tu presupuesto diario</span>
           <span class="config__budget-val">${{ presupuestoDiario() | number }}/día</span>
-          <!-- Estimación dinámica desde brújula (I9) -->
-          <span class="config__budget-est">{{ presupuestoPedidosEst() }}</span>
         </div>
-        <input class="config__slider" type="range" min="10000" max="100000" step="5000"
+        <input class="config__slider" type="range" min="10000" max="200000" step="5000"
                [value]="presupuestoDiario()"
                (input)="presupuestoDiario.set(+$any($event.target).value)">
         <div class="config__slider-labels">
           <span>$10k/día</span>
-          <span>$55k/día</span>
           <span>$100k/día</span>
+          <span>$200k/día</span>
         </div>
       </div>
 
-      <button class="wizard__next" (click)="goTo('lanzar')">
-        Continuar → Revisar y lanzar
+      <div class="presupuesto-insight">
+        <span class="presupuesto-insight__label">✦ Expectativa estimada</span>
+        <span class="presupuesto-insight__val">~{{ expectativaPedidosSem() > 0 ? expectativaPedidosSem() : '—' }} pedidos/sem</span>
+        <span class="presupuesto-insight__sub">Con ROAS histórico {{ 1.93 }}x y precio de referencia</span>
+      </div>
+
+      <div class="presupuesto-aviso">
+        <span aria-hidden="true">ⓘ</span>
+        Recuerda: el precio de venta debe cubrir la pauta por pedido. Lo calcularemos en el siguiente paso.
+      </div>
+
+      <button class="wizard__next" (click)="goTo('campana-brujula')">
+        Continuar → Brújula de precio
       </button>
     </div>
   }
 
-  <!-- ── PASO 4: Lanzar ── -->
-  @if (step() === 'lanzar') {
+  <!-- ── CAMPAÑA: Brújula de precio ── -->
+  @if (step() === 'campana-brujula') {
     <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title"><i class="pi pi-compass"></i> Brújula de precio</h1>
 
-      @if (!launched()) {
-        <h1 class="wizard__title">
-          @if (modoCampana()) { Lista para lanzar la campaña } @else { Listo para lanzar }
-        </h1>
+      @if (selectedProductosList().length <= 1) {
+        <!-- Vista de un solo producto -->
+        <p class="wizard__sub">Calculando precio a partir del costo real del producto + pauta.</p>
 
-        <div class="resumen">
-          <div class="resumen__item">
-            <span class="resumen__label">Objetivo vinculado</span>
-            <span class="resumen__val">{{ objetivo.texto }}</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Producto</span>
-            <span class="resumen__val">{{ selectedProducto()?.nombre ?? '—' }}</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Precio de venta</span>
-            <span class="resumen__val">${{ precioFinal() | number }} · margen {{ margenFinal() }}%</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Ganancia por pedido</span>
-            <span class="resumen__val">${{ gananciaReal() | number }}</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Presupuesto inicial</span>
-            <span class="resumen__val">${{ presupuestoDiario() | number }}/día</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Pedidos esperados</span>
-            <span class="resumen__val">~{{ expectativaPedidosSem() }} pedidos/sem</span>
-          </div>
-          <div class="resumen__item">
-            <span class="resumen__label">Agentes activados</span>
-            <span class="resumen__val">{{ agentesActivos.join(', ') }}</span>
-          </div>
-        </div>
-
-        <div class="gali-msg gali-msg--launch">
-          <span class="gali-msg__icon">✦</span>
-          <div class="gali-msg__text">
-            Con este proyecto y ${{ presupuestoDiario() | number }}/día, esperas ~{{ expectativaPedidosSem() }} pedidos/sem.
-            Roax y Vigilante lo monitorearán en tiempo real. Si el ROAS baja del objetivo, Gali te avisará antes de que impacte tu meta.
-          </div>
-        </div>
-
-        <button class="wizard__launch" [disabled]="isLaunching()" (click)="launch()">
-          @if (isLaunching()) { Lanzando… }
-          @else if (modoCampana()) { <i class="pi pi-send"></i> Lanzar campaña }
-          @else { <i class="pi pi-send"></i> Lanzar proyecto }
-        </button>
-
-        @if (isLaunching()) {
-          <div class="launch-overlay">
-            <div class="launch-overlay__content">
-              <i class="pi pi-send launch-overlay__rocket"></i>
-              <div class="launch-overlay__bar-wrap">
-                <div class="launch-overlay__bar" [style.width.%]="launchProgress()"></div>
-              </div>
-              <div class="launch-overlay__pct">{{ launchProgress() }}%</div>
-              <ul class="launch-overlay__steps">
-                @for (ls of LAUNCH_STEPS; track ls.label; let i = $index) {
-                  <li class="launch-overlay__step"
-                      [class.done]="launchProgress() >= ls.pct"
-                      [class.active]="launchStepActive() === i + 1">
-                    <span class="launch-overlay__step-icon">
-                      @if (launchProgress() >= ls.pct) { ✓ } @else if (launchStepActive() === i + 1) { ◉ } @else { ○ }
-                    </span>
-                    {{ ls.label }}
-                  </li>
-                }
-              </ul>
+        <div class="brujula-inputs">
+          <div class="brujula-field brujula-field--readonly">
+            <label class="brujula-field__label">
+              Costo del producto
+              <span class="brujula-field__readonly-tag">fijado por proveedor</span>
+            </label>
+            <div class="brujula-field__row">
+              <span class="brujula-field__prefix">$</span>
+              <span class="brujula-field__static">{{ costoProd() | number }}</span>
             </div>
           </div>
-        }
+          <div class="brujula-field brujula-field--readonly">
+            <label class="brujula-field__label">Flete promedio <span class="brujula-field__readonly-tag">auto</span></label>
+            <div class="brujula-field__row">
+              <span class="brujula-field__prefix">$</span>
+              <span class="brujula-field__static">{{ FLETE_FIJO | number }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="brujula-outputs">
+          <div class="brujula-metric">
+            <span class="brujula-metric__label">Costo total (producto + flete)</span>
+            <span class="brujula-metric__val brujula-metric__val--neutral">${{ costoTotal() | number }}</span>
+          </div>
+          <div class="brujula-metric">
+            <span class="brujula-metric__label">Comisión Dropi ({{ COMISION_PCT }}%)</span>
+            <span class="brujula-metric__val brujula-metric__val--neutral">−${{ comisionDropi() | number }}</span>
+          </div>
+          @if (rutaConAds()) {
+            <div class="brujula-metric brujula-metric--pauta">
+              <span class="brujula-metric__label">
+                Pauta efectiva/pedido
+                <span class="brujula-metric__hint">(con ${{ presupuestoDiario() | number }}/día)</span>
+              </span>
+              <span class="brujula-metric__val brujula-metric__val--warn">
+                ~${{ pautaEfectivaPorPedido() | number }}
+              </span>
+            </div>
+          }
+          <div class="brujula-metric">
+            <span class="brujula-metric__label">Precio mínimo <span class="brujula-metric__hint">(break-even)</span></span>
+            <span class="brujula-metric__val brujula-metric__val--warn">${{ precioMinimo() | number }}</span>
+          </div>
+          <div class="brujula-metric brujula-metric--recomendado">
+            <span class="brujula-metric__label">
+              ✦ Precio recomendado
+              <span class="brujula-metric__tag">{{ margenObjetivo }}% margen objetivo</span>
+            </span>
+            <span class="brujula-metric__val brujula-metric__val--primary">${{ precioRecomendado() | number }}</span>
+          </div>
+          <div class="brujula-metric brujula-metric--ganancia">
+            <span class="brujula-metric__label">Ganancia real por pedido</span>
+            <span class="brujula-metric__val brujula-metric__val--green">${{ gananciaReal() | number }}</span>
+          </div>
+        </div>
+
+        <div class="brujula-slider-section">
+          <div class="brujula-slider-header">
+            <label class="brujula-slider-header__label">Precio de venta</label>
+            <span class="brujula-price-final">${{ precioFinal() | number }}</span>
+          </div>
+          <input class="brujula-slider" type="range"
+                 [min]="precioMinimo()"
+                 [max]="precioRecomendado() * 1.5"
+                 [step]="500"
+                 [value]="precioFinal()"
+                 (input)="precioSlider.set(+$any($event.target).value)">
+          <div class="brujula-slider-labels">
+            <span>Mínimo ${{ (precioMinimo() / 1000).toFixed(0) }}k</span>
+            <span>Recomendado ${{ (precioRecomendado() / 1000).toFixed(0) }}k</span>
+          </div>
+          <button class="brujula-btn-rec" type="button" (click)="usarPrecioRecomendado()">
+            Usar precio recomendado →
+          </button>
+        </div>
+
+        <div class="brujula-margen" [attr.data-semaforo]="margenSemaforo()">
+          <span class="brujula-margen__label">Margen proyectado</span>
+          <span class="brujula-margen__val">{{ margenFinal() }}%</span>
+          <span class="brujula-margen__desc">
+            @if (margenSemaforo() === 'verde') { Excelente — por encima del objetivo }
+            @else if (margenSemaforo() === 'ambar') { Aceptable — ajusta el precio si puedes }
+            @else { Bajo — considera subir el precio o negociar el costo }
+          </span>
+        </div>
 
       } @else {
-        <div class="launch-success gali-stagger-in">
-          <i class="pi pi-check-circle launch-success__icon"></i>
-          <h2 class="launch-success__title">
-            @if (modoCampana()) { ¡Campaña lanzada! } @else { ¡Proyecto lanzado! }
-          </h2>
-          <p class="launch-success__sub">
-            <strong>{{ selectedProducto()?.nombre }}</strong> está activo.
-            Roax comenzó la campaña con ${{ presupuestoDiario() | number }}/día.
-            Gali te notificará los primeros datos en 24–48h.
-          </p>
-          <div class="launch-success__contrib">
-            <span>Pedidos esperados:</span>
-            <strong>~{{ expectativaPedidosSem() }} pedidos/sem</strong>
-          </div>
-          <button class="wizard__next wizard__next--success" (click)="volverAProyectos()">
-            Ver mis proyectos →
+        <!-- Vista multi-producto: tabla de precios por producto -->
+        <p class="wizard__sub">Ajusta el precio de venta de cada producto. El costo está fijado por el proveedor.</p>
+
+        <div class="brujula-multi">
+          @for (p of selectedProductosList(); track p.id) {
+            <div class="brujula-multi-row">
+              <div class="brujula-multi-row__header">
+                <span class="brujula-multi-row__nombre">{{ p.nombre }}</span>
+                <span class="brujula-multi-row__costo">Costo proveedor: ${{ p.costoBase | number }}</span>
+              </div>
+              <div class="brujula-multi-row__inputs">
+                <div class="brujula-multi-row__field">
+                  <label class="brujula-multi-row__label">Precio de venta</label>
+                  <div class="brujula-field__row">
+                    <span class="brujula-field__prefix">$</span>
+                    <input class="brujula-field__input" type="number" min="0" step="500"
+                           [value]="getPrecioPorProducto(p.id)"
+                           (input)="setPrecioPorProducto(p.id, +$any($event.target).value)">
+                  </div>
+                </div>
+                <div class="brujula-multi-row__margen"
+                     [attr.data-color]="getMargenColorParaProducto(p.id)">
+                  {{ getMargenParaProducto(p.id) }}% margen
+                </div>
+              </div>
+            </div>
+          }
+          <button class="brujula-btn-rec" type="button" (click)="ajustarTodosAlRecomendado()">
+            ✦ Ajustar todos al precio recomendado de Gali
           </button>
         </div>
       }
 
+      <button class="wizard__next" (click)="goTo('campana-creativos')">
+        Continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── CAMPAÑA: Creativos ── -->
+  @if (step() === 'campana-creativos') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">¿Cómo vas a mostrar este producto?</h1>
+      <p class="wizard__sub">Marca lo que ya tienes listo. Lo que falte quedará pendiente en el proyecto.</p>
+
+      <!-- Landing page — solo si la ruta incluye shopify -->
+      @if (mostrarSeccionLanding()) {
+        <div class="creativo-section" [class.is-disabled]="!shopifyConectado()">
+          <div class="creativo-section__header">
+            <span class="creativo-section__title">🌐 Landing Page</span>
+            <span class="creativo-section__req">
+              @if (shopifyConectado()) { Shopify ● } @else { Shopify ○ — sin conectar }
+            </span>
+          </div>
+          @if (shopifyConectado()) {
+            <label class="creativo-check">
+              <input type="checkbox" [checked]="creativoLanding()"
+                     (change)="creativoLanding.set(!creativoLanding())">
+              Landing page configurada
+            </label>
+          } @else {
+            <p class="creativo-section__disabled-msg">
+              Conecta Shopify + DROPIFY para habilitar landing pages.
+              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
+            </p>
+          }
+        </div>
+      }
+
+      <!-- Creativos para ads — solo si el tipo incluye ads -->
+      @if (mostrarSeccionAds()) {
+        <div class="creativo-section" [class.is-disabled]="!metaOTiktokConectado()">
+          <div class="creativo-section__header">
+            <span class="creativo-section__title">📣 Creativos para Ads</span>
+            <span class="creativo-section__req">
+              @if (metaOTiktokConectado()) { Meta/TikTok ● } @else { Meta/TikTok ○ — sin conectar }
+            </span>
+          </div>
+          @if (metaOTiktokConectado()) {
+            <div class="creativo-checks">
+              <label class="creativo-check">
+                <input type="checkbox" [checked]="creativoAngulo()"
+                       (change)="creativoAngulo.set(!creativoAngulo())">
+                Ángulo de venta definido
+              </label>
+              <label class="creativo-check">
+                <input type="checkbox" [checked]="creativoAudiencias()"
+                       (change)="creativoAudiencias.set(!creativoAudiencias())">
+                Audiencias / personas configuradas
+              </label>
+              <label class="creativo-check">
+                <input type="checkbox" [checked]="creativoCopy()"
+                       (change)="creativoCopy.set(!creativoCopy())">
+                Copy / guión de video
+              </label>
+            </div>
+          } @else {
+            <p class="creativo-section__disabled-msg">
+              Conecta Meta Ads o TikTok for Business para habilitar creativos de ads.
+              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
+            </p>
+          }
+        </div>
+      }
+
+      <!-- Chatea flow — solo si el tipo incluye chatea -->
+      @if (mostrarSeccionChatea()) {
+        <div class="creativo-section" [class.is-disabled]="!chateaConectado()">
+          <div class="creativo-section__header">
+            <span class="creativo-section__title">💬 Flujo WhatsApp / Chatea</span>
+            <span class="creativo-section__req">
+              @if (chateaConectado()) { Chatea Pro ● } @else { Chatea Pro ○ — sin conectar }
+            </span>
+          </div>
+          @if (chateaConectado()) {
+            <label class="creativo-check">
+              <input type="checkbox" [checked]="creativoChatea()"
+                     (change)="creativoChatea.set(!creativoChatea())">
+              Flujo de bienvenida configurado
+            </label>
+          } @else {
+            <p class="creativo-section__disabled-msg">
+              Conecta Chatea Pro para habilitar ventas por WhatsApp.
+              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
+            </p>
+          }
+        </div>
+      }
+
+      <label class="creativo-check creativo-check--borrador">
+        <input type="checkbox" [checked]="creativoPorDefinir()"
+               (change)="creativoPorDefinir.set(!creativoPorDefinir())">
+        Definir creativos después — crear campaña como borrador
+      </label>
+
+      <p class="wizard__gali-hint">
+        <span aria-hidden="true">✦</span>
+        Puedes completar los creativos pendientes desde el detalle del proyecto antes de lanzar.
+      </p>
+
+      <button class="wizard__next" (click)="goTo('campana-resumen')">
+        Continuar →
+      </button>
+    </div>
+  }
+
+  <!-- ── CAMPAÑA: Resumen ── -->
+  @if (step() === 'campana-resumen') {
+    <div class="wizard__body gali-stagger-in">
+
+      @if (!isLaunching()) {
+        <h1 class="wizard__title">✓ Todo listo para crear tu campaña</h1>
+
+        <div class="resumen">
+          <div class="resumen__item">
+            <span class="resumen__label">Proyecto</span>
+            <span class="resumen__val">{{ nombreProyecto() }}</span>
+          </div>
+          <div class="resumen__item">
+            <span class="resumen__label">Tipo</span>
+            <span class="resumen__val">{{ getTipoEmoji(selectedTipo()) }} {{ getTipoLabel(selectedTipo()) }}</span>
+          </div>
+          @if (galiIntentRespuesta()) {
+            <div class="resumen__item">
+              <span class="resumen__label">Sub-objetivo</span>
+              <span class="resumen__val">{{ galiIntentRespuesta()!.subObjetivo }}</span>
+            </div>
+          }
+          <div class="resumen__item">
+            <span class="resumen__label">Tipo de campaña</span>
+            <span class="resumen__val">
+              @if (tipoCampanaSeleccionado() === 'ads') { 📣 Pauta en Meta / TikTok }
+              @else if (tipoCampanaSeleccionado() === 'chatea') { 💬 Secuencia Chatea Pro }
+              @else if (tipoCampanaSeleccionado() === 'hibrida') { ⚡ Ads + Chatea Pro }
+              @else if (tipoCampanaSeleccionado() === 'organica') { 🌱 Sin canal de pago }
+            </span>
+          </div>
+          @if (selectedProductosList().length > 0) {
+            <div class="resumen__item">
+              <span class="resumen__label">Productos</span>
+              <span class="resumen__val">{{ productosNombres() }}</span>
+            </div>
+          }
+          @if (rutaConAds()) {
+            <div class="resumen__item">
+              <span class="resumen__label">Presupuesto</span>
+              <span class="resumen__val">${{ presupuestoDiario() | number }}/día</span>
+            </div>
+          }
+          @if (selectedProductos().size > 0) {
+            <div class="resumen__item">
+              <span class="resumen__label">Precio de venta</span>
+              <span class="resumen__val">${{ precioFinal() | number }} · margen {{ margenFinal() }}%</span>
+            </div>
+            <div class="resumen__item">
+              <span class="resumen__label">Ganancia/pedido</span>
+              <span class="resumen__val">${{ gananciaReal() | number }}</span>
+            </div>
+          }
+          @if (rutaConAds()) {
+            <div class="resumen__item">
+              <span class="resumen__label">Expectativa</span>
+              <span class="resumen__val">~{{ expectativaPedidosSem() }} pedidos/sem</span>
+            </div>
+          }
+          <div class="resumen__item">
+            <span class="resumen__label">Agentes</span>
+            <span class="resumen__val">{{ agentesActivosNombres.join(' · ') }}</span>
+          </div>
+        </div>
+
+        <div class="gali-msg gali-msg--launch">
+          <span class="gali-msg__icon" aria-hidden="true">✦</span>
+          <p class="gali-msg__text">
+            @if (tipoCampanaSeleccionado() === 'chatea') {
+              Este proyecto usará Chatea Pro para convertir sin pauta. Gali monitoreará la tasa de respuesta y te avisará cuándo enviar el siguiente mensaje.
+            } @else if (tipoCampanaSeleccionado() === 'ads' || tipoCampanaSeleccionado() === 'hibrida') {
+              Con este proyecto y ${{ presupuestoDiario() | number }}/día, esperas ~{{ expectativaPedidosSem() }} pedidos/sem. Roax y Vigilante lo monitorearán en tiempo real.
+            } @else {
+              Este proyecto seguirá el rendimiento orgánico. Gali te alertará si detecta una oportunidad de escalar.
+            }
+          </p>
+        </div>
+
+        <button class="wizard__launch" type="button" (click)="launch()">
+          <i class="pi pi-send"></i> Crear proyecto y campaña →
+        </button>
+
+      } @else {
+        <!-- Overlay de lanzamiento: position fixed, cubre toda la pantalla -->
+        <div class="launch-overlay" aria-live="assertive" role="status">
+          <div class="launch-overlay__content">
+            <i class="pi pi-send launch-overlay__rocket"></i>
+            <h2 class="launch-overlay__title">Lanzando...</h2>
+            <div class="launch-overlay__bar-wrap">
+              <div class="launch-overlay__bar" [style.width.%]="launchProgress()"></div>
+            </div>
+            <p class="launch-overlay__pct">{{ launchProgress() }}%</p>
+            <ul class="launch-overlay__steps">
+              @for (ls of LAUNCH_STEPS; track ls.label; let i = $index) {
+                <li class="launch-overlay__step"
+                    [class.done]="launchProgress() >= ls.pct"
+                    [class.active]="launchProgress() < ls.pct && (i === 0 || launchProgress() >= LAUNCH_STEPS[i-1].pct)">
+                  <span class="launch-overlay__step-icon">
+                    @if (launchProgress() >= ls.pct) { ✓ } @else { ○ }
+                  </span>
+                  {{ ls.label }}
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── ÉXITO (borrador) ── -->
+  @if (step() === 'exito') {
+    <div class="wizard__body launch-success gali-stagger-in">
+      <span class="launch-success__emoji" aria-hidden="true">
+        {{ getTipoEmoji(selectedTipo()) }}
+      </span>
+      <h2 class="launch-success__title">¡Proyecto creado!</h2>
+      <p class="launch-success__sub">
+        <strong>{{ nombreProyecto() }}</strong> está en borrador.
+        Puedes agregar campañas desde el detalle cuando estés listo.
+      </p>
+      <button class="wizard__next wizard__next--success" type="button" (click)="volverAProyectos()">
+        Ver mis proyectos →
+      </button>
     </div>
   }
 

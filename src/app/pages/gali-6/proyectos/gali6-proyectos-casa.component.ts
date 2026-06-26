@@ -13,7 +13,7 @@ import {
   getObjetivo, saveObjetivo, syncLegacyKeys,
 } from '../../../../../mocks/gali-v6/objetivo';
 import { MOCK_CAMPANAS, Campana } from '../../../../../mocks/gali-v6/campanas.mock';
-import { PROYECTOS_MOCK } from '../../../../../mocks/gali-v6/proyectos.mock';
+import { PROYECTOS_MOCK, TipoProyecto } from '../../../../../mocks/gali-v6/proyectos.mock';
 
 const ESTADO_LABEL: Record<string, string> = {
   en_escala: 'En escala', activo: 'Activo', pausado: 'Pausado', lanzando: 'Lanzando',
@@ -34,6 +34,7 @@ function saludDe(p: any): number {
 interface ProyectoRow {
   id: string;
   nombre: string;
+  tipo?: TipoProyecto;
   estado: string;
   estadoLabel: string;
   saludPct: number;
@@ -50,6 +51,16 @@ interface GaliCheckin {
   titulo: string;
   cuerpo: string;
   cta: string;
+  proyectoId?: string;
+  accion?: 'nuevo' | 'ver';
+}
+
+interface AlertaUnificada {
+  tipo: 'atencion' | 'sugerencia' | 'positivo';
+  titulo: string;
+  cuerpo: string;
+  cta: string;
+  agente?: string;
   proyectoId?: string;
   accion?: 'nuevo' | 'ver';
 }
@@ -164,6 +175,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       return {
         id: pv.id,
         nombre: pv.nombre,
+        tipo: pv.tipo,
         estado: pv.estado,
         estadoLabel: ESTADO_LABEL[pv.estado] ?? pv.estado,
         saludPct: estadoSalud[pv.estado] ?? 50,
@@ -179,6 +191,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   });
 
   readonly searchQuery = signal('');
+  readonly tipoFiltro = signal<TipoProyecto | 'todos'>('todos');
 
   readonly proyectosFiltrados = computed<ProyectoRow[]>(() => {
     const f = this.activeFilter();
@@ -192,7 +205,9 @@ export class Gali6ProyectosCasaComponent implements OnInit {
 
   readonly proyectosFiltradosYBuscados = computed<ProyectoRow[]>(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const filtrados = this.proyectosFiltrados();
+    const tipo = this.tipoFiltro();
+    let filtrados = this.proyectosFiltrados();
+    if (tipo !== 'todos') filtrados = filtrados.filter(p => p.tipo === tipo);
     if (!q) return filtrados;
     return filtrados.filter(p => p.nombre.toLowerCase().includes(q));
   });
@@ -235,6 +250,54 @@ export class Gali6ProyectosCasaComponent implements OnInit {
           ventana: `${s.ventanaDias} días`,
         };
       });
+  });
+
+  // ── Alertas unificadas (reemplaza checkins + recomendaciones separadas) ─
+  readonly alertasUnificadas = computed<AlertaUnificada[]>(() => {
+    const result: AlertaUnificada[] = [];
+
+    // 1. Alertas críticas de agentes (de MOCK_ALERTAS)
+    const alertasCriticas = MOCK_ALERTAS
+      .filter((a) => a.tipo === 'critical' || a.tipo === 'warning')
+      .slice(0, 2);
+    for (const a of alertasCriticas) {
+      if (result.length >= 3) break;
+      result.push({
+        tipo: a.tipo === 'critical' ? 'atencion' : 'sugerencia',
+        titulo: a.titulo,
+        cuerpo: a.descripcion ?? '',
+        cta: 'Ver proyecto →',
+        agente: a.agenteOrigenNombre ? `${a.agenteOrigenNombre} detectó` : 'Gali detectó',
+        proyectoId: a.proyectoId,
+        accion: 'ver',
+      });
+    }
+
+    // 2. Señales de escala/riesgo (de MOCK_SENALES)
+    const senalesRelevantes = MOCK_SENALES
+      .filter((s: any) => s.tipo === 'scale' || s.tipo === 'risk' || s.tipo === 'opportunity')
+      .slice(0, 2);
+    for (const s of senalesRelevantes) {
+      if (result.length >= 3) break;
+      result.push({
+        tipo: s.tipo === 'risk' ? 'atencion' : 'sugerencia',
+        titulo: s.titulo,
+        cuerpo: s.contextoMacromundo ?? '',
+        cta: s.canLaunch ? 'Crear proyecto →' : 'Ver señales →',
+        agente: 'ADA Spy sugiere',
+        accion: s.canLaunch ? 'nuevo' : 'ver',
+      });
+    }
+
+    // 3. Fallback: check-ins del portafolio si no hay suficientes
+    if (result.length < 3) {
+      const checkins = this.galiCheckins().slice(0, 3 - result.length);
+      for (const ci of checkins) {
+        result.push({ ...ci });
+      }
+    }
+
+    return result.slice(0, 3);
   });
 
   // ── Gali check-ins del portafolio (Bloque 5) ─────────────────────────
@@ -446,7 +509,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   }
 
   openEdit(): void {
-    this.router.navigate(['/gali-6/mi-negocio/objetivo']);
+    this.router.navigate(['/gali-6/mi-negocio']);
   }
 
   saveEdit(): void {
@@ -659,6 +722,39 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.router.navigate(['/gali-6/proyectos/nuevo']);
   }
 
+  // ── Modal de confirmación de pausa ───────────────────────────────────
+  readonly pausaModalOpen = signal(false);
+  readonly pausaTargetId = signal<string | null>(null);
+
+  readonly campanasPausarPreview = computed(() => {
+    const id = this.pausaTargetId();
+    if (!id) return [];
+    const pv = PROYECTOS_MOCK.find(p => p.id === id);
+    if (!pv) return [];
+    return pv.campanas.filter(c => c.estado === 'activa');
+  });
+
+  readonly campanasChateaEnPausa = computed(() =>
+    this.campanasPausarPreview().filter(c => c.tipoCampana === 'chatea')
+  );
+
+  abrirModalPausa(proyectoId: string, event: Event): void {
+    event.stopPropagation();
+    this.pausaTargetId.set(proyectoId);
+    this.pausaModalOpen.set(true);
+  }
+
+  confirmarPausa(): void {
+    // En producción: llamar al API para pausar el proyecto y sus campañas de ads
+    this.pausaModalOpen.set(false);
+    this.pausaTargetId.set(null);
+  }
+
+  cancelarPausa(): void {
+    this.pausaModalOpen.set(false);
+    this.pausaTargetId.set(null);
+  }
+
   // ── Campañas accordion ────────────────────────────────────────────────
   readonly expandedCampanas = signal<Set<string>>(new Set());
 
@@ -701,9 +797,31 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.router.navigate(['/gali-6/proyectos/nuevo'], { queryParams: { proyectoId, modo: 'campana' } });
   }
 
+  // ── Helpers de tipo de proyecto ──────────────────────────────────────
+  proyectoTipoLabel(tipo: TipoProyecto | undefined | null): string {
+    const map: Record<TipoProyecto, string> = {
+      lanzar: '🚀 Lanzar', escalar: '📈 Escalar', optimizar: '🔧 Optimizar',
+      crm: '💬 CRM', experimentar: '🧪 Exp.',
+    };
+    return tipo ? (map[tipo] ?? tipo) : '';
+  }
+
+  // ── Acciones de estado ───────────────────────────────────────────────
+  reactivarProyecto(proyectoId: string, event: Event): void {
+    event.stopPropagation();
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyectoId);
+    if (pv) { pv.estado = 'activo'; (pv as any).pausaLog = undefined; }
+  }
+
+  cerrarProyecto(proyectoId: string, event: Event): void {
+    event.stopPropagation();
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyectoId);
+    if (pv) pv.estado = 'cerrado';
+  }
+
   // ── Navegación ────────────────────────────────────────────────────────
   abrir(id: string): void { this.router.navigate(['/gali-6/proyecto', id]); }
-  nuevo(): void { this.abrirNuevoModal(); }
+  nuevo(): void { this.router.navigate(['/gali-6/proyectos/nuevo']); }
 
   handleCheckinCta(ci: GaliCheckin): void {
     if (ci.accion === 'nuevo') { this.nuevo(); return; }

@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 
 // ── Page wrapper ──────────────────────────────────────────────────────────
 .g6-detalle {
@@ -646,4 +647,63 @@
   border-radius: $radius-sm; padding: $size-2 $size-4;
   font-size: $font-sm; font-weight: $font-semibold; cursor: pointer;
   &:hover { background: $primary-600; }
+}
+
+// ── Métricas de productos por proyecto ──────────────────────────────────────
+.pd__productos-metrics {
+  margin-top: $size-6; padding-top: $size-5;
+  border-top: 1px solid $os-border;
+}
+
+.pd__metrics-title {
+  font-size: $font-sm; font-weight: 700; color: $os-text-primary;
+  margin: 0 0 $size-4; letter-spacing: 0.02em; text-transform: uppercase;
+  font-size: 10px;
+}
+
+.pd__prod-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $size-4;
+}
+
+.pd__prod-card {
+  background: $os-surface-2; border: 1px solid $os-border;
+  border-radius: $os-radius-md; padding: $size-4;
+  display: flex; flex-direction: column; gap: $size-3;
+}
+
+.pd__prod-header {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: $size-2;
+}
+.pd__prod-nombre { font-size: $font-sm; font-weight: 600; color: $os-text-primary; }
+
+.pd__ada-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: $os-radius-sm;
+  white-space: nowrap; flex-shrink: 0;
+  &.ada--high { background: rgba($os-ok, 0.12); color: $os-ok; }
+  &.ada--mid  { background: rgba($os-warn, 0.12); color: $os-warn; }
+  &.ada--low  { background: rgba($os-crit, 0.12); color: $os-crit; }
+}
+
+.pd__metricas {
+  display: grid; grid-template-columns: 1fr 1fr; gap: $size-2;
+}
+.pd__metrica { display: flex; flex-direction: column; gap: 1px; }
+.pd__met-label { font-size: 9px; color: $os-text-muted; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.pd__met-val {
+  font-size: $font-sm; font-weight: 700; color: $os-text-primary;
+  &--ok { color: $os-ok; }
+}
+
+.pd__sparkline {
+  display: flex; align-items: flex-end; gap: 3px; height: 28px;
+}
+.pd__spark-bar {
+  flex: 1; background: $os-accent-dim; border-radius: 2px 2px 0 0; min-height: 3px;
+  background: linear-gradient(180deg, $os-accent 0%, rgba($os-accent, 0.4) 100%);
+}
+
+.pd__gali-nota {
+  font-size: 11px; color: $os-text-secondary; margin: 0;
+  border-left: 2px solid $os-accent-dim; padding-left: $size-2;
 }

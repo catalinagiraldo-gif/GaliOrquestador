@@ -1659,6 +1659,55 @@
           ]
         }
       }
+    },
+    "gali-6": {
+      "route": "/gali-6",
+      "label": "Gali 6",
+      "roles": ["dropshipper"],
+      "description": "OS personal del dropshipper. Tú pones la visión, Gali orquesta el resto. Hub con proyectos, agentes, señales y financiero.",
+      "views": {
+        "proyectos": {
+          "route": "/gali-6/proyectos",
+          "type": "page",
+          "prototype": "/gali-6/proyectos",
+          "origin_points": ["sidebar", "gali-6-home"],
+          "layout": "Objetivo activo + alertas unificadas (máx 3) + portafolio con filtros por estado Y por tipo (lanzar/escalar/crm/optimizar/experimentar). CTA 'Nuevo proyecto' navega DIRECTO a /gali-6/proyectos/nuevo sin modal selector. Cards muestran chip de tipo + estado + acciones (Reactivar / Cerrar).",
+          "ctas": [
+            { "cta": "Nuevo proyecto", "navigates_to": "/gali-6/proyectos/nuevo" },
+            { "cta": "Editar objetivo", "navigates_to": "/gali-6/mi-negocio" },
+            { "cta": "Ver todas en Señales →", "navigates_to": "/gali-6/senales" },
+            { "cta": "Reactivar (proyectos pausados)", "navigates_to": "inline — cambia estado a activo" },
+            { "cta": "Cerrar proyecto", "navigates_to": "inline — cambia estado a cerrado" }
+          ]
+        },
+        "nuevo-proyecto": {
+          "route": "/gali-6/proyectos/nuevo",
+          "type": "page",
+          "prototype": "/gali-6/proyectos/nuevo",
+          "origin_points": ["/gali-6/proyectos (click directo en + Nuevo proyecto)"],
+          "layout": "Wizard multi-paso: tipo → intent-chat → nombre → agentes → ¿agregar campaña? → [campana-tipo → campana-ruta-venta* → campana-productos* → campana-presupuesto* → campana-brujula → campana-creativos* → campana-resumen] → éxito. * = condicional según tipo y ruta.",
+          "on_success": "/gali-6/proyecto/:id (ID dinámico, ?recien=1)",
+          "on_cancel": "/gali-6/proyectos",
+          "notes": "Sin modal auto/manual. Flujo directo. Presupuesto solo si ruta tiene ads. Ruta solo si tipo=ads/hibrida. Sin campana va a éxito directo como borrador. Launch overlay z-index: 9999."
+        },
+        "agentes": {
+          "route": "/gali-6/agentes",
+          "type": "page",
+          "prototype": "/gali-6/agentes",
+          "origin_points": ["/gali-6/proyectos/nuevo?paso=agentes"],
+          "layout": "Listado de agentes activos + panel lateral de creación. Query param ?crear=true auto-abre el panel de crear agente.",
+          "ctas": [
+            { "cta": "Crear agente personalizado", "navigates_to": "/gali-6/agentes?crear=true" }
+          ]
+        },
+        "mi-negocio": {
+          "route": "/gali-6/mi-negocio",
+          "type": "page",
+          "prototype": "/gali-6/mi-negocio",
+          "origin_points": ["/gali-6/proyectos (Editar objetivo)"],
+          "layout": "Editor de objetivo: tipo, meta numérica, fecha límite. Datos sincronizados con la card de objetivo en /gali-6/proyectos."
+        }
+      }
     }
   }
 }
