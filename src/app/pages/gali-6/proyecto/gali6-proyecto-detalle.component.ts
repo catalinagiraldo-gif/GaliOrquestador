@@ -45,10 +45,16 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
   readonly toastPausa = signal<string | null>(null);
   readonly panelNuevaCampana = signal<NuevaCampanaData | null>(null);
 
-  // ── PROYECTOS_MOCK (pv-001..004) ─────────────────────────────────────────
-  readonly proyectoNuevo = computed<ProyectoDetalle | null>(() =>
-    PROYECTOS_MOCK.find(p => p.id === this.proyectoId()) ?? null
-  );
+  // ── PROYECTOS_MOCK (pv-001..004) + localStorage nuevos ──────────────────
+  readonly proyectoNuevo = computed<ProyectoDetalle | null>(() => {
+    const id = this.proyectoId();
+    const enMock = PROYECTOS_MOCK.find(p => p.id === id);
+    if (enMock) return enMock;
+    try {
+      const extra: ProyectoDetalle[] = JSON.parse(localStorage.getItem('g6_proyectos_extra') ?? '[]');
+      return extra.find(p => p.id === id) ?? null;
+    } catch { return null; }
+  });
 
   readonly isNewProject = computed(() => this.proyectoNuevo() !== null);
 
@@ -166,6 +172,29 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
     if (tab === 'campanas' || tab === 'agentes') {
       this.activeTab.set(tab);
     }
+  }
+
+  // ── Campañas: acordeón de detalle ────────────────────────────────────────
+  readonly campanaDetalleOpen = signal<Set<string>>(new Set());
+
+  toggleCampanaDetalle(id: string): void {
+    this.campanaDetalleOpen.update(s => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
+  }
+
+  maxHistorialCampana(c: CampanaProyecto): number {
+    const vals = (c.productos ?? []).flatMap(p => (p as any).metricas?.historial5sem as number[] ?? []);
+    return Math.max(...vals, 1);
+  }
+
+  sparklineColor(val: number, c: CampanaProyecto): string {
+    const ratio = val / this.maxHistorialCampana(c);
+    if (ratio >= 0.75) return '#22c55e';
+    if (ratio >= 0.4)  return '#f59e0b';
+    return '#ef4444';
   }
 
   // ── Handlers ─────────────────────────────────────────────────────────────

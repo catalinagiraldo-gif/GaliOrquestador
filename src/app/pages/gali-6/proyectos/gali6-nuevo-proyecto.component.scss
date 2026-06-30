@@ -377,6 +377,114 @@
   &__desc { font-size: $font-xs; color: $gray-600; line-height: 1.4; flex: 1; }
 }
 
+// ── Brújula v2: margen→precio + suscripciones + Gali sidebar ────────────
+
+.brujula-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: $size-3;
+}
+
+.brujula-gali-toggle {
+  font-size: 12px; font-weight: $font-semibold; font-family: $font-primary;
+  padding: 5px 12px; border-radius: $radius-full;
+  background: rgba($os-accent, 0.08); border: 1px solid rgba($os-accent, 0.3);
+  color: $os-accent-dark; cursor: pointer; transition: all 120ms ease;
+
+  &:hover, &--open { background: rgba($os-accent, 0.15); }
+}
+
+.brujula-layout {
+  display: flex; gap: $size-5; align-items: flex-start;
+
+  &--with-gali .brujula-main { flex: 1; min-width: 0; }
+}
+
+.brujula-main { flex: 1; display: flex; flex-direction: column; gap: $size-4; }
+
+.brujula-gali-panel {
+  width: 260px; flex-shrink: 0;
+  border: 1px solid rgba($os-accent, 0.25); border-radius: $radius-md;
+  padding: $size-4; background: rgba($os-accent, 0.03);
+  position: sticky; top: $size-4;
+
+  &__header { display: flex; align-items: center; gap: $size-2; margin-bottom: $size-3; }
+  &__icon { color: $os-accent; font-size: 16px; }
+  &__title { font-size: 13px; font-weight: $font-semibold; color: $gray-700; }
+  &__msg { font-size: 13px; line-height: 1.55; color: #374151; margin-bottom: $size-3; }
+  &__grounding { border-top: 1px solid rgba(0,0,0,0.07); padding-top: $size-3; }
+  &__ground-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: $gray-400; font-weight: 600; }
+  &__ground-list { margin: $size-2 0 0 $size-3; padding: 0; font-size: 12px; color: $gray-500; display: flex; flex-direction: column; gap: 4px; }
+}
+
+.brujula-factores {
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-md;
+  padding: $size-3 $size-4; display: flex; flex-direction: column; gap: $size-2;
+
+  &__title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: $gray-400; margin-bottom: $size-1; }
+}
+
+.brujula-factor-row {
+  display: flex; align-items: center; gap: $size-2; font-size: 13px;
+  border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: $size-1;
+  &:last-child { border-bottom: none; padding-bottom: 0; }
+  &--pauta { color: #b45309; }
+  &--susc { color: #7c3aed; }
+  &--total { font-weight: $font-semibold; padding-top: $size-1; border-top: 1px solid rgba(0,0,0,0.1); }
+}
+
+.brujula-factor {
+  &__label { flex: 1; color: $gray-600; }
+  &__val { font-weight: $font-semibold; color: $gray-900; white-space: nowrap;
+    &--readonly { color: $gray-500; font-weight: 400; }
+    &--total { color: $gray-900; }
+  }
+  &__tag { font-size: 10px; color: $gray-400; white-space: nowrap; }
+  &__canal-tag {
+    display: inline-block; margin-left: 4px;
+    font-size: 10px; font-weight: 600;
+    background: rgba(#b45309, 0.08); color: #b45309;
+    border-radius: $radius-full; padding: 1px 5px;
+  }
+}
+
+.brujula-margen-val {
+  font-size: $font-xl; font-weight: $font-bold;
+  &[data-semaforo='verde'] { color: #16a34a; }
+  &[data-semaforo='ambar'] { color: #d97706; }
+  &[data-semaforo='rojo']  { color: #dc2626; }
+}
+
+.brujula-slider-labels__gali {
+  color: $os-accent-dark; font-weight: $font-semibold;
+}
+
+.brujula-output {
+  border-radius: $radius-md; padding: $size-4; border: 2px solid;
+  display: flex; flex-direction: column; gap: $size-3;
+
+  &[data-semaforo='verde'] { background: #f0fdf4; border-color: #86efac; }
+  &[data-semaforo='ambar'] { background: #fffbeb; border-color: #fde68a; }
+  &[data-semaforo='rojo']  { background: #fef2f2; border-color: #fca5a5; }
+
+  &__precio { display: flex; align-items: center; justify-content: space-between; }
+  &__precio-label { font-size: 13px; color: $gray-600; font-weight: $font-semibold; }
+  &__precio-val { font-size: 28px; font-weight: $font-bold; color: $gray-900; }
+  &__utilidades { display: flex; gap: $size-4; flex-wrap: wrap; }
+}
+
+.brujula-util-item {
+  display: flex; flex-direction: column; gap: 2px;
+  &__label { font-size: 11px; color: $gray-500; }
+  &__val { font-size: 16px; font-weight: $font-bold; color: $gray-800; &--mes { color: #16a34a; } }
+  &__sub { font-size: 10px; color: $gray-400; }
+}
+
+.brujula-semaforo {
+  font-size: 12px; font-weight: $font-semibold;
+  [data-color='verde'] & { color: #16a34a; }
+  [data-color='ambar'] & { color: #d97706; }
+  [data-color='rojo']  & { color: #dc2626; }
+}
+
 // ── Presupuesto con badge Gali (Paso 4) ──────────────────────────────────
 
 .gali-budget-badge {
@@ -587,6 +695,7 @@
   &__icon { font-size: 56px; }
   &__title { margin: 0; font-size: $font-2xl; font-weight: $font-bold; color: $gray-900; }
   &__sub { margin: 0; font-size: $font-sm; color: $gray-600; line-height: 1.6; max-width: 440px; }
+  &__ctas { display: flex; flex-direction: column; align-items: center; gap: $size-2; width: 100%; max-width: 320px; }
   &__contrib {
     background: rgba($os-accent, 0.08); border: 1px solid rgba($os-accent, 0.2);
     border-radius: $radius-md; padding: $size-4 $size-5;
@@ -1130,6 +1239,14 @@
   }
 }
 
+.creativo-borrador-aviso {
+  display: flex; gap: $size-2; align-items: flex-start;
+  padding: $size-3; background: rgba($os-accent, 0.08); border-radius: $radius-md;
+  font-size: 13px; color: #374151; margin-top: $size-2;
+
+  i { color: $os-accent; margin-top: 1px; flex-shrink: 0; }
+}
+
 // ── ÉXITO emoji ───────────────────────────────────────────────────────────
 .launch-success__emoji {
   font-size: 56px; line-height: 1;
@@ -1221,12 +1338,22 @@
 }
 
 // ── PASO: Ruta de venta ──────────────────────────────────────────────────
+.ruta-grupo {
+  display: flex; flex-direction: column; gap: $size-2; margin-bottom: $size-3;
+
+  &__label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: rgba(0,0,0,0.4);
+    padding-bottom: $size-1; border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+}
+
 .ruta-list {
   display: flex; flex-direction: column; gap: $size-2;
 }
 
 .ruta-card {
-  display: flex; align-items: center; gap: $size-3;
+  display: flex; align-items: flex-start; gap: $size-3;
   background: #fff; border: 2px solid $gray-100; border-radius: $radius-md;
   padding: $size-3 $size-4; cursor: pointer; text-align: left;
   transition: border-color 120ms ease;
@@ -1238,7 +1365,16 @@
   &__body { flex: 1; }
   &__label { font-size: $font-sm; font-weight: $font-semibold; color: $gray-900; display: block; }
   &__desc { font-size: 12px; color: $gray-500; margin-top: 2px; }
-  &__check { color: $os-accent; font-weight: $font-bold; }
+  &__check { color: $os-accent; font-weight: $font-bold; flex-shrink: 0; margin-top: 2px; }
+
+  &__factores {
+    display: flex; flex-wrap: wrap; gap: $size-1; margin-top: $size-1;
+  }
+
+  &__factor {
+    font-size: 11px; color: rgba($os-accent, 0.85); background: rgba($os-accent, 0.07);
+    padding: 1px 6px; border-radius: $radius-pill;
+  }
 }
 
 .ruta-integ {
@@ -1330,30 +1466,122 @@
 }
 
 // ── BRUJULA: Multi-producto ──────────────────────────────────────────────
+// ── Brújula multi-producto: resumen global ───────────────────────────────
+.brujula-multi-summary {
+  display: flex; gap: $size-4; flex-wrap: wrap;
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-md;
+  padding: $size-3 $size-4; margin-bottom: $size-2;
+
+  &__item { display: flex; flex-direction: column; gap: 2px; }
+  &__label { font-size: 11px; color: $gray-400; font-weight: $font-medium; }
+  &__val {
+    font-size: $font-sm; font-weight: $font-bold; color: $gray-800;
+    span { font-size: 11px; font-weight: 400; color: $gray-500; margin-left: 2px; }
+    &--big { font-size: $font-xl; color: $os-ok; }
+  }
+}
+
+// ── Brújula multi-producto: accordion ───────────────────────────────────
 .brujula-multi {
-  display: flex; flex-direction: column; gap: $size-4;
+  display: flex; flex-direction: column; gap: $size-2;
 }
 
 .brujula-multi-row {
-  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-md; padding: $size-4;
-  display: flex; flex-direction: column; gap: $size-3;
+  background: $white; border: 1px solid $gray-100; border-radius: $radius-md;
+  overflow: hidden; transition: border-color 0.15s ease;
+
+  &--expanded { border-color: $primary-200; }
 
   &__header {
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: $size-2;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    gap: $size-2; padding: $size-3 $size-4;
+    background: none; border: none; cursor: pointer; width: 100%; text-align: left;
+    transition: background 0.12s ease;
+    &:hover { background: $gray-50; }
   }
   &__nombre { font-size: $font-sm; font-weight: $font-semibold; color: $gray-900; }
-  &__costo { font-size: 12px; color: $gray-500; }
+  &__summary { display: flex; align-items: center; gap: $size-2; flex-wrap: wrap; }
 
-  &__inputs { display: flex; align-items: center; gap: $size-4; flex-wrap: wrap; }
-  &__field { display: flex; flex-direction: column; gap: $size-1; }
-  &__label { font-size: 11px; color: $gray-600; font-weight: $font-semibold; }
-
-  &__margen {
-    font-size: $font-sm; font-weight: $font-bold; padding: 4px 12px; border-radius: $radius-full;
+  &__precio-tag {
+    font-size: $font-xs; font-weight: $font-semibold; color: $gray-700;
+    background: $gray-100; padding: 2px 7px; border-radius: $radius-full;
+  }
+  &__ganancia-tag {
+    font-size: $font-xs; font-weight: $font-bold; padding: 2px 7px; border-radius: $radius-full;
     &[data-color='verde'] { background: #f0fdf4; color: #16a34a; }
     &[data-color='ambar'] { background: #fffbeb; color: #d97706; }
     &[data-color='rojo']  { background: #fef2f2; color: #dc2626; }
   }
+  &__margen-tag {
+    font-size: 11px; color: $gray-400;
+    &[data-color='verde'] { color: #16a34a; }
+    &[data-color='ambar'] { color: #d97706; }
+    &[data-color='rojo']  { color: #dc2626; }
+  }
+  &__arrow { font-size: 10px; color: $gray-400; }
+
+  &__detail {
+    padding: $size-3 $size-4 $size-4;
+    border-top: 1px solid $gray-100;
+    display: flex; flex-direction: column; gap: $size-3;
+    animation: slide-down 0.18s ease both;
+  }
+}
+
+// Slider dentro del accordion por producto
+.brujula-prod-slider {
+  display: flex; flex-direction: column; gap: $size-2;
+  &__header { display: flex; justify-content: space-between; align-items: baseline; }
+  &__label { font-size: 12px; font-weight: $font-semibold; color: $gray-600; }
+  &__val { font-size: $font-lg; font-weight: $font-bold; color: $gray-900; }
+}
+
+.brujula-slider--prod {
+  accent-color: $os-accent;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Brújula multi costos (tabla interna del accordion) ───────────────────
+.brujula-multi-costos {
+  display: flex; flex-direction: column; gap: 4px;
+  background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-sm; padding: $size-2 $size-3;
+}
+
+.brujula-multi-costo-row {
+  display: flex; justify-content: space-between; align-items: center; gap: $size-2;
+  font-size: 12px; color: $gray-500; padding: 2px 0;
+
+  &__label { flex: 1; }
+  &__val { font-weight: $font-semibold; color: $gray-700; white-space: nowrap; }
+  &__tag { font-size: 10px; color: $gray-400; white-space: nowrap; }
+
+  &--pauta .brujula-multi-costo-row__val { color: $os-accent; }
+  &--susc .brujula-multi-costo-row__val { color: #7c3aed; }
+
+  &--ganancia {
+    margin-top: $size-1; padding-top: $size-2;
+    border-top: 1px solid $gray-200;
+    &[data-color='verde'] .brujula-multi-costo-row__val--ganancia { color: #16a34a; }
+    &[data-color='ambar'] .brujula-multi-costo-row__val--ganancia { color: #d97706; }
+    &[data-color='rojo']  .brujula-multi-costo-row__val--ganancia { color: #dc2626; }
+    .brujula-multi-costo-row__val--ganancia { font-size: $font-sm; }
+  }
+}
+
+.brujula-multi-ganancia {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: $size-2 $size-3; border-radius: $radius-sm;
+
+  &__label { font-size: 12px; font-weight: $font-semibold; }
+  &__val { font-size: $font-lg; font-weight: $font-bold; }
+
+  &[data-color='verde'] { background: #f0fdf4; color: #16a34a; }
+  &[data-color='ambar'] { background: #fffbeb; color: #d97706; }
+  &[data-color='rojo']  { background: #fef2f2; color: #dc2626; }
 }
 
 // ── Agente opt: badge de recomendado ────────────────────────────────────
@@ -1398,4 +1626,53 @@
 .wizard__next--secondary {
   background: none; border: 1px solid $gray-200; color: $gray-600;
   &:hover { border-color: $gray-300; background: $gray-50; color: $gray-800; }
+}
+
+// ── Sub-meta step ────────────────────────────────────────────────────────
+.sub-meta-list {
+  display: flex; flex-direction: column; gap: $size-3; margin-bottom: $size-6;
+}
+
+.sub-meta-chip {
+  display: flex; align-items: center; gap: $size-3;
+  padding: $size-3 $size-4; border-radius: $os-radius-sm;
+  border: 1.5px solid $gray-200; background: #fff;
+  cursor: pointer; text-align: left; transition: border-color 0.15s, background 0.15s;
+
+  &--active {
+    border-color: $os-accent; background: rgba($os-accent, 0.06);
+  }
+  &:hover:not(.sub-meta-chip--active) {
+    border-color: $gray-300; background: $gray-50;
+  }
+}
+
+.sub-meta-chip__dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid $gray-300; flex-shrink: 0; transition: all 0.15s;
+
+  &--active {
+    border-color: $os-accent;
+    background: $os-accent;
+    box-shadow: 0 0 0 3px rgba($os-accent, 0.2);
+  }
+}
+
+.sub-meta-chip__label {
+  font-size: 14px; font-family: $font-primary; color: $gray-700; line-height: 1.4;
+}
+
+.sub-meta-empty {
+  font-size: 13px; color: $gray-400; padding: $size-4; text-align: center;
+}
+
+.wizard__actions-row {
+  display: flex; align-items: center; justify-content: space-between; gap: $size-4;
+}
+
+.wizard__skip {
+  background: none; border: none; padding: $size-2 $size-3;
+  font-size: 13px; color: $gray-400; cursor: pointer; border-radius: 4px;
+  transition: color 0.15s;
+  &:hover { color: $gray-600; }
 }

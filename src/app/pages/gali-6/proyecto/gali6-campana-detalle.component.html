@@ -40,11 +40,38 @@
       </span>
     </div>
     <div class="cd__header-actions">
-      <button class="cd__pausa-btn"
-              [class.cd__pausa-btn--pausada]="pausada()"
-              (click)="togglePausa()">
-        {{ pausada() ? '▶ Activar campaña' : '⏸ Pausar campaña' }}
-      </button>
+      @if (!pausada()) {
+        @if (productosEnCampana().length > 1) {
+          <div class="cd__pausa-menu" [class.cd__pausa-menu--open]="pausaMenuOpen()">
+            <button class="cd__pausa-btn" type="button" (click)="togglePausaMenu()">
+              ⏸ Pausar ▾
+            </button>
+            @if (pausaMenuOpen()) {
+              <div class="cd__pausa-opciones" role="menu">
+                <button class="cd__pausa-opcion" type="button" role="menuitem"
+                        (click)="togglePausa(); pausaMenuOpen.set(false)">
+                  ⏸ Pausar toda la campaña
+                </button>
+                <div class="cd__pausa-separador">o pausar por producto:</div>
+                @for (p of productosEnCampana(); track p.id) {
+                  <button class="cd__pausa-opcion cd__pausa-opcion--prod" type="button" role="menuitem"
+                          (click)="pausarProductoEnCampana(p.id)">
+                    Pausar "{{ p.nombre }}"
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <button class="cd__pausa-btn" type="button" (click)="togglePausa()">
+            ⏸ Pausar campaña
+          </button>
+        }
+      } @else {
+        <button class="cd__pausa-btn cd__pausa-btn--pausada" type="button" (click)="togglePausa()">
+          ▶ Activar campaña
+        </button>
+      }
     </div>
   </div>
 
@@ -80,34 +107,171 @@
     } @else if (productosEnCampana().length > 0) {
       <div class="cd__productos-list">
         @for (p of productosEnCampana(); track p.id) {
-          <div class="cd__prod-row">
-            <div class="cd__prod-icon"><i class="pi pi-box"></i></div>
-            <div class="cd__prod-info">
-              <span class="cd__prod-nombre">{{ p.nombre }}</span>
-              @if (p.precioVentaLabel) {
-                <span class="cd__prod-precio">{{ p.precioVentaLabel }}</span>
-              }
-              @if (p.margenPct > 0) {
-                <span class="cd__prod-margen" [class.cd__prod-margen--ok]="p.margenPct >= 30">
-                  {{ p.margenPct }}% margen
-                </span>
-              }
+          <div class="cd__prod-row-wrap">
+            <!-- Fila principal -->
+            <div class="cd__prod-row">
+              <div class="cd__prod-icon"><i class="pi pi-box"></i></div>
+              <div class="cd__prod-info">
+                <span class="cd__prod-nombre">{{ p.nombre }}</span>
+                @if (p.precioVentaLabel) {
+                  <span class="cd__prod-precio">{{ p.precioVentaLabel }}</span>
+                }
+                @if (p.margenPct > 0) {
+                  <span class="cd__prod-margen" [class.cd__prod-margen--ok]="p.margenPct >= 30">
+                    {{ p.margenPct }}% margen
+                  </span>
+                }
+                @if (p.estadoStock) {
+                  <span class="cd__prod-stock cd__prod-stock--{{ p.estadoStock }}">
+                    <i class="pi pi-box"></i> {{ p.stockActual ?? '?' }} uds
+                    @if (p.estadoStock === 'bajo') { · ⚠ Stock bajo }
+                    @if (p.estadoStock === 'agotado') { · ✕ Agotado }
+                  </span>
+                }
+              </div>
+              <div class="cd__prod-actions">
+                @if (p.angulos && p.angulos.length > 0) {
+                  <button class="cd__angulos-toggle"
+                          type="button"
+                          [class.cd__angulos-toggle--open]="angulosVisibles().has(p.id)"
+                          (click)="toggleAngulos(p.id)"
+                          [attr.aria-expanded]="angulosVisibles().has(p.id)">
+                    {{ p.angulos.length }} ángulo{{ p.angulos.length !== 1 ? 's' : '' }}
+                    <i class="pi" [class.pi-chevron-down]="!angulosVisibles().has(p.id)"
+                       [class.pi-chevron-up]="angulosVisibles().has(p.id)"></i>
+                  </button>
+                }
+                <button class="cd__btn-cambiar" type="button" (click)="abrirCambiarProducto(p.id)">
+                  Cambiar →
+                </button>
+              </div>
             </div>
-            <button class="cd__btn-cambiar" (click)="abrirCambiarProducto(p.id)">
-              Cambiar →
-            </button>
+
+            <!-- Ángulos de venta expandibles -->
+            @if (angulosVisibles().has(p.id) && p.angulos) {
+              <div class="cd__angulos-list">
+                @for (a of p.angulos; track a.id) {
+                  <div class="cd__angulo-row" [class.cd__angulo-row--pausado]="a.estado === 'pausado'">
+                    <span class="cd__angulo-dot" [attr.data-estado]="a.estado">
+                      {{ a.estado === 'activo' ? '●' : a.estado === 'pausado' ? '⏸' : '○' }}
+                    </span>
+                    <div class="cd__angulo-info">
+                      <span class="cd__angulo-nombre">{{ a.nombre }}</span>
+                      <span class="cd__angulo-pub">{{ a.publicoObj }}</span>
+                    </div>
+                    @if (a.roas) {
+                      <span class="cd__angulo-roas"
+                            [class.cd__angulo-roas--ok]="a.roas >= c.roasObjetivo">
+                        ROAS {{ a.roas }}x
+                      </span>
+                    }
+                    @if (a.pedidosSem) {
+                      <span class="cd__angulo-ped">{{ a.pedidosSem }} ped/sem</span>
+                    }
+                    <button class="cd__angulo-pausa"
+                            type="button"
+                            (click)="toggleAnguloEstado(p.id, a.id)"
+                            [attr.aria-label]="(a.estado === 'activo' ? 'Pausar' : 'Activar') + ' ángulo ' + a.nombre">
+                      {{ a.estado === 'activo' ? '⏸ Pausar' : '▶ Activar' }}
+                    </button>
+                  </div>
+                }
+
+                <!-- Formulario nuevo ángulo -->
+                @if (nuevoAnguloForm()?.prodId === p.id) {
+                  <div class="cd__angulo-nuevo-form">
+                    <input class="cd__angulo-nuevo-form__input"
+                           placeholder="Nombre del ángulo (ej: Para mamás con perro)"
+                           [ngModel]="nuevoAnguloForm()!.nombre"
+                           (ngModelChange)="actualizarNuevoAnguloNombre($event)">
+                    <input class="cd__angulo-nuevo-form__input"
+                           placeholder="Público objetivo (ej: Mujeres 28-45)"
+                           [ngModel]="nuevoAnguloForm()!.publico"
+                           (ngModelChange)="actualizarNuevoAnguloPublico($event)">
+                    <div class="cd__angulo-nuevo-form__actions">
+                      <button class="cd__angulo-nuevo-form__save" type="button"
+                              [disabled]="!nuevoAnguloForm()?.nombre?.trim()"
+                              (click)="guardarNuevoAngulo()">Guardar ángulo</button>
+                      <button class="cd__angulo-nuevo-form__cancel" type="button"
+                              (click)="cerrarNuevoAngulo()">Cancelar</button>
+                    </div>
+                  </div>
+                } @else {
+                  <button class="cd__angulo-nuevo-cta" type="button" (click)="abrirNuevoAngulo(p.id)">
+                    + Nuevo ángulo de venta
+                  </button>
+                }
+              </div>
+            }
           </div>
         }
       </div>
+
+      <!-- Agregar otro producto -->
+      <button class="cd__agregar-cta" type="button" (click)="abrirCambiarProducto('')">
+        + Agregar producto
+      </button>
     } @else {
       <div class="cd__sin-producto">
         <i class="pi pi-exclamation-triangle"></i> Sin producto asignado
-        <button class="cd__agregar-producto" (click)="abrirCambiarProducto('')">
+        <button class="cd__agregar-producto" type="button" (click)="abrirCambiarProducto('')">
           + Agregar producto
         </button>
       </div>
     }
   </section>
+
+  <!-- ── RENDIMIENTO POR PRODUCTO ── -->
+  @if (tieneMetricasRendimiento()) {
+    <section class="cd__section">
+      <h2 class="cd__section-title">Rendimiento por producto</h2>
+      <div class="cd__rend" role="table" aria-label="Rendimiento de productos en esta campaña">
+        <div class="cd__rend__head" role="row">
+          <span role="columnheader">Producto</span>
+          <span role="columnheader">Ped/sem</span>
+          <span role="columnheader">CPA real</span>
+          <span role="columnheader">ROAS</span>
+          <span role="columnheader">Stock</span>
+          <span role="columnheader">Tendencia</span>
+        </div>
+        @for (p of productosEnCampana(); track p.id) {
+          @if (p.metricas) {
+            <div class="cd__rend__row" role="row"
+                 [class.cd__rend__row--bajo]="p.metricas.estadoStock === 'bajo'"
+                 [class.cd__rend__row--agotado]="p.metricas.estadoStock === 'agotado'">
+              <span class="cd__rend-nombre" role="cell">
+                {{ p.nombre }}
+                @if (p.metricas.estadoStock === 'bajo') {
+                  <span class="cd__stock-alert" title="Stock bajo">⚠</span>
+                }
+              </span>
+              <span role="cell">{{ p.metricas.pedidosSem }}</span>
+              <span role="cell">${{ p.metricas.cpaReal | number:'1.0-0':'es' }}</span>
+              <span role="cell"
+                    [class.cd__roas--ok]="p.metricas.roasCampana >= c.roasObjetivo"
+                    [class.cd__roas--low]="p.metricas.roasCampana < c.roasObjetivo">
+                {{ p.metricas.roasCampana }}x
+              </span>
+              <span role="cell" [class]="'cd__stock--' + p.metricas.estadoStock">
+                {{ p.metricas.stockActual }} uds
+              </span>
+              <div role="cell" class="cd__sparkline" aria-hidden="true">
+                <svg width="60" height="20" viewBox="0 0 60 20">
+                  @for (val of p.metricas.historial5sem; track val; let i = $index) {
+                    <rect [attr.x]="i * 13" width="10"
+                          [attr.y]="20 - (val / maxHistorial() * 18)"
+                          [attr.height]="val / maxHistorial() * 18"
+                          [attr.fill]="sparkColor(val)">
+                    </rect>
+                  }
+                </svg>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  }
 
   <!-- ── AGENTES ── -->
   <section class="cd__section">
@@ -191,28 +355,43 @@
 
 </div>
 
-<!-- ── MODAL CAMBIAR PRODUCTO ── -->
+<!-- ── MODAL CAMBIAR/AGREGAR PRODUCTO ── -->
 @if (cambiarProductoOpen()) {
   <div class="cd__modal-bg" (click)="cerrarCambiarProducto()">
-    <div class="cd__modal" (click)="$event.stopPropagation()">
+    <div class="cd__modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+         [attr.aria-label]="cambiarProductoTargetId() ? 'Cambiar producto' : 'Agregar producto'">
       <div class="cd__modal-header">
-        <h3>{{ cambiarProductoTargetId() ? 'Cambiar producto' : 'Agregar producto' }}</h3>
-        <button class="cd__modal-close" (click)="cerrarCambiarProducto()">✕</button>
+        <h3>{{ cambiarProductoTargetId() ? 'Cambiar producto' : 'Agregar producto a esta campaña' }}</h3>
+        <button class="cd__modal-close" type="button" (click)="cerrarCambiarProducto()" aria-label="Cerrar">✕</button>
       </div>
-      <p class="cd__modal-hint">
-        Selecciona un producto de tu catálogo para asignarlo a esta campaña.
-      </p>
-      <!-- Lista de productos disponibles (mock) -->
+
+      <input class="cd__modal-search"
+             type="search"
+             placeholder="Buscar en catálogo de productos…"
+             [ngModel]="modalBusqueda()"
+             (ngModelChange)="modalBusqueda.set($event)"
+             autofocus>
+
+      @if (productosCatalogoBuscados().length === 0) {
+        <p class="cd__modal-empty">Sin resultados para "{{ modalBusqueda() }}"</p>
+      }
+
       <div class="cd__modal-prod-list">
-        @for (nombre of ['Collar GPS para mascotas', 'Collar GPS Pro (v2)', 'Difusor de aromaterapia', 'Kit K-Beauty', 'Masajeador eléctrico']; track nombre) {
-          <button class="cd__modal-prod-item" (click)="cerrarCambiarProducto()">
+        @for (item of productosCatalogoBuscados(); track item.id) {
+          <button class="cd__modal-prod-item" type="button" (click)="asignarProducto(item)">
             <i class="pi pi-box"></i>
-            <span>{{ nombre }}</span>
-            <span class="cd__modal-prod-sel">Seleccionar</span>
+            <div class="cd__modal-prod-body">
+              <span class="cd__modal-prod-nombre">{{ item.nombre }}</span>
+              <span class="cd__modal-prod-meta">
+                ADA {{ item.adaScore }}/100 · {{ item.margenEst }} margen · {{ item.stockLabel }}
+              </span>
+            </div>
+            <span class="cd__modal-prod-cta">Agregar →</span>
           </button>
         }
       </div>
-      <button class="cd__modal-cancel" (click)="cerrarCambiarProducto()">Cancelar</button>
+
+      <button class="cd__modal-cancel" type="button" (click)="cerrarCambiarProducto()">Cancelar</button>
     </div>
   </div>
 }

@@ -9,6 +9,12 @@
       <span class="g6-detalle__estado" [attr.data-estado]="pv.estado">{{ estadoLabel() }}</span>
     </div>
     <p class="g6-detalle__subobjetivo">{{ pv.descripcion }}</p>
+    @if (proyectoNuevo()?.subObjetivo && proyectoNuevo()?.subObjetivo !== pv.descripcion) {
+      <p class="g6-detalle__subobjlink">
+        <span class="g6-detalle__subobjlink-arrow">↳ Sub-objetivo:</span>
+        {{ proyectoNuevo()?.subObjetivo }}
+      </p>
+    }
     <div class="g6-detalle__meta-row">
       @if (pv.pedidosSem > 0) {
         <span class="g6-detalle__meta-item"><i class="pi pi-box"></i> {{ pv.pedidosSem }}/sem</span>
@@ -37,6 +43,17 @@
             <i class="pi pi-chart-line"></i> A este ritmo, alcanzas la meta en <strong>{{ pv.proyeccionSemanas }} semanas</strong>
           </span>
         }
+      </div>
+    }
+
+    <!-- Sub-objetivo del contexto (3A) -->
+    @if (pv.subObjetivo) {
+      <div class="g6-detalle__subobj-row">
+        <span class="g6-detalle__subobj-icon" aria-hidden="true">↳</span>
+        <span class="g6-detalle__subobj-label">Alimenta:</span>
+        <a class="g6-detalle__subobj-link" [routerLink]="['/gali-6/mi-negocio']">
+          {{ pv.subObjetivo }}
+        </a>
       </div>
     }
 
@@ -206,8 +223,8 @@
                 @if (c.producto) {
                   <span class="g6-campana-card__producto-chip"><i class="pi pi-box"></i> {{ c.producto }}</span>
                 } @else {
-                  <button class="g6-campana-card__sin-producto" (click)="nuevaCampana()">
-                    <i class="pi pi-exclamation-triangle"></i> Sin producto — agregar →
+                  <button class="g6-campana-card__sin-producto" (click)="irADetalleCampana(proyectoId(), c.id)">
+                    <i class="pi pi-box"></i> Sin producto — agregar →
                   </button>
                 }
               </div>
@@ -293,11 +310,100 @@
                         (click)="togglePausaCampana(c.id)">
                   {{ esCampanaPausada(c.id) ? '▶ Activar campaña' : '⏸ Pausar campaña' }}
                 </button>
+                @if (c.productos && c.productos.length > 0) {
+                  <button class="g6-campana-card__toggle-rend"
+                          type="button"
+                          [class.is-open]="campanaDetalleOpen().has(c.id)"
+                          (click)="toggleCampanaDetalle(c.id)"
+                          [attr.aria-expanded]="campanaDetalleOpen().has(c.id)">
+                    Rendimiento
+                    <i class="pi" [class.pi-chevron-down]="!campanaDetalleOpen().has(c.id)"
+                       [class.pi-chevron-up]="campanaDetalleOpen().has(c.id)"></i>
+                  </button>
+                }
                 <button class="g6-campana-card__ver-detalle"
                         (click)="irADetalleCampana(pv.id, c.id)">
                   Ver detalle →
                 </button>
               </div>
+
+              <!-- Rendimiento expandible: tabla por producto + ángulos -->
+              @if (campanaDetalleOpen().has(c.id) && c.productos && c.productos.length > 0) {
+                <div class="g6-campana-rend">
+                  <div class="g6-campana-rend__tabla" role="table" [attr.aria-label]="'Rendimiento en ' + c.nombre">
+                    <div class="g6-campana-rend__head" role="row">
+                      <span role="columnheader">Producto</span>
+                      <span role="columnheader">Ped/sem</span>
+                      <span role="columnheader">CPA real</span>
+                      <span role="columnheader">ROAS</span>
+                      <span role="columnheader">Stock</span>
+                      <span role="columnheader">Tendencia</span>
+                    </div>
+                    @for (p of c.productos; track p.id) {
+                      <div class="g6-campana-rend__row" role="row"
+                           [class.g6-campana-rend__row--stock-bajo]="p.estadoStock === 'bajo'"
+                           [class.g6-campana-rend__row--stock-agotado]="p.estadoStock === 'agotado'">
+                        <span class="g6-campana-rend__nombre" role="cell">
+                          {{ p.nombre }}
+                          @if (p.estadoStock === 'bajo') {
+                            <span class="g6-campana-rend__stock-warn" title="Stock bajo">⚠</span>
+                          }
+                        </span>
+                        <span role="cell">{{ p.metricas?.pedidosSem ?? '—' }}</span>
+                        <span role="cell">
+                          @if (p.metricas?.cpaReal) { ${{ p.metricas!.cpaReal | number:'1.0-0':'es' }} }
+                          @else { — }
+                        </span>
+                        <span role="cell"
+                              [class.g6-campana-rend__roas--ok]="(p.metricas?.roasCampana ?? 0) >= c.roasObjetivo"
+                              [class.g6-campana-rend__roas--low]="(p.metricas?.roasCampana ?? 0) > 0 && p.metricas!.roasCampana < c.roasObjetivo">
+                          @if (p.metricas?.roasCampana) { {{ p.metricas!.roasCampana }}x } @else { — }
+                        </span>
+                        <span role="cell" [class]="'g6-campana-rend__stock--' + (p.estadoStock ?? 'ok')">
+                          @if (p.stockActual !== undefined) { {{ p.stockActual }} uds } @else { — }
+                        </span>
+                        <div role="cell" class="g6-campana-sparkline" aria-hidden="true">
+                          @if (p.metricas?.historial5sem) {
+                            <svg width="60" height="20" viewBox="0 0 60 20">
+                              @for (val of p.metricas!.historial5sem; track val; let i = $index) {
+                                <rect [attr.x]="i * 13" width="10"
+                                      [attr.y]="20 - (maxHistorialCampana(c) > 0 ? (val / maxHistorialCampana(c) * 18) : 0)"
+                                      [attr.height]="maxHistorialCampana(c) > 0 ? (val / maxHistorialCampana(c) * 18) : 0"
+                                      [attr.fill]="sparklineColor(val, c)">
+                                </rect>
+                              }
+                            </svg>
+                          } @else { — }
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Ángulos por producto -->
+                  @for (p of c.productos; track p.id) {
+                    @if (p.angulos && p.angulos.length > 0) {
+                      <div class="g6-campana-angulos">
+                        <span class="g6-campana-angulos__title">Ángulos — {{ p.nombre }}</span>
+                        @for (a of p.angulos; track a.id) {
+                          <div class="g6-campana-angulo-row" [class.g6-campana-angulo-row--pausado]="a.estado === 'pausado'">
+                            <span class="g6-campana-angulo__dot" [attr.data-estado]="a.estado">
+                              {{ a.estado === 'activo' ? '●' : a.estado === 'pausado' ? '⏸' : '○' }}
+                            </span>
+                            <span class="g6-campana-angulo__nombre">{{ a.nombre }}</span>
+                            <span class="g6-campana-angulo__pub">{{ a.publicoObj }}</span>
+                            @if (a.roas) {
+                              <span class="g6-campana-angulo__roas"
+                                    [class.g6-campana-angulo__roas--ok]="a.roas >= c.roasObjetivo">
+                                ROAS {{ a.roas }}x
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  }
+                </div>
+              }
             </div>
           }
         </div>
@@ -656,10 +762,17 @@
   }
 </div>
 } @else {
-  <div class="g6-detalle g6-detalle--not-found">
-    <button class="g6-detalle__back" (click)="volverAProyectos()">← Volver</button>
-    <h2>Proyecto no encontrado</h2>
-    <p>El proyecto con ID "{{ proyectoId() }}" no existe.</p>
-  </div>
+  @if (!proyectoId()) {
+    <div class="g6-detalle g6-detalle--loading">
+      <button class="g6-detalle__back" (click)="volverAProyectos()">← Volver</button>
+      <p class="g6-detalle__loading-msg">Cargando proyecto...</p>
+    </div>
+  } @else {
+    <div class="g6-detalle g6-detalle--not-found">
+      <button class="g6-detalle__back" (click)="volverAProyectos()">← Volver</button>
+      <h2>Proyecto no encontrado</h2>
+      <p>Si acabas de crearlo desde el wizard, vuelve al portafolio y ábrelo desde ahí.</p>
+    </div>
+  }
 }
 }

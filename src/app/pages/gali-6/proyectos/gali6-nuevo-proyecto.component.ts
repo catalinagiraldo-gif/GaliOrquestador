@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { getObjetivo, G6Objetivo } from '../../../../../mocks/gali-v6/objetivo';
 import {
   TIPOS_PROYECTO, TipoProyecto, TipoProyectoMeta,
+  CampanaProyecto, TipoCampana, ProductoRef,
 } from '../../../../../mocks/gali-v6/proyectos.mock';
 import {
   INTEGRACIONES_CAMPANA, IntegracionStatus, IntegracionId,
 } from '../../../../../mocks/gali-v6/campanas.mock';
 
 type Step =
-  | 'tipo' | 'intent-chat' | 'nombre' | 'agentes' | 'agregar-campana'
+  | 'tipo' | 'intent-chat' | 'nombre' | 'agentes' | 'sub-meta' | 'agregar-campana'
   | 'campana-tipo' | 'campana-ruta-venta' | 'campana-productos'
   | 'campana-presupuesto' | 'campana-brujula' | 'campana-creativos'
   | 'campana-resumen' | 'exito';
@@ -22,6 +23,8 @@ interface RutaVentaOp {
   id: string;
   label: string;
   descripcion: string;
+  grupo: 'pauta' | 'landing' | 'chatea' | 'paquete' | 'organico';
+  factoresExtra: Array<'shopify' | 'chatea-pro'>;
   integracionesRequeridas: IntegracionId[];
 }
 
@@ -57,6 +60,8 @@ const NOMBRE_SUGERIDO: Record<TipoProyecto, () => string> = {
   optimizar: () => 'Optimización portafolio',
   crm: () => 'Estrategia Chatea',
   experimentar: () => `Experimento — ${new Date().toLocaleDateString('es-CO', { month: 'short' })}`,
+  operacion: () => 'Mejora operativa',
+  negociacion: () => `Negociación — ${new Date().toLocaleDateString('es-CO', { month: 'short', year: 'numeric' })}`,
 };
 
 const LAUNCH_STEPS = [
@@ -91,6 +96,16 @@ const INTENT_OPCIONES: Record<TipoProyecto, string[]> = {
     'Quiero testear un producto antes de lanzarlo',
     'Tengo una hipótesis de audiencia',
   ],
+  operacion: [
+    'Quiero reducir la tasa de novedad',
+    'Necesito mejorar tiempos de respuesta',
+    'Quiero bajar costos operativos sin afectar ventas',
+  ],
+  negociacion: [
+    'Quiero mejorar el precio con mi proveedor',
+    'Necesito asegurar stock para temporada alta',
+    'Quiero negociar mejores condiciones de pago',
+  ],
 };
 
 const GALI_INTENT_RESPUESTA: Record<TipoProyecto, { texto: string; subObjetivo: string }> = {
@@ -99,10 +114,13 @@ const GALI_INTENT_RESPUESTA: Record<TipoProyecto, { texto: string; subObjetivo: 
   optimizar:   { texto: 'Vamos a revisar el portafolio completo. Te mostraré qué proyectos cerrar y cuáles ajustar.', subObjetivo: 'Identificar y cerrar proyectos que no aportan' },
   crm:         { texto: 'Chatea Pro es la herramienta ideal para esto. Sin pauta, solo conversaciones que convierten.', subObjetivo: 'Reactivar base de contactos existente' },
   experimentar:{ texto: 'Experimento acotado con presupuesto y tiempo límite definidos. ADA monitoreará los resultados.', subObjetivo: 'Validar hipótesis en 14 días' },
+  operacion:   { texto: 'Vamos a identificar los cuellos de botella operativos. Te daré un diagnóstico claro y acciones concretas.', subObjetivo: 'Mejorar eficiencia operativa en 30 días' },
+  negociacion: { texto: 'ADA analizará el historial con tu proveedor y te ayudará a construir argumentos sólidos para la negociación.', subObjetivo: 'Mejorar condiciones con el proveedor este mes' },
 };
 
 const TIPO_CAMPANA_DEFAULT: Record<TipoProyecto, TipoCampanaOp> = {
   lanzar: 'ads', escalar: 'ads', optimizar: 'hibrida', crm: 'chatea', experimentar: 'ads',
+  operacion: 'organica', negociacion: 'organica',
 };
 
 const CAMP_TIPO_OPTIONS: { id: TipoCampanaOp; label: string; descripcion: string; emoji: string }[] = [
@@ -113,35 +131,80 @@ const CAMP_TIPO_OPTIONS: { id: TipoCampanaOp; label: string; descripcion: string
 ];
 
 const RUTAS_VENTA: RutaVentaOp[] = [
+  // Grupo pauta
   {
-    id: 'meta-landing-chatea',
-    label: 'Landing page + Meta Ads + Chatea Pro',
-    descripcion: 'Full-funnel: pauta → landing → conversación por WhatsApp',
-    integracionesRequeridas: ['shopify', 'meta-ads', 'chatea-pro'],
+    id: 'solo-meta',
+    label: 'Solo Meta Ads',
+    descripcion: 'Publicidad en Facebook e Instagram. Leads van directo a WhatsApp o manual.',
+    grupo: 'pauta', factoresExtra: [],
+    integracionesRequeridas: ['meta-ads'],
   },
   {
+    id: 'solo-tiktok',
+    label: 'Solo TikTok Ads',
+    descripcion: 'Publicidad en TikTok. Conversión en DMs o manual.',
+    grupo: 'pauta', factoresExtra: [],
+    integracionesRequeridas: ['tiktok-ads'],
+  },
+  {
+    id: 'meta-tiktok',
+    label: 'Meta + TikTok Ads',
+    descripcion: 'Ambas plataformas simultáneamente. Mayor alcance, mayor inversión.',
+    grupo: 'pauta', factoresExtra: [],
+    integracionesRequeridas: ['meta-ads', 'tiktok-ads'],
+  },
+  // Grupo landing
+  {
+    id: 'meta-landing',
+    label: 'Meta Ads → Landing Page',
+    descripcion: 'Pauta Meta dirige a una landing page en Shopify/Dropify.',
+    grupo: 'landing', factoresExtra: ['shopify'],
+    integracionesRequeridas: ['meta-ads', 'shopify'],
+  },
+  {
+    id: 'tiktok-landing',
+    label: 'TikTok Ads → Landing Page',
+    descripcion: 'Pauta TikTok dirige a una landing page en Shopify/Dropify.',
+    grupo: 'landing', factoresExtra: ['shopify'],
+    integracionesRequeridas: ['tiktok-ads', 'shopify'],
+  },
+  // Grupo chatea
+  {
     id: 'meta-chatea',
-    label: 'Solo Meta Ads + Chatea Pro',
-    descripcion: 'Pauta directa a conversación WhatsApp, sin landing page',
+    label: 'Meta Ads → Chatea Pro',
+    descripcion: 'Pauta Meta lleva al usuario directo a WhatsApp con flujo automatizado.',
+    grupo: 'chatea', factoresExtra: ['chatea-pro'],
     integracionesRequeridas: ['meta-ads', 'chatea-pro'],
   },
   {
     id: 'tiktok-chatea',
-    label: 'TikTok Ads + Chatea Pro',
-    descripcion: 'Pauta en TikTok con seguimiento por WhatsApp',
+    label: 'TikTok Ads → Chatea Pro',
+    descripcion: 'Pauta TikTok lleva al usuario a WhatsApp con flujo automatizado.',
+    grupo: 'chatea', factoresExtra: ['chatea-pro'],
     integracionesRequeridas: ['tiktok-ads', 'chatea-pro'],
   },
+  // Grupo paquete
+  {
+    id: 'meta-landing-chatea',
+    label: 'Paquete completo (Meta + Landing + Chatea)',
+    descripcion: 'Landing Page + Meta Ads + Chatea Pro. El stack completo de dropshipping.',
+    grupo: 'paquete', factoresExtra: ['shopify', 'chatea-pro'],
+    integracionesRequeridas: ['meta-ads', 'shopify', 'chatea-pro'],
+  },
+  // Grupo organico
   {
     id: 'landing-chatea',
-    label: 'Landing page + Chatea Pro (sin ads)',
-    descripcion: 'Tráfico orgánico o directo, seguimiento por chat',
+    label: 'Solo Chatea Pro (orgánico)',
+    descripcion: 'Ventas por WhatsApp sin pauta pagada. Ideal para recuperar clientes o CRM.',
+    grupo: 'organico', factoresExtra: ['chatea-pro'],
     integracionesRequeridas: ['shopify', 'chatea-pro'],
   },
   {
     id: 'directo',
-    label: 'Directamente por WhatsApp / Link directo',
-    descripcion: 'Sin plataforma de ads. Envías a conocidos o publicas en redes',
-    integracionesRequeridas: ['chatea-pro'],
+    label: 'Sin canal de pago',
+    descripcion: 'Sin pauta ni suscripciones. Solo gestión manual o seguimiento orgánico.',
+    grupo: 'organico', factoresExtra: [],
+    integracionesRequeridas: [],
   },
 ];
 
@@ -151,6 +214,8 @@ const AGREGAR_CAMPANA_COPY: Record<TipoProyecto, { si: string; no: string }> = {
   optimizar:   { si: 'Sí, crear campaña de ajuste', no: 'No, solo quiero hacer seguimiento' },
   crm:         { si: 'Sí, crear secuencia en Chatea Pro', no: 'Después, solo crear el proyecto' },
   experimentar:{ si: 'Sí, crear campaña de prueba', no: 'No, solo registrar el experimento' },
+  operacion:   { si: 'Sí, crear campaña de seguimiento', no: 'No, crear solo el proyecto' },
+  negociacion: { si: 'Sí, crear campaña de negociación', no: 'No, crear solo el proyecto' },
 };
 
 const CATEGORIAS = ['Todos', 'Salud & Bienestar', 'Belleza', 'Hogar', 'Fitness'];
@@ -163,7 +228,7 @@ const CATEGORIAS = ['Todos', 'Salud & Bienestar', 'Belleza', 'Hogar', 'Fitness']
   styleUrl: './gali6-nuevo-proyecto.component.scss',
 })
 export class Gali6NuevoProyectoComponent {
-  private readonly router = inject(Router);
+  readonly router = inject(Router);
 
   readonly TIPOS_PROYECTO: TipoProyectoMeta[] = TIPOS_PROYECTO;
   readonly LAUNCH_STEPS = LAUNCH_STEPS;
@@ -171,9 +236,9 @@ export class Gali6NuevoProyectoComponent {
   readonly RUTAS_VENTA = RUTAS_VENTA;
   readonly CATEGORIAS = CATEGORIAS;
 
-  readonly PROJ_STEPS: Step[] = ['tipo', 'intent-chat', 'nombre', 'agentes', 'agregar-campana'];
+  readonly PROJ_STEPS: Step[] = ['tipo', 'intent-chat', 'nombre', 'agentes', 'sub-meta', 'agregar-campana'];
   readonly CAMP_STEPS: Step[] = [
-    'campana-tipo', 'campana-ruta-venta', 'campana-productos',
+    'campana-productos', 'campana-tipo', 'campana-ruta-venta',
     'campana-presupuesto', 'campana-brujula', 'campana-creativos', 'campana-resumen',
   ];
 
@@ -284,15 +349,32 @@ export class Gali6NuevoProyectoComponent {
     this.router.navigate(['/gali-6/agentes'], { queryParams: { crear: 'true' } });
   }
 
-  // ── Paso 4: ¿Agregar campaña? ────────────────────────────────────────
+  // ── Paso 4b: Sub-meta ────────────────────────────────────────────────
+  readonly subMetaSeleccionadaId = signal<string | null>(null);
+
+  readonly subMetasPendientes = computed(() =>
+    getObjetivo().sub_metas.filter(sm => !sm.lograda)
+  );
+
+  seleccionarSubMeta(id: string | null): void {
+    this.subMetaSeleccionadaId.set(id);
+    this.step.set('agregar-campana');
+  }
+
+  // ── Paso 5: ¿Agregar campaña? ────────────────────────────────────────
   readonly campanaCtaCopy = computed(() => {
     const tipo = this.selectedTipo();
     return tipo ? AGREGAR_CAMPANA_COPY[tipo] : { si: 'Sí, añadir campaña', no: 'Después' };
   });
 
+  readonly tipoRequiereCampana = computed(() => {
+    const tipo = this.selectedTipo();
+    return TIPOS_PROYECTO.find(t => t.id === tipo)?.requiereCampana ?? true;
+  });
+
   elegirAgregarCampana(si: boolean): void {
     if (si) {
-      this.step.set('campana-tipo');
+      this.goTo('campana-productos'); // productos primero, luego tipo/canal
     } else {
       this.crearProyectoBorrador();
     }
@@ -303,10 +385,10 @@ export class Gali6NuevoProyectoComponent {
 
   selectTipoCampana(tipo: TipoCampanaOp): void {
     this.tipoCampanaSeleccionado.set(tipo);
-    // Si es chatea u organica, saltamos la ruta de venta a directo
+    // Si es chatea u organica, saltamos la ruta de venta y vamos directo a presupuesto
     if (tipo === 'chatea' || tipo === 'organica') {
       this.rutaVentaSeleccionada.set('directo');
-      this.goTo('campana-productos');
+      this.goTo('campana-presupuesto');
     } else {
       this.goTo('campana-ruta-venta');
     }
@@ -316,6 +398,14 @@ export class Gali6NuevoProyectoComponent {
   readonly rutaVentaSeleccionada = signal<string | null>(null);
   readonly integraciones = signal<IntegracionStatus[]>(INTEGRACIONES_CAMPANA);
   readonly integExpandida = signal<IntegracionId | null>(null);
+
+  readonly rutasAgrupadas = computed(() => [
+    { id: 'pauta',    label: 'Solo pauta',           rutas: RUTAS_VENTA.filter(r => r.grupo === 'pauta') },
+    { id: 'landing',  label: 'Pauta + landing page', rutas: RUTAS_VENTA.filter(r => r.grupo === 'landing') },
+    { id: 'chatea',   label: 'Pauta + Chatea Pro',   rutas: RUTAS_VENTA.filter(r => r.grupo === 'chatea') },
+    { id: 'paquete',  label: 'Paquete completo',     rutas: RUTAS_VENTA.filter(r => r.grupo === 'paquete') },
+    { id: 'organico', label: 'Sin canal de pago',    rutas: RUTAS_VENTA.filter(r => r.grupo === 'organico') },
+  ]);
 
   readonly rutaSeleccionadaObj = computed(() =>
     RUTAS_VENTA.find(r => r.id === this.rutaVentaSeleccionada()) ?? null
@@ -330,8 +420,28 @@ export class Gali6NuevoProyectoComponent {
   });
 
   readonly rutaConAds = computed(() => {
-    const id = this.rutaVentaSeleccionada();
-    return id === 'meta-landing-chatea' || id === 'meta-chatea' || id === 'tiktok-chatea';
+    const ruta = this.rutaSeleccionadaObj();
+    if (!ruta) return false;
+    return ['pauta', 'landing', 'chatea', 'paquete'].includes(ruta.grupo);
+  });
+
+  // Qué plataformas de pauta aplican en la ruta seleccionada
+  readonly canalPautaLabel = computed(() => {
+    const id = this.rutaVentaSeleccionada() ?? '';
+    if (id.startsWith('meta-tiktok') || id === 'meta-tiktok') return 'Meta Ads + TikTok Ads';
+    if (id.startsWith('meta')) return 'Meta Ads';
+    if (id.startsWith('tiktok')) return 'TikTok Ads';
+    return '';
+  });
+
+  // Lista de suscripciones que aplican con sus costos
+  readonly suscripcionesActivas = computed<Array<{ nombre: string; mensual: number }>>(() => {
+    const ruta = this.rutaSeleccionadaObj();
+    if (!ruta) return [];
+    const lista: Array<{ nombre: string; mensual: number }> = [];
+    if (ruta.factoresExtra.includes('shopify'))    lista.push({ nombre: 'Shopify',    mensual: this.SHOPIFY_MENSUAL });
+    if (ruta.factoresExtra.includes('chatea-pro')) lista.push({ nombre: 'Chatea Pro', mensual: this.CHATEA_MENSUAL });
+    return lista;
   });
 
   selectRuta(id: string): void {
@@ -339,7 +449,7 @@ export class Gali6NuevoProyectoComponent {
   }
 
   continuarDesdeRuta(): void {
-    this.goTo('campana-productos');
+    this.goTo('campana-presupuesto');
   }
 
   toggleIntegGuide(id: IntegracionId): void {
@@ -508,12 +618,53 @@ export class Gali6NuevoProyectoComponent {
     return Math.round(((precio - costo - comision) / precio) * 100);
   }
 
+  getGananciaParaProducto(id: string): number {
+    const p = ADA_PRODUCTOS.find(x => x.id === id)!;
+    const precio = this.getPrecioPorProducto(id);
+    const costo = p.costoBase + p.fleteBase;
+    const comision = Math.round(precio * this.COMISION_PCT / 100);
+    const pauta = this.pautaEfectivaPorPedido();
+    const susc = this.costoSuscripcionPorPedido();
+    return precio - costo - comision - pauta - susc;
+  }
+
   getMargenColorParaProducto(id: string): string {
     const m = this.getMargenParaProducto(id);
     if (m >= 35) return 'verde';
     if (m >= 20) return 'ambar';
     return 'rojo';
   }
+
+  // Brújula accordion por producto (multi-select)
+  readonly brujulaExpandido = signal<Set<string>>(new Set());
+
+  toggleBrujulaProducto(id: string): void {
+    this.brujulaExpandido.update(s => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
+  }
+
+  isBrujulaExpanded(id: string): boolean {
+    return this.brujulaExpandido().has(id);
+  }
+
+  getMinPrecio(id: string): number {
+    const p = ADA_PRODUCTOS.find(x => x.id === id)!;
+    return Math.round((p.costoBase + p.fleteBase) * 1.1);
+  }
+
+  getMaxPrecio(id: string): number {
+    const p = ADA_PRODUCTOS.find(x => x.id === id)!;
+    return Math.round((p.costoBase + p.fleteBase) * 3.5);
+  }
+
+  readonly utilidadTotalMulti = computed(() => {
+    const pedidos = this.expectativaPedidosSem() * 4;
+    return this.selectedProductosList()
+      .reduce((sum, p) => sum + this.getGananciaParaProducto(p.id) * (pedidos / (this.selectedProductosList().length || 1)), 0);
+  });
 
   ajustarTodosAlRecomendado(): void {
     const nuevo: Record<string, number> = {};
@@ -526,6 +677,72 @@ export class Gali6NuevoProyectoComponent {
   usarPrecioRecomendado(): void {
     this.precioSlider.set(this.precioRecomendado());
   }
+
+  // ── Brújula v2: margen→precio + suscripciones ────────────────────────
+  readonly SHOPIFY_MENSUAL = 89000;
+  readonly CHATEA_MENSUAL = 149000;
+
+  readonly costoSuscripcionMensual = computed(() => {
+    const ruta = RUTAS_VENTA.find(r => r.id === this.rutaVentaSeleccionada());
+    let total = 0;
+    if (ruta?.factoresExtra.includes('shopify'))    total += this.SHOPIFY_MENSUAL;
+    if (ruta?.factoresExtra.includes('chatea-pro')) total += this.CHATEA_MENSUAL;
+    return total;
+  });
+
+  readonly costoSuscripcionPorPedido = computed(() => {
+    const pedidosMes = this.expectativaPedidosSem() * 4;
+    if (pedidosMes <= 0) return 0;
+    return Math.round(this.costoSuscripcionMensual() / pedidosMes);
+  });
+
+  readonly margenDeseado = signal(40);
+
+  readonly costoCompletoBase = computed(() =>
+    this.costoProd() + this.FLETE_FIJO + this.costoSuscripcionPorPedido()
+  );
+
+  readonly precioCalculado = computed(() => {
+    const costoTotal = this.costoCompletoBase() + this.pautaEfectivaPorPedido();
+    const m = this.margenDeseado() / 100;
+    const factor = 1 - m - this.COMISION_PCT / 100;
+    if (factor <= 0) return costoTotal * 10;
+    return Math.round(costoTotal / factor);
+  });
+
+  readonly utilidadPorPedido = computed(() => {
+    const p = this.precioCalculado();
+    const comision = Math.round(p * this.COMISION_PCT / 100);
+    return p - this.costoCompletoBase() - this.pautaEfectivaPorPedido() - comision;
+  });
+
+  readonly utilidadMensual = computed(() =>
+    this.utilidadPorPedido() * this.expectativaPedidosSem() * 4
+  );
+
+  readonly margenSemaforoNuevo = computed(() => {
+    const m = this.margenDeseado();
+    if (m >= 35) return 'verde';
+    if (m >= 20) return 'ambar';
+    return 'rojo';
+  });
+
+  readonly brujulaGaliOpen = signal(false);
+
+  toggleBrujulaGali(): void {
+    this.brujulaGaliOpen.update(v => !v);
+  }
+
+  readonly brujulaGaliMsg = computed(() => {
+    const m = this.margenDeseado();
+    const utilidad = this.utilidadPorPedido();
+    const precio = this.precioCalculado();
+    if (m < 15) return '⚠️ Con este margen estás casi en break-even. Cualquier variación en costos te haría perder dinero. Sube el margen a al menos 20%.';
+    if (m < 25) return `💡 Margen aceptable pero ajustado. Con $${utilidad.toLocaleString('es-CO')}/pedido necesitarás volumen alto para ser rentable.`;
+    if (m >= 35 && precio > 200000) return `✦ Margen excelente (${m}%). Precio de $${precio.toLocaleString('es-CO')} puede ser competitivo. Verifica el precio de mercado antes de lanzar.`;
+    if (m >= 35) return `✦ Margen excelente (${m}%). Precio saludable para el mercado colombiano.`;
+    return `✦ Margen ${m}% — ganancia $${utilidad.toLocaleString('es-CO')} por pedido. Estás en zona segura.`;
+  });
 
   // ── Campaña: Creativos ───────────────────────────────────────────────
   readonly creativoLanding = signal(false);
@@ -570,6 +787,8 @@ export class Gali6NuevoProyectoComponent {
   }
 
   crearProyectoBorrador(): void {
+    const id = this.generarNuevoId();
+    this.nuevoProyectoId.set(id);
     this.isLaunching.set(true);
     this.launchProgress.set(0);
     this.launchStepActive.set(1);
@@ -577,6 +796,7 @@ export class Gali6NuevoProyectoComponent {
     setTimeout(() => { this.launchProgress.set(100); this.launchStepActive.set(3); }, 1200);
     setTimeout(() => {
       this.isLaunching.set(false);
+      this.persistirProyecto(id, 'borrador');
       this.step.set('exito');
     }, 1800);
   }
@@ -592,8 +812,106 @@ export class Gali6NuevoProyectoComponent {
     setTimeout(() => { this.launchProgress.set(100); this.launchStepActive.set(3); }, 1700);
     setTimeout(() => {
       this.isLaunching.set(false);
+      this.persistirProyecto(id, 'activo');
       this.router.navigate(['/gali-6/proyecto', id], { queryParams: { recien: '1' } });
     }, 2500);
+  }
+
+  private rutaACanal(rutaId: string | null): { canal: CampanaProyecto['canal']; canalLabel: string; canalColor: string } {
+    if (!rutaId || rutaId === 'directo' || rutaId === 'landing-chatea') {
+      return { canal: 'whatsapp', canalLabel: 'WhatsApp', canalColor: '#25D366' };
+    }
+    if (rutaId.startsWith('tiktok')) {
+      return { canal: 'tiktok', canalLabel: 'TikTok Ads', canalColor: '#010101' };
+    }
+    return { canal: 'meta', canalLabel: 'Meta Ads', canalColor: '#1877F2' };
+  }
+
+  private persistirProyecto(id: string, estado: 'activo' | 'borrador' = 'activo'): void {
+    const tipo = this.selectedTipo() ?? 'lanzar';
+    const nombre = this.nombreProyecto() || NOMBRE_SUGERIDO[tipo]();
+    const subObjIntent = this.galiIntentRespuesta()?.subObjetivo ?? '';
+
+    // Sub-meta vinculada por el usuario
+    const subMetaId = this.subMetaSeleccionadaId();
+    const subMetaLabel = subMetaId
+      ? getObjetivo().sub_metas.find(sm => sm.id === subMetaId)?.label
+      : undefined;
+
+    // Construir campaña desde signals del wizard
+    const campanas: CampanaProyecto[] = [];
+    if (this.tipoCampanaSeleccionado()) {
+      const rutaId = this.rutaVentaSeleccionada();
+      const ruta = RUTAS_VENTA.find(r => r.id === rutaId) ?? null;
+      const { canal, canalLabel, canalColor } = this.rutaACanal(rutaId);
+
+      const productosRef: ProductoRef[] = this.selectedProductosList().map(p => ({
+        id: p.id,
+        nombre: p.nombre,
+        margenPct: parseInt(p.margenEst, 10) || 0,
+        precioVentaLabel: this.preciosPorProducto()[p.id]
+          ? `$${Math.round(this.preciosPorProducto()[p.id]).toLocaleString('es-CO')} COP`
+          : `$${Math.round((p.costoBase + p.fleteBase) / 0.6).toLocaleString('es-CO')} COP`,
+        costoBase: p.costoBase,
+        fleteBase: p.fleteBase,
+      }));
+
+      const campanaBase: CampanaProyecto = {
+        id: `camp-${Date.now().toString(36)}`,
+        nombre: `${canalLabel} — ${nombre}`,
+        canal,
+        canalLabel,
+        canalColor,
+        producto: productosRef[0]?.nombre ?? null,
+        productos: productosRef,
+        estado: estado === 'borrador' ? 'borrador' : (productosRef.length > 0 ? 'activa' : 'sin_producto'),
+        tipoCampana: this.tipoCampanaSeleccionado() as TipoCampana,
+        roasObjetivo: 1.5,
+        presupuestoDiario: this.presupuestoDiario(),
+        presupuestoDiarioLabel: `$${this.presupuestoDiario().toLocaleString('es-CO')}/día`,
+        agentes: Object.entries(this.agentes()).filter(([, v]) => v).map(([k]) => k),
+        conexiones: ruta?.integracionesRequeridas ?? [],
+        notaGali: estado === 'activo' ? 'Gali monitoreando. Primeras señales en 48h.' : undefined,
+      };
+      campanas.push(campanaBase);
+
+      // Ruta meta-tiktok → segunda campaña TikTok
+      if (rutaId === 'meta-tiktok') {
+        campanas.push({
+          ...campanaBase,
+          id: `camp-${(Date.now() + 1).toString(36)}`,
+          canal: 'tiktok',
+          canalLabel: 'TikTok Ads',
+          canalColor: '#010101',
+          nombre: `TikTok Ads — ${nombre}`,
+        });
+      }
+    }
+
+    const nuevo = {
+      id,
+      nombre,
+      tipo,
+      estado,
+      descripcion: subObjIntent,
+      subObjetivo: subMetaLabel ?? subObjIntent,
+      subObjetivoId: subMetaId ?? undefined,
+      fechaInicio: new Date().toISOString().split('T')[0],
+      campanas,
+      agentes: Object.entries(this.agentes()).filter(([, v]) => v).map(([k]) => k),
+      pedidosSem: 0,
+      roasPromedio: 0,
+      presupuestoTotal: campanas[0]?.presupuestoDiario ?? 0,
+      contribucionPct: 0,
+      proyeccionSemanas: null,
+      alertaGali: estado === 'borrador' ? 'Proyecto en borrador — agrega una campaña para empezar a generar pedidos.' : null,
+      productosMetrics: [],
+    };
+    try {
+      const stored: object[] = JSON.parse(localStorage.getItem('g6_proyectos_extra') ?? '[]');
+      stored.push(nuevo);
+      localStorage.setItem('g6_proyectos_extra', JSON.stringify(stored));
+    } catch { /* ignore storage errors */ }
   }
 
   // ── Navegación ───────────────────────────────────────────────────────
@@ -613,6 +931,7 @@ export class Gali6NuevoProyectoComponent {
       'intent-chat': 'Tu intención',
       'nombre': 'Nombre',
       'agentes': 'Agentes',
+      'sub-meta': 'Tu meta',
       'agregar-campana': '¿Agregar campaña?',
       'campana-tipo': 'Tipo de campaña',
       'campana-ruta-venta': '¿Por dónde quieres vender?',
@@ -637,9 +956,11 @@ export class Gali6NuevoProyectoComponent {
     const cur = this.step();
     if (cur === 'tipo') { this.router.navigate(['/gali-6/proyectos']); return; }
     if (cur === 'intent-chat') { this.step.set('tipo'); return; }
-    if (cur === 'campana-tipo') { this.step.set('agregar-campana'); return; }
+    // Nuevo orden: productos → tipo → ruta-venta → presupuesto
+    if (cur === 'campana-productos') { this.step.set('agregar-campana'); return; }
+    if (cur === 'campana-tipo') { this.step.set('campana-productos'); return; }
     if (cur === 'campana-ruta-venta') { this.step.set('campana-tipo'); return; }
-    if (cur === 'campana-productos') {
+    if (cur === 'campana-presupuesto') {
       const tipo = this.tipoCampanaSeleccionado();
       if (tipo === 'chatea' || tipo === 'organica') {
         this.step.set('campana-tipo');
@@ -648,7 +969,6 @@ export class Gali6NuevoProyectoComponent {
       }
       return;
     }
-    if (cur === 'campana-presupuesto') { this.step.set('campana-productos'); return; }
     const projIdx = this.PROJ_STEPS.indexOf(cur);
     if (projIdx > 0) { this.step.set(this.PROJ_STEPS[projIdx - 1]); return; }
     const campIdx = this.CAMP_STEPS.indexOf(cur);

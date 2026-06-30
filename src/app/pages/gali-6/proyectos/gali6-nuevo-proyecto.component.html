@@ -178,19 +178,51 @@
         + Crear agente personalizado →
       </button>
 
-      <button class="wizard__next" (click)="goTo('agregar-campana')">
+      <button class="wizard__next" (click)="goTo('sub-meta')">
         Continuar →
       </button>
     </div>
   }
 
-  <!-- ── PASO 4: ¿Agregar campaña? ── -->
+  <!-- ── PASO 4b: Sub-meta ── -->
+  @if (step() === 'sub-meta') {
+    <div class="wizard__body gali-stagger-in">
+      <h1 class="wizard__title">¿Este proyecto alimenta alguna de tus metas?</h1>
+      <p class="wizard__sub">Conectar el proyecto a una meta permite a Gali medir su impacto real en tu objetivo.</p>
+
+      <div class="sub-meta-list">
+        @for (sm of subMetasPendientes(); track sm.id) {
+          <button class="sub-meta-chip"
+                  [class.sub-meta-chip--active]="subMetaSeleccionadaId() === sm.id"
+                  (click)="subMetaSeleccionadaId.set(sm.id)">
+            <span class="sub-meta-chip__dot" [class.sub-meta-chip__dot--active]="subMetaSeleccionadaId() === sm.id"></span>
+            <span class="sub-meta-chip__label">{{ sm.label }}</span>
+          </button>
+        }
+        @if (subMetasPendientes().length === 0) {
+          <p class="sub-meta-empty">No tienes metas pendientes. Puedes crearlas desde Mi Negocio.</p>
+        }
+      </div>
+
+      <div class="wizard__actions-row">
+        <button class="wizard__skip" (click)="seleccionarSubMeta(null)">
+          Ninguna por ahora
+        </button>
+        @if (subMetaSeleccionadaId()) {
+          <button class="wizard__next" (click)="seleccionarSubMeta(subMetaSeleccionadaId())">
+            Continuar →
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ── PASO 5: ¿Agregar campaña? ── -->
   @if (step() === 'agregar-campana') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">¿Quieres añadir una campaña ahora?</h1>
-      <p class="wizard__sub">Un proyecto puede tener 0, 1 o N campañas de cualquier tipo.</p>
 
       @if (isLaunching()) {
+        <h1 class="wizard__title">Creando tu proyecto...</h1>
         <div class="launch-mini" aria-live="polite">
           <span class="launch-mini__icon" aria-hidden="true">✦</span>
           <p class="launch-mini__text">Creando proyecto...</p>
@@ -198,7 +230,51 @@
             <div class="launch-mini__fill" [style.width.%]="launchProgress()"></div>
           </div>
         </div>
+      } @else if (!tipoRequiereCampana()) {
+        <!-- Flujo sin campaña: operacion / negociacion -->
+        <div class="wizard__tipo-badge">
+          <span class="wizard__tipo-badge__emoji" aria-hidden="true">
+            {{ getTipoEmoji(selectedTipo()) }}
+          </span>
+        </div>
+        <h1 class="wizard__title">¿Listo para crear el proyecto?</h1>
+        <p class="wizard__sub">
+          Este tipo de proyecto <strong>no requiere campaña activa</strong>. Podrás añadir campañas desde el detalle en cualquier momento.
+        </p>
+
+        <div class="agregar-cards">
+          <button class="agregar-card agregar-card--si" type="button" (click)="elegirAgregarCampana(false)">
+            <i class="pi pi-check-circle agregar-card__icon"></i>
+            <div class="agregar-card__body">
+              <strong class="agregar-card__titulo">Crear proyecto</strong>
+              <p class="agregar-card__desc">
+                Se crea sin campaña. Define objetivos y asigna agentes desde el detalle.
+              </p>
+            </div>
+            <span class="agregar-card__arrow" aria-hidden="true">→</span>
+          </button>
+
+          <button class="agregar-card agregar-card--no" type="button" (click)="elegirAgregarCampana(true)">
+            <i class="pi pi-megaphone agregar-card__icon"></i>
+            <div class="agregar-card__body">
+              <strong class="agregar-card__titulo">{{ campanaCtaCopy().si }}</strong>
+              <p class="agregar-card__desc">
+                Si igual quieres incluir una campaña de seguimiento o negociación.
+              </p>
+            </div>
+            <span class="agregar-card__arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <p class="wizard__gali-hint">
+          <span aria-hidden="true">✦</span>
+          Gali monitoreará el proyecto con los agentes asignados incluso sin campaña activa.
+        </p>
       } @else {
+        <!-- Flujo normal: tipos que requieren campaña -->
+        <h1 class="wizard__title">¿Quieres añadir una campaña ahora?</h1>
+        <p class="wizard__sub">Un proyecto puede tener 0, 1 o N campañas de cualquier tipo.</p>
+
         <div class="agregar-cards">
           <button class="agregar-card agregar-card--si" type="button" (click)="elegirAgregarCampana(true)">
             <i class="pi pi-megaphone agregar-card__icon"></i>
@@ -270,24 +346,45 @@
   @if (step() === 'campana-ruta-venta') {
     <div class="wizard__body gali-stagger-in">
       <h1 class="wizard__title">¿Por dónde quieres vender?</h1>
-      <p class="wizard__sub">Selecciona la ruta de venta. Gali verificará las integraciones necesarias.</p>
+      <p class="wizard__sub">Selecciona la ruta. Gali verificará las integraciones necesarias y ajustará la calculadora de precio.</p>
 
-      <div class="ruta-list">
-        @for (r of RUTAS_VENTA; track r.id) {
-          <button class="ruta-card"
-                  [class.is-selected]="rutaVentaSeleccionada() === r.id"
-                  type="button"
-                  (click)="selectRuta(r.id)">
-            <div class="ruta-card__body">
-              <strong class="ruta-card__label">{{ r.label }}</strong>
-              <p class="ruta-card__desc">{{ r.descripcion }}</p>
+      @for (grupo of rutasAgrupadas(); track grupo.id) {
+        @if (grupo.rutas.length > 0) {
+          <div class="ruta-grupo">
+            <span class="ruta-grupo__label">{{ grupo.label }}</span>
+            <div class="ruta-list">
+              @for (r of grupo.rutas; track r.id) {
+                <button class="ruta-card"
+                        [class.is-selected]="rutaVentaSeleccionada() === r.id"
+                        type="button"
+                        (click)="selectRuta(r.id)">
+                  <div class="ruta-card__body">
+                    <strong class="ruta-card__label">{{ r.label }}</strong>
+                    <p class="ruta-card__desc">{{ r.descripcion }}</p>
+                    @if (r.factoresExtra.length > 0) {
+                      <div class="ruta-card__factores">
+                        @if (r.factoresExtra.includes('shopify')) {
+                          <span class="ruta-card__factor ruta-card__factor--costo">
+                            + Shopify <strong>$89.000/mes</strong>
+                          </span>
+                        }
+                        @if (r.factoresExtra.includes('chatea-pro')) {
+                          <span class="ruta-card__factor ruta-card__factor--costo">
+                            + Chatea Pro <strong>$149.000/mes</strong>
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  @if (rutaVentaSeleccionada() === r.id) {
+                    <span class="ruta-card__check" aria-hidden="true">✓</span>
+                  }
+                </button>
+              }
             </div>
-            @if (rutaVentaSeleccionada() === r.id) {
-              <span class="ruta-card__check" aria-hidden="true">✓</span>
-            }
-          </button>
+          </div>
         }
-      </div>
+      }
 
       <!-- Integraciones requeridas para la ruta seleccionada -->
       @if (rutaVentaSeleccionada() && integEstadoParaRuta().length > 0) {
@@ -515,125 +612,228 @@
   <!-- ── CAMPAÑA: Brújula de precio ── -->
   @if (step() === 'campana-brujula') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title"><i class="pi pi-compass"></i> Brújula de precio</h1>
+      <div class="brujula-header">
+        <h1 class="wizard__title"><i class="pi pi-compass"></i> Brújula de precio</h1>
+        <button class="brujula-gali-toggle"
+                type="button"
+                [class.brujula-gali-toggle--open]="brujulaGaliOpen()"
+                (click)="toggleBrujulaGali()"
+                aria-label="Consejo de Gali">
+          ✦ Consejo de Gali
+        </button>
+      </div>
 
-      @if (selectedProductosList().length <= 1) {
-        <!-- Vista de un solo producto -->
-        <p class="wizard__sub">Calculando precio a partir del costo real del producto + pauta.</p>
+      <div class="brujula-layout" [class.brujula-layout--with-gali]="brujulaGaliOpen()">
+        <div class="brujula-main">
 
-        <div class="brujula-inputs">
-          <div class="brujula-field brujula-field--readonly">
-            <label class="brujula-field__label">
-              Costo del producto
-              <span class="brujula-field__readonly-tag">fijado por proveedor</span>
-            </label>
-            <div class="brujula-field__row">
-              <span class="brujula-field__prefix">$</span>
-              <span class="brujula-field__static">{{ costoProd() | number }}</span>
-            </div>
-          </div>
-          <div class="brujula-field brujula-field--readonly">
-            <label class="brujula-field__label">Flete promedio <span class="brujula-field__readonly-tag">auto</span></label>
-            <div class="brujula-field__row">
-              <span class="brujula-field__prefix">$</span>
-              <span class="brujula-field__static">{{ FLETE_FIJO | number }}</span>
-            </div>
-          </div>
-        </div>
+          @if (selectedProductosList().length <= 1) {
+            <!-- Vista de un solo producto — slider de margen → precio calculado -->
+            <p class="wizard__sub">Ajusta el margen que quieres obtener. El precio de venta se calcula automáticamente.</p>
 
-        <div class="brujula-outputs">
-          <div class="brujula-metric">
-            <span class="brujula-metric__label">Costo total (producto + flete)</span>
-            <span class="brujula-metric__val brujula-metric__val--neutral">${{ costoTotal() | number }}</span>
-          </div>
-          <div class="brujula-metric">
-            <span class="brujula-metric__label">Comisión Dropi ({{ COMISION_PCT }}%)</span>
-            <span class="brujula-metric__val brujula-metric__val--neutral">−${{ comisionDropi() | number }}</span>
-          </div>
-          @if (rutaConAds()) {
-            <div class="brujula-metric brujula-metric--pauta">
-              <span class="brujula-metric__label">
-                Pauta efectiva/pedido
-                <span class="brujula-metric__hint">(con ${{ presupuestoDiario() | number }}/día)</span>
-              </span>
-              <span class="brujula-metric__val brujula-metric__val--warn">
-                ~${{ pautaEfectivaPorPedido() | number }}
-              </span>
+            <!-- Factores de costo (readonly) -->
+            <div class="brujula-factores">
+              <span class="brujula-factores__title">Factores de costo / pedido</span>
+              <div class="brujula-factor-row">
+                <span class="brujula-factor__label">Costo producto</span>
+                <span class="brujula-factor__val brujula-factor__val--readonly">${{ costoProd() | number:'1.0-0':'es' }}</span>
+                <span class="brujula-factor__tag">fijado por proveedor</span>
+              </div>
+              <div class="brujula-factor-row">
+                <span class="brujula-factor__label">Flete promedio</span>
+                <span class="brujula-factor__val brujula-factor__val--readonly">${{ FLETE_FIJO | number:'1.0-0':'es' }}</span>
+                <span class="brujula-factor__tag">estimado Dropi</span>
+              </div>
+              <div class="brujula-factor-row">
+                <span class="brujula-factor__label">Comisión Dropi ({{ COMISION_PCT }}%)</span>
+                <span class="brujula-factor__val brujula-factor__val--readonly">del precio final</span>
+              </div>
+              @if (rutaConAds() && pautaEfectivaPorPedido() > 0) {
+                <div class="brujula-factor-row brujula-factor-row--pauta">
+                  <span class="brujula-factor__label">
+                    Pauta / pedido
+                    @if (canalPautaLabel()) {
+                      <span class="brujula-factor__canal-tag">{{ canalPautaLabel() }}</span>
+                    }
+                  </span>
+                  <span class="brujula-factor__val">~${{ pautaEfectivaPorPedido() | number:'1.0-0':'es' }}</span>
+                  <span class="brujula-factor__tag">${{ presupuestoDiario() | number:'1.0-0':'es' }}/día ÷ ~{{ expectativaPedidosSem() }} ped/sem</span>
+                </div>
+              }
+              @if (suscripcionesActivas().length > 0) {
+                @for (susc of suscripcionesActivas(); track susc.nombre) {
+                  <div class="brujula-factor-row brujula-factor-row--susc">
+                    <span class="brujula-factor__label">{{ susc.nombre }} / pedido</span>
+                    <span class="brujula-factor__val">~${{ (susc.mensual / (expectativaPedidosSem() * 4 || 1)) | number:'1.0-0':'es' }}</span>
+                    <span class="brujula-factor__tag">${{ susc.mensual | number:'1.0-0':'es' }}/mes ÷ {{ expectativaPedidosSem() * 4 }} ped/mes</span>
+                  </div>
+                }
+              }
+              <div class="brujula-factor-row brujula-factor-row--total">
+                <span class="brujula-factor__label">Costo total / pedido</span>
+                <span class="brujula-factor__val brujula-factor__val--total">
+                  ${{ (costoCompletoBase() + pautaEfectivaPorPedido()) | number:'1.0-0':'es' }}
+                </span>
+              </div>
             </div>
-          }
-          <div class="brujula-metric">
-            <span class="brujula-metric__label">Precio mínimo <span class="brujula-metric__hint">(break-even)</span></span>
-            <span class="brujula-metric__val brujula-metric__val--warn">${{ precioMinimo() | number }}</span>
-          </div>
-          <div class="brujula-metric brujula-metric--recomendado">
-            <span class="brujula-metric__label">
-              ✦ Precio recomendado
-              <span class="brujula-metric__tag">{{ margenObjetivo }}% margen objetivo</span>
+
+            <!-- Slider: margen deseado → precio como output -->
+            <div class="brujula-slider-section">
+              <div class="brujula-slider-header">
+                <label class="brujula-slider-header__label" for="brujula-margen-slider">
+                  Margen que quiero obtener
+                </label>
+                <span class="brujula-margen-val" [attr.data-semaforo]="margenSemaforoNuevo()">
+                  {{ margenDeseado() }}%
+                </span>
+              </div>
+              <input id="brujula-margen-slider"
+                     class="brujula-slider" type="range" min="10" max="60" step="1"
+                     [value]="margenDeseado()"
+                     (input)="margenDeseado.set(+$any($event.target).value)"
+                     [attr.aria-valuetext]="margenDeseado() + '% de margen'">
+              <div class="brujula-slider-labels">
+                <span>10% mínimo</span>
+                <span class="brujula-slider-labels__gali">✦ Gali sugiere {{ margenObjetivo }}%</span>
+                <span>60% ideal</span>
+              </div>
+            </div>
+
+            <!-- Output principal -->
+            <div class="brujula-output" [attr.data-semaforo]="margenSemaforoNuevo()">
+              <div class="brujula-output__precio">
+                <span class="brujula-output__precio-label">Precio de venta</span>
+                <span class="brujula-output__precio-val">${{ precioCalculado() | number:'1.0-0':'es' }}</span>
+              </div>
+              <div class="brujula-output__utilidades">
+                <div class="brujula-util-item">
+                  <span class="brujula-util-item__label">Ganancia / pedido</span>
+                  <span class="brujula-util-item__val">${{ utilidadPorPedido() | number:'1.0-0':'es' }}</span>
+                </div>
+                <div class="brujula-util-item">
+                  <span class="brujula-util-item__label">Ganancia estimada / mes</span>
+                  <span class="brujula-util-item__val brujula-util-item__val--mes">
+                    ${{ utilidadMensual() | number:'1.0-0':'es' }}
+                  </span>
+                  <span class="brujula-util-item__sub">con ~{{ expectativaPedidosSem() }} ped/sem</span>
+                </div>
+              </div>
+              <div class="brujula-semaforo" [attr.data-color]="margenSemaforoNuevo()">
+                @if (margenSemaforoNuevo() === 'verde') {
+                  <span>● Excelente — margen saludable para el mercado</span>
+                } @else if (margenSemaforoNuevo() === 'ambar') {
+                  <span>● Aceptable — sube el precio si el mercado lo permite</span>
+                } @else {
+                  <span>● Bajo — estás cerca del break-even</span>
+                }
+              </div>
+            </div>
+
+          } @else {
+        <!-- Vista multi-producto: accordion por producto -->
+        <p class="wizard__sub">Desliza el precio de cada producto y ve en tiempo real cuánto ganarías por pedido.</p>
+
+        <!-- Resumen global -->
+        <div class="brujula-multi-summary">
+          <div class="brujula-multi-summary__item">
+            <span class="brujula-multi-summary__label">Utilidad proyectada</span>
+            <span class="brujula-multi-summary__val brujula-multi-summary__val--big">
+              ${{ utilidadTotalMulti() | number:'1.0-0':'es' }}<span>/mes</span>
             </span>
-            <span class="brujula-metric__val brujula-metric__val--primary">${{ precioRecomendado() | number }}</span>
           </div>
-          <div class="brujula-metric brujula-metric--ganancia">
-            <span class="brujula-metric__label">Ganancia real por pedido</span>
-            <span class="brujula-metric__val brujula-metric__val--green">${{ gananciaReal() | number }}</span>
+          <div class="brujula-multi-summary__item">
+            <span class="brujula-multi-summary__label">Est. pedidos/sem</span>
+            <span class="brujula-multi-summary__val">~{{ expectativaPedidosSem() }}</span>
+          </div>
+          <div class="brujula-multi-summary__item">
+            <span class="brujula-multi-summary__label">Productos en campaña</span>
+            <span class="brujula-multi-summary__val">{{ selectedProductosList().length }}</span>
           </div>
         </div>
-
-        <div class="brujula-slider-section">
-          <div class="brujula-slider-header">
-            <label class="brujula-slider-header__label">Precio de venta</label>
-            <span class="brujula-price-final">${{ precioFinal() | number }}</span>
-          </div>
-          <input class="brujula-slider" type="range"
-                 [min]="precioMinimo()"
-                 [max]="precioRecomendado() * 1.5"
-                 [step]="500"
-                 [value]="precioFinal()"
-                 (input)="precioSlider.set(+$any($event.target).value)">
-          <div class="brujula-slider-labels">
-            <span>Mínimo ${{ (precioMinimo() / 1000).toFixed(0) }}k</span>
-            <span>Recomendado ${{ (precioRecomendado() / 1000).toFixed(0) }}k</span>
-          </div>
-          <button class="brujula-btn-rec" type="button" (click)="usarPrecioRecomendado()">
-            Usar precio recomendado →
-          </button>
-        </div>
-
-        <div class="brujula-margen" [attr.data-semaforo]="margenSemaforo()">
-          <span class="brujula-margen__label">Margen proyectado</span>
-          <span class="brujula-margen__val">{{ margenFinal() }}%</span>
-          <span class="brujula-margen__desc">
-            @if (margenSemaforo() === 'verde') { Excelente — por encima del objetivo }
-            @else if (margenSemaforo() === 'ambar') { Aceptable — ajusta el precio si puedes }
-            @else { Bajo — considera subir el precio o negociar el costo }
-          </span>
-        </div>
-
-      } @else {
-        <!-- Vista multi-producto: tabla de precios por producto -->
-        <p class="wizard__sub">Ajusta el precio de venta de cada producto. El costo está fijado por el proveedor.</p>
 
         <div class="brujula-multi">
           @for (p of selectedProductosList(); track p.id) {
-            <div class="brujula-multi-row">
-              <div class="brujula-multi-row__header">
+            <div class="brujula-multi-row" [class.brujula-multi-row--expanded]="isBrujulaExpanded(p.id)">
+              <!-- Header siempre visible — click para expandir -->
+              <button class="brujula-multi-row__header" type="button"
+                      (click)="toggleBrujulaProducto(p.id)"
+                      [attr.aria-expanded]="isBrujulaExpanded(p.id)">
                 <span class="brujula-multi-row__nombre">{{ p.nombre }}</span>
-                <span class="brujula-multi-row__costo">Costo proveedor: ${{ p.costoBase | number }}</span>
-              </div>
-              <div class="brujula-multi-row__inputs">
-                <div class="brujula-multi-row__field">
-                  <label class="brujula-multi-row__label">Precio de venta</label>
-                  <div class="brujula-field__row">
-                    <span class="brujula-field__prefix">$</span>
-                    <input class="brujula-field__input" type="number" min="0" step="500"
+                <div class="brujula-multi-row__summary">
+                  <span class="brujula-multi-row__precio-tag">${{ getPrecioPorProducto(p.id) | number:'1.0-0':'es' }}</span>
+                  <span class="brujula-multi-row__ganancia-tag"
+                        [attr.data-color]="getMargenColorParaProducto(p.id)">
+                    ${{ getGananciaParaProducto(p.id) | number:'1.0-0':'es' }}/ped
+                  </span>
+                  <span class="brujula-multi-row__margen-tag"
+                        [attr.data-color]="getMargenColorParaProducto(p.id)">
+                    {{ getMargenParaProducto(p.id) }}%
+                  </span>
+                  <span class="brujula-multi-row__arrow">{{ isBrujulaExpanded(p.id) ? '▲' : '▼' }}</span>
+                </div>
+              </button>
+
+              @if (isBrujulaExpanded(p.id)) {
+                <div class="brujula-multi-row__detail">
+                  <!-- Slider de precio en tiempo real -->
+                  <div class="brujula-prod-slider">
+                    <div class="brujula-prod-slider__header">
+                      <span class="brujula-prod-slider__label">Precio de venta</span>
+                      <span class="brujula-prod-slider__val">${{ getPrecioPorProducto(p.id) | number:'1.0-0':'es' }}</span>
+                    </div>
+                    <input class="brujula-slider brujula-slider--prod" type="range"
+                           [min]="getMinPrecio(p.id)"
+                           [max]="getMaxPrecio(p.id)"
+                           step="500"
                            [value]="getPrecioPorProducto(p.id)"
-                           (input)="setPrecioPorProducto(p.id, +$any($event.target).value)">
+                           (input)="setPrecioPorProducto(p.id, +$any($event.target).value)"
+                           [attr.aria-valuetext]="'$' + getPrecioPorProducto(p.id)">
+                    <div class="brujula-slider-labels">
+                      <span>${{ getMinPrecio(p.id) | number:'1.0-0':'es' }}</span>
+                      <span class="brujula-slider-labels__gali">✦ Gali rec: ${{ ((p.costoBase + p.fleteBase) / 0.60) | number:'1.0-0':'es' }}</span>
+                      <span>${{ getMaxPrecio(p.id) | number:'1.0-0':'es' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Desglose completo de costos -->
+                  <div class="brujula-multi-costos">
+                    <div class="brujula-multi-costo-row">
+                      <span class="brujula-multi-costo-row__label">Costo proveedor</span>
+                      <span class="brujula-multi-costo-row__val">${{ p.costoBase | number:'1.0-0':'es' }}</span>
+                    </div>
+                    <div class="brujula-multi-costo-row">
+                      <span class="brujula-multi-costo-row__label">Flete Dropi</span>
+                      <span class="brujula-multi-costo-row__val">${{ p.fleteBase | number:'1.0-0':'es' }}</span>
+                      <span class="brujula-multi-costo-row__tag">fijo</span>
+                    </div>
+                    <div class="brujula-multi-costo-row">
+                      <span class="brujula-multi-costo-row__label">Comisión Dropi ({{ COMISION_PCT }}%)</span>
+                      <span class="brujula-multi-costo-row__val">
+                        ${{ (getPrecioPorProducto(p.id) * COMISION_PCT / 100) | number:'1.0-0':'es' }}
+                      </span>
+                    </div>
+                    @if (pautaEfectivaPorPedido() > 0) {
+                      <div class="brujula-multi-costo-row brujula-multi-costo-row--pauta">
+                        <span class="brujula-multi-costo-row__label">Pauta / pedido</span>
+                        <span class="brujula-multi-costo-row__val">~${{ pautaEfectivaPorPedido() | number:'1.0-0':'es' }}</span>
+                        <span class="brujula-multi-costo-row__tag">{{ canalPautaLabel() }}</span>
+                      </div>
+                    }
+                    @for (susc of suscripcionesActivas(); track susc.nombre) {
+                      <div class="brujula-multi-costo-row brujula-multi-costo-row--susc">
+                        <span class="brujula-multi-costo-row__label">{{ susc.nombre }} / pedido</span>
+                        <span class="brujula-multi-costo-row__val">~${{ costoSuscripcionPorPedido() | number:'1.0-0':'es' }}</span>
+                      </div>
+                    }
+                    <div class="brujula-multi-costo-row brujula-multi-costo-row--ganancia"
+                         [attr.data-color]="getMargenColorParaProducto(p.id)">
+                      <span class="brujula-multi-costo-row__label"><strong>Ganancia / pedido</strong></span>
+                      <span class="brujula-multi-costo-row__val brujula-multi-costo-row__val--ganancia">
+                        <strong>${{ getGananciaParaProducto(p.id) | number:'1.0-0':'es' }}</strong>
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div class="brujula-multi-row__margen"
-                     [attr.data-color]="getMargenColorParaProducto(p.id)">
-                  {{ getMargenParaProducto(p.id) }}% margen
-                </div>
-              </div>
+              }
             </div>
           }
           <button class="brujula-btn-rec" type="button" (click)="ajustarTodosAlRecomendado()">
@@ -642,9 +842,36 @@
         </div>
       }
 
-      <button class="wizard__next" (click)="goTo('campana-creativos')">
-        Continuar →
-      </button>
+          <button class="wizard__next" (click)="goTo('campana-creativos')" style="margin-top: 24px">
+            Continuar →
+          </button>
+
+        </div><!-- /brujula-main -->
+
+        <!-- Gali sidebar — AI Experience: Legibility + Grounding -->
+        @if (brujulaGaliOpen()) {
+          <aside class="brujula-gali-panel" aria-label="Consejo de Gali sobre el precio">
+            <div class="brujula-gali-panel__header">
+              <span class="brujula-gali-panel__icon" aria-hidden="true">✦</span>
+              <span class="brujula-gali-panel__title">Gali analiza</span>
+            </div>
+            <div class="brujula-gali-panel__msg" role="status" aria-live="polite">
+              {{ brujulaGaliMsg() }}
+            </div>
+            <div class="brujula-gali-panel__grounding">
+              <span class="brujula-gali-panel__ground-label">Basado en</span>
+              <ul class="brujula-gali-panel__ground-list">
+                <li>Historial ROAS de tus campañas ({{ 1.93 }}x promedio)</li>
+                <li>Margen objetivo del mercado colombiano dropshipping</li>
+                @if (costoSuscripcionMensual() > 0) {
+                  <li>Suscripciones activas: ${{ costoSuscripcionMensual() | number:'1.0-0':'es' }}/mes</li>
+                }
+              </ul>
+            </div>
+          </aside>
+        }
+
+      </div><!-- /brujula-layout -->
     </div>
   }
 
@@ -743,6 +970,14 @@
                (change)="creativoPorDefinir.set(!creativoPorDefinir())">
         Definir creativos después — crear campaña como borrador
       </label>
+
+      @if (creativoPorDefinir()) {
+        <div class="creativo-borrador-aviso" role="status" aria-live="polite">
+          <i class="pi pi-clock"></i>
+          La campaña se creará como <strong>Borrador</strong> — no correrá pauta ni consumirá presupuesto
+          hasta que completes los creativos desde el detalle de la campaña.
+        </div>
+      }
 
       <p class="wizard__gali-hint">
         <span aria-hidden="true">✦</span>
@@ -876,9 +1111,15 @@
         <strong>{{ nombreProyecto() }}</strong> está en borrador.
         Puedes agregar campañas desde el detalle cuando estés listo.
       </p>
-      <button class="wizard__next wizard__next--success" type="button" (click)="volverAProyectos()">
-        Ver mis proyectos →
-      </button>
+      <div class="launch-success__ctas">
+        <button class="wizard__next wizard__next--success" type="button"
+                (click)="router.navigate(['/gali-6/proyecto', nuevoProyectoId()])">
+          Ir al proyecto →
+        </button>
+        <button class="wizard__next wizard__next--secondary" type="button" (click)="volverAProyectos()">
+          Ver mis proyectos
+        </button>
+      </div>
     </div>
   }
 

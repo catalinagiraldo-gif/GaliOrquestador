@@ -44,6 +44,7 @@ interface ProyectoRow {
   contribucionPct: number;
   borrador_steps?: any[];
   campanaCount: number;
+  subObjetivo?: string;
 }
 
 interface GaliCheckin {
@@ -63,6 +64,9 @@ interface AlertaUnificada {
   agente?: string;
   proyectoId?: string;
   accion?: 'nuevo' | 'ver';
+  destino?: 'conexiones' | 'agente' | 'campana' | 'senales';
+  agenteId?: string;
+  campanaId?: string;
 }
 
 // Mapeo de IDs internos del portafolio → proyectoId del mock de señales
@@ -184,10 +188,35 @@ export class Gali6ProyectosCasaComponent implements OnInit {
         roas: pv.roasPromedio ? `${pv.roasPromedio}x` : '—',
         contribucionPct: pv.contribucionPct,
         campanaCount: pv.campanas.length,
+        subObjetivo: (pv as any).subObjetivo,
       };
     });
 
-    return [...pvRows, ...legacy];
+    // Proyectos creados desde el wizard (guardados en localStorage)
+    const extraRows: ProyectoRow[] = (() => {
+      try {
+        const extra: any[] = JSON.parse(localStorage.getItem('g6_proyectos_extra') ?? '[]');
+        const estadoSalud: Record<string, number> = {
+          borrador: 15, configurando: 50, activo: 78, en_riesgo: 32, en_escala: 92, pausado: 38, cerrado: 20,
+        };
+        return extra.map(p => ({
+          id: p.id,
+          nombre: p.nombre,
+          tipo: p.tipo as TipoProyecto | undefined,
+          estado: p.estado,
+          estadoLabel: ESTADO_LABEL[p.estado] ?? p.estado,
+          saludPct: estadoSalud[p.estado] ?? 50,
+          pedidos: p.pedidosSem > 0 ? `${p.pedidosSem}` : '—',
+          pedidosSem: p.pedidosSem ?? 0,
+          roas: p.roasPromedio ? `${p.roasPromedio}x` : '—',
+          contribucionPct: p.contribucionPct ?? 0,
+          campanaCount: (p.campanas ?? []).length,
+          subObjetivo: p.subObjetivo ?? p.descripcion ?? undefined,
+        }));
+      } catch { return []; }
+    })();
+
+    return [...pvRows, ...extraRows, ...legacy];
   });
 
   readonly searchQuery = signal('');
@@ -227,6 +256,61 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.proyectos().filter(p => ['activo', 'en_escala', 'lanzando', 'recien_lanzado'].includes(p.estado))
   );
 
+  readonly conteoEnRiesgo = computed(() =>
+    this.proyectos().filter(p => p.estado === 'en_riesgo').length
+  );
+
+  // ── Salud del portafolio (score agregado) ────────────────────────────
+  readonly saludPortafolio = computed<{ score: number; label: string; color: 'verde' | 'ambar' | 'rojo'; breakdown: string }>(() => {
+    const todos = this.proyectos();
+    const activos = todos.filter(p => ['activo', 'en_escala', 'lanzando', 'recien_lanzado'].includes(p.estado));
+    const enRiesgo = todos.filter(p => p.estado === 'en_riesgo').length;
+    const pausados = todos.filter(p => p.estado === 'pausado').length;
+    const borradores = todos.filter(p => p.estado === 'borrador').length;
+    const total = todos.filter(p => p.estado !== 'cerrado').length;
+    if (total === 0) return { score: 0, label: 'Sin proyectos', color: 'rojo', breakdown: '' };
+
+    // Score: promedio ponderado de salud de proyectos activos
+    const saludPromedio = activos.length > 0
+      ? Math.round(activos.reduce((acc, p) => acc + p.saludPct, 0) / activos.length)
+      : 0;
+    // Penalizar por proyectos en riesgo y pausados
+    const penalizacion = (enRiesgo * 8) + (pausados * 4) + (borradores * 2);
+    const score = Math.max(0, Math.min(100, saludPromedio - penalizacion));
+
+    const label = score >= 70 ? 'Portafolio saludable'
+      : score >= 40 ? 'Portafolio en revisión'
+      : 'Portafolio en riesgo';
+    const color: 'verde' | 'ambar' | 'rojo' = score >= 70 ? 'verde' : score >= 40 ? 'ambar' : 'rojo';
+
+    const partes: string[] = [];
+    if (activos.length > 0) partes.push(`${activos.length} activo${activos.length !== 1 ? 's' : ''}`);
+    if (enRiesgo > 0) partes.push(`${enRiesgo} en riesgo`);
+    if (pausados > 0) partes.push(`${pausados} pausado${pausados !== 1 ? 's' : ''}`);
+    if (borradores > 0) partes.push(`${borradores} en borrador`);
+
+    return { score, label, color, breakdown: partes.join(' · ') };
+  });
+
+  // Signal para el flujo de cierre inline 2-pasos
+  readonly pendientesCierre = signal<Set<string>>(new Set());
+
+  readonly campanasPausadas = computed(() => {
+    const result = new Map<string, boolean>();
+    for (const pv of PROYECTOS_MOCK) {
+      if (pv.campanas.length > 0) {
+        result.set(pv.id, pv.campanas.every(c => c.estado === 'pausada'));
+      }
+    }
+    return result;
+  });
+
+  readonly objetivoSubtitulo = computed(() => {
+    const texto = this.objetivo().texto ?? '';
+    const truncado = texto.length > 60 ? texto.slice(0, 57) + '…' : texto;
+    return truncado ? `Orientados a: ${truncado}` : '';
+  });
+
   readonly contribucionTotal = computed(() =>
     this.proyectosActivos().reduce((acc, p) => acc + p.pedidosSem, 0)
   );
@@ -256,44 +340,76 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly alertasUnificadas = computed<AlertaUnificada[]>(() => {
     const result: AlertaUnificada[] = [];
 
-    // 1. Alertas críticas de agentes (de MOCK_ALERTAS)
-    const alertasCriticas = MOCK_ALERTAS
-      .filter((a) => a.tipo === 'critical' || a.tipo === 'warning')
-      .slice(0, 2);
-    for (const a of alertasCriticas) {
+    // 0. Alertas prioritarias con destino contextual (Siigo, Adaspi, etc.)
+    const alertasContextuales: AlertaUnificada[] = [
+      {
+        tipo: 'atencion',
+        titulo: 'Siigo desconectado',
+        cuerpo: 'La conexión con Siigo se interrumpió. Gali no puede sincronizar pedidos ni facturar automáticamente hasta reconectar.',
+        cta: 'Conectar Siigo →',
+        agente: 'Gali detectó',
+        destino: 'conexiones',
+      },
+      {
+        tipo: 'sugerencia',
+        titulo: 'Adaspi tiene señales nuevas sobre tu catálogo',
+        cuerpo: 'Adaspi encontró 3 productos con alta demanda y márgenes por encima del 35%. Ideal para lanzar esta semana.',
+        cta: 'Ver señales de Adaspi →',
+        agente: 'Adaspi sugiere',
+        destino: 'agente',
+        agenteId: 'adaspi',
+      },
+    ];
+
+    for (const a of alertasContextuales) {
       if (result.length >= 3) break;
-      result.push({
-        tipo: a.tipo === 'critical' ? 'atencion' : 'sugerencia',
-        titulo: a.titulo,
-        cuerpo: a.descripcion ?? '',
-        cta: 'Ver proyecto →',
-        agente: a.agenteOrigenNombre ? `${a.agenteOrigenNombre} detectó` : 'Gali detectó',
-        proyectoId: a.proyectoId,
-        accion: 'ver',
-      });
+      result.push(a);
     }
 
-    // 2. Señales de escala/riesgo (de MOCK_SENALES)
-    const senalesRelevantes = MOCK_SENALES
-      .filter((s: any) => s.tipo === 'scale' || s.tipo === 'risk' || s.tipo === 'opportunity')
-      .slice(0, 2);
-    for (const s of senalesRelevantes) {
-      if (result.length >= 3) break;
-      result.push({
-        tipo: s.tipo === 'risk' ? 'atencion' : 'sugerencia',
-        titulo: s.titulo,
-        cuerpo: s.contextoMacromundo ?? '',
-        cta: s.canLaunch ? 'Crear proyecto →' : 'Ver señales →',
-        agente: 'ADA Spy sugiere',
-        accion: s.canLaunch ? 'nuevo' : 'ver',
-      });
+    // 1. Alertas críticas de agentes (de MOCK_ALERTAS) — solo si hay espacio
+    if (result.length < 3) {
+      const alertasCriticas = MOCK_ALERTAS
+        .filter((a) => a.tipo === 'critical' || a.tipo === 'warning')
+        .slice(0, 3 - result.length);
+      for (const a of alertasCriticas) {
+        if (result.length >= 3) break;
+        result.push({
+          tipo: a.tipo === 'critical' ? 'atencion' : 'sugerencia',
+          titulo: a.titulo,
+          cuerpo: a.descripcion ?? '',
+          cta: 'Ver proyecto →',
+          agente: a.agenteOrigenNombre ? `${a.agenteOrigenNombre} detectó` : 'Gali detectó',
+          proyectoId: a.proyectoId,
+          accion: 'ver',
+          destino: 'senales',
+        });
+      }
+    }
+
+    // 2. Señales de escala/riesgo — solo si hay espacio
+    if (result.length < 3) {
+      const senalesRelevantes = MOCK_SENALES
+        .filter((s: any) => s.tipo === 'scale' || s.tipo === 'risk' || s.tipo === 'opportunity')
+        .slice(0, 3 - result.length);
+      for (const s of senalesRelevantes) {
+        if (result.length >= 3) break;
+        result.push({
+          tipo: s.tipo === 'risk' ? 'atencion' : 'sugerencia',
+          titulo: s.titulo,
+          cuerpo: s.contextoMacromundo ?? '',
+          cta: s.canLaunch ? 'Crear proyecto →' : 'Ver señales →',
+          agente: 'ADA Spy sugiere',
+          accion: s.canLaunch ? 'nuevo' : 'ver',
+          destino: 'senales',
+        });
+      }
     }
 
     // 3. Fallback: check-ins del portafolio si no hay suficientes
     if (result.length < 3) {
       const checkins = this.galiCheckins().slice(0, 3 - result.length);
       for (const ci of checkins) {
-        result.push({ ...ci });
+        result.push({ ...ci, destino: 'senales' as const });
       }
     }
 
@@ -802,6 +918,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     const map: Record<TipoProyecto, string> = {
       lanzar: '🚀 Lanzar', escalar: '📈 Escalar', optimizar: '🔧 Optimizar',
       crm: '💬 CRM', experimentar: '🧪 Exp.',
+      operacion: '⚙️ Operación', negociacion: '🤝 Negociación',
     };
     return tipo ? (map[tipo] ?? tipo) : '';
   }
@@ -819,14 +936,64 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     if (pv) pv.estado = 'cerrado';
   }
 
+  pedirCierre(id: string, event: Event): void {
+    event.stopPropagation();
+    this.pendientesCierre.update(s => new Set([...s, id]));
+    setTimeout(() => this.cancelarCierre(id), 5000);
+  }
+
+  cancelarCierre(id: string, event?: Event): void {
+    event?.stopPropagation();
+    this.pendientesCierre.update(s => { const n = new Set(s); n.delete(id); return n; });
+  }
+
+  confirmarCierre(id: string, event: Event): void {
+    event.stopPropagation();
+    this.cerrarProyecto(id, event);
+    this.cancelarCierre(id);
+    this.galiCambioMensaje.set('Proyecto cerrado. Los datos históricos se conservan en tu portafolio.');
+    setTimeout(() => this.galiCambioMensaje.set(null), 4000);
+  }
+
+  descartarBorrador(id: string, event: Event): void {
+    event.stopPropagation();
+    // Borradores del wizard (localStorage)
+    try {
+      const extra: any[] = JSON.parse(localStorage.getItem('g6_proyectos_extra') ?? '[]');
+      const actualizado = extra.filter(p => p.id !== id);
+      localStorage.setItem('g6_proyectos_extra', JSON.stringify(actualizado));
+    } catch { /* noop */ }
+    // Borradores del mock legacy (PROYECTOS_MOCK)
+    const pv = PROYECTOS_MOCK.find(p => p.id === id);
+    if (pv) pv.estado = 'cerrado';
+    this.galiCambioMensaje.set('Borrador descartado.');
+    setTimeout(() => this.galiCambioMensaje.set(null), 3000);
+  }
+
+  pedirPausa(id: string, event: Event): void {
+    event.stopPropagation();
+    this.pausaTargetId.set(id);
+    this.pausaModalOpen.set(true);
+  }
+
   // ── Navegación ────────────────────────────────────────────────────────
   abrir(id: string): void { this.router.navigate(['/gali-6/proyecto', id]); }
   nuevo(): void { this.router.navigate(['/gali-6/proyectos/nuevo']); }
 
-  handleCheckinCta(ci: GaliCheckin): void {
-    if (ci.accion === 'nuevo') { this.nuevo(); return; }
-    if (ci.accion === 'ver' && ci.proyectoId) { this.abrir(ci.proyectoId); return; }
-    if (ci.accion === 'ver') { this.router.navigate(['/gali-6/senales']); }
+  handleCheckinCta(ci: GaliCheckin | AlertaUnificada): void {
+    const a = ci as AlertaUnificada;
+    if (a.destino === 'conexiones') {
+      this.router.navigate(['/gali-6/conexiones']); return;
+    }
+    if (a.destino === 'agente') {
+      this.router.navigate(['/gali-6/agentes'], { queryParams: { highlight: a.agenteId ?? '' } }); return;
+    }
+    if (a.destino === 'campana' && a.proyectoId && a.campanaId) {
+      this.router.navigate(['/gali-6/proyecto', a.proyectoId, 'campana', a.campanaId]); return;
+    }
+    if ((ci as GaliCheckin).accion === 'nuevo') { this.nuevo(); return; }
+    if ((ci as GaliCheckin).accion === 'ver' && ci.proyectoId) { this.abrir(ci.proyectoId!); return; }
+    this.router.navigate(['/gali-6/senales']);
   }
 
   ngOnInit(): void {

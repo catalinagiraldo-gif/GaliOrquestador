@@ -11,7 +11,22 @@
     display: flex; flex-direction: column; align-items: center;
     gap: $size-4; padding-top: $size-10; text-align: center;
     h2 { font-size: $font-xl; color: $gray-700; }
-    p  { color: $gray-500; }
+    p  { color: $gray-500; max-width: 360px; line-height: 1.6; }
+  }
+
+  &--loading {
+    display: flex; flex-direction: column;
+    gap: $size-4; padding-top: $size-6;
+  }
+
+  &__loading-msg {
+    font-size: $font-sm; color: $gray-400;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
   &__back {
@@ -47,9 +62,18 @@
   }
 
   &__subobjetivo {
-    margin: 0 0 $size-3;
+    margin: 0 0 $size-2;
     font-size: $font-sm; color: $gray-500; line-height: 1.5;
     font-style: italic;
+  }
+
+  &__subobjlink {
+    margin: 0 0 $size-3;
+    font-size: $font-sm; color: $os-accent;
+    display: flex; gap: $size-1; align-items: baseline; flex-wrap: wrap;
+  }
+  &__subobjlink-arrow {
+    font-weight: $font-semibold; opacity: 0.7; white-space: nowrap;
   }
 
   &__toast {
@@ -411,6 +435,93 @@
   &__obj { font-size: 11px; font-weight: 400; color: $gray-400; }
 }
 
+// ── Rendimiento expandible en campaña card ───────────────────────────────
+.g6-campana-card__toggle-rend {
+  background: none; border: 1px solid rgba($os-accent, 0.3); color: $os-accent-dark;
+  padding: 4px 10px; border-radius: $radius-full; font-size: 12px; font-weight: 500;
+  font-family: $font-primary; cursor: pointer; transition: all 120ms ease;
+  display: flex; align-items: center; gap: 4px;
+
+  &:hover, &.is-open { background: rgba($os-accent, 0.08); }
+  i { font-size: 10px; }
+}
+
+.g6-campana-rend {
+  border-top: 1px solid rgba(0,0,0,0.06); padding-top: $size-3; margin-top: $size-2;
+  display: flex; flex-direction: column; gap: $size-3;
+
+  &__tabla {
+    display: flex; flex-direction: column;
+    background: $gray-50; border-radius: $radius-md; overflow: hidden;
+    border: 1px solid $gray-100;
+  }
+
+  &__head, &__row {
+    display: grid;
+    grid-template-columns: 1fr 60px 80px 60px 80px 70px;
+    gap: $size-2; padding: $size-2 $size-3; align-items: center;
+  }
+
+  &__head {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: $gray-400;
+    border-bottom: 1px solid $gray-100;
+  }
+
+  &__row {
+    font-size: 13px; color: $gray-700;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    &:last-child { border-bottom: none; }
+    &--stock-bajo { background: rgba(245, 158, 11, 0.05); }
+    &--stock-agotado { background: rgba(239, 68, 68, 0.05); }
+  }
+
+  &__nombre { font-weight: 500; color: $gray-900; display: flex; align-items: center; gap: $size-1; }
+
+  &__stock-warn { color: #d97706; }
+
+  &__roas--ok { color: #16a34a; font-weight: 600; }
+  &__roas--low { color: #dc2626; font-weight: 600; }
+
+  &__stock--ok { color: $gray-600; }
+  &__stock--bajo { color: #d97706; font-weight: 600; }
+  &__stock--agotado { color: #dc2626; font-weight: 600; }
+}
+
+.g6-campana-sparkline {
+  display: flex; align-items: flex-end;
+  svg { display: block; }
+}
+
+.g6-campana-angulos {
+  background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: $radius-md;
+  padding: $size-3; display: flex; flex-direction: column; gap: $size-1;
+
+  &__title {
+    font-size: 11px; font-weight: 600; color: $gray-400; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: $size-1;
+  }
+}
+
+.g6-campana-angulo-row {
+  display: flex; align-items: center; gap: $size-2; font-size: 12px; padding: $size-1 0;
+  opacity: 1; transition: opacity 120ms;
+  &--pausado { opacity: 0.5; }
+}
+
+.g6-campana-angulo {
+  &__dot {
+    font-size: 10px;
+    &[data-estado='activo'] { color: #16a34a; }
+    &[data-estado='pausado'] { color: $gray-400; }
+    &[data-estado='borrador'] { color: $gray-300; }
+  }
+  &__nombre { font-weight: 500; color: $gray-800; flex: 1; }
+  &__pub { color: $gray-500; font-size: 11px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__roas { color: $gray-500; font-size: 11px; &--ok { color: #16a34a; font-weight: 600; } }
+}
+
+// ── Vacío campañas ────────────────────────────────────────────────────────
 .g6-campanas-empty {
   display: flex; flex-direction: column; align-items: center;
   gap: $size-3; padding: $size-10; text-align: center;
@@ -503,6 +614,23 @@
   border-radius: $radius-full; padding: 4px 12px;
   font-size: $font-sm; color: #166534;
   strong { color: #16a34a; }
+}
+
+// ── Sub-objetivo del contexto (3A) ───────────────────────────────────────────
+.g6-detalle__subobj-row {
+  display: flex;
+  align-items: center;
+  gap: $size-2;
+  margin-top: $size-2;
+  font-size: $font-xs;
+}
+.g6-detalle__subobj-icon { color: rgba(0,0,0,0.3); }
+.g6-detalle__subobj-label { color: $gray-500; font-weight: $font-medium; }
+.g6-detalle__subobj-link {
+  color: $os-accent;
+  font-weight: $font-semibold;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
 }
 
 // ── Alerta Gali (header PV) ───────────────────────────────────────────────────

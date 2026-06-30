@@ -333,3 +333,159 @@
   padding: $size-2 $size-4; cursor: pointer; align-self: flex-end;
   &:hover { border-color: $os-border-strong; color: $os-text-secondary; }
 }
+
+.cd__modal-search {
+  width: 100%; padding: $size-2 $size-3;
+  border: 1px solid $os-border; border-radius: $os-radius-md;
+  font-size: $font-sm; font-family: $font-primary; color: $os-text-primary;
+  background: $os-surface-2;
+  &:focus { outline: 2px solid $os-accent; outline-offset: 0; border-color: transparent; }
+}
+
+.cd__modal-empty { font-size: $font-sm; color: $os-text-muted; text-align: center; padding: $size-4; }
+
+.cd__modal-prod-body { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.cd__modal-prod-nombre { font-size: $font-sm; font-weight: 500; color: $os-text-primary; }
+.cd__modal-prod-meta { font-size: 11px; color: $os-text-muted; }
+.cd__modal-prod-cta { font-size: 11px; font-weight: 600; color: $os-accent; white-space: nowrap; flex-shrink: 0; }
+
+// ── Pausa granular ────────────────────────────────────────────────────────
+.cd__pausa-menu {
+  position: relative;
+
+  &--open .cd__pausa-btn { border-color: $os-accent; background: rgba($os-accent, 0.06); }
+}
+
+.cd__pausa-opciones {
+  position: absolute; right: 0; top: calc(100% + 4px);
+  background: #fff; border: 1px solid $os-border; border-radius: $os-radius-md;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 50;
+  min-width: 220px; display: flex; flex-direction: column; overflow: hidden;
+}
+
+.cd__pausa-opcion {
+  padding: $size-2 $size-4; font-size: $font-sm; color: $os-text-primary;
+  background: none; border: none; text-align: left; cursor: pointer;
+  transition: background 80ms ease;
+  &:hover { background: $os-surface-2; }
+  &--prod { font-size: 12px; color: $os-text-secondary; }
+}
+
+.cd__pausa-separador {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: $os-text-muted; padding: $size-1 $size-4;
+  border-top: 1px solid $os-border; margin-top: $size-1;
+}
+
+// ── Ángulos de venta ─────────────────────────────────────────────────────
+.cd__prod-row-wrap { display: flex; flex-direction: column; }
+
+.cd__prod-actions {
+  display: flex; align-items: center; gap: $size-2; flex-shrink: 0;
+}
+
+.cd__angulos-toggle {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 500; font-family: $font-primary;
+  padding: 3px 10px; border-radius: 999px;
+  background: rgba($os-accent, 0.07); border: 1px solid rgba($os-accent, 0.25);
+  color: $os-accent; cursor: pointer; transition: all 100ms ease;
+
+  &:hover, &--open { background: rgba($os-accent, 0.14); }
+  i { font-size: 9px; }
+}
+
+.cd__angulos-list {
+  border-top: 1px solid rgba(0,0,0,0.06); padding: $size-2 $size-4;
+  background: rgba(0,0,0,0.015); display: flex; flex-direction: column; gap: $size-1;
+}
+
+.cd__angulo-row {
+  display: flex; align-items: center; gap: $size-2; font-size: 12px;
+  padding: $size-1 0; border-bottom: 1px solid rgba(0,0,0,0.04);
+  &:last-of-type { border-bottom: none; }
+  &--pausado { opacity: 0.55; }
+}
+
+.cd__angulo-dot {
+  font-size: 9px; flex-shrink: 0;
+  &[data-estado='activo']  { color: #16a34a; }
+  &[data-estado='pausado'] { color: #9ca3af; }
+  &[data-estado='borrador']{ color: #d1d5db; }
+}
+
+.cd__angulo-info { display: flex; flex-direction: column; flex: 1; gap: 1px; }
+.cd__angulo-nombre { font-weight: 500; color: $os-text-primary; }
+.cd__angulo-pub { font-size: 11px; color: $os-text-muted; }
+.cd__angulo-roas { font-size: 11px; color: $os-text-muted; &--ok { color: #16a34a; font-weight: 600; } }
+.cd__angulo-ped  { font-size: 11px; color: $os-text-muted; }
+
+.cd__angulo-pausa {
+  font-size: 11px; padding: 2px 8px; border-radius: 999px;
+  background: none; border: 1px solid rgba(0,0,0,0.15); cursor: pointer;
+  color: $os-text-secondary; font-family: $font-primary; transition: all 100ms;
+  flex-shrink: 0;
+  &:hover { border-color: $os-accent; color: $os-accent; }
+}
+
+.cd__angulo-nuevo-form {
+  display: flex; flex-direction: column; gap: $size-2; padding: $size-2 0;
+  &__input {
+    width: 100%; padding: $size-1 $size-2; border: 1px solid $os-border;
+    border-radius: $os-radius-md; font-size: 12px; font-family: $font-primary;
+    &:focus { outline: 2px solid $os-accent; border-color: transparent; }
+  }
+  &__actions { display: flex; gap: $size-2; }
+  &__save {
+    font-size: 12px; padding: 4px 12px; background: $os-accent; color: #fff;
+    border: none; border-radius: $os-radius-md; cursor: pointer;
+    font-family: $font-primary; font-weight: 600;
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+  &__cancel {
+    font-size: 12px; padding: 4px 12px; background: none; color: $os-text-muted;
+    border: 1px solid $os-border; border-radius: $os-radius-md; cursor: pointer;
+    font-family: $font-primary;
+  }
+}
+
+.cd__angulo-nuevo-cta {
+  font-size: 12px; color: $os-accent; background: none; border: none;
+  cursor: pointer; padding: $size-1 0; text-align: left; font-family: $font-primary;
+  &:hover { text-decoration: underline; }
+}
+
+// ── Tabla rendimiento ─────────────────────────────────────────────────────
+.cd__rend {
+  display: flex; flex-direction: column;
+  border: 1px solid $os-border; border-radius: $os-radius-md; overflow: hidden;
+
+  &__head, &__row {
+    display: grid;
+    grid-template-columns: 1fr 60px 80px 60px 80px 70px;
+    gap: $size-2; padding: $size-2 $size-3; align-items: center;
+  }
+
+  &__head {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: $os-text-muted;
+    background: $os-surface-2; border-bottom: 1px solid $os-border;
+  }
+
+  &__row {
+    font-size: 13px; color: $os-text-secondary;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    &:last-child { border-bottom: none; }
+    &--bajo   { background: rgba(245, 158, 11, 0.05); }
+    &--agotado{ background: rgba(239, 68, 68, 0.05); }
+  }
+}
+
+.cd__rend-nombre { font-weight: 500; color: $os-text-primary; display: flex; align-items: center; gap: 4px; }
+.cd__stock-alert { color: #d97706; font-size: 11px; }
+.cd__roas--ok  { color: #16a34a; font-weight: 600; }
+.cd__roas--low { color: #dc2626; font-weight: 600; }
+.cd__stock--ok      { color: $os-text-secondary; }
+.cd__stock--bajo    { color: #d97706; font-weight: 600; }
+.cd__stock--agotado { color: #dc2626; font-weight: 600; }
+.cd__sparkline { display: flex; align-items: flex-end; svg { display: block; } }

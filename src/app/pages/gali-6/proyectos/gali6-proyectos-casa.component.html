@@ -1,5 +1,5 @@
 <div class="proy gali-stagger-in">
-  <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" sub="Proyectos organizados alrededor de tu meta de negocio." />
+  <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" [sub]="objetivoSubtitulo()" />
 
   <!-- ── BLOQUE 4: Objetivo compacto ── -->
   <div class="objetivo-compact">
@@ -59,8 +59,62 @@
   <!-- ── BLOQUE 3+4: Portafolio de proyectos ── -->
   <section class="port">
     <div class="port__head">
-      <span class="port__eyebrow">Salud del portafolio</span>
-      <button class="port__new" (click)="nuevo()">+ Nuevo proyecto</button>
+      <div class="port__head-left">
+        <span class="port__eyebrow">Mis proyectos</span>
+        <div class="port__mini-stats" aria-label="Resumen del portafolio">
+          <span class="port__mini-stat port__mini-stat--activo">{{ filterCounts().activos }} activos</span>
+          @if (conteoEnRiesgo() > 0) {
+            <span class="port__mini-stat port__mini-stat--riesgo">{{ conteoEnRiesgo() }} en riesgo</span>
+          }
+          @if (filterCounts().cerrados > 0) {
+            <span class="port__mini-stat port__mini-stat--cerrado">{{ filterCounts().cerrados }} cerrados</span>
+          }
+        </div>
+      </div>
+      <button class="port__new" (click)="nuevo()" type="button">+ Nuevo proyecto</button>
+    </div>
+
+    <!-- Estado del portafolio — semáforo visual -->
+    <div class="port__salud" [attr.data-color]="saludPortafolio().color"
+         role="status" [attr.aria-label]="saludPortafolio().label + ' · ' + saludPortafolio().score + ' puntos'">
+      <div class="port__salud-left">
+        <div class="port__salud-score">
+          <span class="port__salud-num">{{ saludPortafolio().score }}</span>
+          <span class="port__salud-max">/100</span>
+        </div>
+        <div class="port__salud-body">
+          <span class="port__salud-label">{{ saludPortafolio().label }}</span>
+        </div>
+        <div class="port__salud-track" aria-hidden="true">
+          <div class="port__salud-fill" [style.width.%]="saludPortafolio().score"></div>
+        </div>
+      </div>
+      <div class="port__salud-chips" aria-label="Desglose del portafolio">
+        @if (filterCounts().activos > 0) {
+          <span class="port__salud-chip port__salud-chip--activo">
+            <span class="port__salud-chip-dot"></span>
+            {{ filterCounts().activos }} activo{{ filterCounts().activos !== 1 ? 's' : '' }}
+          </span>
+        }
+        @if (conteoEnRiesgo() > 0) {
+          <span class="port__salud-chip port__salud-chip--riesgo">
+            <span class="port__salud-chip-dot"></span>
+            {{ conteoEnRiesgo() }} en riesgo
+          </span>
+        }
+        @if (filterCounts().pausados > 0) {
+          <span class="port__salud-chip port__salud-chip--pausado">
+            <span class="port__salud-chip-dot"></span>
+            {{ filterCounts().pausados }} pausado{{ filterCounts().pausados !== 1 ? 's' : '' }}
+          </span>
+        }
+        @if (filterCounts().borradores > 0) {
+          <span class="port__salud-chip port__salud-chip--borrador">
+            <span class="port__salud-chip-dot"></span>
+            {{ filterCounts().borradores }} borrador{{ filterCounts().borradores !== 1 ? 'es' : '' }}
+          </span>
+        }
+      </div>
     </div>
 
     <!-- Filtros por tipo de proyecto -->
@@ -115,8 +169,9 @@
     <div class="port__legend">
       <span>Estado</span>
       <span>Proyecto</span>
+      <span>Señales</span>
       <span>Salud</span>
-      <span></span>
+      <span>Acciones</span>
     </div>
     @if (portfolioVisible()) {
     <ul class="port__list">
@@ -155,17 +210,23 @@
                   <span class="port__tipo-chip port__tipo-chip--{{ p.tipo }}">{{ proyectoTipoLabel(p.tipo) }}</span>
                 }
               </div>
-              <span class="port__name">{{ p.nombre }}</span>
+              <div class="port__name-col">
+                <span class="port__name">{{ p.nombre }}</span>
+                @if (p.subObjetivo) {
+                  <span class="port__subobj">↳ {{ p.subObjetivo }}</span>
+                }
+              </div>
 
-              @if (getSignalCount(p.id) > 0) {
-                <a class="port__signal-badge"
-                   [routerLink]="['/gali-6/senales']"
-                   [queryParams]="{ projectId: getProyectoSenalId(p.id) }"
-                   (click)="$event.stopPropagation()"
-                   [title]="getSignalCount(p.id) + ' señales activas'">
-                  <i class="pi pi-bell"></i> {{ getSignalCount(p.id) }}
-                </a>
-              }
+              <div class="port__signal-col" (click)="$event.stopPropagation()">
+                @if (getSignalCount(p.id) > 0) {
+                  <a class="port__signal-badge"
+                     [routerLink]="['/gali-6/senales']"
+                     [queryParams]="{ projectId: getProyectoSenalId(p.id) }"
+                     [title]="getSignalCount(p.id) + ' señales activas'">
+                    <i class="pi pi-bell"></i> {{ getSignalCount(p.id) }}
+                  </a>
+                }
+              </div>
 
               <span class="port__health">
                 <span class="port__health-track">
@@ -178,7 +239,7 @@
               </span>
 
               <div class="port__actions" (click)="$event.stopPropagation()">
-                @if (p.estado !== 'cerrado' && p.campanaCount > 0) {
+                @if (p.estado !== 'cerrado' && p.estado !== 'borrador' && p.campanaCount > 0) {
                   <button class="port__campanas-toggle"
                           [class.port__campanas-toggle--open]="isCampanasExpanded(p.id)"
                           (click)="toggleCampanas(p.id, $event)"
@@ -187,17 +248,64 @@
                     <i class="pi pi-megaphone"></i> {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
                     <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
                   </button>
-                } @else if (p.estado !== 'cerrado' && p.campanaCount === 0) {
+                } @else if (p.estado !== 'cerrado' && p.estado !== 'borrador' && p.campanaCount === 0) {
                   <span class="port__sin-campanas">Sin campañas</span>
                 }
-                @if (p.estado === 'pausado') {
-                  <button class="port__accion-btn port__accion-btn--reactivar" (click)="reactivarProyecto(p.id, $event)">▶ Reactivar</button>
+
+                @if (p.estado === 'borrador') {
+                  <button class="port__accion-btn port__accion-btn--completar"
+                          type="button"
+                          (click)="abrir(p.id); $event.stopPropagation()">
+                    Completar →
+                  </button>
+                  <button class="port__accion-btn port__accion-btn--descartar"
+                          type="button"
+                          (click)="descartarBorrador(p.id, $event)"
+                          [attr.aria-label]="'Descartar borrador ' + p.nombre">
+                    ✕ Descartar
+                  </button>
                 }
+
+                @if (p.estado === 'pausado') {
+                  <button class="port__accion-btn port__accion-btn--reactivar"
+                          (click)="reactivarProyecto(p.id, $event)"
+                          title="Reactivar campañas de este proyecto">
+                    ▶ Reactivar campañas
+                  </button>
+                }
+
+                @if (['activo','en_riesgo','en_escala'].includes(p.estado) && p.campanaCount > 0) {
+                  <button class="port__accion-btn port__accion-btn--pausar-camp"
+                          type="button"
+                          (click)="pedirPausa(p.id, $event)"
+                          title="Pausar todas las campañas de este proyecto">
+                    ⏸ Pausar campañas
+                  </button>
+                }
+
                 @if (['activo','en_riesgo','en_escala','pausado'].includes(p.estado)) {
-                  <button class="port__accion-btn port__accion-btn--cerrar" (click)="cerrarProyecto(p.id, $event)">✕ Cerrar</button>
+                  @if (!pendientesCierre().has(p.id)) {
+                    <button class="port__accion-btn port__accion-btn--cerrar"
+                            type="button"
+                            (click)="pedirCierre(p.id, $event)"
+                            title="Cerrar este proyecto permanentemente"
+                            [attr.aria-label]="'Cerrar proyecto ' + p.nombre + ' permanentemente'">
+                      ✕ Cerrar proyecto
+                    </button>
+                  } @else {
+                    <div class="port__confirm-cierre" role="group" [attr.aria-label]="'Confirmar cierre de ' + p.nombre">
+                      <span class="port__confirm-label">¿Cerrar proyecto?</span>
+                      <button class="port__confirm-yes" type="button" (click)="confirmarCierre(p.id, $event)">Confirmar</button>
+                      <button class="port__confirm-no" type="button" (click)="cancelarCierre(p.id, $event)">Cancelar</button>
+                    </div>
+                  }
+                }
+
+                @if (campanasPausadas().get(p.id) && p.estado !== 'pausado') {
+                  <span class="port__campanas-pausa-chip" title="Todas las campañas están pausadas">⏸ Campañas pausadas</span>
                 }
                 <span class="port__go">
-                  @if (p.estado === 'cerrado') { Ver postmortem → }
+                  @if (p.estado === 'cerrado') { Ver historial → }
                   @else { → }
                 </span>
               </div>
@@ -260,8 +368,8 @@
   </section>
 </div>
 
-<!-- ── Modal editar proyecto — edición avanzada (Bloque 3) — PLACEHOLDER ── -->
-@if (false) {
+<!-- ── Modal editar proyecto — edición avanzada (Bloque 3) ── -->
+@if (editProyectoOpen()) {
   <div class="modal-bg" aria-hidden="true"></div>
   <div class="modal modal--objetivo" role="dialog" aria-modal="true"
        aria-labelledby="modal-objetivo-title" cdkTrapFocus cdkTrapFocusAutoCapture>
@@ -694,50 +802,3 @@
   </div>
 }
 
-<!-- ── Modal de confirmación de pausa ── -->
-@if (pausaModalOpen()) {
-  <div class="modal-bg" role="dialog" aria-modal="true" aria-label="Confirmar pausa de proyecto"
-       (click)="cancelarPausa()">
-    <div class="modal pausa-modal" (click)="$event.stopPropagation()">
-      <div class="pausa-modal__header">
-        <h2 class="pausa-modal__title">Pausar este proyecto</h2>
-        <button class="modal__close" (click)="cancelarPausa()" aria-label="Cerrar">×</button>
-      </div>
-
-      @if (campanasPausarPreview().length > 0) {
-        <p class="pausa-modal__desc">
-          Pausar este proyecto también pausará
-          <strong>{{ campanasPausarPreview().length }} campaña{{ campanasPausarPreview().length !== 1 ? 's' : '' }} activa{{ campanasPausarPreview().length !== 1 ? 's' : '' }}</strong>:
-        </p>
-
-        <ul class="pausa-modal__campanas">
-          @for (c of campanasPausarPreview(); track c.id) {
-            <li class="pausa-modal__campana-item">
-              <span class="pausa-modal__campana-nombre">{{ c.nombre }}</span>
-              <span class="pausa-modal__campana-tipo" [attr.data-tipo]="c.tipoCampana">
-                @if (c.tipoCampana === 'ads') { 📣 Ads }
-                @else if (c.tipoCampana === 'chatea') { 💬 Chatea Pro }
-                @else if (c.tipoCampana === 'hibrida') { ⚡ Híbrida }
-                @else { 🌱 Orgánica }
-              </span>
-            </li>
-          }
-        </ul>
-
-        @if (campanasChateaEnPausa().length > 0) {
-          <div class="pausa-modal__nota">
-            <span aria-hidden="true">💬</span>
-            <p>Las campañas de <strong>Chatea Pro</strong> seguirán activas hasta que las pauses manualmente. Solo las campañas de pauta (ads) se pausan automáticamente.</p>
-          </div>
-        }
-      } @else {
-        <p class="pausa-modal__desc">El proyecto no tiene campañas activas en este momento. Se marcará como pausado.</p>
-      }
-
-      <div class="pausa-modal__actions">
-        <button class="pausa-modal__btn-cancel" type="button" (click)="cancelarPausa()">Cancelar</button>
-        <button class="pausa-modal__btn-confirm" type="button" (click)="confirmarPausa()">Confirmar pausa</button>
-      </div>
-    </div>
-  </div>
-}

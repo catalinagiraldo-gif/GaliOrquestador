@@ -1,6 +1,6 @@
 export type EstadoProyecto = 'borrador' | 'configurando' | 'activo' | 'en_riesgo' | 'en_escala' | 'pausado' | 'cerrado';
 
-export type TipoProyecto = 'lanzar' | 'escalar' | 'optimizar' | 'crm' | 'experimentar';
+export type TipoProyecto = 'lanzar' | 'escalar' | 'optimizar' | 'crm' | 'experimentar' | 'operacion' | 'negociacion';
 
 export type TipoCampana = 'ads' | 'chatea' | 'hibrida' | 'organica';
 
@@ -11,6 +11,7 @@ export interface TipoProyectoMeta {
   descripcion: string;
   cuandoUsar: string;
   agentesDefault: string[];
+  requiereCampana: boolean;
 }
 
 export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
@@ -21,6 +22,7 @@ export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
     descripcion: 'Valida un producto con pauta y primera campaña.',
     cuandoUsar: 'Tienes un producto nuevo y quieres probarlo en el mercado.',
     agentesDefault: ['roax', 'vigilante'],
+    requiereCampana: true,
   },
   {
     id: 'escalar',
@@ -29,6 +31,7 @@ export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
     descripcion: 'Dobla el presupuesto en un proyecto ganador.',
     cuandoUsar: 'Tu ROAS supera 1.8x y quieres aumentar el volumen.',
     agentesDefault: ['roax', 'vigilante', 'ada'],
+    requiereCampana: true,
   },
   {
     id: 'optimizar',
@@ -37,6 +40,7 @@ export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
     descripcion: 'Corrige proyectos con bajo rendimiento.',
     cuandoUsar: 'Tienes proyectos en riesgo o con ROAS bajo el umbral.',
     agentesDefault: ['vigilante', 'ada'],
+    requiereCampana: true,
   },
   {
     id: 'crm',
@@ -45,6 +49,7 @@ export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
     descripcion: 'Ventas por conversación, sin pauta obligatoria.',
     cuandoUsar: 'Quieres recuperar clientes o vender sin Meta/TikTok.',
     agentesDefault: ['chatea'],
+    requiereCampana: true,
   },
   {
     id: 'experimentar',
@@ -53,14 +58,58 @@ export const TIPOS_PROYECTO: TipoProyectoMeta[] = [
     descripcion: 'Prueba un nuevo ángulo o producto.',
     cuandoUsar: 'Para testear ideas con presupuesto controlado antes de comprometerte.',
     agentesDefault: ['roax', 'ada'],
+    requiereCampana: true,
+  },
+  {
+    id: 'operacion',
+    emoji: '⚙️',
+    titulo: 'Optimizar operación',
+    descripcion: 'Mejora procesos, eficiencia y métricas sin necesidad de pauta activa.',
+    cuandoUsar: 'Quieres reducir novedad, mejorar tiempo de respuesta o bajar costos operativos.',
+    agentesDefault: ['vigilante', 'ada'],
+    requiereCampana: false,
+  },
+  {
+    id: 'negociacion',
+    emoji: '🤝',
+    titulo: 'Negociar con proveedor',
+    descripcion: 'Gestiona precios, condiciones y stock con tu proveedor.',
+    cuandoUsar: 'Quieres mejorar márgenes o asegurar stock para una temporada de alta demanda.',
+    agentesDefault: ['ada'],
+    requiereCampana: false,
   },
 ];
+
+export interface AnguloVenta {
+  id: string;
+  nombre: string;
+  publicoObj: string;
+  estado: 'activo' | 'pausado' | 'borrador';
+  roas?: number;
+  pedidosSem?: number;
+  creativoUrl?: string;
+}
+
+export interface ProductoCampanaMetrica {
+  pedidosSem: number;
+  cpaReal: number;
+  roasCampana: number;
+  stockActual: number;
+  historial5sem: number[];
+  estadoStock: 'ok' | 'bajo' | 'agotado';
+}
 
 export interface ProductoRef {
   id: string;
   nombre: string;
   margenPct: number;
   precioVentaLabel: string;
+  angulos?: AnguloVenta[];
+  metricas?: ProductoCampanaMetrica;
+  stockActual?: number;
+  estadoStock?: 'ok' | 'bajo' | 'agotado';
+  costoBase?: number;
+  fleteBase?: number;
 }
 
 export interface CampanaProyecto {
@@ -120,6 +169,7 @@ export interface ProyectoDetalle {
   tipoCampana?: TipoCampana | null;
   intentDeclarado?: string;
   subObjetivo?: string;
+  subObjetivoId?: string;
   pausaLog?: PausaLog;
   productosMetrics?: ProductoMetrics[];
 }
@@ -140,6 +190,7 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
     fechaInicio: '2026-06-20',
     rutaVenta: null,
     tipoCampana: null,
+    subObjetivo: 'Lanzar primer producto rentable en 4 semanas',
   },
 
   // ── Estado 2: Campañas sin producto ─────────────────────────────────────
@@ -216,7 +267,25 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
         canalColor: '#010101',
         producto: 'Collar GPS para mascotas',
         productos: [
-          { id: 'prod-collar-gps', nombre: 'Collar GPS para mascotas', margenPct: 38, precioVentaLabel: '$89.900' },
+          {
+            id: 'prod-collar-gps',
+            nombre: 'Collar GPS para mascotas',
+            margenPct: 38,
+            precioVentaLabel: '$89.900',
+            costoBase: 28000,
+            fleteBase: 7000,
+            stockActual: 145,
+            estadoStock: 'ok',
+            angulos: [
+              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 2.4, pedidosSem: 18 },
+              { id: 'a-002', nombre: 'Para aventureros', publicoObj: 'Hombres 25-35, outdoor', estado: 'activo', roas: 1.9, pedidosSem: 10 },
+              { id: 'a-003', nombre: 'Control parental mascotas', publicoObj: 'Familias con niños y perro', estado: 'pausado', roas: 0.8, pedidosSem: 2 },
+            ],
+            metricas: {
+              pedidosSem: 28, cpaReal: 12400, roasCampana: 2.3,
+              stockActual: 145, historial5sem: [18, 22, 25, 28, 28], estadoStock: 'ok',
+            },
+          },
         ],
         estado: 'activa',
         tipoCampana: 'ads',
@@ -237,8 +306,41 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
         canalColor: '#0064e0',
         producto: 'Collar GPS para mascotas',
         productos: [
-          { id: 'prod-collar-gps', nombre: 'Collar GPS para mascotas', margenPct: 38, precioVentaLabel: '$89.900' },
-          { id: 'prod-collar-gps-v2', nombre: 'Collar GPS Pro (v2)', margenPct: 42, precioVentaLabel: '$109.900' },
+          {
+            id: 'prod-collar-gps',
+            nombre: 'Collar GPS para mascotas',
+            margenPct: 38,
+            precioVentaLabel: '$89.900',
+            costoBase: 28000,
+            fleteBase: 7000,
+            stockActual: 145,
+            estadoStock: 'ok',
+            angulos: [
+              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 1.9, pedidosSem: 11 },
+              { id: 'a-004', nombre: 'Regalo para tu perro', publicoObj: 'Personas 22-55, regalo', estado: 'activo', roas: 1.7, pedidosSem: 7 },
+            ],
+            metricas: {
+              pedidosSem: 18, cpaReal: 14800, roasCampana: 1.8,
+              stockActual: 145, historial5sem: [12, 14, 16, 17, 18], estadoStock: 'ok',
+            },
+          },
+          {
+            id: 'prod-collar-gps-v2',
+            nombre: 'Collar GPS Pro (v2)',
+            margenPct: 42,
+            precioVentaLabel: '$109.900',
+            costoBase: 34000,
+            fleteBase: 7000,
+            stockActual: 32,
+            estadoStock: 'bajo',
+            angulos: [
+              { id: 'a-v2-001', nombre: 'Premium para perros grandes', publicoObj: 'Dueños de razas grandes 30-55', estado: 'activo', roas: 2.0, pedidosSem: 8 },
+            ],
+            metricas: {
+              pedidosSem: 8, cpaReal: 11200, roasCampana: 2.0,
+              stockActual: 32, historial5sem: [5, 6, 7, 7, 8], estadoStock: 'bajo',
+            },
+          },
         ],
         estado: 'activa',
         tipoCampana: 'hibrida',
@@ -293,6 +395,27 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
         canalLabel: 'Meta Ads',
         canalColor: '#0064e0',
         producto: 'Kit Skincare Coreano 5 pasos',
+        productos: [
+          {
+            id: 'prod-kbeauty-kit',
+            nombre: 'Kit K-Beauty Hidratación',
+            margenPct: 22,
+            precioVentaLabel: '$124.900',
+            costoBase: 42000,
+            fleteBase: 7000,
+            stockActual: 12,
+            estadoStock: 'bajo',
+            angulos: [
+              { id: 'a-k01', nombre: 'Antiedad 30+', publicoObj: 'Mujeres 30-50', estado: 'pausado', roas: 1.1, pedidosSem: 4 },
+              { id: 'a-k02', nombre: 'Piel seca invierno', publicoObj: 'Mujeres 20-40', estado: 'activo', roas: 0.9, pedidosSem: 3 },
+              { id: 'a-k03', nombre: 'Regalo para mamá', publicoObj: 'Personas 20-45', estado: 'borrador' },
+            ],
+            metricas: {
+              pedidosSem: 7, cpaReal: 28900, roasCampana: 0.9,
+              stockActual: 12, historial5sem: [15, 12, 10, 8, 7], estadoStock: 'bajo',
+            },
+          },
+        ],
         estado: 'activa',
         tipoCampana: 'ads',
         roasActual: 0.9,
