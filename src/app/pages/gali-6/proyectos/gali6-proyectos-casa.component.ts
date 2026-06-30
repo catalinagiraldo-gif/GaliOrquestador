@@ -147,6 +147,49 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly activeFilter = signal<'todos' | 'activos' | 'pausados' | 'borradores' | 'cerrados'>('todos');
   readonly portfolioVisible = signal(true);
 
+  // Filtros multi-dimensión
+  readonly filtroEstado = signal<string>('todos');
+  readonly filtroCampanas = signal<string>('todos'); // todos | con-campanas | sin-campanas
+  readonly filtroPanelOpen = signal(false);
+
+  readonly filtrosActivosCount = computed(() => {
+    let count = 0;
+    if (this.filtroEstado() !== 'todos') count++;
+    if (this.filtroCampanas() !== 'todos') count++;
+    if (this.tipoFiltro() !== 'todos') count++;
+    return count;
+  });
+
+  readonly estadoOpts = [
+    { value: 'todos', label: 'Todos' },
+    { value: 'activo', label: 'Activo' },
+    { value: 'en_escala', label: 'En escala' },
+    { value: 'en_riesgo', label: 'En riesgo' },
+    { value: 'configurando', label: 'Configurando' },
+    { value: 'pausado', label: 'Pausado' },
+    { value: 'borrador', label: 'Borrador' },
+    { value: 'cerrado', label: 'Cerrado' },
+  ];
+
+  readonly tipoOpts = [
+    { value: 'todos', label: 'Todos' },
+    { value: 'lanzar', label: '🚀 Lanzar' },
+    { value: 'escalar', label: '📈 Escalar' },
+    { value: 'crm', label: '💬 CRM' },
+    { value: 'optimizar', label: '🔧 Optimizar' },
+    { value: 'experimentar', label: '🧪 Exp.' },
+    { value: 'operacion', label: '⚙️ Operación' },
+    { value: 'negociacion', label: '🤝 Negociación' },
+  ];
+
+  readonly filtroEstadoLabel = computed(() =>
+    this.estadoOpts.find(o => o.value === this.filtroEstado())?.label ?? this.filtroEstado()
+  );
+
+  readonly filtroTipoLabel = computed(() =>
+    this.tipoOpts.find(o => o.value === this.tipoFiltro())?.label ?? String(this.tipoFiltro())
+  );
+
   // ── Proyectos con contribución al objetivo (Bloque 4) ────────────────
   readonly proyectos = computed<ProyectoRow[]>(() => {
     const overrides = getProyectoOverrides();
@@ -225,11 +268,25 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   readonly proyectosFiltrados = computed<ProyectoRow[]>(() => {
     const f = this.activeFilter();
     const todos = this.proyectos();
-    if (f === 'activos')    return todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando', 'en_riesgo', 'configurando'].includes(p.estado));
-    if (f === 'pausados')   return todos.filter(p => p.estado === 'pausado');
-    if (f === 'borradores') return todos.filter(p => p.estado === 'borrador');
-    if (f === 'cerrados')   return todos.filter(p => p.estado === 'cerrado');
-    return todos;
+    // filtro de estado legacy (tabs)
+    let result = todos;
+    if (f === 'activos')    result = todos.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando', 'en_riesgo', 'configurando'].includes(p.estado));
+    else if (f === 'pausados')   result = todos.filter(p => p.estado === 'pausado');
+    else if (f === 'borradores') result = todos.filter(p => p.estado === 'borrador');
+    else if (f === 'cerrados')   result = todos.filter(p => p.estado === 'cerrado');
+
+    // filtros multi-dimensión
+    const fe = this.filtroEstado();
+    if (fe !== 'todos') {
+      if (fe === 'activos') result = result.filter(p => ['activo', 'en_escala', 'recien_lanzado', 'lanzando', 'en_riesgo', 'configurando'].includes(p.estado));
+      else result = result.filter(p => p.estado === fe);
+    }
+
+    const fc = this.filtroCampanas();
+    if (fc === 'con-campanas') result = result.filter(p => p.campanaCount > 0);
+    if (fc === 'sin-campanas') result = result.filter(p => p.campanaCount === 0);
+
+    return result;
   });
 
   readonly proyectosFiltradosYBuscados = computed<ProyectoRow[]>(() => {
@@ -838,9 +895,139 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     this.router.navigate(['/gali-6/proyectos/nuevo']);
   }
 
+  // ── Salud portafolio V2 — 3 indicadores concretos ───────────────────
+  readonly saludPortafolioV2 = computed(() => {
+    const todos = this.proyectos();
+    const activos = todos.filter(p => ['activo', 'en_escala'].includes(p.estado));
+    const conCampana = activos.filter(p => p.campanaCount > 0);
+    const enRiesgo = todos.filter(p => p.estado === 'en_riesgo');
+    const total = todos.filter(p => !['cerrado', 'borrador'].includes(p.estado));
+
+    // % campañas sobre objetivo ROAS (usando PROYECTOS_MOCK)
+    const pvActivos = PROYECTOS_MOCK.filter(pv => ['activo', 'en_escala'].includes(pv.estado));
+    const pvConCampana = pvActivos.filter(pv => pv.campanas.length > 0);
+    const pvRoasOk = pvConCampana.filter(pv =>
+      pv.campanas.some(c => (c.roasActual ?? 0) >= c.roasObjetivo)
+    );
+    const campanasPct = pvConCampana.length > 0
+      ? Math.round((pvRoasOk.length / pvConCampana.length) * 100) : 0;
+
+    // % presupuesto en proyectos alineados a meta
+    const pvConMeta = PROYECTOS_MOCK.filter(pv => pv.subObjetivoId || pv.subObjetivo);
+    const pvConPresupuesto = PROYECTOS_MOCK.filter(pv => pv.presupuestoTotal > 0);
+    const presupuestoAlineado = pvConPresupuesto.length > 0
+      ? Math.round((pvConMeta.filter(pv => pv.presupuestoTotal > 0).length / pvConPresupuesto.length) * 100) : 0;
+
+    return {
+      campanasPct,
+      presupuestoAlineado,
+      enRiesgo: enRiesgo.length,
+      totalActivos: total.length,
+      riesgoLabel: `${enRiesgo.length}/${total.length}`,
+    };
+  });
+
   // ── Modal de confirmación de pausa ───────────────────────────────────
   readonly pausaModalOpen = signal(false);
   readonly pausaTargetId = signal<string | null>(null);
+
+  // ── Modal de pausa de campaña individual ─────────────────────────────
+  readonly campanaPausaModalOpen = signal(false);
+  readonly campanaEnPausaId = signal<string | null>(null);
+  readonly campanaEnPausaProyectoId = signal<string | null>(null);
+
+  readonly campanaEnPausaData = computed(() => {
+    const campId = this.campanaEnPausaId();
+    const proyId = this.campanaEnPausaProyectoId();
+    if (!campId || !proyId) return null;
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    return pv?.campanas.find(c => c.id === campId) ?? null;
+  });
+
+  abrirModalPausaCampana(proyectoId: string, campanaId: string, event: Event): void {
+    event.stopPropagation();
+    this.campanaEnPausaProyectoId.set(proyectoId);
+    this.campanaEnPausaId.set(campanaId);
+    this.campanaPausaModalOpen.set(true);
+  }
+
+  confirmarPausaCampana(): void {
+    const pv = PROYECTOS_MOCK.find(p => p.id === this.campanaEnPausaProyectoId());
+    if (pv) {
+      const c = pv.campanas.find(c => c.id === this.campanaEnPausaId());
+      if (c) c.estado = 'pausada';
+    }
+    this.campanaPausaModalOpen.set(false);
+    this.campanaEnPausaId.set(null);
+    this.campanaEnPausaProyectoId.set(null);
+    this.galiCambioMensaje.set('Campaña pausada. Gali dejará de optimizar hasta que la reactives.');
+    setTimeout(() => this.galiCambioMensaje.set(null), 4000);
+  }
+
+  cancelarPausaCampana(): void {
+    this.campanaPausaModalOpen.set(false);
+    this.campanaEnPausaId.set(null);
+    this.campanaEnPausaProyectoId.set(null);
+  }
+
+  // ── Métricas financieras por proyecto ────────────────────────────────
+  presupuestoMes(proyId: string): number {
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    if (!pv) return 0;
+    const activas = pv.campanas.filter(c => c.estado === 'activa');
+    return activas.reduce((sum, c) => sum + (c.presupuestoDiario ?? 0) * 30, 0);
+  }
+
+  gananciaMes(proyId: string): number {
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    if (!pv) return 0;
+    const activas = pv.campanas.filter(c => c.estado === 'activa');
+    return activas.reduce((sum, c) => sum + ((c.presupuestoDiario ?? 0) * 30 * (c.roasActual ?? 0)), 0);
+  }
+
+  utilidadEstimadaMes(proyId: string): number {
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    return (pv as any)?.utilidadEstimadaMes ?? 0;
+  }
+
+  utilidadRealMes(proyId: string): number {
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    return (pv as any)?.utilidadRealMes ?? 0;
+  }
+
+  formatCOP(val: number): string {
+    if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'M';
+    if (val >= 1000) return '$' + Math.round(val / 1000) + 'k';
+    return '$' + val.toLocaleString('es-CO');
+  }
+
+  accionesAgentes(proyId: string): any[] {
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyId);
+    return (pv as any)?.accionesAgentes ?? [];
+  }
+
+  ctasParaTipo(tipo: string | undefined): { id: string; icon: string; label: string }[] {
+    const mapa: Record<string, { id: string; icon: string; label: string }[]> = {
+      optimizar: [
+        { id: 'margenes', icon: '📊', label: 'Analizar márgenes del portafolio' },
+        { id: 'cerrar', icon: '🔍', label: 'Identificar productos a cerrar' },
+        { id: 'precios', icon: '💰', label: 'Revisar precios vs competencia' },
+      ],
+      operacion: [
+        { id: 'integraciones', icon: '🔗', label: 'Revisar integraciones activas' },
+        { id: 'automatizaciones', icon: '⚙️', label: 'Ver automatizaciones' },
+      ],
+      negociacion: [
+        { id: 'historial', icon: '📋', label: 'Ver historial con proveedor' },
+        { id: 'condiciones', icon: '🤝', label: 'Solicitar nuevas condiciones' },
+      ],
+      experimentar: [
+        { id: 'precio', icon: '🧪', label: 'Crear experimento de precio' },
+        { id: 'angulo', icon: '🎯', label: 'Testear nuevo ángulo' },
+      ],
+    };
+    return mapa[tipo ?? ''] ?? [];
+  }
 
   readonly campanasPausarPreview = computed(() => {
     const id = this.pausaTargetId();
@@ -888,8 +1075,16 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     return this.expandedCampanas().has(proyectoId);
   }
 
-  getCampanas(proyectoId: string): Campana[] {
-    return MOCK_CAMPANAS.filter(c => c.proyectoId === proyectoId);
+  getCampanas(proyectoId: string): any[] {
+    const fromMock = MOCK_CAMPANAS.filter(c => c.proyectoId === proyectoId);
+    if (fromMock.length > 0) return fromMock;
+    // fallback a campanas embebidas en PROYECTOS_MOCK
+    const pv = PROYECTOS_MOCK.find(p => p.id === proyectoId);
+    return (pv?.campanas ?? []).map(c => ({
+      ...c,
+      productos: c.productos ?? [],
+      roasActualLabel: c.roasActual != null ? `${c.roasActual}x` : null,
+    }));
   }
 
   getSignalCount(proyectoId: string): number {

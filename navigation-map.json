@@ -1671,13 +1671,15 @@
           "type": "page",
           "prototype": "/gali-6/proyectos",
           "origin_points": ["sidebar", "gali-6-home"],
-          "layout": "Objetivo activo + alertas unificadas (máx 3) + portafolio con filtros por estado Y por tipo (lanzar/escalar/crm/optimizar/experimentar). CTA 'Nuevo proyecto' navega DIRECTO a /gali-6/proyectos/nuevo sin modal selector. Cards muestran chip de tipo + estado + acciones (Reactivar / Cerrar).",
+          "layout": "Objetivo activo + alertas unificadas (máx 3) + portafolio con panel de filtros multi-dimensión (estado × tipo × campañas). Salud portafolio redefinida en 3 indicadores concretos (% ROAS OK, % alineados, en riesgo). Cards muestran chip tipo + métricas en COP + pausa individual por campaña. Proyectos sin campañas muestran feed GALI + CTAs por tipo. Wizard: paso tipo dividido en 2 ramas (con campaña / sin campaña) + recomendación GALI. Paso creativos: choice cards (GALI vs manual-pronto).",
+          "updated": "2026-06-29",
           "ctas": [
             { "cta": "Nuevo proyecto", "navigates_to": "/gali-6/proyectos/nuevo" },
             { "cta": "Editar objetivo", "navigates_to": "/gali-6/mi-negocio" },
             { "cta": "Ver todas en Señales →", "navigates_to": "/gali-6/senales" },
             { "cta": "Reactivar (proyectos pausados)", "navigates_to": "inline — cambia estado a activo" },
-            { "cta": "Cerrar proyecto", "navigates_to": "inline — cambia estado a cerrado" }
+            { "cta": "Cerrar proyecto", "navigates_to": "inline — cambia estado a cerrado" },
+            { "cta": "⏸ Pausar (campaña individual)", "navigates_to": "modal inline con impacto" }
           ]
         },
         "nuevo-proyecto": {

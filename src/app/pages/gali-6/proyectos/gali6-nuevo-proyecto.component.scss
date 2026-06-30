@@ -969,6 +969,80 @@
   &:hover &__arrow { transform: translateX(3px); color: $os-accent; }
 }
 
+// ── Ramas de tipo de proyecto ────────────────────────────────────────────
+.tipo-rama {
+  display: flex; flex-direction: column; gap: $size-3;
+
+  &__label {
+    display: flex; align-items: center; gap: $size-3; flex-wrap: wrap;
+  }
+
+  &__badge {
+    font-size: 11px; font-weight: $font-semibold;
+    padding: 3px 10px; border-radius: $radius-full;
+
+    &--campana { background: rgba($os-accent, 0.12); color: $os-accent-dark; }
+    &--proceso { background: rgba(100,116,139,0.1); color: #475569; }
+  }
+
+  &__desc {
+    font-size: 11px; color: $gray-500;
+  }
+}
+
+.tipo-grid--rama {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-3;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.tipo-card--proceso {
+  border-color: $gray-100 !important;
+  &:hover { border-color: rgba(100,116,139,0.5) !important; box-shadow: none !important; }
+}
+
+// ── Chip recomendación GALI en tipo de proyecto ───────────────────────────
+.wizard__gali-rec {
+  display: flex; align-items: center; gap: $size-3;
+  background: linear-gradient(135deg, #fffaf4, #fff7ed);
+  border: 1px solid rgba($os-accent, 0.3);
+  border-left: 3px solid $os-accent;
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+  margin-bottom: $size-2;
+  flex-wrap: wrap;
+
+  &__spark { color: $os-accent; font-size: 14px; flex-shrink: 0; }
+
+  &__body {
+    flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 120px;
+  }
+
+  &__label {
+    font-size: 10px; font-weight: $font-semibold; color: $os-accent-dark;
+    text-transform: uppercase; letter-spacing: 0.06em; display: block;
+  }
+
+  &__tipo {
+    font-size: $font-sm; color: $gray-900; display: block;
+  }
+
+  &__why {
+    font-size: 11px; color: $gray-500; display: block; line-height: 1.4;
+  }
+
+  &__usar {
+    background: $os-accent; border: none; border-radius: $radius-md;
+    padding: 6px 14px; font-size: 12px; font-weight: $font-semibold;
+    color: white; cursor: pointer; font-family: $font-primary;
+    white-space: nowrap; flex-shrink: 0;
+    transition: background 120ms ease;
+    &:hover { background: $os-accent-dark; }
+  }
+}
+
 // ── PASO: Nombre ──────────────────────────────────────────────────────────
 .nombre-field {
   display: flex; flex-direction: column; gap: $size-2;
@@ -1245,6 +1319,99 @@
   font-size: 13px; color: #374151; margin-top: $size-2;
 
   i { color: $os-accent; margin-top: 1px; flex-shrink: 0; }
+}
+
+// ── Choice cards (paso creativos) ──────────────────────────────────────────
+.wizard__choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $size-4;
+  margin-bottom: $size-4;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.wizard__choice-card {
+  display: flex; flex-direction: column; gap: $size-3;
+  padding: $size-4; border: 2px solid $gray-200;
+  border-radius: $radius-lg; cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+  background: $white;
+
+  &:hover:not(&--disabled) {
+    border-color: rgba($os-accent, 0.5);
+    box-shadow: 0 0 0 3px rgba($os-accent, 0.08);
+  }
+
+  &--selected {
+    border-color: $os-accent;
+    background: rgba($os-accent, 0.03);
+    box-shadow: 0 0 0 3px rgba($os-accent, 0.1);
+  }
+
+  &--disabled {
+    opacity: 0.55; cursor: not-allowed;
+    background: $gray-50;
+  }
+
+  &__header {
+    display: flex; align-items: center; justify-content: space-between; gap: $size-2;
+  }
+}
+
+.wizard__choice-header {
+  display: flex; align-items: center; justify-content: space-between; gap: $size-2;
+}
+
+.wizard__choice-icon {
+  font-size: 22px; line-height: 1;
+  &--gali { color: $os-accent; }
+}
+
+.wizard__choice-content {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.wizard__choice-title {
+  font-size: $font-sm; font-weight: $font-bold; color: $gray-900;
+}
+
+.wizard__choice-desc {
+  font-size: 13px; color: $gray-600; line-height: 1.5;
+}
+
+.wizard__badge-pronto {
+  font-size: 10px; font-weight: $font-semibold;
+  background: $gray-100; color: $gray-500;
+  padding: 2px 8px; border-radius: $radius-full;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+
+.wizard__badge-elegido {
+  font-size: 10px; font-weight: $font-semibold;
+  background: rgba($os-accent, 0.12); color: $os-accent-dark;
+  padding: 2px 8px; border-radius: $radius-full;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+
+.wizard__gali-preview {
+  background: rgba($os-accent, 0.06);
+  border: 1px solid rgba($os-accent, 0.18);
+  border-radius: $radius-md;
+  padding: $size-3;
+  animation: slideDown 200ms ease;
+}
+
+.wizard__gali-preview-title {
+  font-size: 11px; font-weight: $font-semibold;
+  color: $os-accent-dark; margin-bottom: $size-2;
+}
+
+.wizard__gali-preview-list {
+  margin: 0; padding-left: $size-4;
+  display: flex; flex-direction: column; gap: 4px;
+
+  li { font-size: 12px; color: $gray-700; line-height: 1.5; }
 }
 
 // ── ÉXITO emoji ───────────────────────────────────────────────────────────

@@ -244,6 +244,7 @@ export class Gali6NuevoProyectoComponent {
 
   readonly step = signal<Step>('tipo');
   readonly objetivo: G6Objetivo = getObjetivo();
+  readonly metaPct = Math.min(100, Math.round((70 / (this.objetivo.meta_pedidos_sem || 100)) * 100));
 
   // ── Paso 1: Tipo de proyecto ──────────────────────────────────────────
   readonly selectedTipo = signal<TipoProyecto | null>(null);
@@ -751,6 +752,7 @@ export class Gali6NuevoProyectoComponent {
   readonly creativoCopy = signal(false);
   readonly creativoChatea = signal(false);
   readonly creativoPorDefinir = signal(false);
+  readonly creativosStrategy = signal<'gali' | 'manual' | null>(null);
 
   readonly shopifyConectado = computed(() =>
     this.integraciones().find(i => i.id === 'shopify')?.estado === 'conectado'

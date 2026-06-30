@@ -273,6 +273,35 @@
     </section>
   }
 
+  <!-- ── CREATIVOS GALI ── -->
+  @if (proyecto()?.creativosStrategy === 'gali' && angulosDeCampana().length > 0) {
+    <section class="cd__section cd__creativos">
+      <h2 class="cd__section-title">✦ Creativos · GALI</h2>
+      <div class="cd__angulos-gali">
+        <div class="cd__angulos-gali__head">
+          <span>Ángulo</span>
+          <span>Señal</span>
+          <span>Ped/sem</span>
+          <span>ROAS</span>
+          <span>Acción GALI</span>
+        </div>
+        @for (a of angulosDeCampana(); track a.id) {
+          <div class="cd__angulos-gali__row">
+            <span class="cd__ag-nombre">{{ a.nombre }}</span>
+            <span class="cd__ag-senal" [attr.data-senal]="anguloSenalKey(a)">
+              {{ anguloSenalLabel(a) }}
+            </span>
+            <span>{{ a.pedidosSem ?? '—' }}</span>
+            <span [class.cd__ag-roas--ok]="(a.roas ?? 0) >= (campana()?.roasObjetivo ?? 1.5)">
+              {{ a.roas ? a.roas + 'x' : '—' }}
+            </span>
+            <span class="cd__ag-rec">{{ anguloRecomendacion(a) }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
   <!-- ── AGENTES ── -->
   <section class="cd__section">
     <h2 class="cd__section-title">Agentes activos en esta campaña</h2>

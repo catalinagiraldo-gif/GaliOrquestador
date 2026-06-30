@@ -17,22 +17,66 @@
     <div class="wizard__body gali-stagger-in">
       <div class="wizard__eyebrow"><span aria-hidden="true">✦</span> Nuevo proyecto</div>
       <h1 class="wizard__title">¿Qué quieres lograr con este proyecto?</h1>
-      <p class="wizard__sub">Gali asignará los agentes y el enfoque según tu elección.</p>
 
-      <div class="tipo-grid">
-        @for (t of TIPOS_PROYECTO; track t.id) {
-          <button class="tipo-card" (click)="selectTipo(t.id)"
-                  [attr.aria-label]="t.titulo"
-                  type="button">
-            <span class="tipo-card__emoji" aria-hidden="true">{{ t.emoji }}</span>
-            <div class="tipo-card__body">
-              <strong class="tipo-card__titulo">{{ t.titulo }}</strong>
-              <p class="tipo-card__desc">{{ t.descripcion }}</p>
-              <p class="tipo-card__cuando">{{ t.cuandoUsar }}</p>
-            </div>
-            <span class="tipo-card__arrow" aria-hidden="true">→</span>
-          </button>
-        }
+      <!-- Chip recomendación GALI -->
+      <div class="wizard__gali-rec">
+        <span class="wizard__gali-rec__spark" aria-hidden="true">✦</span>
+        <div class="wizard__gali-rec__body">
+          <span class="wizard__gali-rec__label">Gali recomienda</span>
+          <strong class="wizard__gali-rec__tipo">🚀 Lanzar nuevo producto</strong>
+          <span class="wizard__gali-rec__why">Llevas 3 semanas sin nuevo lanzamiento y tu objetivo está al {{ metaPct }}%</span>
+        </div>
+        <button class="wizard__gali-rec__usar" type="button" (click)="selectTipo('lanzar')">
+          Usar esta →
+        </button>
+      </div>
+
+      <!-- Rama 1: Con campaña y producto -->
+      <div class="tipo-rama">
+        <div class="tipo-rama__label">
+          <span class="tipo-rama__badge tipo-rama__badge--campana">📣 Con campaña y producto</span>
+          <span class="tipo-rama__desc">Requieren inversión en pauta o canal activo</span>
+        </div>
+        <div class="tipo-grid tipo-grid--rama">
+          @for (t of TIPOS_PROYECTO; track t.id) {
+            @if (t.requiereCampana) {
+              <button class="tipo-card" (click)="selectTipo(t.id)"
+                      [attr.aria-label]="t.titulo"
+                      type="button">
+                <span class="tipo-card__emoji" aria-hidden="true">{{ t.emoji }}</span>
+                <div class="tipo-card__body">
+                  <strong class="tipo-card__titulo">{{ t.titulo }}</strong>
+                  <p class="tipo-card__desc">{{ t.descripcion }}</p>
+                </div>
+                <span class="tipo-card__arrow" aria-hidden="true">→</span>
+              </button>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Rama 2: Para optimizar procesos -->
+      <div class="tipo-rama">
+        <div class="tipo-rama__label">
+          <span class="tipo-rama__badge tipo-rama__badge--proceso">⚙ Para optimizar procesos</span>
+          <span class="tipo-rama__desc">GALI orquesta agentes, sin pauta obligatoria</span>
+        </div>
+        <div class="tipo-grid tipo-grid--rama">
+          @for (t of TIPOS_PROYECTO; track t.id) {
+            @if (!t.requiereCampana) {
+              <button class="tipo-card tipo-card--proceso" (click)="selectTipo(t.id)"
+                      [attr.aria-label]="t.titulo"
+                      type="button">
+                <span class="tipo-card__emoji" aria-hidden="true">{{ t.emoji }}</span>
+                <div class="tipo-card__body">
+                  <strong class="tipo-card__titulo">{{ t.titulo }}</strong>
+                  <p class="tipo-card__desc">{{ t.descripcion }}</p>
+                </div>
+                <span class="tipo-card__arrow" aria-hidden="true">→</span>
+              </button>
+            }
+          }
+        </div>
       </div>
 
       <p class="wizard__gali-hint">
@@ -545,14 +589,13 @@
 
       <button class="wizard__next"
               [disabled]="selectedProductos().size === 0 && tipoCampanaSeleccionado() !== 'chatea'"
-              (click)="rutaConAds() ? goTo('campana-presupuesto') : goTo('campana-brujula')">
-        @if (rutaConAds()) { Continuar → Presupuesto }
-        @else { Continuar → Brújula de precio }
+              (click)="goTo('campana-tipo')">
+        Continuar →
       </button>
 
       @if (tipoCampanaSeleccionado() === 'chatea' && selectedProductos().size === 0) {
         <button class="wizard__next wizard__next--secondary" type="button"
-                (click)="goTo('campana-brujula')">
+                (click)="goTo('campana-tipo')">
           Continuar sin productos →
         </button>
       }
@@ -878,92 +921,59 @@
   <!-- ── CAMPAÑA: Creativos ── -->
   @if (step() === 'campana-creativos') {
     <div class="wizard__body gali-stagger-in">
-      <h1 class="wizard__title">¿Cómo vas a mostrar este producto?</h1>
-      <p class="wizard__sub">Marca lo que ya tienes listo. Lo que falte quedará pendiente en el proyecto.</p>
+      <h1 class="wizard__title">¿Cómo quieres crear los creativos?</h1>
+      <p class="wizard__sub">Elige cómo vas a preparar los creativos para tu campaña antes de lanzar.</p>
 
-      <!-- Landing page — solo si la ruta incluye shopify -->
-      @if (mostrarSeccionLanding()) {
-        <div class="creativo-section" [class.is-disabled]="!shopifyConectado()">
-          <div class="creativo-section__header">
-            <span class="creativo-section__title">🌐 Landing Page</span>
-            <span class="creativo-section__req">
-              @if (shopifyConectado()) { Shopify ● } @else { Shopify ○ — sin conectar }
-            </span>
+      <div class="wizard__choice-grid">
+
+        <!-- Opción A: manual — deshabilitada -->
+        <div class="wizard__choice-card wizard__choice-card--disabled" aria-disabled="true">
+          <div class="wizard__choice-header">
+            <span class="wizard__choice-icon">✏️</span>
+            <span class="wizard__badge-pronto">Próximamente</span>
           </div>
-          @if (shopifyConectado()) {
-            <label class="creativo-check">
-              <input type="checkbox" [checked]="creativoLanding()"
-                     (change)="creativoLanding.set(!creativoLanding())">
-              Landing page configurada
-            </label>
-          } @else {
-            <p class="creativo-section__disabled-msg">
-              Conecta Shopify + DROPIFY para habilitar landing pages.
-              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
-            </p>
-          }
+          <div class="wizard__choice-content">
+            <div class="wizard__choice-title">Crear yo mismo</div>
+            <div class="wizard__choice-desc">Diseña tus propios copies, imágenes y videos y súbelos directamente a Meta o TikTok.</div>
+          </div>
         </div>
-      }
 
-      <!-- Creativos para ads — solo si el tipo incluye ads -->
-      @if (mostrarSeccionAds()) {
-        <div class="creativo-section" [class.is-disabled]="!metaOTiktokConectado()">
-          <div class="creativo-section__header">
-            <span class="creativo-section__title">📣 Creativos para Ads</span>
-            <span class="creativo-section__req">
-              @if (metaOTiktokConectado()) { Meta/TikTok ● } @else { Meta/TikTok ○ — sin conectar }
-            </span>
+        <!-- Opción B: GALI — seleccionable -->
+        <div class="wizard__choice-card"
+             [class.wizard__choice-card--selected]="creativosStrategy() === 'gali'"
+             (click)="creativosStrategy.set('gali')"
+             role="button"
+             tabindex="0"
+             (keydown.enter)="creativosStrategy.set('gali')"
+             (keydown.space)="creativosStrategy.set('gali'); $event.preventDefault()"
+             [attr.aria-pressed]="creativosStrategy() === 'gali'">
+          <div class="wizard__choice-header">
+            <span class="wizard__choice-icon wizard__choice-icon--gali">✦</span>
+            @if (creativosStrategy() === 'gali') {
+              <span class="wizard__badge-elegido">Elegido</span>
+            }
           </div>
-          @if (metaOTiktokConectado()) {
-            <div class="creativo-checks">
-              <label class="creativo-check">
-                <input type="checkbox" [checked]="creativoAngulo()"
-                       (change)="creativoAngulo.set(!creativoAngulo())">
-                Ángulo de venta definido
-              </label>
-              <label class="creativo-check">
-                <input type="checkbox" [checked]="creativoAudiencias()"
-                       (change)="creativoAudiencias.set(!creativoAudiencias())">
-                Audiencias / personas configuradas
-              </label>
-              <label class="creativo-check">
-                <input type="checkbox" [checked]="creativoCopy()"
-                       (change)="creativoCopy.set(!creativoCopy())">
-                Copy / guión de video
-              </label>
+          <div class="wizard__choice-content">
+            <div class="wizard__choice-title">GALI lo hace por mí</div>
+            <div class="wizard__choice-desc">GALI genera ángulos de venta, hooks y estructura de campaña basados en tu producto y audiencia objetivo.</div>
+          </div>
+
+          @if (creativosStrategy() === 'gali') {
+            <div class="wizard__gali-preview">
+              <div class="wizard__gali-preview-title">✦ GALI creará para ti:</div>
+              <ul class="wizard__gali-preview-list">
+                <li>3 ángulos de venta para {{ selectedProductosList()[0]?.nombre ?? 'tu producto' }}</li>
+                <li>2 hooks por ángulo (urgencia + curiosidad)</li>
+                <li>Estructura de campaña optimizada para {{ tipoCampanaSeleccionado() === 'ads' ? 'Meta/TikTok' : tipoCampanaSeleccionado() === 'chatea' ? 'Chatea Pro' : 'tu canal' }}</li>
+                @if (mostrarSeccionLanding()) {
+                  <li>Landing page optimizada para conversión</li>
+                }
+              </ul>
             </div>
-          } @else {
-            <p class="creativo-section__disabled-msg">
-              Conecta Meta Ads o TikTok for Business para habilitar creativos de ads.
-              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
-            </p>
           }
         </div>
-      }
 
-      <!-- Chatea flow — solo si el tipo incluye chatea -->
-      @if (mostrarSeccionChatea()) {
-        <div class="creativo-section" [class.is-disabled]="!chateaConectado()">
-          <div class="creativo-section__header">
-            <span class="creativo-section__title">💬 Flujo WhatsApp / Chatea</span>
-            <span class="creativo-section__req">
-              @if (chateaConectado()) { Chatea Pro ● } @else { Chatea Pro ○ — sin conectar }
-            </span>
-          </div>
-          @if (chateaConectado()) {
-            <label class="creativo-check">
-              <input type="checkbox" [checked]="creativoChatea()"
-                     (change)="creativoChatea.set(!creativoChatea())">
-              Flujo de bienvenida configurado
-            </label>
-          } @else {
-            <p class="creativo-section__disabled-msg">
-              Conecta Chatea Pro para habilitar ventas por WhatsApp.
-              <button class="creativo-section__link" type="button" (click)="irConexiones()">Conectar →</button>
-            </p>
-          }
-        </div>
-      }
+      </div>
 
       <label class="creativo-check creativo-check--borrador">
         <input type="checkbox" [checked]="creativoPorDefinir()"
@@ -979,12 +989,9 @@
         </div>
       }
 
-      <p class="wizard__gali-hint">
-        <span aria-hidden="true">✦</span>
-        Puedes completar los creativos pendientes desde el detalle del proyecto antes de lanzar.
-      </p>
-
-      <button class="wizard__next" (click)="goTo('campana-resumen')">
+      <button class="wizard__next"
+              [disabled]="creativosStrategy() === null && !creativoPorDefinir()"
+              (click)="goTo('campana-resumen')">
         Continuar →
       </button>
     </div>

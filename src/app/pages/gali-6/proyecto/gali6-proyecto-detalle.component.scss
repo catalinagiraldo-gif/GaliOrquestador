@@ -835,3 +835,41 @@
   font-size: 11px; color: $os-text-secondary; margin: 0;
   border-left: 2px solid $os-accent-dim; padding-left: $size-2;
 }
+
+// ── Resumen enriquecido ──────────────────────────────────────────────────────
+.det__resumen-extra {
+  display: flex; flex-wrap: wrap; gap: $size-2;
+  padding: $size-3 $size-4;
+  background: $os-surface-2; border-radius: $radius-md;
+  border: 1px solid $os-border;
+  margin-bottom: $size-4;
+}
+
+.det__resumen-stat {
+  display: flex; align-items: center; gap: $size-2;
+  font-size: $font-sm; color: $gray-600;
+  padding: $size-1 $size-3;
+  background: #fff; border-radius: $radius-sm;
+  border: 1px solid $gray-100;
+
+  strong { color: $gray-900; font-weight: $font-semibold; }
+
+  &__icon { font-size: 13px; color: $gray-400; }
+
+  &--up {
+    border-color: rgba(5, 150, 105, 0.2);
+    strong { color: #059669; }
+    .det__resumen-stat__icon { color: #059669; }
+  }
+
+  &--down {
+    border-color: rgba(220, 38, 38, 0.2);
+    strong { color: #dc2626; }
+    .det__resumen-stat__icon { color: #dc2626; }
+  }
+
+  &--meta {
+    border-color: rgba($os-accent, 0.25);
+    .det__resumen-stat__icon { color: $os-accent; }
+  }
+}

@@ -154,6 +154,32 @@
           </div>
         </div>
 
+        <!-- ── Resumen enriquecido ── -->
+        @if (diasActivo() !== null || tendenciaSemana() !== null) {
+          <div class="det__resumen-extra">
+            @if (diasActivo() !== null) {
+              <div class="det__resumen-stat">
+                <i class="pi pi-calendar det__resumen-stat__icon"></i>
+                Activo hace <strong>{{ diasActivo() }} días</strong>
+              </div>
+            }
+            @if (tendenciaSemana() !== null) {
+              <div class="det__resumen-stat"
+                   [class.det__resumen-stat--up]="tendenciaSemana()! > 0"
+                   [class.det__resumen-stat--down]="tendenciaSemana()! < 0">
+                <span class="det__resumen-stat__icon">{{ tendenciaSemana()! > 0 ? '📈' : tendenciaSemana()! < 0 ? '📉' : '→' }}</span>
+                <strong>{{ tendenciaSemana()! > 0 ? '+' : '' }}{{ tendenciaSemana() }}%</strong>&nbsp;pedidos vs semana anterior
+              </div>
+            }
+            @if ((proyectoNuevo()?.contribucionPct ?? 0) > 0) {
+              <div class="det__resumen-stat det__resumen-stat--meta">
+                <i class="pi pi-target det__resumen-stat__icon"></i>
+                Aporta <strong>{{ proyectoNuevo()?.contribucionPct }}%</strong> de tu meta semanal
+              </div>
+            }
+          </div>
+        }
+
         <!-- ── Métricas de productos en este proyecto ── -->
         @if (productosMetrics().length > 0) {
           <section class="pd__productos-metrics">

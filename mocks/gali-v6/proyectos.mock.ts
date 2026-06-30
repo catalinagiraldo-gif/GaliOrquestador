@@ -88,6 +88,16 @@ export interface AnguloVenta {
   roas?: number;
   pedidosSem?: number;
   creativoUrl?: string;
+  señal?: 'subiendo' | 'estable' | 'bajando';
+  señalLabel?: string;
+  recomendacionGali?: string;
+}
+
+export interface AgenteAccion {
+  id: string;
+  agenteIcon: string;
+  descripcion: string;
+  hace: string;
 }
 
 export interface ProductoCampanaMetrica {
@@ -172,6 +182,10 @@ export interface ProyectoDetalle {
   subObjetivoId?: string;
   pausaLog?: PausaLog;
   productosMetrics?: ProductoMetrics[];
+  utilidadEstimadaMes?: number;
+  utilidadRealMes?: number;
+  creativosStrategy?: 'gali' | 'manual' | null;
+  accionesAgentes?: AgenteAccion[];
 }
 
 export const PROYECTOS_MOCK: ProyectoDetalle[] = [
@@ -277,9 +291,9 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
             stockActual: 145,
             estadoStock: 'ok',
             angulos: [
-              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 2.4, pedidosSem: 18 },
-              { id: 'a-002', nombre: 'Para aventureros', publicoObj: 'Hombres 25-35, outdoor', estado: 'activo', roas: 1.9, pedidosSem: 10 },
-              { id: 'a-003', nombre: 'Control parental mascotas', publicoObj: 'Familias con niños y perro', estado: 'pausado', roas: 0.8, pedidosSem: 2 },
+              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 2.4, pedidosSem: 18, señal: 'subiendo', señalLabel: '↑ Subiendo', recomendacionGali: 'Escalar presupuesto 20% esta semana.' },
+              { id: 'a-002', nombre: 'Para aventureros', publicoObj: 'Hombres 25-35, outdoor', estado: 'activo', roas: 1.9, pedidosSem: 10, señal: 'estable', señalLabel: '→ Estable', recomendacionGali: 'Mantener, explorar nuevo hook.' },
+              { id: 'a-003', nombre: 'Control parental mascotas', publicoObj: 'Familias con niños y perro', estado: 'pausado', roas: 0.8, pedidosSem: 2, señal: 'bajando', señalLabel: '↓ Bajando', recomendacionGali: 'Pausado. Revisar creativos antes de reactivar.' },
             ],
             metricas: {
               pedidosSem: 28, cpaReal: 12400, roasCampana: 2.3,
@@ -316,8 +330,8 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
             stockActual: 145,
             estadoStock: 'ok',
             angulos: [
-              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 1.9, pedidosSem: 11 },
-              { id: 'a-004', nombre: 'Regalo para tu perro', publicoObj: 'Personas 22-55, regalo', estado: 'activo', roas: 1.7, pedidosSem: 7 },
+              { id: 'a-001', nombre: 'Para mamás de mascota', publicoObj: 'Mujeres 28-45 con perro', estado: 'activo', roas: 1.9, pedidosSem: 11, señal: 'subiendo', señalLabel: '↑ Subiendo', recomendacionGali: 'Buen desempeño en Meta. Aumentar frecuencia.' },
+              { id: 'a-004', nombre: 'Regalo para tu perro', publicoObj: 'Personas 22-55, regalo', estado: 'activo', roas: 1.7, pedidosSem: 7, señal: 'estable', señalLabel: '→ Estable', recomendacionGali: 'Testear nuevo copy de urgencia.' },
             ],
             metricas: {
               pedidosSem: 18, cpaReal: 14800, roasCampana: 1.8,
@@ -360,6 +374,9 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
     tipoCampana: 'hibrida',
     intentDeclarado: 'Mi ROAS está por encima de 1.8x y quiero doblar',
     subObjetivo: 'Doblar pedidos/sem sin bajar margen',
+    utilidadEstimadaMes: 1500000,
+    utilidadRealMes: 2100000,
+    creativosStrategy: 'gali',
     productosMetrics: [
       {
         productoId: 'prod-collar-gps',
@@ -406,9 +423,9 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
             stockActual: 12,
             estadoStock: 'bajo',
             angulos: [
-              { id: 'a-k01', nombre: 'Antiedad 30+', publicoObj: 'Mujeres 30-50', estado: 'pausado', roas: 1.1, pedidosSem: 4 },
-              { id: 'a-k02', nombre: 'Piel seca invierno', publicoObj: 'Mujeres 20-40', estado: 'activo', roas: 0.9, pedidosSem: 3 },
-              { id: 'a-k03', nombre: 'Regalo para mamá', publicoObj: 'Personas 20-45', estado: 'borrador' },
+              { id: 'a-k01', nombre: 'Antiedad 30+', publicoObj: 'Mujeres 30-50', estado: 'pausado', roas: 1.1, pedidosSem: 4, señal: 'bajando', señalLabel: '↓ Bajando', recomendacionGali: 'Pausar y revisar copy.' },
+              { id: 'a-k02', nombre: 'Piel seca invierno', publicoObj: 'Mujeres 20-40', estado: 'activo', roas: 0.9, pedidosSem: 3, señal: 'bajando', señalLabel: '↓ Bajando', recomendacionGali: 'ROAS crítico. Cambiar audiencia.' },
+              { id: 'a-k03', nombre: 'Regalo para mamá', publicoObj: 'Personas 20-45', estado: 'borrador', señal: 'estable', señalLabel: '→ Sin datos', recomendacionGali: 'Activar para testear nueva hipótesis.' },
             ],
             metricas: {
               pedidosSem: 7, cpaReal: 28900, roasCampana: 0.9,
@@ -435,6 +452,9 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
     tipoCampana: 'ads',
     intentDeclarado: 'Quiero corregir este proyecto que no está rindiendo',
     subObjetivo: 'Recuperar ROAS mínimo de 1.5x',
+    utilidadEstimadaMes: 800000,
+    utilidadRealMes: 180000,
+    creativosStrategy: 'gali',
     productosMetrics: [
       {
         productoId: 'prod-kbeauty-kit',
@@ -485,23 +505,29 @@ export const PROYECTOS_MOCK: ProyectoDetalle[] = [
     subObjetivo: 'Reactivar base de contactos existente',
   },
 
-  // ── Estado 6: Proyecto sin campañas (solo seguimiento) ──────────────────
+  // ── Estado 6: Proyecto sin campañas (solo GALI orquesta) ────────────────
   {
     id: 'pv-006',
-    nombre: 'Revisión portafolio Q3',
+    nombre: 'Optimización portafolio Q3',
     tipo: 'optimizar',
-    estado: 'borrador',
-    descripcion: 'Proyecto creado solo para seguimiento de salud de productos existentes. Sin campañas por ahora.',
+    estado: 'activo',
+    descripcion: 'Gali analiza márgenes y salud de productos sin pauta activa. Acciones de agentes orquestando en tiempo real.',
     contribucionPct: 0,
     pedidosSem: 0,
     presupuestoTotal: 0,
     campanas: [],
     agentes: ['vigilante', 'ada'],
-    fechaInicio: '2026-06-25',
+    alertaGali: 'Gali identificó 3 productos con margen < 20%. Revisando precios de proveedores para negociación.',
+    fechaInicio: '2026-06-20',
     rutaVenta: null,
     tipoCampana: null,
     intentDeclarado: 'Quiero saber cuáles productos funcionan y cuáles dejar ir',
     subObjetivo: 'Optimizar portafolio actual',
+    accionesAgentes: [
+      { id: 'aa-001', agenteIcon: '🔍', descripcion: 'ADA Spy escaneó 12 productos de tu catálogo y encontró 3 con margen neto < 20%.', hace: 'hace 2h' },
+      { id: 'aa-002', agenteIcon: '📊', descripcion: 'Vigilante detectó que "Difusor aromaterapia v1" lleva 6 días sin pedidos. Stock de 34 unidades quieto.', hace: 'hace 4h' },
+      { id: 'aa-003', agenteIcon: '🤝', descripcion: 'Gali preparó propuesta de renegociación para proveedor collar GPS: solicitar -8% por volumen.', hace: 'hace 1d' },
+    ],
   },
 
   // ── Estado 7: Proyecto pausado con campañas ──────────────────────────────

@@ -74,97 +74,143 @@
       <button class="port__new" (click)="nuevo()" type="button">+ Nuevo proyecto</button>
     </div>
 
-    <!-- Estado del portafolio — semáforo visual -->
-    <div class="port__salud" [attr.data-color]="saludPortafolio().color"
-         role="status" [attr.aria-label]="saludPortafolio().label + ' · ' + saludPortafolio().score + ' puntos'">
-      <div class="port__salud-left">
-        <div class="port__salud-score">
-          <span class="port__salud-num">{{ saludPortafolio().score }}</span>
-          <span class="port__salud-max">/100</span>
+    <!-- Estado del portafolio — 3 indicadores concretos -->
+    <div class="port__salud-v2" role="status" aria-label="Alineación del portafolio con tus objetivos">
+      <div class="port__salud-v2__title">Alineación con tus objetivos</div>
+      <div class="port__salud-v2__metrics">
+        <div class="port__salud-v2__metric">
+          <span class="port__salud-v2__val"
+                [class.port__salud-v2__val--ok]="saludPortafolioV2().campanasPct >= 60"
+                [class.port__salud-v2__val--warn]="saludPortafolioV2().campanasPct < 60">
+            {{ saludPortafolioV2().campanasPct }}%
+          </span>
+          <span class="port__salud-v2__desc">campañas sobre objetivo ROAS</span>
         </div>
-        <div class="port__salud-body">
-          <span class="port__salud-label">{{ saludPortafolio().label }}</span>
+        <div class="port__salud-v2__divider"></div>
+        <div class="port__salud-v2__metric">
+          <span class="port__salud-v2__val"
+                [class.port__salud-v2__val--ok]="saludPortafolioV2().presupuestoAlineado >= 60"
+                [class.port__salud-v2__val--warn]="saludPortafolioV2().presupuestoAlineado < 60">
+            {{ saludPortafolioV2().presupuestoAlineado }}%
+          </span>
+          <span class="port__salud-v2__desc">proyectos alineados a tu meta</span>
         </div>
-        <div class="port__salud-track" aria-hidden="true">
-          <div class="port__salud-fill" [style.width.%]="saludPortafolio().score"></div>
+        <div class="port__salud-v2__divider"></div>
+        <div class="port__salud-v2__metric">
+          <span class="port__salud-v2__val"
+                [class.port__salud-v2__val--ok]="saludPortafolioV2().enRiesgo === 0"
+                [class.port__salud-v2__val--alert]="saludPortafolioV2().enRiesgo > 0">
+            {{ saludPortafolioV2().riesgoLabel }}
+          </span>
+          <span class="port__salud-v2__desc">proyectos en riesgo</span>
         </div>
-      </div>
-      <div class="port__salud-chips" aria-label="Desglose del portafolio">
-        @if (filterCounts().activos > 0) {
-          <span class="port__salud-chip port__salud-chip--activo">
-            <span class="port__salud-chip-dot"></span>
-            {{ filterCounts().activos }} activo{{ filterCounts().activos !== 1 ? 's' : '' }}
-          </span>
-        }
-        @if (conteoEnRiesgo() > 0) {
-          <span class="port__salud-chip port__salud-chip--riesgo">
-            <span class="port__salud-chip-dot"></span>
-            {{ conteoEnRiesgo() }} en riesgo
-          </span>
-        }
-        @if (filterCounts().pausados > 0) {
-          <span class="port__salud-chip port__salud-chip--pausado">
-            <span class="port__salud-chip-dot"></span>
-            {{ filterCounts().pausados }} pausado{{ filterCounts().pausados !== 1 ? 's' : '' }}
-          </span>
-        }
-        @if (filterCounts().borradores > 0) {
-          <span class="port__salud-chip port__salud-chip--borrador">
-            <span class="port__salud-chip-dot"></span>
-            {{ filterCounts().borradores }} borrador{{ filterCounts().borradores !== 1 ? 'es' : '' }}
-          </span>
-        }
       </div>
     </div>
 
-    <!-- Filtros por tipo de proyecto -->
-    <div class="port__tipo-filtros">
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'todos'" (click)="tipoFiltro.set('todos')">Todos</button>
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'lanzar'" (click)="tipoFiltro.set('lanzar')">🚀 Lanzar</button>
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'escalar'" (click)="tipoFiltro.set('escalar')">📈 Escalar</button>
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'crm'" (click)="tipoFiltro.set('crm')">💬 CRM</button>
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'optimizar'" (click)="tipoFiltro.set('optimizar')">🔧 Optimizar</button>
-      <button class="port__tipo-btn" [class.port__tipo-btn--active]="tipoFiltro() === 'experimentar'" (click)="tipoFiltro.set('experimentar')">🧪 Exp.</button>
+    <!-- Barra de búsqueda + filtros multi-dimensión -->
+    <div class="port__filter-bar">
+      <div class="port__search">
+        <input type="search" class="port__search-input"
+               placeholder="Buscar proyecto..."
+               [ngModel]="searchQuery()"
+               (ngModelChange)="searchQuery.set($event)">
+      </div>
+      <button class="port__filter-toggle"
+              type="button"
+              [class.port__filter-toggle--active]="filtroPanelOpen()"
+              (click)="filtroPanelOpen.set(!filtroPanelOpen())">
+        <i class="pi pi-sliders-h"></i>
+        Filtros
+        @if (filtrosActivosCount() > 0) {
+          <span class="port__filter-badge">{{ filtrosActivosCount() }}</span>
+        }
+        <span class="port__filter-arrow">{{ filtroPanelOpen() ? '▲' : '▼' }}</span>
+      </button>
     </div>
 
-    <!-- Search bar (I8a) -->
-    <div class="port__search">
-      <input type="search" class="port__search-input"
-             placeholder="Buscar proyecto..."
-             [ngModel]="searchQuery()"
-             (ngModelChange)="searchQuery.set($event)">
-    </div>
+    <!-- Panel de filtros desplegable -->
+    @if (filtroPanelOpen()) {
+      <div class="port__filter-panel">
 
-    <!-- Filtros de estado -->
-    <div class="port__filters" role="group" aria-label="Filtrar proyectos por estado">
-      <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'todos'"
-              [attr.aria-pressed]="activeFilter() === 'todos'"
-              (click)="setFilter('todos')">
-        Todos <span class="pf-count" [attr.aria-label]="filterCounts().todos + ' proyectos'">{{ filterCounts().todos }}</span>
-      </button>
-      <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'activos'"
-              [attr.aria-pressed]="activeFilter() === 'activos'"
-              (click)="setFilter('activos')">
-        Activos <span class="pf-count" [attr.aria-label]="filterCounts().activos + ' proyectos'">{{ filterCounts().activos }}</span>
-      </button>
-      <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'pausados'"
-              [attr.aria-pressed]="activeFilter() === 'pausados'"
-              (click)="setFilter('pausados')">
-        Pausados <span class="pf-count" [attr.aria-label]="filterCounts().pausados + ' proyectos'">{{ filterCounts().pausados }}</span>
-      </button>
-      <button class="pf-tab" [class.pf-tab--active]="activeFilter() === 'borradores'"
-              [attr.aria-pressed]="activeFilter() === 'borradores'"
-              (click)="setFilter('borradores')">
-        Borradores <span class="pf-count" [attr.aria-label]="filterCounts().borradores + ' proyectos'">{{ filterCounts().borradores }}</span>
-      </button>
-      @if (filterCounts().cerrados > 0) {
-        <button class="pf-tab pf-tab--cerrados" [class.pf-tab--active]="activeFilter() === 'cerrados'"
-                [attr.aria-pressed]="activeFilter() === 'cerrados'"
-                (click)="setFilter('cerrados')">
-          Cerrados <span class="pf-count" [attr.aria-label]="filterCounts().cerrados + ' proyectos'">{{ filterCounts().cerrados }}</span>
-        </button>
-      }
-    </div>
+        <!-- Filtro estado -->
+        <div class="port__filter-group">
+          <span class="port__filter-group-label">Estado</span>
+          <div class="port__filter-chips">
+            @for (opt of estadoOpts; track opt.value) {
+              <button class="port__filter-chip"
+                      type="button"
+                      [class.port__filter-chip--active]="filtroEstado() === opt.value"
+                      (click)="filtroEstado.set(opt.value)">
+                {{ opt.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Filtro tipo -->
+        <div class="port__filter-group">
+          <span class="port__filter-group-label">Tipo</span>
+          <div class="port__filter-chips">
+            @for (opt of tipoOpts; track opt.value) {
+              <button class="port__filter-chip"
+                      type="button"
+                      [class.port__filter-chip--active]="tipoFiltro() === opt.value"
+                      (click)="tipoFiltro.set($any(opt.value))">
+                {{ opt.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Filtro campañas -->
+        <div class="port__filter-group">
+          <span class="port__filter-group-label">Campañas</span>
+          <div class="port__filter-chips">
+            <button class="port__filter-chip" type="button"
+                    [class.port__filter-chip--active]="filtroCampanas() === 'todos'"
+                    (click)="filtroCampanas.set('todos')">Todos</button>
+            <button class="port__filter-chip" type="button"
+                    [class.port__filter-chip--active]="filtroCampanas() === 'con-campanas'"
+                    (click)="filtroCampanas.set('con-campanas')">Con campañas</button>
+            <button class="port__filter-chip" type="button"
+                    [class.port__filter-chip--active]="filtroCampanas() === 'sin-campanas'"
+                    (click)="filtroCampanas.set('sin-campanas')">Sin campañas</button>
+          </div>
+        </div>
+
+        <!-- Limpiar filtros -->
+        @if (filtrosActivosCount() > 0) {
+          <button class="port__filter-clear" type="button"
+                  (click)="filtroEstado.set('todos'); tipoFiltro.set('todos'); filtroCampanas.set('todos')">
+            × Limpiar filtros
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Tags de filtros activos (inline) -->
+    @if (filtrosActivosCount() > 0 && !filtroPanelOpen()) {
+      <div class="port__active-filters">
+        @if (filtroEstado() !== 'todos') {
+          <span class="port__active-tag">
+            Estado: {{ filtroEstadoLabel() }}
+            <button type="button" (click)="filtroEstado.set('todos')">×</button>
+          </span>
+        }
+        @if (tipoFiltro() !== 'todos') {
+          <span class="port__active-tag">
+            Tipo: {{ filtroTipoLabel() }}
+            <button type="button" (click)="tipoFiltro.set('todos')">×</button>
+          </span>
+        }
+        @if (filtroCampanas() !== 'todos') {
+          <span class="port__active-tag">
+            {{ filtroCampanas() === 'con-campanas' ? 'Con campañas' : 'Sin campañas' }}
+            <button type="button" (click)="filtroCampanas.set('todos')">×</button>
+          </span>
+        }
+      </div>
+    }
 
     <div class="port__legend">
       <span>Estado</span>
@@ -225,6 +271,19 @@
                      [title]="getSignalCount(p.id) + ' señales activas'">
                     <i class="pi pi-bell"></i> {{ getSignalCount(p.id) }}
                   </a>
+                }
+                <!-- Métricas financieras rápidas en COP -->
+                @if (presupuestoMes(p.id) > 0) {
+                  <div class="port__financials">
+                    <span class="port__fin-item">{{ formatCOP(presupuestoMes(p.id)) }}/mes</span>
+                    @if (gananciaMes(p.id) > 0) {
+                      <span class="port__fin-sep">→</span>
+                      <span class="port__fin-retorno"
+                            [class.port__fin-retorno--ok]="gananciaMes(p.id) > presupuestoMes(p.id)">
+                        ret. {{ formatCOP(gananciaMes(p.id)) }}
+                      </span>
+                    }
+                  </div>
                 }
               </div>
 
@@ -311,6 +370,34 @@
               </div>
             </div>
 
+            <!-- Bloque sin campañas — GALI orquesta agentes -->
+            @if (p.campanaCount === 0 && !['borrador','cerrado'].includes(p.estado)) {
+              <div class="sin-camp-gali">
+                @if (accionesAgentes(p.id).length > 0) {
+                  <div class="sin-camp-gali__feed">
+                    <span class="sin-camp-gali__feed-title">✦ GALI actuando ahora</span>
+                    @for (a of accionesAgentes(p.id); track a.id) {
+                      <div class="sin-camp-gali__accion">
+                        <span class="sin-camp-gali__icon">{{ a.agenteIcon }}</span>
+                        <span class="sin-camp-gali__desc">{{ a.descripcion }}</span>
+                        <span class="sin-camp-gali__time">{{ a.hace }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (ctasParaTipo(p.tipo).length > 0) {
+                  <div class="sin-camp-gali__ctas">
+                    @for (cta of ctasParaTipo(p.tipo); track cta.id) {
+                      <button class="sin-camp-gali__cta" type="button"
+                              (click)="$event.stopPropagation()">
+                        {{ cta.icon }} {{ cta.label }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
             <!-- Accordion de campañas -->
             @if (isCampanasExpanded(p.id) && p.estado !== 'cerrado') {
               <div class="campanas-accordion">
@@ -330,7 +417,7 @@
                         </span>
                         <span class="campana-row__nombre">{{ c.nombre }}</span>
                         <span class="campana-row__canal">{{ c.canalLabel }}</span>
-                        @if (c.productos.length > 1) {
+                        @if (c.productos && c.productos.length > 1) {
                           <span class="campana-row__productos">{{ c.productos.length }} productos</span>
                         }
                       </div>
@@ -343,6 +430,14 @@
                           </span>
                         }
                         <span class="campana-row__presupuesto">{{ c.presupuestoDiarioLabel }}</span>
+                        @if (c.estado === 'activa' && c.tipoCampana !== 'chatea') {
+                          <button class="campana-row__pause-btn"
+                                  type="button"
+                                  title="Pausar esta campaña"
+                                  (click)="abrirModalPausaCampana(p.id, c.id, $event)">
+                            ⏸ Pausar
+                          </button>
+                        }
                       </div>
                       @if (c.notaGali) {
                         <div class="campana-row__nota">
@@ -367,6 +462,34 @@
     } <!-- @if portfolioVisible -->
   </section>
 </div>
+
+<!-- ── Modal: pausa de campaña individual ── -->
+@if (campanaPausaModalOpen()) {
+  <div class="pausa-camp-modal-bg" role="dialog" aria-modal="true"
+       [attr.aria-label]="'Pausar campaña ' + (campanaEnPausaData()?.nombre ?? '')"
+       (click)="cancelarPausaCampana()">
+    <div class="pausa-camp-modal" (click)="$event.stopPropagation()">
+      <div class="pausa-camp-modal__icon">⏸</div>
+      <h3 class="pausa-camp-modal__title">¿Pausar "{{ campanaEnPausaData()?.nombre }}"?</h3>
+      <p class="pausa-camp-modal__body">
+        @if ((campanaEnPausaData()?.presupuestoDiario ?? 0) > 0) {
+          Esta campaña tiene <strong>{{ campanaEnPausaData()?.presupuestoDiarioLabel }}</strong> activos.
+          Roax dejará de optimizar hasta que la reactives.
+        } @else {
+          Esta campaña quedará pausada. Gali dejará de monitorear su rendimiento hasta que la reactives.
+        }
+      </p>
+      <div class="pausa-camp-modal__actions">
+        <button class="pausa-camp-modal__cancel" type="button" (click)="cancelarPausaCampana()">
+          Cancelar
+        </button>
+        <button class="pausa-camp-modal__confirm" type="button" (click)="confirmarPausaCampana()">
+          Sí, pausar campaña
+        </button>
+      </div>
+    </div>
+  </div>
+}
 
 <!-- ── Modal editar proyecto — edición avanzada (Bloque 3) ── -->
 @if (editProyectoOpen()) {

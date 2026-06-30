@@ -78,6 +78,23 @@ export class Gali6ProyectoDetalleComponent implements OnInit {
   readonly proyeccionSemanas = computed(() => this.proyectoNuevo()?.proyeccionSemanas ?? null);
   readonly alertaGali = computed(() => this.proyectoNuevo()?.alertaGali ?? null);
 
+  readonly diasActivo = computed<number | null>(() => {
+    const fecha = this.proyectoNuevo()?.fechaInicio;
+    if (!fecha) return null;
+    const inicio = new Date(fecha);
+    const hoy = new Date();
+    return Math.max(0, Math.floor((hoy.getTime() - inicio.getTime()) / 86400000));
+  });
+
+  readonly tendenciaSemana = computed<number | null>(() => {
+    const metrics = this.productosMetrics();
+    if (metrics.length === 0) return null;
+    const ultima   = metrics.reduce((s, pm) => s + (pm.historialSemanas[pm.historialSemanas.length - 1] ?? 0), 0);
+    const anterior = metrics.reduce((s, pm) => s + (pm.historialSemanas[pm.historialSemanas.length - 2] ?? 0), 0);
+    if (anterior === 0) return null;
+    return Math.round(((ultima - anterior) / anterior) * 100);
+  });
+
   // ── Campañas (PROYECTOS_MOCK) ────────────────────────────────────────────
   readonly campanasPv = computed<CampanaProyecto[]>(() => {
     return this.proyectoNuevo()?.campanas ?? [];

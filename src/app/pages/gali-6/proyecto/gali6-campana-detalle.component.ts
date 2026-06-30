@@ -155,6 +155,28 @@ export class Gali6CampanaDetalleComponent implements OnInit {
     this.modalBusqueda.set('');
   }
 
+  // ── Creativos GALI — ángulos agregados de la campaña ─────────────────
+  readonly angulosDeCampana = computed<AnguloVenta[]>(() =>
+    this.productosEnCampana().flatMap(p => p.angulos ?? [])
+  );
+
+  anguloSenalKey(a: AnguloVenta): string {
+    return (a as any)['señal'] ?? 'estable';
+  }
+
+  anguloSenalLabel(a: AnguloVenta): string {
+    const label = (a as any)['señalLabel'];
+    if (label) return label;
+    const senal = (a as any)['señal'];
+    if (senal === 'subiendo') return '↑ Subiendo';
+    if (senal === 'bajando') return '↓ Bajando';
+    return '→ Estable';
+  }
+
+  anguloRecomendacion(a: AnguloVenta): string {
+    return (a as any)['recomendacionGali'] ?? '—';
+  }
+
   // ── Catálogo con búsqueda (corrección 4C) ────────────────────────────
   readonly productosCatalogoBuscados = computed<CatalogoItem[]>(() => {
     const q = this.modalBusqueda().toLowerCase().trim();
