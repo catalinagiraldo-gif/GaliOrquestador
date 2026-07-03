@@ -10,6 +10,24 @@
   display: flex;
   flex-direction: column;
   gap: $size-6;
+
+  @media (min-width: 1280px) { max-width: 1100px; }
+}
+
+// ── Franja de estado del negocio: objetivo + alineación fusionados ──────
+// Antes eran 2 cards apiladas (objetivo-compact + port__salud-v2) con el
+// mismo peso visual que el resto de bloques de la pantalla. Ahora comparten
+// una sola card para que se lean como un solo dato, no dos secciones.
+.estado-negocio {
+  display: flex;
+  flex-direction: column;
+  gap: $size-3;
+  background: $white;
+  border: 1px solid $gray-100;
+  border-left: 3px solid $primary-500;
+  border-radius: $radius-md;
+  padding: $size-3 $size-4;
+  box-shadow: $shadow-small;
 }
 
 // ── Objetivo (Bloque 4) ─────────────────────────────────────────────────
@@ -179,13 +197,7 @@
   display: flex;
   align-items: center;
   gap: $size-3;
-  min-height: 48px;
-  padding: $size-3 $size-4;
-  background: $white;
-  border: 1px solid $gray-100;
-  border-left: 3px solid $primary-500;
-  border-radius: $radius-md;
-  box-shadow: $shadow-small;
+  min-height: 32px;
   flex-wrap: wrap;
 
   &__texto {
@@ -398,7 +410,10 @@
 // ── Portafolio (Bloque 3 + 4) ────────────────────────────────────────────
 
 .port {
-  &__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: $size-3; }
+  // Header del portafolio + barra de filtros leen como una sola cabecera
+  // de 2 filas en vez de 2 bloques separados por el gap completo de .proy.
+  &__toolbar { display: flex; flex-direction: column; gap: $size-2; margin-bottom: $size-3; }
+  &__head { display: flex; align-items: center; justify-content: space-between; }
   &__head-left { display: flex; flex-direction: column; gap: $size-1; }
   &__eyebrow { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
   &__mini-stats { display: flex; gap: $size-2; flex-wrap: wrap; }
@@ -492,21 +507,19 @@
     }
   }
 
-  // 5 cols: Estado (110px) | Nombre (1fr) | Señales (70px) | Salud (100px) | Acciones (auto ≥ 180px)
-  $port-cols: 110px 1fr 70px 100px minmax(180px, auto);
-
-  &__legend {
-    display: grid; grid-template-columns: $port-cols; gap: $size-3;
-    padding: 0 $size-4 $size-2;
-    span { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: $gray-500; font-weight: $font-semibold; }
-  }
+  &__legend { display: none; } // reemplazado por el modelo de card de 2 líneas — ya no hay columnas de tabla
 
   &__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: $size-3; }
 
+  // Card de 2 líneas (rediseño de fila): línea 1 = identidad, siempre
+  // escaneable en 2s; línea 2 = metadata secundaria en un solo renglón
+  // muted que envuelve si falta espacio. Reemplaza el grid rígido de 5
+  // columnas que apretaba estado/nombre/señales/salud/acciones (feedback:
+  // "demasiada información, no se ve estándar de fila").
   &__item {
-    display: grid;
-    grid-template-columns: $port-cols;
-    align-items: center; gap: $size-3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
     padding: $size-3 $size-4; cursor: pointer;
     animation: port-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -515,9 +528,37 @@
     &:focus-visible { outline: 2px solid $primary-500; outline-offset: 1px; border-color: $primary-300; }
   }
 
-  // Borrador simplificado (I8c): 4 columnas propias (sin señales ni salud)
+  &__item-top {
+    display: flex; align-items: center; justify-content: space-between; gap: $size-3;
+  }
+
+  &__item-top-left {
+    display: flex; align-items: center; gap: $size-2;
+    flex: 1 1 auto; min-width: 0;
+  }
+
+  // Línea 2: todo lo secundario (tipo, sub-objetivo, señales, salud,
+  // financials, campañas) vive aquí como una sola línea muted — antes
+  // estaba repartido en columnas de ancho fijo que forzaban wraps dispares.
+  &__item-meta {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 5px 10px;
+    font-size: 11px; color: $gray-500;
+  }
+
+  // Fila seguida de .sin-camp-gali (proyecto sin campañas): se aplana la
+  // esquina inferior para que el bloque de abajo se sienta parte de esta
+  // fila, no una card distinta flotando debajo (hallazgo de audit UI).
+  &__item--attached {
+    border-radius: $radius-md $radius-md 0 0 !important;
+    border-bottom-color: transparent !important;
+  }
+
+  // Borrador simplificado (I8c): fila de un solo renglón, sin línea de metadata
   &__item--borrador {
+    display: grid;
     grid-template-columns: 110px 1fr 1fr 80px;
+    align-items: center; gap: $size-3;
     background: #fffbf5;
     border-color: rgba($primary-300, 0.4);
     border-style: dashed;
@@ -532,13 +573,9 @@
     white-space: nowrap;
   }
 
-  &__estado-group {
-    display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
-  }
-
   &__estado {
     font-size: 10px; font-weight: $font-semibold; text-align: center; padding: 3px 6px; border-radius: $radius-full;
-    background: $gray-100; color: $gray-600;
+    background: $gray-100; color: $gray-600; flex-shrink: 0;
     &[data-estado='en_escala']    { background: #f0fdf4; color: #15803d; }
     &[data-estado='activo']       { background: rgba($os-ok, 0.12); color: $os-ok; }
     &[data-estado='pausado']      { background: #f1f5f9; color: #475569; }
@@ -549,16 +586,21 @@
     &[data-estado='cerrado']      { background: #f1f5f9; color: #9ca3af; }
   }
 
-  &__tipo-chip {
-    font-size: 9px; font-weight: 600; padding: 1px 5px;
-    border-radius: $radius-full; border: 1px solid $os-border;
-    color: $os-text-secondary; background: $os-surface-2;
-    white-space: nowrap;
-    &--crm          { color: $os-agent-chatea; border-color: rgba(52, 211, 153, 0.3); background: rgba(52, 211, 153, 0.06); }
-    &--lanzar       { color: $os-accent; border-color: $os-accent-dim; background: rgba(255, 97, 2, 0.06); }
-    &--escalar      { color: $os-ok; border-color: rgba($os-ok, 0.3); background: rgba($os-ok, 0.06); }
-    &--optimizar    { color: $os-warn; border-color: rgba($os-warn, 0.3); background: rgba($os-warn, 0.06); }
-    &--experimentar { color: $os-agent-ada; border-color: rgba(129, 140, 248, 0.3); background: rgba(129, 140, 248, 0.06); }
+  // Tipo de proyecto en la línea de metadata: texto plano coloreado (sin
+  // pill/borde) para que se lea como metadata, no como una segunda badge
+  // de estado compitiendo por atención (audit: jerarquía primaria/secundaria).
+  &__meta-tipo {
+    font-weight: $font-semibold; white-space: nowrap;
+    &--crm          { color: $os-agent-chatea; }
+    &--lanzar       { color: $os-accent; }
+    &--escalar      { color: $os-ok; }
+    &--optimizar    { color: $os-warn; }
+    &--experimentar { color: $os-agent-ada; }
+  }
+
+  &__meta-subobj {
+    font-style: italic; color: $gray-400;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 240px;
   }
 
   &__accion-btn {
@@ -566,14 +608,8 @@
     cursor: pointer; border: 1px solid; transition: background 0.12s, color 0.12s; white-space: nowrap;
     &--reactivar { color: $os-ok; border-color: rgba($os-ok, 0.3); background: rgba($os-ok, 0.08);
       &:hover { background: rgba($os-ok, 0.18); } }
-    &--cerrar { color: $os-text-muted; border-color: $os-border; background: $os-surface-2;
-      &:hover { color: $os-crit; border-color: rgba($os-crit, 0.3); } }
-    &--pausar-camp { color: #64748b; border-color: #e2e8f0; background: #f8fafc;
-      &:hover { color: #1e293b; border-color: #94a3b8; background: #f1f5f9; } }
     &--completar { color: $os-accent; border-color: $os-accent-dim; background: rgba($os-accent, 0.06);
       &:hover { background: rgba($os-accent, 0.12); } }
-    &--descartar { color: #9ca3af; border-color: #e5e7eb; background: transparent;
-      &:hover { color: $os-crit; border-color: rgba($os-crit, 0.3); background: rgba($os-crit, 0.04); } }
   }
 
   &__confirm-cierre {
@@ -603,7 +639,12 @@
   }
 
 
-  &__name { font-size: $font-sm; font-weight: $font-semibold; color: $gray-800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  // Título de la fila (línea 1) — un poco más grande que antes: ahora es la
+  // única pieza de identidad en su línea, sin competir con el tipo/subobjetivo.
+  &__name {
+    font-size: $font-md; font-weight: $font-semibold; color: $gray-800;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+  }
 
   &__contrib {
     display: flex; align-items: center; gap: $size-2;
@@ -626,51 +667,73 @@
 
   &__metric { font-size: $font-xs; color: $gray-500; font-weight: $font-medium; }
 
-  &__health { display: flex; align-items: center; gap: $size-2; }
-  &__health-track { flex: 1; height: 6px; background: $gray-100; border-radius: $radius-full; overflow: hidden; }
+  // Salud, ahora un ítem inline más de la línea de metadata (antes vivía en
+  // su propia columna de ancho fijo).
+  &__health { display: inline-flex; align-items: center; gap: 5px; }
+  &__health-track { width: 46px; height: 5px; background: $gray-100; border-radius: $radius-full; overflow: hidden; }
   &__health-fill {
     display: block; height: 100%; background: $os-ok; border-radius: $radius-full;
     &.is-mid { background: $os-warn; }
     &.is-low { background: $os-crit; }
   }
-  &__health-num { font-size: 11px; color: $gray-500; font-weight: $font-semibold; width: 32px; text-align: right; }
-
-  &__name-col {
-    display: flex; flex-direction: column; gap: 2px; min-width: 0;
-  }
-
-  &__subobj {
-    font-size: 10px; color: $gray-400; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
-    font-style: italic;
-  }
-
-  &__signal-col {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  &__health-num { color: $gray-600; font-weight: $font-semibold; }
 
   &__signal-badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 7px;
+    padding: 1px 6px;
     border-radius: 6px;
-    font-size: 11px;
     font-weight: 700;
-    background: rgba(255, 97, 2, 0.1);
-    color: #ff6102;
-    border: 1px solid rgba(255, 97, 2, 0.2);
+    background: rgba($os-accent, 0.1);
+    color: $os-accent;
+    border: 1px solid rgba($os-accent, 0.2);
     text-decoration: none;
     white-space: nowrap;
     transition: background 0.12s, border-color 0.12s;
-    &:hover { background: rgba(255, 97, 2, 0.18); border-color: rgba(255, 97, 2, 0.35); }
+    &:hover { background: rgba($os-accent, 0.18); border-color: rgba($os-accent, 0.35); }
   }
 
+  // Cluster de acciones de la línea 1 (derecha): reactivar / confirmar
+  // cierre / kebab / flecha. Ya no incluye campañas ni "sin campañas"
+  // (movidos a la línea de metadata, donde describen el proyecto).
   &__actions {
-    display: flex; align-items: center; justify-content: flex-end; gap: 4px;
-    flex-wrap: nowrap; // evita que los botones se apilen y rompan la fila
-    overflow: hidden;
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+
+  // ── Menú de acciones secundarias (kebab) ──────────────────────────────
+  &__kebab-wrap { position: relative; }
+
+  &__kebab-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; flex-shrink: 0;
+    background: none; border: 1px solid transparent; border-radius: $radius-sm;
+    color: $gray-400; font-size: 15px; line-height: 1; cursor: pointer;
+    transition: background 100ms ease, color 100ms ease, border-color 100ms ease;
+
+    &:hover, &[aria-expanded='true'] {
+      background: $gray-100; color: $gray-700; border-color: $gray-200;
+    }
+    &:focus-visible { outline: 2px solid $primary-500; outline-offset: 1px; }
+  }
+
+  &__kebab-menu {
+    position: absolute; top: calc(100% + 4px); right: 0; z-index: 20;
+    min-width: 180px;
+    background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    padding: 4px; display: flex; flex-direction: column;
+    animation: port-item-in 120ms ease both;
+
+    button {
+      display: flex; align-items: center; gap: 6px; width: 100%;
+      background: none; border: none; border-radius: $radius-sm;
+      text-align: left; cursor: pointer; white-space: nowrap;
+      padding: 7px 10px; font-size: 12px; font-weight: $font-medium;
+      color: $gray-700; font-family: $font-primary;
+
+      &:hover { background: $gray-50; }
+      &.is-danger { color: #dc2626; &:hover { background: #fef2f2; } }
+    }
   }
   &__edit-btn {
     background: none; border: 1px solid $gray-200; border-radius: $radius-sm; cursor: pointer;
@@ -865,11 +928,9 @@
 
 @media (max-width: 760px) {
   .reco__cards { grid-template-columns: 1fr; }
-  .port__legend { display: none; }
-  .port__item { grid-template-columns: 110px 1fr minmax(140px, auto); }
+  // .port__item ya es flex-column con línea de metadata que envuelve sola;
+  // no necesita overrides de grid en mobile (el modelo de card lo resuelve).
   .port__item--borrador { grid-template-columns: 110px 1fr 80px; }
-  .port__signal-col, .port__health { display: none; }
-  .port__actions .port__edit-btn { display: none; }
   .goal__contrib-row { grid-template-columns: 10px 1fr 36px; }
   .goal__contrib-track, .goal__contrib-pct { display: none; }
   .tipo-picker { grid-template-columns: 1fr; }
@@ -1549,6 +1610,13 @@
   display: flex;
   flex-direction: column;
   animation: port-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  // El fill-mode "both" de la animación de entrada deja un transform
+  // residual en cada fila, y eso crea un stacking context nuevo por fila
+  // (aunque la animación ya terminó). Como resultado, el menú kebab con
+  // z-index quedaba tapado por la fila SIGUIENTE en el DOM. Al abrir el
+  // menú, subimos el z-index de esta fila por encima de sus hermanas.
+  &--menu-open { position: relative; z-index: 30; }
 }
 
 // Campaigns toggle button inside project row
@@ -2634,18 +2702,11 @@
 }
 
 // ── Salud portafolio V2 — 3 indicadores concretos ───────────────────────────
+// Vive ahora dentro de .estado-negocio, subordinado al objetivo (separador
+// sutil en vez de su propia card con border/shadow).
 .port__salud-v2 {
-  padding: $size-3 $size-4;
-  border: 1px solid $gray-100;
-  border-radius: $radius-md;
-  background: $white;
-  margin-bottom: $size-3;
-
-  &__title {
-    font-size: 11px; font-weight: $font-semibold; color: $gray-500;
-    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: $size-3;
-    display: block;
-  }
+  padding-top: $size-3;
+  border-top: 1px solid $gray-100;
 
   &__metrics {
     display: flex; align-items: center; gap: $size-4; flex-wrap: wrap;
@@ -2678,7 +2739,6 @@
 // ── Filtros multi-dimensión ──────────────────────────────────────────────────
 .port__filter-bar {
   display: flex; align-items: center; gap: $size-3; flex-wrap: wrap;
-  margin-bottom: $size-3;
 
   .port__search { margin-bottom: 0; flex: 1; min-width: 160px; }
   .port__search-input { max-width: 100%; }
@@ -2756,6 +2816,8 @@
   padding: 3px 8px; border-radius: $radius-full;
   background: rgba($primary-500, 0.1); color: $primary-700;
   font-size: 11px; font-weight: $font-semibold;
+  cursor: pointer;
+  &:hover { background: rgba($primary-500, 0.18); }
 
   button {
     background: none; border: none; cursor: pointer;
@@ -2837,9 +2899,10 @@
 }
 
 // ── Métricas financieras rápidas en card ────────────────────────────────────
+// Vive dentro de .port__health-col (que ya define el gap con la barra de
+// salud de arriba) — sin margin-top propio para no duplicar el espaciado.
 .port__financials {
   display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
-  margin-top: 3px;
 }
 
 .port__fin-item {
@@ -2856,10 +2919,15 @@
 }
 
 // ── Proyectos sin campañas — GALI feed ──────────────────────────────────────
+// Se conecta directamente con la fila de arriba (.port__item--attached aplana
+// su esquina inferior) en vez de flotar como una card de tipo distinto
+// separada por un margin (hallazgo de audit UI).
 .sin-camp-gali {
-  background: #fafafa; border-left: 3px solid rgba($primary-500, 0.3);
-  border-radius: 0 $radius-md $radius-md 0;
-  margin: 0 0 2px; padding: $size-3 $size-4;
+  background: #fafafa;
+  border: 1px solid $gray-100; border-top: none;
+  border-left: 3px solid rgba($primary-500, 0.3);
+  border-radius: 0 0 $radius-md $radius-md;
+  margin: 0; padding: $size-3 $size-4;
   display: flex; flex-direction: column; gap: $size-3;
 
   &__feed-title {

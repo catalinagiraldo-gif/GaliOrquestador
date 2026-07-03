@@ -612,6 +612,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   // ── Escape para cerrar cualquier modal abierto ────────────────────────
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.actionsMenuOpenId()) { this.actionsMenuOpenId.set(null); return; }
     if (this.editProyectoOpen()) { this.editProyectoOpen.set(false); return; }
     if (this.editOpen()) { this.editOpen.set(false); return; }
     if (this.nuevoModalOpen() && this.nuevoAutoEstado() === 'preview') { this.nuevoAutoEstado.set('listo'); return; }
@@ -1056,6 +1057,29 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   cancelarPausa(): void {
     this.pausaModalOpen.set(false);
     this.pausaTargetId.set(null);
+  }
+
+  // ── Menú kebab de acciones secundarias por fila ──────────────────────
+  // Reemplaza el patrón anterior de N botones condicionales en una fila
+  // con overflow:hidden, que recortaba acciones silenciosamente cuando
+  // coincidían varias condiciones (heurística #1/#6, severidad 4).
+  readonly actionsMenuOpenId = signal<string | null>(null);
+
+  toggleActionsMenu(id: string, event: Event): void {
+    event.stopPropagation();
+    this.actionsMenuOpenId.update(cur => (cur === id ? null : id));
+  }
+
+  hasSecondaryActions(p: ProyectoRow): boolean {
+    if (p.estado === 'borrador') return true;
+    if (['activo', 'en_riesgo', 'en_escala'].includes(p.estado) && p.campanaCount > 0) return true;
+    if (['activo', 'en_riesgo', 'en_escala', 'pausado'].includes(p.estado) && !this.pendientesCierre().has(p.id)) return true;
+    return false;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.actionsMenuOpenId()) this.actionsMenuOpenId.set(null);
   }
 
   // ── Campañas accordion ────────────────────────────────────────────────

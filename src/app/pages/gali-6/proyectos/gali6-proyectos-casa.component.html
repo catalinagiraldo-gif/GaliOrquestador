@@ -1,82 +1,26 @@
 <div class="proy gali-stagger-in">
   <app-g6-page-header [breadcrumbs]="['Proyectos']" title="Proyectos" [sub]="objetivoSubtitulo()" />
 
-  <!-- ── BLOQUE 4: Objetivo compacto ── -->
-  <div class="objetivo-compact">
-    <span class="objetivo-compact__texto">{{ objetivo().texto }}</span>
-    <div class="objetivo-compact__bar"
-         role="progressbar"
-         [attr.aria-valuenow]="pedidosActual"
-         [attr.aria-valuemin]="0"
-         [attr.aria-valuemax]="objetivo().meta_pedidos_sem"
-         [attr.aria-label]="pedidosActual + ' de ' + objetivo().meta_pedidos_sem + ' pedidos · ' + metaPct() + '%'">
-      <div class="objetivo-compact__fill" [style.width.%]="metaPct()"></div>
-    </div>
-    <span class="objetivo-compact__val">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} · {{ metaPct() }}%</span>
-    <button class="objetivo-compact__edit" type="button" (click)="openEdit()">
-      Editar →
-    </button>
-  </div>
-
-  <!-- ── BLOQUE 5: Toast Gali cuando cambia el objetivo ── -->
-  @if (galiCambioMensaje()) {
-    <div class="gali-toast">
-      <span class="gali-toast__icon">✦</span>
-      <p class="gali-toast__text">{{ galiCambioMensaje() }}</p>
-      <button class="gali-toast__close" (click)="galiCambioMensaje.set(null)" aria-label="Cerrar notificación">×</button>
-    </div>
-  }
-
-  <!-- ── Alertas unificadas ── -->
-  @if (alertasUnificadas().length > 0) {
-    <section class="alertas-unif">
-      <span class="alertas-unif__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tu portafolio</span>
-      <div class="alertas-unif__list">
-        @for (a of alertasUnificadas(); track a.titulo) {
-          <article class="alerta-item" [attr.data-tipo]="a.tipo">
-            <div class="alerta-item__icon" aria-hidden="true">
-              @if (a.tipo === 'atencion') { ⚠ }
-              @if (a.tipo === 'sugerencia') { 💡 }
-              @if (a.tipo === 'positivo') { ✦ }
-            </div>
-            <div class="alerta-item__body">
-              @if (a.agente) {
-                <span class="alerta-item__agente">{{ a.agente }}</span>
-              }
-              <strong class="alerta-item__titulo">{{ a.titulo }}</strong>
-              <p class="alerta-item__cuerpo">{{ a.cuerpo }}</p>
-            </div>
-            <button class="alerta-item__cta" [attr.data-tipo]="a.tipo" (click)="handleCheckinCta(a)">
-              {{ a.cta }}
-            </button>
-          </article>
-        }
+  <!-- ── Franja de estado del negocio: objetivo + alineación en un solo bloque ── -->
+  <div class="estado-negocio">
+    <div class="objetivo-compact">
+      <span class="objetivo-compact__texto">{{ objetivo().texto }}</span>
+      <div class="objetivo-compact__bar"
+           role="progressbar"
+           [attr.aria-valuenow]="pedidosActual"
+           [attr.aria-valuemin]="0"
+           [attr.aria-valuemax]="objetivo().meta_pedidos_sem"
+           [attr.aria-label]="pedidosActual + ' de ' + objetivo().meta_pedidos_sem + ' pedidos · ' + metaPct() + '%'">
+        <div class="objetivo-compact__fill" [style.width.%]="metaPct()"></div>
       </div>
-      <a class="alertas-unif__ver-todas" routerLink="/gali-6/senales">Ver todas en Señales →</a>
-    </section>
-  }
-
-  <!-- ── BLOQUE 3+4: Portafolio de proyectos ── -->
-  <section class="port">
-    <div class="port__head">
-      <div class="port__head-left">
-        <span class="port__eyebrow">Mis proyectos</span>
-        <div class="port__mini-stats" aria-label="Resumen del portafolio">
-          <span class="port__mini-stat port__mini-stat--activo">{{ filterCounts().activos }} activos</span>
-          @if (conteoEnRiesgo() > 0) {
-            <span class="port__mini-stat port__mini-stat--riesgo">{{ conteoEnRiesgo() }} en riesgo</span>
-          }
-          @if (filterCounts().cerrados > 0) {
-            <span class="port__mini-stat port__mini-stat--cerrado">{{ filterCounts().cerrados }} cerrados</span>
-          }
-        </div>
-      </div>
-      <button class="port__new" (click)="nuevo()" type="button">+ Nuevo proyecto</button>
+      <span class="objetivo-compact__val">{{ pedidosActual }}/{{ objetivo().meta_pedidos_sem }} · {{ metaPct() }}%</span>
+      <button class="objetivo-compact__edit" type="button" (click)="openEdit()">
+        Editar →
+      </button>
     </div>
 
-    <!-- Estado del portafolio — 3 indicadores concretos -->
+    <!-- Estado del portafolio — 3 indicadores concretos, subordinados al objetivo -->
     <div class="port__salud-v2" role="status" aria-label="Alineación del portafolio con tus objetivos">
-      <div class="port__salud-v2__title">Alineación con tus objetivos</div>
       <div class="port__salud-v2__metrics">
         <div class="port__salud-v2__metric">
           <span class="port__salud-v2__val"
@@ -106,26 +50,85 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Barra de búsqueda + filtros multi-dimensión -->
-    <div class="port__filter-bar">
-      <div class="port__search">
-        <input type="search" class="port__search-input"
-               placeholder="Buscar proyecto..."
-               [ngModel]="searchQuery()"
-               (ngModelChange)="searchQuery.set($event)">
-      </div>
-      <button class="port__filter-toggle"
-              type="button"
-              [class.port__filter-toggle--active]="filtroPanelOpen()"
-              (click)="filtroPanelOpen.set(!filtroPanelOpen())">
-        <i class="pi pi-sliders-h"></i>
-        Filtros
-        @if (filtrosActivosCount() > 0) {
-          <span class="port__filter-badge">{{ filtrosActivosCount() }}</span>
+  <!-- ── BLOQUE 5: Toast Gali cuando cambia el objetivo ── -->
+  @if (galiCambioMensaje()) {
+    <div class="gali-toast">
+      <span class="gali-toast__icon">✦</span>
+      <p class="gali-toast__text">{{ galiCambioMensaje() }}</p>
+      <button class="gali-toast__close" (click)="galiCambioMensaje.set(null)" aria-label="Cerrar notificación">×</button>
+    </div>
+  }
+
+  <!-- ── Alertas unificadas (máx. 2 en pantalla — el resto vive en Señales) ── -->
+  @if (alertasUnificadas().length > 0) {
+    <section class="alertas-unif">
+      <span class="alertas-unif__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tu portafolio</span>
+      <div class="alertas-unif__list">
+        @for (a of alertasUnificadas().slice(0, 2); track a.titulo) {
+          <article class="alerta-item" [attr.data-tipo]="a.tipo">
+            <div class="alerta-item__icon" aria-hidden="true">
+              @if (a.tipo === 'atencion') { ⚠ }
+              @if (a.tipo === 'sugerencia') { 💡 }
+              @if (a.tipo === 'positivo') { ✦ }
+            </div>
+            <div class="alerta-item__body">
+              @if (a.agente) {
+                <span class="alerta-item__agente">{{ a.agente }}</span>
+              }
+              <strong class="alerta-item__titulo">{{ a.titulo }}</strong>
+              <p class="alerta-item__cuerpo">{{ a.cuerpo }}</p>
+            </div>
+            <button class="alerta-item__cta" [attr.data-tipo]="a.tipo" (click)="handleCheckinCta(a)">
+              {{ a.cta }}
+            </button>
+          </article>
         }
-        <span class="port__filter-arrow">{{ filtroPanelOpen() ? '▲' : '▼' }}</span>
-      </button>
+      </div>
+      <a class="alertas-unif__ver-todas" routerLink="/gali-6/senales">Ver todas en Señales →</a>
+    </section>
+  }
+
+  <!-- ── BLOQUE 3+4: Portafolio de proyectos ── -->
+  <section class="port">
+    <div class="port__toolbar">
+      <div class="port__head">
+        <div class="port__head-left">
+          <span class="port__eyebrow">Mis proyectos</span>
+          <div class="port__mini-stats" aria-label="Resumen del portafolio">
+            <span class="port__mini-stat port__mini-stat--activo">{{ filterCounts().activos }} activos</span>
+            @if (conteoEnRiesgo() > 0) {
+              <span class="port__mini-stat port__mini-stat--riesgo">{{ conteoEnRiesgo() }} en riesgo</span>
+            }
+            @if (filterCounts().cerrados > 0) {
+              <span class="port__mini-stat port__mini-stat--cerrado">{{ filterCounts().cerrados }} cerrados</span>
+            }
+          </div>
+        </div>
+        <button class="port__new" (click)="nuevo()" type="button">+ Nuevo proyecto</button>
+      </div>
+
+      <!-- Barra de búsqueda + filtros multi-dimensión -->
+      <div class="port__filter-bar">
+        <div class="port__search">
+          <input type="search" class="port__search-input"
+                 placeholder="Buscar proyecto..."
+                 [ngModel]="searchQuery()"
+                 (ngModelChange)="searchQuery.set($event)">
+        </div>
+        <button class="port__filter-toggle"
+                type="button"
+                [class.port__filter-toggle--active]="filtroPanelOpen()"
+                (click)="filtroPanelOpen.set(!filtroPanelOpen())">
+          <i class="pi pi-sliders-h"></i>
+          Filtros
+          @if (filtrosActivosCount() > 0) {
+            <span class="port__filter-badge">{{ filtrosActivosCount() }}</span>
+          }
+          <span class="port__filter-arrow">{{ filtroPanelOpen() ? '▲' : '▼' }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Panel de filtros desplegable -->
@@ -188,37 +191,30 @@
       </div>
     }
 
-    <!-- Tags de filtros activos (inline) -->
+    <!-- Tags de filtros activos — clic en la etiqueta reabre el panel para ajustar, la × limpia ese filtro -->
     @if (filtrosActivosCount() > 0 && !filtroPanelOpen()) {
       <div class="port__active-filters">
         @if (filtroEstado() !== 'todos') {
-          <span class="port__active-tag">
+          <span class="port__active-tag" (click)="filtroPanelOpen.set(true)">
             Estado: {{ filtroEstadoLabel() }}
-            <button type="button" (click)="filtroEstado.set('todos')">×</button>
+            <button type="button" (click)="filtroEstado.set('todos'); $event.stopPropagation()">×</button>
           </span>
         }
         @if (tipoFiltro() !== 'todos') {
-          <span class="port__active-tag">
+          <span class="port__active-tag" (click)="filtroPanelOpen.set(true)">
             Tipo: {{ filtroTipoLabel() }}
-            <button type="button" (click)="tipoFiltro.set('todos')">×</button>
+            <button type="button" (click)="tipoFiltro.set('todos'); $event.stopPropagation()">×</button>
           </span>
         }
         @if (filtroCampanas() !== 'todos') {
-          <span class="port__active-tag">
+          <span class="port__active-tag" (click)="filtroPanelOpen.set(true)">
             {{ filtroCampanas() === 'con-campanas' ? 'Con campañas' : 'Sin campañas' }}
-            <button type="button" (click)="filtroCampanas.set('todos')">×</button>
+            <button type="button" (click)="filtroCampanas.set('todos'); $event.stopPropagation()">×</button>
           </span>
         }
       </div>
     }
 
-    <div class="port__legend">
-      <span>Estado</span>
-      <span>Proyecto</span>
-      <span>Señales</span>
-      <span>Salud</span>
-      <span>Acciones</span>
-    </div>
     @if (portfolioVisible()) {
     <ul class="port__list">
       @for (p of proyectosFiltradosYBuscados(); track p.id; let i = $index) {
@@ -239,42 +235,113 @@
           </li>
         } @else {
           <!-- Proyectos normales con accordion de campañas -->
-          <li class="port__item-wrap" [style.animationDelay]="(i * 55) + 'ms'">
+          <li class="port__item-wrap"
+              [class.port__item-wrap--menu-open]="actionsMenuOpenId() === p.id"
+              [style.animationDelay]="(i * 55) + 'ms'">
             <!-- Fila principal del proyecto -->
             <div class="port__item"
                 [class.port__item--cerrado]="p.estado === 'cerrado'"
                 [class.port__item--recien]="p.estado === 'recien_lanzado'"
                 [class.port__item--expanded]="isCampanasExpanded(p.id)"
+                [class.port__item--attached]="p.campanaCount === 0 && !['borrador','cerrado'].includes(p.estado)"
                 tabindex="0"
                 [attr.aria-label]="'Proyecto ' + p.nombre + ', estado ' + p.estadoLabel"
                 (click)="abrir(p.id)"
                 (keydown.enter)="abrir(p.id)"
                 (keydown.space)="abrir(p.id); $event.preventDefault()">
-              <div class="port__estado-group">
-                <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
-                @if (p.tipo) {
-                  <span class="port__tipo-chip port__tipo-chip--{{ p.tipo }}">{{ proyectoTipoLabel(p.tipo) }}</span>
-                }
-              </div>
-              <div class="port__name-col">
-                <span class="port__name">{{ p.nombre }}</span>
-                @if (p.subObjetivo) {
-                  <span class="port__subobj">↳ {{ p.subObjetivo }}</span>
-                }
+
+              <!-- Línea 1: identidad — estado + nombre, siempre escaneable en 2s -->
+              <div class="port__item-top">
+                <div class="port__item-top-left">
+                  <span class="port__estado" [attr.data-estado]="p.estado">{{ p.estadoLabel }}</span>
+                  <span class="port__name">{{ p.nombre }}</span>
+                </div>
+
+                <div class="port__actions">
+                  @if (p.estado === 'pausado') {
+                    <button class="port__accion-btn port__accion-btn--reactivar"
+                            (click)="reactivarProyecto(p.id, $event)"
+                            title="Reactivar campañas de este proyecto">
+                      ▶ Reactivar
+                    </button>
+                  }
+
+                  <!-- Confirmación de cierre: destructiva, nunca se oculta en un menú -->
+                  @if (pendientesCierre().has(p.id)) {
+                    <div class="port__confirm-cierre" role="group" [attr.aria-label]="'Confirmar cierre de ' + p.nombre">
+                      <span class="port__confirm-label">¿Cerrar?</span>
+                      <button class="port__confirm-yes" type="button" (click)="confirmarCierre(p.id, $event)">Confirmar</button>
+                      <button class="port__confirm-no" type="button" (click)="cancelarCierre(p.id, $event)">Cancelar</button>
+                    </div>
+                  }
+
+                  <!-- Acciones secundarias: menú kebab -->
+                  @if (hasSecondaryActions(p)) {
+                    <div class="port__kebab-wrap">
+                      <button class="port__kebab-btn"
+                              type="button"
+                              (click)="toggleActionsMenu(p.id, $event)"
+                              [attr.aria-expanded]="actionsMenuOpenId() === p.id"
+                              [attr.aria-label]="'Más acciones para ' + p.nombre">
+                        ⋮
+                      </button>
+                      @if (actionsMenuOpenId() === p.id) {
+                        <div class="port__kebab-menu" role="menu">
+                          @if (['activo','en_riesgo','en_escala'].includes(p.estado) && p.campanaCount > 0) {
+                            <button type="button" role="menuitem"
+                                    (click)="pedirPausa(p.id, $event); actionsMenuOpenId.set(null)">
+                              ⏸ Pausar campañas
+                            </button>
+                          }
+                          @if (['activo','en_riesgo','en_escala','pausado'].includes(p.estado) && !pendientesCierre().has(p.id)) {
+                            <button type="button" role="menuitem" class="is-danger"
+                                    (click)="pedirCierre(p.id, $event); actionsMenuOpenId.set(null)">
+                              ✕ Cerrar proyecto
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <span class="port__go">
+                    @if (p.estado === 'cerrado') { Ver historial → }
+                    @else { → }
+                  </span>
+                </div>
               </div>
 
-              <div class="port__signal-col" (click)="$event.stopPropagation()">
+              <!-- Línea 2: metadata secundaria — un solo renglón muted, envuelve si falta espacio -->
+              <div class="port__item-meta">
+                @if (p.tipo) {
+                  <span class="port__meta-tipo port__meta-tipo--{{ p.tipo }}">{{ proyectoTipoLabel(p.tipo) }}</span>
+                }
+                @if (p.subObjetivo) {
+                  <span class="port__meta-subobj">↳ {{ p.subObjetivo }}</span>
+                }
+
                 @if (getSignalCount(p.id) > 0) {
                   <a class="port__signal-badge"
+                     (click)="$event.stopPropagation()"
                      [routerLink]="['/gali-6/senales']"
                      [queryParams]="{ projectId: getProyectoSenalId(p.id) }"
                      [title]="getSignalCount(p.id) + ' señales activas'">
                     <i class="pi pi-bell"></i> {{ getSignalCount(p.id) }}
                   </a>
                 }
-                <!-- Métricas financieras rápidas en COP -->
+
+                <span class="port__health">
+                  <span class="port__health-track">
+                    <span class="port__health-fill"
+                          [style.width.%]="p.saludPct"
+                          [class.is-low]="p.saludPct < 45"
+                          [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
+                  </span>
+                  <span class="port__health-num">{{ p.saludPct }}%</span>
+                </span>
+
                 @if (presupuestoMes(p.id) > 0) {
-                  <div class="port__financials">
+                  <span class="port__financials">
                     <span class="port__fin-item">{{ formatCOP(presupuestoMes(p.id)) }}/mes</span>
                     @if (gananciaMes(p.id) > 0) {
                       <span class="port__fin-sep">→</span>
@@ -283,22 +350,10 @@
                         ret. {{ formatCOP(gananciaMes(p.id)) }}
                       </span>
                     }
-                  </div>
+                  </span>
                 }
-              </div>
 
-              <span class="port__health">
-                <span class="port__health-track">
-                  <span class="port__health-fill"
-                        [style.width.%]="p.saludPct"
-                        [class.is-low]="p.saludPct < 45"
-                        [class.is-mid]="p.saludPct >= 45 && p.saludPct < 75"></span>
-                </span>
-                <span class="port__health-num">{{ p.saludPct }}%</span>
-              </span>
-
-              <div class="port__actions" (click)="$event.stopPropagation()">
-                @if (p.estado !== 'cerrado' && p.estado !== 'borrador' && p.campanaCount > 0) {
+                @if (p.estado !== 'cerrado' && p.campanaCount > 0) {
                   <button class="port__campanas-toggle"
                           [class.port__campanas-toggle--open]="isCampanasExpanded(p.id)"
                           (click)="toggleCampanas(p.id, $event)"
@@ -307,66 +362,13 @@
                     <i class="pi pi-megaphone"></i> {{ p.campanaCount }} campaña{{ p.campanaCount !== 1 ? 's' : '' }}
                     <span class="port__campanas-arrow">{{ isCampanasExpanded(p.id) ? '▲' : '▼' }}</span>
                   </button>
-                } @else if (p.estado !== 'cerrado' && p.estado !== 'borrador' && p.campanaCount === 0) {
+                } @else if (p.estado !== 'cerrado') {
                   <span class="port__sin-campanas">Sin campañas</span>
                 }
 
-                @if (p.estado === 'borrador') {
-                  <button class="port__accion-btn port__accion-btn--completar"
-                          type="button"
-                          (click)="abrir(p.id); $event.stopPropagation()">
-                    Completar →
-                  </button>
-                  <button class="port__accion-btn port__accion-btn--descartar"
-                          type="button"
-                          (click)="descartarBorrador(p.id, $event)"
-                          [attr.aria-label]="'Descartar borrador ' + p.nombre">
-                    ✕ Descartar
-                  </button>
-                }
-
-                @if (p.estado === 'pausado') {
-                  <button class="port__accion-btn port__accion-btn--reactivar"
-                          (click)="reactivarProyecto(p.id, $event)"
-                          title="Reactivar campañas de este proyecto">
-                    ▶ Reactivar campañas
-                  </button>
-                }
-
-                @if (['activo','en_riesgo','en_escala'].includes(p.estado) && p.campanaCount > 0) {
-                  <button class="port__accion-btn port__accion-btn--pausar-camp"
-                          type="button"
-                          (click)="pedirPausa(p.id, $event)"
-                          title="Pausar todas las campañas de este proyecto">
-                    ⏸ Pausar campañas
-                  </button>
-                }
-
-                @if (['activo','en_riesgo','en_escala','pausado'].includes(p.estado)) {
-                  @if (!pendientesCierre().has(p.id)) {
-                    <button class="port__accion-btn port__accion-btn--cerrar"
-                            type="button"
-                            (click)="pedirCierre(p.id, $event)"
-                            title="Cerrar este proyecto permanentemente"
-                            [attr.aria-label]="'Cerrar proyecto ' + p.nombre + ' permanentemente'">
-                      ✕ Cerrar proyecto
-                    </button>
-                  } @else {
-                    <div class="port__confirm-cierre" role="group" [attr.aria-label]="'Confirmar cierre de ' + p.nombre">
-                      <span class="port__confirm-label">¿Cerrar proyecto?</span>
-                      <button class="port__confirm-yes" type="button" (click)="confirmarCierre(p.id, $event)">Confirmar</button>
-                      <button class="port__confirm-no" type="button" (click)="cancelarCierre(p.id, $event)">Cancelar</button>
-                    </div>
-                  }
-                }
-
                 @if (campanasPausadas().get(p.id) && p.estado !== 'pausado') {
-                  <span class="port__campanas-pausa-chip" title="Todas las campañas están pausadas">⏸ Campañas pausadas</span>
+                  <span class="port__campanas-pausa-chip" title="Todas las campañas están pausadas">⏸ Pausadas</span>
                 }
-                <span class="port__go">
-                  @if (p.estado === 'cerrado') { Ver historial → }
-                  @else { → }
-                </span>
               </div>
             </div>
 
