@@ -41,27 +41,17 @@ export const G6_SECTION_PANELS: Record<string, SectionPanel> = Object.fromEntrie
 );
 
 /**
- * Panel de Gali 6 — Cambio D: simplificado a 2 módulos principales.
- * Básico: Mi Negocio (con sub-items) + Proyectos.
- * Experto: + Centro de Gali accordion (filtrado por modo en shell).
+ * Panel de Gali 6 — IA consolidada (decisiones Revision7Jul: Señales independiente
+ * como centro de notificaciones, Centro de Gali unifica config/reglas/conexiones/
+ * contexto, skills vive dentro de reglas, impacto se reencuadra dentro de Conexiones).
+ * Raíz plana (Hoy · Señales · Proyectos) + accordion Centro de Gali (experto).
  */
 export const GALI_6_MISSION_PANEL: SectionPanel = {
   railKey: 'home',
   title: 'Gali 6',
   items: [
-    {
-      id: 'mi-negocio',
-      label: 'Mi Negocio',
-      type: 'accordion' as const,
-      icon: 'assets/icons/sidebar/gali-v5/user-circle.svg',
-      defaultExpanded: true,
-      children: [
-        { label: 'Hoy',         route: '/gali-6' },
-        { label: 'Señales',     route: '/gali-6/senales' },
-        { label: 'Impacto',     route: '/gali-6/impacto' },
-        { label: 'Mi Contexto', route: '/gali-6/mi-negocio' },
-      ],
-    },
+    { id: 'hoy', label: 'Hoy', route: '/gali-6', icon: 'assets/icons/sidebar/gali-v5/user-circle.svg' },
+    { id: 'senales', label: 'Señales', route: '/gali-6/senales', icon: 'assets/icons/sidebar/gali-v5/apps-add.svg' },
     { id: 'proyectos', label: 'Proyectos', route: '/gali-6/proyectos', icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
     {
       id: 'centro-gali',
@@ -71,10 +61,7 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
       defaultExpanded: false,
       children: [
         { label: 'Agentes',     route: '/gali-6/agentes' },
-        { label: 'Skills',      route: '/gali-6/skills' },
-        { label: 'Reglas',      route: '/gali-6/reglas' },
-        { label: 'Marketplace', route: '/gali-6/marketplace' },
-        { label: 'Conexiones',  route: '/gali-6/conexiones' },
+        { label: 'Mi Contexto', route: '/gali-6/mi-negocio' },
         { label: 'Academy',     route: '/gali-6/academy' },
       ],
     },
@@ -82,6 +69,54 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
   agentFooter: {
     agentId: 'gali',
     label: 'Gali 6',
+    color: '#f49a3d',
+    statusLabel: 'La Casita · facilitador activo',
+    contextKey: 'home',
+  },
+};
+
+/**
+ * Panel de Gali 6 V2 — snapshot congelado del panel de Gali 6 previo a la
+ * consolidación de IA (Señales independiente + Centro de Gali unificado).
+ * No editar salvo que se quiera actualizar intencionalmente el snapshot.
+ */
+export const GALI_6_V2_MISSION_PANEL: SectionPanel = {
+  railKey: 'home',
+  title: 'Gali 6 V2',
+  items: [
+    {
+      id: 'mi-negocio',
+      label: 'Mi Negocio',
+      type: 'accordion' as const,
+      icon: 'assets/icons/sidebar/gali-v5/user-circle.svg',
+      defaultExpanded: true,
+      children: [
+        { label: 'Hoy',         route: '/gali-6-v2' },
+        { label: 'Señales',     route: '/gali-6-v2/senales' },
+        { label: 'Impacto',     route: '/gali-6-v2/impacto' },
+        { label: 'Mi Contexto', route: '/gali-6-v2/mi-negocio' },
+      ],
+    },
+    { id: 'proyectos', label: 'Proyectos', route: '/gali-6-v2/proyectos', icon: 'assets/icons/sidebar/gali-v5/boxes.svg' },
+    {
+      id: 'centro-gali',
+      label: 'Centro de Gali',
+      type: 'accordion' as const,
+      icon: 'assets/icons/sidebar/gali-v5/apps-add.svg',
+      defaultExpanded: false,
+      children: [
+        { label: 'Agentes',     route: '/gali-6-v2/agentes' },
+        { label: 'Skills',      route: '/gali-6-v2/skills' },
+        { label: 'Reglas',      route: '/gali-6-v2/reglas' },
+        { label: 'Marketplace', route: '/gali-6-v2/marketplace' },
+        { label: 'Conexiones',  route: '/gali-6-v2/conexiones' },
+        { label: 'Academy',     route: '/gali-6-v2/academy' },
+      ],
+    },
+  ],
+  agentFooter: {
+    agentId: 'gali',
+    label: 'Gali 6 V2',
     color: '#f49a3d',
     statusLabel: 'La Casita · facilitador activo',
     contextKey: 'home',
@@ -134,6 +169,7 @@ export const GALI_6_V1_MISSION_PANEL: SectionPanel = {
 
 const G6_HOME_EXACT = new Set(['/gali-6', '/gali-6/']);
 const G6_V1_HOME_EXACT = new Set(['/gali-6-v1', '/gali-6-v1/']);
+const G6_V2_HOME_EXACT = new Set(['/gali-6-v2', '/gali-6-v2/']);
 const G6_HUB_PREFIXES = [
   '/gali-6/proyectos', '/gali-6/proyecto',
   '/gali-6/mi-negocio', '/gali-6/conexiones',
@@ -150,15 +186,25 @@ const G6_V1_HUB_PREFIXES = [
   '/gali-6-v1/marketplace', '/gali-6-v1/academy',
   '/gali-6-v1/centro-control',
 ];
+const G6_V2_HUB_PREFIXES = [
+  '/gali-6-v2/proyectos', '/gali-6-v2/proyecto',
+  '/gali-6-v2/mi-negocio', '/gali-6-v2/conexiones',
+  '/gali-6-v2/senales', '/gali-6-v2/impacto',
+  '/gali-6-v2/agentes', '/gali-6-v2/skills',
+  '/gali-6-v2/reglas', '/gali-6-v2/marketplace',
+  '/gali-6-v2/academy', '/gali-6-v2/centro-control',
+];
 
 export function resolveG6RailKey(url: string): string {
-  return resolveActiveRailKey(toV5(url.replace('/gali-6-v1', '/gali-6')));
+  return resolveActiveRailKey(toV5(url.replace('/gali-6-v1', '/gali-6').replace('/gali-6-v2', '/gali-6')));
 }
 
 export function resolveG6SectionPanel(url: string): SectionPanel | null {
   const path = url.split('?')[0];
   if (G6_V1_HOME_EXACT.has(path)) return GALI_6_V1_MISSION_PANEL;
   if (G6_V1_HUB_PREFIXES.some(p => path.startsWith(p))) return GALI_6_V1_MISSION_PANEL;
+  if (G6_V2_HOME_EXACT.has(path)) return GALI_6_V2_MISSION_PANEL;
+  if (G6_V2_HUB_PREFIXES.some(p => path.startsWith(p))) return GALI_6_V2_MISSION_PANEL;
   if (G6_HOME_EXACT.has(path)) return GALI_6_MISSION_PANEL;
   if (G6_HUB_PREFIXES.some(p => path.startsWith(p))) return GALI_6_MISSION_PANEL;
 

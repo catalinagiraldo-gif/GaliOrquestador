@@ -5,6 +5,7 @@ import { GALI_V5_V2_CHILD_ROUTES } from './pages/gali-5/gali-v5-v2/gali-v5-v2.ro
 import { GALI_6_CHILD_ROUTES } from './pages/gali-6/gali-6.routes';
 import { GALI_6_ZERO_ROUTES } from './pages/gali-6-zero/gali-6-zero.routes';
 import { GALI_6_V1_CHILD_ROUTES } from './pages/gali-6-v1/gali-6-v1.routes';
+import { GALI_6_V2_CHILD_ROUTES } from './pages/gali-6-v2/gali-6-v2.routes';
 
 export const routes: Routes = [
   {
@@ -152,6 +153,15 @@ export const routes: Routes = [
             m => m.Gali6ShellComponent,
           ),
         children: GALI_6_V1_CHILD_ROUTES,
+      },
+      // Gali 6 V2 — snapshot congelado de /gali-6 previo a la consolidación de IA
+      {
+        path: 'gali-6-v2',
+        loadComponent: () =>
+          import('./pages/gali-6/gali-6-shell.component').then(
+            m => m.Gali6ShellComponent,
+          ),
+        children: GALI_6_V2_CHILD_ROUTES,
       },
       // Gali 6 Zero — Onboarding para usuario nuevo (sin historial)
       {

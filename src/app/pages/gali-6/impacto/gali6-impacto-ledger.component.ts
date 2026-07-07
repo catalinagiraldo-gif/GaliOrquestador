@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
@@ -11,10 +11,12 @@ import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
   imports: [CommonModule, RouterModule, GaliGlosarioDirective, Gali6PageHeaderComponent],
   template: `
     <div class="imp gali-stagger-in">
-      <app-g6-page-header
-        [breadcrumbs]="['Impacto Gali']"
-        title="El impacto de Gali"
-        sub="Lo que Gali ha hecho por tu negocio. Tu relación con Gali compone valor cada semana." />
+      @if (!embedded()) {
+        <app-g6-page-header
+          [breadcrumbs]="['Impacto Gali']"
+          title="El impacto de Gali"
+          sub="Lo que Gali ha hecho por tu negocio. Tu relación con Gali compone valor cada semana." />
+      }
 
       <section class="card">
         <div class="card__head">
@@ -78,6 +80,9 @@ import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
   styleUrl: './gali6-impacto-ledger.component.scss',
 })
 export class Gali6ImpactoLedgerComponent {
+  /** true cuando se embebe dentro de otro shell (ej. hub Centro de Gali) — oculta el header propio */
+  readonly embedded = input(false);
+
   readonly s = (LEDGER as any).summary_semana;
   readonly a = (LEDGER as any).summary_acumulado;
   readonly actions = (LEDGER as any).actions;

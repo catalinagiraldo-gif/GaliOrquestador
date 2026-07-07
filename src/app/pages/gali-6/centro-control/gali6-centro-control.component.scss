@@ -3,7 +3,7 @@
 :host { display: block; width: 100%; }
 
 .cc {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: $size-8 $size-6 $size-10;
 
@@ -12,21 +12,6 @@
     letter-spacing: 0.06em; color: $gray-500; background: $gray-100;
     padding: 3px 10px; border-radius: $radius-full;
   }
-}
-
-/* Diagrama de jerarquía */
-.onto {
-  display: flex; align-items: center; gap: $size-3; flex-wrap: wrap;
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
-  padding: $size-4 $size-5; margin-bottom: $size-5; box-shadow: $shadow-small;
-
-  &__node {
-    display: flex; flex-direction: column;
-    strong { font-size: $font-sm; color: $gray-800; font-weight: $font-bold; }
-    span { font-size: 11px; color: $gray-500; }
-    &--gali strong { color: $primary-600; }
-  }
-  &__arrow, &__plus { color: $gray-400; font-size: $font-sm; }
 }
 
 /* Tab nav */
@@ -45,198 +30,31 @@
 
   &:hover { color: $gray-800; }
   &--active { color: $primary-600; border-bottom-color: $primary-500; font-weight: $font-semibold; }
-
-  &__badge {
-    font-size: 11px; font-weight: $font-semibold; color: $gray-500;
-    background: $gray-100; padding: 0 6px; border-radius: $radius-full; line-height: 18px;
-    .cc-tab--active & { background: rgba($primary-500, 0.12); color: $gray-700; }
-  }
 }
 
-/* Intro para cada tab */
-.cc-intro {
-  font-size: $font-sm; color: $gray-500; line-height: 1.6;
-  margin: 0 0 $size-4; max-width: 640px;
-  position: relative;
-
-  &__tasa-hint {
-    color: $gray-500; font-size: 12px; cursor: default; position: relative;
-    &:hover .cc-intro__tooltip { opacity: 1; pointer-events: auto; }
-  }
-  &__tooltip {
-    position: absolute; left: 0; top: calc(100% + 6px); z-index: 10;
-    background: $gray-900; color: #fff; font-size: 11px; line-height: 1.5;
-    padding: 8px 12px; border-radius: $radius-md; width: 320px;
-    opacity: 0; pointer-events: none; transition: opacity 150ms ease;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  }
-}
-
-/* Botón añadir (skills y reglas) */
-.cc-add-btn {
-  display: flex; align-items: center;
-  width: 100%; margin-top: $size-3;
-  padding: $size-3 $size-4; border: 1.5px dashed $gray-200;
-  border-radius: $radius-md; background: transparent;
-  font-family: $font-primary; font-size: $font-sm; color: $gray-500;
-  cursor: pointer; transition: border-color 120ms ease, color 120ms ease;
-  &:hover { border-color: $primary-300; color: $primary-600; }
-}
-
-/* ── AGENTES ── */
-.agents { animation: cc-fade-in 220ms ease both; }
-
-.agents__grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: $size-4;
-}
-
-.agent {
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
-  box-shadow: $shadow-small; overflow: hidden; display: flex;
-  animation: cc-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-
-  &:hover { border-color: $gray-200; box-shadow: $shadow-medium; }
-
-  &--off { opacity: 0.65; }
-  &--urgente { border-color: rgba(#ef4444, 0.3); background: rgba(#ef4444, 0.02); }
-
-  &__accent {
-    width: 4px; flex-shrink: 0; border-radius: $radius-sm 0 0 $radius-sm;
-    .agent--off & { background: $gray-200 !important; }
-  }
-
-  &__body { flex: 1; padding: $size-4; display: flex; flex-direction: column; gap: $size-2; }
-
-  &__top { display: flex; align-items: flex-start; gap: $size-3; }
-
-  &__glyph {
-    font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 2px;
-    .agent--off & { filter: grayscale(1); }
-  }
-
-  &__meta { flex: 1; }
-  &__nombre { display: block; font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
-  &__sub { font-size: 11px; color: $gray-500; }
+/* Sub-sección colapsable (Automatizaciones dentro de Reglas, Lo que Gali hizo dentro de Conexiones) */
+.cc-sub {
+  margin-top: $size-6;
+  border-top: 1px solid $gray-100;
+  padding-top: $size-4;
 
   &__toggle {
-    flex-shrink: 0; padding: 3px 10px; border-radius: $radius-full; border: none;
-    font-family: $font-primary; font-size: 11px; font-weight: $font-bold;
-    cursor: pointer; transition: background 120ms ease, color 120ms ease;
-    background: $gray-100; color: $gray-500;
-    &--on { background: #dcfce7; color: #16a34a; }
+    display: flex; align-items: center; gap: $size-2;
+    background: transparent; border: none; padding: 0;
+    font-family: $font-primary; font-size: $font-base; font-weight: $font-bold;
+    color: $gray-800; cursor: pointer;
   }
 
-  &__desc { margin: 0; font-size: 12px; color: $gray-600; line-height: 1.5; }
+  &__chevron { color: $gray-400; font-size: 12px; }
 
-  &__accion {
-    margin: 0; font-size: 11px; color: $gray-500; line-height: 1.4;
-    &--warn { color: #ef4444; }
-  }
-
-  &__tasa-row { display: flex; align-items: center; gap: $size-2; margin-top: 2px; }
-
-  &__tasa-bar {
-    flex: 1; height: 4px; background: $gray-100; border-radius: $radius-full; overflow: hidden;
-  }
-  &__tasa-fill {
-    height: 100%; border-radius: $radius-full;
-    transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  &__tasa-val { font-size: 11px; color: $gray-500; white-space: nowrap; font-weight: $font-medium; }
-}
-
-/* ── SKILLS ── */
-.skills { animation: cc-fade-in 220ms ease both; }
-
-.skill {
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
-  padding: $size-4; margin-bottom: $size-3; box-shadow: $shadow-small;
-  animation: cc-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  &__top {
-    display: flex; align-items: center; gap: $size-2; margin-bottom: $size-2;
-  }
-  &__dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-    background: $gray-200;
-    &[data-status='active'] { background: #22c55e; }
-  }
-  &__name { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; flex: 1; }
-  &__status {
-    font-size: 11px; font-weight: $font-semibold; padding: 2px 8px;
-    border-radius: $radius-full;
-    background: $gray-100; color: $gray-500;
-    &[data-status='active'] { background: #dcfce7; color: #16a34a; }
-  }
-  &__desc { margin: 0 0 $size-2; font-size: $font-xs; color: $gray-600; line-height: 1.5; }
-  &__meta {
-    display: flex; gap: $size-4; flex-wrap: wrap;
-    span { font-size: 11px; color: $gray-500; }
+  &__body {
+    margin-top: $size-4;
+    animation: cc-fade-in 220ms ease both;
   }
 }
 
-/* ── REGLAS ── */
-.rules { animation: cc-fade-in 220ms ease both; }
-
-.rule {
-  display: flex; align-items: flex-start; gap: $size-3;
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
-  padding: $size-4; margin-bottom: $size-3; box-shadow: $shadow-small;
-  animation: cc-item-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  &__dot {
-    width: 12px; height: 12px; border-radius: 50%; border: 2px solid $gray-200;
-    flex-shrink: 0; margin-top: 3px;
-    &--on { background: #22c55e; border-color: #22c55e; }
-  }
-  &__body { flex: 1; }
-  &__texto {
-    margin: 0 0 4px; font-size: $font-sm; color: $gray-800; line-height: 1.5;
-    font-style: italic;
-  }
-  &__agente { font-size: 11px; color: $gray-500; }
-}
-
-/* ── MARKETPLACE ── */
-.mkt { animation: cc-fade-in 220ms ease both; }
-
-.mkt__grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: $size-4;
-}
-
-.mkt-card {
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-lg;
-  padding: $size-5; display: flex; flex-direction: column; gap: $size-2;
-  box-shadow: $shadow-small; transition: border-color 120ms ease, transform 120ms ease;
-  &:hover { border-color: $primary-300; transform: translateY(-2px); }
-
-  &__glyph { font-size: $font-xl; color: $primary-500; }
-  &__name { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
-  &__desc { margin: 0; font-size: $font-xs; color: $gray-600; line-height: 1.5; flex: 1; }
-  &__footer { display: flex; justify-content: space-between; font-size: 11px; color: $gray-500; }
-  &__cta {
-    margin-top: $size-2; width: 100%;
-    padding: $size-2 $size-4; background: $primary-500; color: #fff;
-    border: none; border-radius: $radius-md; font-family: $font-primary;
-    font-size: $font-sm; font-weight: $font-semibold; cursor: pointer;
-    transition: background 120ms ease;
-    &:hover { background: $primary-600; }
-  }
-}
-
-/* Animaciones */
 @keyframes cc-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes cc-item-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Responsive */
-@media (max-width: 720px) {
-  .agents__grid, .mkt__grid { grid-template-columns: 1fr; }
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .agent, .skill, .rule, .mkt-card { animation: none; }
-  .mkt-card:hover, .agent:hover { transform: none; }
+  .cc-sub__body { animation: none; }
 }

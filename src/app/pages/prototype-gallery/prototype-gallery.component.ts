@@ -46,9 +46,10 @@ interface VistaShortcut {
         </h3>
 
         <p class="featured__lead">
-          Shell limpio sin herencia de v5. Espinazo Hoy → Proyectos → Conexiones → Señales.
-          Modo básico/experto. FAB único para chat. Todas las páginas operativas de Gali 5
-          accesibles como lazy routes. Cero <code>data-proto-skip</code>.
+          IA consolidada: Señales es su propio centro de notificaciones, y Centro de Gali
+          unifica Agentes, Reglas (con Automatizaciones adentro), Conexiones (con
+          "Lo que Gali hizo") y Marketplace en un solo hub con tabs. Raíz plana —
+          Hoy · Señales · Proyectos — más Centro de Gali en modo experto.
         </p>
 
         <div class="featured__vistas">
@@ -66,53 +67,45 @@ interface VistaShortcut {
           <a routerLink="/gali-6-v1" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
             Gali 6 V1 →
           </a>
+          <a routerLink="/gali-6-v2" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
+            Gali 6 V2 →
+          </a>
           <a routerLink="/gali-6" class="featured__cta" (click)="$event.stopPropagation()">
-            <span aria-hidden="true">✦</span> Gali 6 V2
+            <span aria-hidden="true">✦</span> Gali 6 V3
             <span aria-hidden="true">→</span>
           </a>
-          <span class="featured__kbd">Ultimate Plan · Jun 15 2026</span>
+          <span class="featured__kbd">Señales independiente · Centro de Gali unificado</span>
         </footer>
       </article>
 
-      <!-- ARCHIVO: Gali 5 (V5 + V5v2) -->
-      <article class="featured" routerLink="/gali-5">
-        <header class="featured__head">
-          <span class="featured__tag">
-            <span aria-hidden="true">◆</span> Gali 5 · Archivo
-          </span>
-          <span class="featured__status" data-status="active">v5 + v5-v2</span>
-        </header>
-
-        <h3 class="featured__title">
-          Gali V5 + La Casita v1 — <em>archivo de desarrollo</em>
-        </h3>
-
-        <p class="featured__lead">
-          Las versiones anteriores del prototipo. Gali V5 tiene 38 rutas operativas completas.
-          Gali V5 v2 ("La Casita v1") es el prototipo de validación del concepto casita
-          del que nació Gali 6.
-        </p>
-
-        <div class="featured__vistas">
-          <strong class="featured__vistas-label">Acceso rápido</strong>
+      <!-- Gali 5 (V5 + V5v2) — archivada como versión anterior inmediata -->
+      <details class="legacy legacy--v5" [open]="v5Open()">
+        <summary (click)="toggleV5($event)">
+          <span class="legacy__chevron" aria-hidden="true">{{ v5Open() ? '▾' : '▸' }}</span>
+          <strong>Gali 5 — versión anterior</strong>
+          <span class="legacy__count">{{ vistasV5v2.length }} vistas</span>
+        </summary>
+        <article class="featured featured--compact" routerLink="/gali-5">
+          <p class="featured__lead featured__lead--compact">
+            Gali V5 tiene 38 rutas operativas completas. Gali V5 v2 ("La Casita v1") es el
+            prototipo de validación del concepto casita del que nació Gali 6.
+          </p>
           <div class="featured__vistas-grid">
             <a *ngFor="let v of vistasV5v2" [routerLink]="v.route" class="featured__vista" (click)="$event.stopPropagation()">
               <span class="featured__vista-badge">{{ v.badge }}</span>
               <strong>{{ v.label }}</strong>
-              <span class="featured__vista-desc">{{ v.description }}</span>
             </a>
           </div>
-        </div>
-
-        <footer class="featured__foot">
-          <a routerLink="/gali-5" class="featured__cta featured__cta--secondary">
-            Abrir Gali 5 → V5 shell
-          </a>
-          <a routerLink="/gali-v5-v2" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
-            Abrir La Casita v1 →
-          </a>
-        </footer>
-      </article>
+          <footer class="featured__foot">
+            <a routerLink="/gali-5" class="featured__cta featured__cta--secondary">
+              Abrir Gali 5 → V5 shell
+            </a>
+            <a routerLink="/gali-v5-v2" class="featured__cta featured__cta--secondary" (click)="$event.stopPropagation()">
+              Abrir La Casita v1 →
+            </a>
+          </footer>
+        </article>
+      </details>
 
       <!-- VERSIÓN ACTUAL: Gali V5 — Dropi baseline -->
       <article class="featured" routerLink="/gali-v5">
@@ -219,6 +212,7 @@ interface VistaShortcut {
 export class PrototypeGalleryComponent {
   legacyOpen = signal(false);
   v4Open = signal(false);
+  v5Open = signal(false);
 
   toggleLegacy(ev: Event) {
     ev.preventDefault();
@@ -230,12 +224,17 @@ export class PrototypeGalleryComponent {
     this.v4Open.update(v => !v);
   }
 
+  toggleV5(ev: Event) {
+    ev.preventDefault();
+    this.v5Open.update(v => !v);
+  }
+
   vistasG6: VistaShortcut[] = [
     { label: 'Hoy', route: '/gali-6', badge: '✦', description: 'Briefing · 1 decisión · impacto · palanca' },
-    { label: 'Punto cero', route: '/gali-6?zero=1', badge: '○', description: 'Usuario sin historial · ZeroState onboarding' },
+    { label: 'Señales', route: '/gali-6/senales', badge: '◈', description: 'Centro de notificaciones · alertas y tareas en curso' },
     { label: 'Proyectos', route: '/gali-6/proyectos', badge: '◎', description: 'Objetivo editable · salud · Gali recomienda' },
-    { label: 'Mi Contexto', route: '/gali-6/mi-negocio', badge: '⬡', description: '3 tabs: Señales · Conexiones · Mi Operación' },
-    { label: 'Impacto', route: '/gali-6/impacto', badge: '↗', description: 'Ledger · $ ahorrados · acciones · horas' },
+    { label: 'Centro de Gali · Agentes', route: '/gali-6/agentes', badge: '⬡', description: 'Hub con tabs: Agentes · Reglas +Automatizaciones · Conexiones +Lo que Gali hizo · Marketplace' },
+    { label: 'Mi Contexto', route: '/gali-6/mi-negocio', badge: '◇', description: 'Objetivo y documentación del negocio · ahora dentro de Centro de Gali' },
     { label: 'Wallet', route: '/gali-6/financiero/historial-de-cartera', badge: '◆', description: 'Kronos · ledger financiero' },
   ];
 

@@ -1,4 +1,4 @@
-import { Component, signal, HostListener } from '@angular/core';
+import { Component, signal, input, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
@@ -26,6 +26,9 @@ interface ArchivoLocal {
   styleUrl: './gali6-conexiones-casa.component.scss',
 })
 export class Gali6ConexionesCasaComponent {
+  /** true cuando se embebe dentro de otro shell (ej. hub Centro de Gali) — oculta el header propio */
+  readonly embedded = input(false);
+
   readonly mcps: Mcp[] = [
     { nombre: 'Meta Ads',            glyph: '◈', estado: 'conectado',    tipo: 'pauta',         campanasActivas: 3, dato: 'Campañas, ROAS declarado, CTR y gasto de pauta.', contexto: 'calcular tu ROAS real, detectar saturación de creativos y proponer escalas.' },
     { nombre: 'TikTok Ads',          glyph: '♪', estado: 'conectado',    tipo: 'pauta',         campanasActivas: 2, dato: 'Métricas de campañas y audiencias de TikTok.', contexto: 'comparar canales y diversificar dónde inviertes tu pauta.' },

@@ -1,9 +1,11 @@
 <div class="cnx gali-stagger-in">
 
-  <app-g6-page-header
-    [breadcrumbs]="['Conexiones']"
-    title="Conexiones"
-    sub="Lo que conectas es lo que Gali usa para decidir por ti. Cada fuente le da contexto real de tu negocio." />
+  @if (!embedded()) {
+    <app-g6-page-header
+      [breadcrumbs]="['Conexiones']"
+      title="Conexiones"
+      sub="Lo que conectas es lo que Gali usa para decidir por ti. Cada fuente le da contexto real de tu negocio." />
+  }
 
   <!-- ── Toast post-upload ── -->
   @if (uploadToast()) {

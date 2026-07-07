@@ -1,17 +1,23 @@
 import { Routes } from '@angular/router';
 
-export const GALI_6_CHILD_ROUTES: Routes = [
+/**
+ * Snapshot congelado del estado de /gali-6 previo a la consolidación de IA (Señales
+ * independiente + Centro de Gali unificado). Preserva el comportamiento exacto de
+ * "V2" para referencia/demos puntuales. No editar salvo que se quiera actualizar
+ * intencionalmente el snapshot congelado.
+ */
+export const GALI_6_V2_CHILD_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./home/gali6-hoy-home.component').then(
+      import('../gali-6/home/gali6-hoy-home.component').then(
         m => m.Gali6HoyHomeComponent,
       ),
   },
   {
     path: 'centro-control',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
+      import('../gali-6/centro-control/gali6-centro-control.component').then(
         m => m.Gali6CentroControlComponent,
       ),
   },
@@ -20,25 +26,23 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'proyectos',
     loadComponent: () =>
-      import('./proyectos/gali6-proyectos-casa.component').then(
+      import('../gali-6/proyectos/gali6-proyectos-casa.component').then(
         m => m.Gali6ProyectosCasaComponent,
       ),
   },
   {
     path: 'conexiones',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-6/conexiones/gali6-conexiones-casa.component').then(
+        m => m.Gali6ConexionesCasaComponent,
       ),
-    data: { tab: 'conexiones' },
   },
   {
     path: 'impacto',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-6/impacto/gali6-impacto-ledger.component').then(
+        m => m.Gali6ImpactoLedgerComponent,
       ),
-    data: { tab: 'conexiones', focus: 'historial' },
   },
 
   // ── Páginas operativas — lazy refs a gali-5/gali-v5 ──
@@ -116,7 +120,7 @@ export const GALI_6_CHILD_ROUTES: Routes = [
   {
     path: 'reportes/dashboard',
     loadComponent: () =>
-      import('./reportes/gali6-reportes-dashboard.component').then(
+      import('../gali-6/reportes/gali6-reportes-dashboard.component').then(
         m => m.Gali6ReportesDashboardComponent,
       ),
   },
@@ -204,78 +208,73 @@ export const GALI_6_CHILD_ROUTES: Routes = [
         m => m.AkademyPageComponent,
       ),
   },
-  // ── Centro de Gali consolidado: hub con tabs (Agentes | Reglas +Automatizaciones | Conexiones +Lo que Gali hizo | Marketplace) ──
   {
     path: 'agentes',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-6/agentes/gali6-agentes.component').then(
+        m => m.Gali6AgentesComponent,
       ),
-    data: { tab: 'agentes' },
   },
   {
     path: 'skills',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-5/gali-v5/pages/skills/skills-page.component').then(
+        m => m.SkillsPageComponent,
       ),
-    data: { tab: 'reglas', focus: 'skills' },
   },
   {
     path: 'reglas',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-5/gali-v5/pages/reglas/reglas-page.component').then(
+        m => m.ReglasPageComponent,
       ),
-    data: { tab: 'reglas' },
   },
   {
     path: 'marketplace',
     loadComponent: () =>
-      import('./centro-control/gali6-centro-control.component').then(
-        m => m.Gali6CentroControlComponent,
+      import('../gali-6/marketplace/gali6-marketplace.component').then(
+        m => m.Gali6MarketplaceComponent,
       ),
-    data: { tab: 'marketplace' },
   },
   {
     path: 'senales',
     loadComponent: () =>
-      import('./senales/gali6-senales.component').then(
+      import('../gali-6/senales/gali6-senales.component').then(
         m => m.Gali6SenalesComponent,
       ),
   },
   {
     path: 'proyectos/nuevo',
     loadComponent: () =>
-      import('./proyectos/gali6-nuevo-proyecto.component').then(
+      import('../gali-6/proyectos/gali6-nuevo-proyecto.component').then(
         m => m.Gali6NuevoProyectoComponent,
       ),
   },
   {
     path: 'proyecto/:proyectoId/campana/:campanaId',
     loadComponent: () =>
-      import('./proyecto/gali6-campana-detalle.component').then(
+      import('../gali-6/proyecto/gali6-campana-detalle.component').then(
         m => m.Gali6CampanaDetalleComponent,
       ),
   },
   {
     path: 'proyecto/:id',
     loadComponent: () =>
-      import('./proyecto/gali6-proyecto-detalle.component').then(
+      import('../gali-6/proyecto/gali6-proyecto-detalle.component').then(
         m => m.Gali6ProyectoDetalleComponent,
       ),
   },
   {
     path: 'mi-negocio/objetivo',
     loadComponent: () =>
-      import('./mi-contexto/gali6-objetivo-editor.component').then(
+      import('../gali-6/mi-contexto/gali6-objetivo-editor.component').then(
         m => m.Gali6ObjetivoEditorComponent,
       ),
   },
   {
     path: 'mi-negocio',
     loadComponent: () =>
-      import('./mi-contexto/gali6-mi-contexto.component').then(
+      import('../gali-6/mi-contexto/gali6-mi-contexto.component').then(
         m => m.Gali6MiContextoComponent,
       ),
   },
