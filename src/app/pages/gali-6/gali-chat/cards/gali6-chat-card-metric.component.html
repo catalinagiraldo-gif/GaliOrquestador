@@ -1,0 +1,14 @@
+<div class="g6card-metric">
+  <span class="g6card-metric__label">{{ metric.label }}</span>
+  <div class="g6card-metric__row">
+    <span class="g6card-metric__value">{{ metric.value }}</span>
+    @if (metric.delta) {
+      <span class="g6card-metric__delta"
+        [class.g6card-metric__delta--up]="metric.trend === 'up'"
+        [class.g6card-metric__delta--down]="metric.trend === 'down'">
+        <i class="pi" [class.pi-arrow-up]="metric.trend === 'up'" [class.pi-arrow-down]="metric.trend === 'down'" [class.pi-minus]="metric.trend === 'flat'"></i>
+        {{ metric.delta }}
+      </span>
+    }
+  </div>
+</div>

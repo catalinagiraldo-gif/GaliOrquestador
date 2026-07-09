@@ -61,7 +61,7 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
       defaultExpanded: false,
       children: [
         { label: 'Agentes',     route: '/gali-6/agentes' },
-        { label: 'Mi Contexto', route: '/gali-6/mi-negocio' },
+        { label: 'Mi contexto', route: '/gali-6/mi-negocio' },
         { label: 'Academy',     route: '/gali-6/academy' },
       ],
     },
@@ -70,7 +70,7 @@ export const GALI_6_MISSION_PANEL: SectionPanel = {
     agentId: 'gali',
     label: 'Gali 6',
     color: '#f49a3d',
-    statusLabel: 'La Casita · facilitador activo',
+    statusLabel: 'Gali activo · monitoreando tu negocio',
     contextKey: 'home',
   },
 };

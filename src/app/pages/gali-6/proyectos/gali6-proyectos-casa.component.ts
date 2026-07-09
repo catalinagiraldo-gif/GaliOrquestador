@@ -1,10 +1,14 @@
-import { Component, computed, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Component, computed, effect, inject, signal, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { A11yModule } from '@angular/cdk/a11y';
 import { GaliGlosarioDirective } from '../directives/gali-glosario.directive';
 import { Gali6PageHeaderComponent } from '../components/gali6-page-header.component';
+import { Gali6ScreenContextService } from '../services/gali6-screen-context.service';
+import { Gali6HighlightService } from '../services/gali6-highlight.service';
+import { Gali6LiveMutationsService } from '../services/gali6-live-mutations.service';
+import { Gali6HighlightDirective } from '../directives/gali6-highlight.directive';
 import PROJECTS from '../../../../../mocks/gali-v5/projects.json';
 import KPIS from '../../../../../mocks/gali-v5/kpis-global.json';
 import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
@@ -107,13 +111,33 @@ const AGENTES_DEFAULT: Record<string, { label: string; desc: string; default: bo
 @Component({
   selector: 'app-gali6-proyectos-casa',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, GaliGlosarioDirective, Gali6PageHeaderComponent, A11yModule],
+  imports: [CommonModule, FormsModule, RouterModule, GaliGlosarioDirective, Gali6HighlightDirective, Gali6PageHeaderComponent, A11yModule],
   templateUrl: './gali6-proyectos-casa.component.html',
   styleUrl: './gali6-proyectos-casa.component.scss',
 })
 export class Gali6ProyectosCasaComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly screenCtx = inject(Gali6ScreenContextService);
+  private readonly highlight = inject(Gali6HighlightService);
+  private readonly mutations = inject(Gali6LiveMutationsService);
+
+  // ── Screen-awareness: publica el contexto activo para el panel de chat (ver plan §2) ──
+  private readonly publishScreenContext = effect(() => {
+    const todos = this.proyectos();
+    const enRiesgo = todos.filter(p => p.estado === 'en_riesgo').length;
+    const expandedIds = Array.from(this.expandedCampanas());
+    const activo = expandedIds.length === 1 ? todos.find(p => p.id === expandedIds[0]) : undefined;
+
+    this.screenCtx.publish({
+      route: '/gali-6/proyectos',
+      viewId: 'proyectos-casa',
+      viewLabel: 'Proyectos',
+      summary: `${todos.length} proyecto${todos.length === 1 ? '' : 's'}${enRiesgo > 0 ? `, ${enRiesgo} en riesgo` : ''}`,
+      entity: activo ? { kind: 'proyecto', id: activo.id, label: activo.nombre } : undefined,
+      filters: this.filtroEstado() !== 'todos' ? { estado: this.filtroEstado() } : undefined,
+    });
+  }, { allowSignalWrites: true });
 
   // ── Objetivo (Bloque 1) ──────────────────────────────────────────────
   readonly objetivo = signal<G6Objetivo>(getObjetivo());
@@ -513,7 +537,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       checkins.push({
         tipo: 'positivo',
         titulo: `${p.nombre} está escalando — tu objetivo avanza`,
-        cuerpo: `Este proyecto genera ${p.pedidos} con salud ${p.saludPct}%. Gali lo monitorea para mantener el ritmo hacia tu meta de ${obj.meta_pedidos_sem} ped/sem.`,
+        cuerpo: `Este proyecto genera ${p.pedidos} con salud ${p.saludPct}%. Gali lo monitorea para mantener el ritmo hacia tu meta de ${obj.meta_pedidos_sem} pedidos/sem.`,
         cta: 'Ver proyecto →',
         proyectoId: p.id,
         accion: 'ver',
@@ -643,7 +667,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     return [
       {
         id: 'A',
-        titulo: `Llegar a ${Math.round(actual * 1.5)} ped/sem — factible en 6 semanas`,
+        titulo: `Llegar a ${Math.round(actual * 1.5)} pedidos/sem — factible en 6 semanas`,
         detalle: `Con tu ROAS actual (${roas}x) y optimizando el horario de pauta, este objetivo es ambicioso pero alcanzable.`,
         pedidos: Math.round(actual * 1.5),
         semanas: 6,
@@ -651,7 +675,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       },
       {
         id: 'B',
-        titulo: `Objetivo conservador: ${Math.round(actual * 1.2)} ped/sem en 4 semanas`,
+        titulo: `Objetivo conservador: ${Math.round(actual * 1.2)} pedidos/sem en 4 semanas`,
         detalle: 'Incremento gradual basado en tu ritmo actual. Ideal si prefieres estabilidad antes de escalar.',
         pedidos: Math.round(actual * 1.2),
         semanas: 4,
@@ -711,7 +735,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
       setTimeout(() => this.galiCambioMensaje.set(null), 8000);
     } else if (anterior.texto !== updated.texto) {
       this.galiCambioMensaje.set(
-        `Objetivo actualizado. Gali lo tomará en cuenta para las próximas recomendaciones de tu portafolio.`
+        `Objetivo actualizado. Gali lo tomará en cuenta para las próximas recomendaciones de tus proyectos.`
       );
       setTimeout(() => this.galiCambioMensaje.set(null), 5000);
     }
@@ -953,16 +977,18 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   }
 
   confirmarPausaCampana(): void {
-    const pv = PROYECTOS_MOCK.find(p => p.id === this.campanaEnPausaProyectoId());
-    if (pv) {
-      const c = pv.campanas.find(c => c.id === this.campanaEnPausaId());
-      if (c) c.estado = 'pausada';
-    }
+    const proyectoId = this.campanaEnPausaProyectoId();
+    const campanaId = this.campanaEnPausaId();
+    // Misma fuente de verdad que usa el chat para "pausar campaña" — ver plan §3.3.
+    const ok = proyectoId && campanaId ? this.mutations.pausarCampana(proyectoId, campanaId) : false;
     this.campanaPausaModalOpen.set(false);
     this.campanaEnPausaId.set(null);
     this.campanaEnPausaProyectoId.set(null);
-    this.galiCambioMensaje.set('Campaña pausada. Gali dejará de optimizar hasta que la reactives.');
-    setTimeout(() => this.galiCambioMensaje.set(null), 4000);
+    if (ok && campanaId) {
+      this.highlight.trigger({ targetId: campanaId, variant: 'success' });
+      this.galiCambioMensaje.set('Campaña pausada. Gali dejará de optimizar hasta que la reactives.');
+      setTimeout(() => this.galiCambioMensaje.set(null), 4000);
+    }
   }
 
   cancelarPausaCampana(): void {
@@ -1010,7 +1036,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
   ctasParaTipo(tipo: string | undefined): { id: string; icon: string; label: string }[] {
     const mapa: Record<string, { id: string; icon: string; label: string }[]> = {
       optimizar: [
-        { id: 'margenes', icon: '📊', label: 'Analizar márgenes del portafolio' },
+        { id: 'margenes', icon: '📊', label: 'Analizar márgenes de tus proyectos' },
         { id: 'cerrar', icon: '🔍', label: 'Identificar productos a cerrar' },
         { id: 'precios', icon: '💰', label: 'Revisar precios vs competencia' },
       ],
@@ -1170,7 +1196,7 @@ export class Gali6ProyectosCasaComponent implements OnInit {
     event.stopPropagation();
     this.cerrarProyecto(id, event);
     this.cancelarCierre(id);
-    this.galiCambioMensaje.set('Proyecto cerrado. Los datos históricos se conservan en tu portafolio.');
+    this.galiCambioMensaje.set('Proyecto cerrado. Los datos históricos se conservan en tus proyectos.');
     setTimeout(() => this.galiCambioMensaje.set(null), 4000);
   }
 

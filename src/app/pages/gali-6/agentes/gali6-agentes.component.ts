@@ -347,7 +347,7 @@ export class Gali6AgentesComponent implements OnInit {
     if (pct <= 20) return 'Solo notifica';
     if (pct <= 45) return 'Pide aprobación';
     if (pct <= 70) return 'Opera con límites';
-    return 'Autopilot total';
+    return 'Modo automático';
   }
 
   private showToast(msg: string): void {

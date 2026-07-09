@@ -94,10 +94,10 @@
                       <div class="g6-historial-item__hdr">
                         <span class="g6-historial-item__tiempo">{{ item.timestamp }}</span>
                         <span class="g6-historial-item__tipo {{ getHistorialTipoClass(item.tipo) }}">
-                          {{ item.tipo === 'deterministico' ? 'Auto' : 'IA' }}
+                          {{ item.tipo === 'deterministico' ? 'Automático' : 'Decisión de Gali' }}
                         </span>
                         @if (!item.auto) {
-                          <span class="g6-historial-item__aprobado">Requirió OK</span>
+                          <span class="g6-historial-item__aprobado">Esperó tu aprobación</span>
                         }
                       </div>
                       <p class="g6-historial-item__accion">{{ item.accion }}</p>
@@ -153,7 +153,7 @@
               <!-- Skills con toggle ON/OFF -->
               <div class="g6-agente-card__skills">
                 <div class="g6-agente-card__skills-hdr">
-                  <span class="g6-agente-card__skills-label">Skills activas</span>
+                  <span class="g6-agente-card__skills-label">Automatizaciones activas</span>
                 </div>
                 @for (sk of ag.skills; track sk.id) {
                   <div class="g6-agente-skill" [class.g6-agente-skill--off]="!sk.activa">
@@ -260,7 +260,7 @@
                 <div class="g6-autonomia-markers">
                   <span>Solo notifica</span>
                   <span>Pide aprobación</span>
-                  <span>Autopilot</span>
+                  <span>Automático</span>
                 </div>
               </div>
 
@@ -336,7 +336,7 @@
   <div class="g6-agentes__crear-row">
     <button class="g6-agentes__crear-btn" (click)="crearAgente()">
       <span class="g6-agentes__crear-icon" aria-hidden="true">+</span>
-      Crear agente personalizado
+      Describir un agente con Gali
     </button>
   </div>
 
@@ -345,12 +345,12 @@
 <!-- ── PANEL CREAR AGENTE (chatbot slide-in) ── -->
 @if (panelCrear()) {
   <div class="g6-crear-backdrop" (click)="cerrarCrearModal()" aria-hidden="true"></div>
-  <div class="g6-crear-panel" role="dialog" aria-label="Crear agente personalizado">
+  <div class="g6-crear-panel" role="dialog" aria-label="Describir un agente con Gali">
 
     <div class="g6-crear-panel__header">
       <div class="g6-crear-panel__hdr-left">
         <span class="g6-crear-panel__spark" aria-hidden="true">✦</span>
-        <span class="g6-crear-panel__title">Crear agente personalizado</span>
+        <span class="g6-crear-panel__title">Describir un agente con Gali</span>
       </div>
       <button class="g6-crear-panel__close" (click)="cerrarCrearModal()" aria-label="Cerrar">×</button>
     </div>

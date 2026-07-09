@@ -17,7 +17,13 @@ export class Gali6HoyHomeComponent {
   readonly objetivoV2 = signal<ObjetivoGeneral>(getObjetivoV2());
   readonly toastMsg = signal<string | null>(null);
   readonly verAporte = signal(false);
+  readonly verTodosObjetivos = signal(false);
   readonly senalesDismissed = signal<Set<string>>(new Set());
+
+  readonly objetivosVisibles = computed(() => {
+    const objs = this.objetivoV2().objetivos ?? [];
+    return this.verTodosObjetivos() ? objs : objs.slice(0, 3);
+  });
 
   readonly semanaDeObjetivo = computed(() => {
     const obj = this.objetivoV2();
@@ -47,11 +53,15 @@ export class Gali6HoyHomeComponent {
     this.verAporte.update(v => !v);
   }
 
+  toggleTodosObjetivos(): void {
+    this.verTodosObjetivos.update(v => !v);
+  }
+
   onAgenteClick(_a: AgenteActivo): void {
     this.router.navigate(['/gali-6/agentes']);
   }
 
   irAMiContextoObjetivo(): void {
-    this.router.navigate(['/gali-6/mi-negocio/objetivo']);
+    this.router.navigate(['/gali-6/mi-negocio']);
   }
 }

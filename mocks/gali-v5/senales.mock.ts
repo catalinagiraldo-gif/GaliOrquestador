@@ -57,6 +57,8 @@ export interface GaliSignal {
     descripcion: string;
     metrica?: string;
   };
+  /** true si el usuario (o el chat de Gali) ya marcó esta señal como resuelta */
+  resuelta?: boolean;
 }
 
 export interface AlertaOpcion {
@@ -98,6 +100,8 @@ export interface GaliAlerta {
   resolucionResumen?: string;
   /** ID del pedido que originó esta alerta (para deep-link desde mis-pedidos) */
   originPedidoId?: string;
+  /** true si el usuario (o el chat de Gali) ya marcó esta alerta como resuelta */
+  resuelta?: boolean;
 }
 
 export const MOCK_SENALES: GaliSignal[] = [

@@ -14,7 +14,7 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mo
     <nav class="icon-rail" aria-label="Navegación principal Gali 6">
       <a routerLink="/gali-6" class="icon-rail__logo-btn"
          [class.icon-rail__logo-btn--active]="activeKey() === 'home'"
-         title="Gali 6 · La Casita" aria-label="Gali 6 · La Casita">
+         title="Inicio Gali" aria-label="Inicio Gali">
         <span class="icon-rail__spark" aria-hidden="true">✦</span>
         @if (tieneCriticas()) {
           <span class="rail-badge rail-badge--criticas">{{ alertasCriticasCount() }}</span>
@@ -56,7 +56,7 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mo
           title="Ayuda" aria-label="Ayuda" (click)="showHelpDrawer.set(true)">
           <span class="icon-rail__item-inner"><span class="icon-rail__help-glyph" aria-hidden="true">?</span></span>
         </button>
-        <button type="button" class="icon-rail__item icon-rail__item--heart" title="Gali 6 · La Casita">
+        <button type="button" class="icon-rail__item icon-rail__item--heart" title="Centro de ayuda Gali">
           <span class="icon-rail__item-inner"><i class="pi pi-heart-fill" aria-hidden="true"></i></span>
         </button>
       </div>
@@ -70,8 +70,8 @@ import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../mocks/gali-v5/senales.mo
             </div>
             <nav class="help-drawer__sections">
               <div class="help-section">
-                <h4 class="help-section__title">La Casita definitiva</h4>
-                <p class="help-section__text">Gali 6: el Director de E-commerce organizado en torno a tus objetivos. Shell propio, cero herencia frágil de V5. Modo básico/experto. ROAS real desde mocks.</p>
+                <h4 class="help-section__title">Tu espacio con Gali</h4>
+                <p class="help-section__text">Gali organiza tu negocio en torno a tus objetivos: Hoy para decisiones, Señales para alertas, Proyectos para campañas y Centro de Gali para configuración avanzada.</p>
               </div>
               <div class="help-section help-section--support">
                 <h4 class="help-section__title">¿Necesitas ayuda?</h4>

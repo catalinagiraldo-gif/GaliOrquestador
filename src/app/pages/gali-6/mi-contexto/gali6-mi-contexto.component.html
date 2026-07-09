@@ -1,7 +1,7 @@
 <div class="mc gali-stagger-in">
   <app-g6-page-header
-    [breadcrumbs]="['Mi Negocio', 'Mi Contexto']"
-    title="Mi Contexto"
+    [breadcrumbs]="['Mi contexto']"
+    title="Mi contexto"
     sub="El contexto de tu negocio que Gali usa para operar." />
 
   <!-- ══════════════════════════════════════════════════════
@@ -98,7 +98,7 @@
                     <strong>{{ objetivoV2().progreso_pct }}%</strong>
                     a
                     <strong>{{ imp.nuevoProgreso }}%</strong>
-                    ({{ imp.progresoDelta > 0 ? '+' : '' }}{{ imp.progresoDelta }}pp).
+                    ({{ imp.progresoDelta > 0 ? '+' : '' }}{{ imp.progresoDelta }} puntos porcentuales).
                     @if (imp.tienesSugerencia) {
                       La sugerencia activa de Gali para este objetivo también se perderá.
                     }
@@ -499,7 +499,7 @@
           <div class="mc-edit__hdr">
             <div class="mc-edit__hdr-izq">
               <span class="mc-edit__eyebrow">Objetivo principal</span>
-              <h2 class="mc-edit__titulo">Asesoría estratégica de Gali</h2>
+              <h2 class="mc-edit__titulo">Ajustar objetivo principal con Gali</h2>
             </div>
             <button class="mc-edit__cancelar" (click)="cancelarEditarGeneral()">← Volver</button>
           </div>
@@ -708,7 +708,7 @@
             </div>
             <div class="mc-fin-item">
               <span class="mc-fin-item__val">{{ financiero.pedidosFact }}</span>
-              <span class="mc-fin-item__lbl">pedidos fact.</span>
+              <span class="mc-fin-item__lbl">pedidos facturados</span>
             </div>
             <div class="mc-fin-item">
               <span class="mc-fin-item__val">{{ financiero.roasPromedio }}</span>
@@ -730,7 +730,7 @@
             </div>
             <div class="mc-fin-item">
               <span class="mc-fin-item__val">{{ financiero.pedidosMes }}</span>
-              <span class="mc-fin-item__lbl">pedidos fact.</span>
+              <span class="mc-fin-item__lbl">pedidos facturados</span>
             </div>
           </div>
         </div>

@@ -5,5 +5,5 @@ otra idea de arquitectura es:
 CHAT PRESENTE EN CADA UNA DE LAS SECCIONES CORE DEL PRODUCTO. 
 ME PERMITE DEFINIR NUEVOS OBJETIVOS, VER SENALES Y ABRIR NUEVOS PROYECTOS.
 
-
+isa l
 todo igual pero poner skill dentro de reglas

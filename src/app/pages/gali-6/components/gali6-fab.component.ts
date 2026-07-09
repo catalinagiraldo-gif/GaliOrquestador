@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, Input, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -94,28 +94,41 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
         <span class="g6-fab__label">Torre</span>
       </div>
 
-      <!-- Botón principal ✦ Gali -->
+      <!-- Botón principal — ayuda (placeholder, no promete chat en vivo) en /gali-6, Gali panel en v1/v2 -->
       <div class="g6-fab__gali-wrap">
-        <button
-          type="button"
-          class="g6-fab__gali"
-          [class.g6-fab__gali--open]="gali.galiMode() > 0"
-          [class.g6-fab__gali--preview]="decisionPreviewOpen()"
-          [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : (decisionPreviewOpen() ? 'Abrir chat con Gali' : (gali.criticalCount() > 0 ? 'Ver decisión pendiente' : 'Hablar con Gali'))"
-          (click)="onFabClick()"
-          data-proto-skip>
-          @if (gali.galiMode() === 0 && gali.criticalCount() > 0 && !decisionPreviewOpen()) {
-            <span class="g6-fab__badge" [attr.aria-label]="gali.criticalCount() + ' decisiones pendientes'">
-              {{ gali.criticalCount() }}
+        @if (variant === 'placeholder') {
+          <button
+            type="button"
+            class="g6-fab__gali g6-fab__gali--placeholder"
+            aria-label="Ayuda (próximamente)"
+            title="Ayuda (próximamente)"
+            (click)="onFabClick()"
+            data-proto-skip>
+            <span class="g6-fab__icon" aria-hidden="true"><i class="pi pi-question-circle"></i></span>
+          </button>
+          <span class="g6-fab__label">Ayuda</span>
+        } @else {
+          <button
+            type="button"
+            class="g6-fab__gali"
+            [class.g6-fab__gali--open]="gali.galiMode() > 0"
+            [class.g6-fab__gali--preview]="decisionPreviewOpen()"
+            [attr.aria-label]="gali.galiMode() > 0 ? 'Cerrar panel Gali' : (decisionPreviewOpen() ? 'Abrir chat con Gali' : (gali.criticalCount() > 0 ? 'Ver decisión pendiente' : 'Hablar con Gali'))"
+            (click)="onFabClick()"
+            data-proto-skip>
+            @if (gali.galiMode() === 0 && gali.criticalCount() > 0 && !decisionPreviewOpen()) {
+              <span class="g6-fab__badge" [attr.aria-label]="gali.criticalCount() + ' decisiones pendientes'">
+                {{ gali.criticalCount() }}
+              </span>
+            }
+            <span class="g6-fab__icon" aria-hidden="true">
+              {{ gali.galiMode() > 0 ? '✕' : (decisionPreviewOpen() ? '✕' : '✦') }}
             </span>
-          }
-          <span class="g6-fab__icon" aria-hidden="true">
-            {{ gali.galiMode() > 0 ? '✕' : (decisionPreviewOpen() ? '✕' : '✦') }}
+          </button>
+          <span class="g6-fab__label">
+            {{ gali.galiMode() > 0 ? 'Cerrar Gali' : (decisionPreviewOpen() ? 'Abrir chat →' : (gali.criticalCount() > 0 ? 'Decisión pendiente' : 'Panel Gali')) }}
           </span>
-        </button>
-        <span class="g6-fab__label">
-          {{ gali.galiMode() > 0 ? 'Cerrar Gali' : (decisionPreviewOpen() ? 'Abrir chat →' : (gali.criticalCount() > 0 ? 'Decisión pendiente' : 'Panel Gali')) }}
-        </span>
+        }
       </div>
     </div>
   `,
@@ -214,6 +227,15 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
           border: 1px solid rgba(255, 255, 255, 0.15);
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
           &:hover { background: #2a2a2a; }
+        }
+
+        // Placeholder de chat de soporte (/gali-6) — más discreto, sin pulso
+        // ni badge, para no competir visualmente con el botón real del dock.
+        &--placeholder {
+          animation: none;
+          background: #1c1c1e;
+          font-size: 20px;
+          &:hover { background: #2a2a2a; transform: scale(1.06); }
         }
       }
 
@@ -419,6 +441,11 @@ const CONTEXT_MAP: Array<{ prefix: string; btn: ContextBtn }> = [
   `],
 })
 export class Gali6FabComponent {
+  // 'legacy' = comportamiento original (v1/v2): abre el panel de Gali.
+  // 'placeholder' = /gali-6: ícono de chat sin acción todavía (el dock
+  // persistente tiene su propio botón en el topbar — ver plan).
+  @Input() variant: 'legacy' | 'placeholder' = 'legacy';
+
   readonly gali = inject(GaliStateService);
   private router = inject(Router);
   private feedback = inject(DropiPrototypeFeedbackService);
@@ -442,6 +469,11 @@ export class Gali6FabComponent {
   }
 
   onFabClick(): void {
+    if (this.variant === 'placeholder') {
+      // Sin acción real todavía — solo feedback de que el click registró.
+      this.feedback.action('Ayuda — próximamente');
+      return;
+    }
     if (this.decisionPreviewOpen()) {
       // 2do click con mini-card abierta → cierra mini-card y abre chat
       this.decisionPreviewOpen.set(false);

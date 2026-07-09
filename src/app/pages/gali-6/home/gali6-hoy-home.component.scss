@@ -12,12 +12,31 @@
   gap: $os-5;
 }
 
-// ── STATUS HEADER — AI-first atmosphere ───────────────────
-.hoy__status {
+// ── 2-COLUMN PAGE GRID — contenido principal + "Mis objetivos" fijo ──
+.hoy--grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  align-items: start;
+  gap: $os-5;
+  max-width: 1200px;
+}
+
+.hoy__main {
+  display: flex;
+  flex-direction: column;
+  gap: $os-5;
+  min-width: 0;
+}
+
+// ── HERO — "cómo voy": saludo + objetivo + aporte de Gali ─
+// Fuente única de progreso (fusiona el status header + "Gali hizo por ti" +
+// el resumen general de objetivos, que antes vivían en 3 bloques separados).
+.hoy__hero {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   gap: $size-3;
-  padding: $size-6 $size-6 $size-5;
+  padding: $size-6;
   border-radius: $radius-xl;
   background:
     radial-gradient(ellipse 60% 100% at 95% 0%, rgba($primary-500, 0.07) 0%, transparent 70%),
@@ -37,6 +56,51 @@
     pointer-events: none;
     border-radius: inherit;
   }
+}
+
+.hoy__hero-obj {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: $size-2;
+}
+
+.hoy__hero-obj-texto {
+  margin: 0;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: $gray-700;
+  line-height: 1.4;
+}
+
+// Número ancla — el único número de la página en esta escala
+.hoy__hero-pct-row {
+  display: flex;
+  align-items: center;
+  gap: $size-4;
+  margin-top: $size-1;
+}
+
+.hoy__hero-pct {
+  font-size: $os-font-hero;
+  font-weight: 800;
+  color: $gray-900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hoy__hero-track {
+  flex: 1;
+}
+
+.hoy__hero-aporte-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $size-4;
+  padding-top: $size-4;
+  border-top: 1px solid rgba($primary-500, 0.1);
 }
 
 .hoy__status-saludo {
@@ -80,43 +144,62 @@
   }
 }
 
-// ── OBJETIVO BLOQUE — card con micro-profundidad ──────────
-.hoy__objetivo-bloque {
-  padding: $size-4 $size-5;
-  background: rgba($primary-500, 0.03);
-  border: 1px solid rgba($primary-500, 0.12);
-  border-radius: $radius-lg;
+// ── COLUMNA DERECHA — Mis objetivos (persistente) ─────────
+.hoy__objetivos-col {
+  display: flex;
+  flex-direction: column;
+  gap: $size-4;
+  padding: $size-5;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  border-radius: $radius-xl;
+  position: sticky;
+  top: $os-6;
+}
+
+.hoy__objetivos-col-title {
+  margin: 0;
+  font-size: $font-sm;
+  font-weight: $font-bold;
+  color: $gray-900;
+}
+
+// Track/fill reutilizados por el número ancla del hero (.hoy__hero-pct-row)
+.hoy__obj-general-track {
+  height: 8px;
+  background: rgba($primary-500, 0.14);
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.hoy__obj-general-fill {
+  height: 100%;
+  background: $primary-500;
+  border-radius: $radius-full;
+  transition: width 0.8s ease;
+}
+
+.hoy__obj-cards {
   display: flex;
   flex-direction: column;
   gap: $size-3;
-  backdrop-filter: blur(4px);
 }
 
-.hoy__objetivo-texto {
-  margin: 0;
-  font-size: $font-sm;
-  font-weight: $font-semibold;
-  color: $gray-800;
-  line-height: 1.45;
-}
-
-// ── MINI-OBJETIVOS ───────────────────────────────────────
-.hoy__objetivos-mini {
+.hoy__obj-card {
   display: flex;
   flex-direction: column;
-  gap: $size-2;
-}
-
-.hoy__obj-mini {
-  display: grid;
-  grid-template-columns: 1fr 120px auto auto;
-  align-items: center;
-  gap: $size-2;
+  gap: $size-1;
+  padding: $size-3;
+  border: 1px solid $gray-100;
+  border-radius: $radius-md;
+  background: #fff;
   animation: hoy-obj-in 0.4s ease both;
 
-  @for $i from 1 through 3 {
-    &:nth-child(#{$i}) { animation-delay: #{$i * 80}ms; }
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) { animation-delay: #{$i * 60}ms; }
   }
+
+  &--logrado { border-color: rgba(#10b981, 0.3); }
 }
 
 @keyframes hoy-obj-in {
@@ -124,22 +207,36 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
-.hoy__obj-mini-label {
-  font-size: 11px;
-  color: $gray-600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.hoy__obj-card-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $size-2;
 }
 
-.hoy__obj-mini-track {
+.hoy__obj-card-titulo {
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  color: $gray-700;
+}
+
+.hoy__obj-card-dot {
+  font-size: 10px;
+  color: $primary-400;
+  cursor: default;
+  flex-shrink: 0;
+  transition: color 0.15s;
+  &:hover { color: $primary-600; }
+}
+
+.hoy__obj-card-track {
   height: 5px;
   background: rgba($primary-500, 0.12);
   border-radius: $radius-full;
   overflow: hidden;
 }
 
-.hoy__obj-mini-fill {
+.hoy__obj-card-fill {
   height: 100%;
   background: $primary-400;
   border-radius: $radius-full;
@@ -148,21 +245,24 @@
   &--logrado { background: #10b981; }
 }
 
-.hoy__obj-mini-val {
-  font-size: 11px;
+.hoy__obj-card-val {
+  align-self: flex-end;
+  font-size: $font-xs;
   font-weight: $font-bold;
   color: $gray-700;
-  white-space: nowrap;
-  text-align: right;
 }
 
-.hoy__obj-mini-dot {
-  font-size: 10px;
-  color: $primary-400;
-  cursor: default;
-  flex-shrink: 0;
-  transition: color 0.15s;
-  &:hover { color: $primary-600; }
+.hoy__obj-toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  color: $primary-600;
+  padding: 0;
+  line-height: 1;
+  &:hover { color: $primary-700; text-decoration: underline; }
 }
 
 .hoy__objetivo-acciones {
@@ -194,11 +294,12 @@
 }
 
 // ── 2-COLUMN LAYOUT ──────────────────────────────────────
+// align-items: stretch (default) — Asistentes y Novedades deben terminar
+// en el mismo borde inferior aunque su contenido tenga largos distintos.
 .hoy__cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $os-5;
-  align-items: start;
 }
 
 .hoy__col { display: flex; flex-direction: column; gap: $os-4; }
@@ -215,34 +316,9 @@
   span { color: $primary-500; }
 }
 
-// ── GALI HIZO POR TI — highlight section ─────────────────
-.hoy__aporte {
-  background: linear-gradient(135deg, #fff7ed 0%, #fffbf5 60%, #fff 100%);
-  border: 1.5px solid rgba($primary-500, 0.18);
-  border-radius: $radius-xl;
-  padding: $size-5 $size-6;
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '✦';
-    position: absolute;
-    right: $size-5;
-    bottom: $size-3;
-    font-size: 48px;
-    color: rgba($primary-500, 0.06);
-    pointer-events: none;
-    line-height: 1;
-  }
-}
-
-.hoy__aporte-hdr {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $size-3;
-}
-
+// ── GALI HIZO POR TI — clases reutilizadas dentro de .hoy__hero ─────────
+// (el contenedor visual con gradiente/borde ahora es .hoy__hero, no un
+// bloque .hoy__aporte separado — ver .hoy__hero-aporte-hdr más arriba)
 .hoy__aporte-toggle {
   font-size: $font-xs;
   font-weight: $font-semibold;
@@ -311,7 +387,7 @@
   background: $os-surface;
   border: 1px solid $os-border;
   border-radius: $radius-lg;
-  padding: $size-4 $size-5;
+  padding: $size-5;
 }
 
 .hoy__senales-hdr {
@@ -323,7 +399,9 @@
 
 .hoy__senales-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  // auto-fit en vez de un conteo fijo — la proporción de las tarjetas debe
+  // sostenerse sin importar cuántas señales existan ese día.
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: $size-3;
 
   @media (max-width: 640px) { grid-template-columns: 1fr; }
@@ -423,6 +501,7 @@
 
 // ── ASISTENTES ────────────────────────────────────────────
 .hoy__asistentes {
+  height: 100%;
   background: $os-surface;
   border: 1px solid $os-border;
   border-radius: $radius-lg;
@@ -485,6 +564,7 @@
 
 // ── NOVEDADES / CHATEA PRO ────────────────────────────────
 .hoy__chatea {
+  height: 100%;
   background: $os-surface;
   border: 1px solid $os-border;
   border-radius: $radius-lg;
@@ -547,13 +627,17 @@
 }
 
 // ── Responsive ────────────────────────────────────────────
+@media (max-width: 1080px) {
+  .hoy--grid { grid-template-columns: 1fr; max-width: 720px; }
+  .hoy__objetivos-col { position: static; }
+}
+
 @media (max-width: 768px) {
   .hoy__cols { grid-template-columns: 1fr; }
-  .hoy__obj-mini { grid-template-columns: 1fr 90px auto auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hoy__toast { animation: none; }
-  .hoy__obj-mini { animation: none; }
+  .hoy__obj-card { animation: none; }
   * { transition-duration: 0.01ms !important; }
 }

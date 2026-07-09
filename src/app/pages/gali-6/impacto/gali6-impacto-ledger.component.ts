@@ -56,7 +56,7 @@ import LEDGER from '../../../../../mocks/gali-v5/impact-ledger.json';
           <span><strong>{{ a.pesos_ahorrados_label }}</strong> ahorrados</span>
           <span><strong>{{ a.acciones_totales }}</strong> acciones</span>
           <span><strong>{{ a.novedades_evitadas }}</strong> <span galiGlosario="novedad">novedades</span> evitadas</span>
-          <span><strong>{{ a.horas_libradas }}h</strong> libres</span>
+          <span><strong>{{ a.horas_libradas }}h</strong> que no operaste tú</span>
         </div>
         <span class="acum__hito">{{ a.hito_proximo_label }}</span>
       </section>

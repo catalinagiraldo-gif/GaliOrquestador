@@ -1,0 +1,43 @@
+@if (isEditing) {
+  <div class="g6trow g6trow--editing">
+    <span class="g6trow__dot" [style.background]="thread.agentColor"></span>
+    <input #nameInput type="text" class="g6trow__input" [defaultValue]="thread.title"
+      (blur)="commit(nameInput.value)"
+      (keydown.enter)="commit(nameInput.value)"
+      (keydown.escape)="cancelEdit.emit()"
+      aria-label="Nombre de la conversación" />
+  </div>
+} @else {
+  <div class="g6trow-wrap" (mouseenter)="hovered.set(true)" (mouseleave)="hovered.set(false)">
+    <button type="button" class="g6trow" [class.g6trow--active]="isActive" [class.g6trow--expanded]="expanded"
+      [title]="thread.title" [attr.aria-label]="thread.title" [attr.aria-current]="isActive ? 'true' : null"
+      (click)="switchClick.emit()">
+      <span class="g6trow__dot" [style.background]="thread.agentColor"></span>
+      @if (expanded) {
+        <span class="g6trow__name">{{ thread.title }}</span>
+        @if (thread.unread > 0) {
+          <span class="g6trow__unread">{{ thread.unread }}</span>
+        }
+      } @else if (thread.unread > 0) {
+        <span class="g6trow__badge" [attr.aria-label]="thread.unread + ' sin leer'">{{ thread.unread }}</span>
+      }
+    </button>
+
+    @if (expanded && hovered()) {
+      <span class="g6trow__actions">
+        <button type="button" class="g6trow__action" [class.g6trow__action--on]="isPinned"
+          (click)="pinClick.emit()" [attr.aria-label]="isPinned ? 'Desfijar' : 'Fijar'" [attr.aria-pressed]="isPinned">
+          <i class="pi" [class.pi-bookmark-fill]="isPinned" [class.pi-bookmark]="!isPinned"></i>
+        </button>
+        <button type="button" class="g6trow__action" (click)="startEditClick.emit()" aria-label="Renombrar">
+          <i class="pi pi-pencil"></i>
+        </button>
+        @if (canArchive) {
+          <button type="button" class="g6trow__action" (click)="archiveClick.emit()" aria-label="Archivar conversación">
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </span>
+    }
+  </div>
+}

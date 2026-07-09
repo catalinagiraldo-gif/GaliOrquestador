@@ -1,6 +1,6 @@
 <div class="g6shell"
   [class.g6shell--nav-open]="navOpen()"
-  [class.g6shell--panel-open]="gali.galiMode() > 0"
+  [class.g6shell--panel-open]="isGaliSixCurrent() ? !galiDockCollapsed() : gali.galiMode() > 0"
   [class.g6shell--section-collapsed]="sectionCollapsed()"
   [class.g6shell--gali-acting]="galiIsActing()">
   <!-- Topbar — misma estructura que V5v1 (brand-section: gallery + logo) -->
@@ -20,6 +20,17 @@
     </div>
 
     <div class="topbar__right">
+      <!-- Botón dedicado para abrir/cerrar el dock persistente de Gali — solo /gali-6 -->
+      @if (isGaliSixCurrent()) {
+        <button class="topbar__gali" type="button"
+          [class.is-on]="!galiDockCollapsed()"
+          (click)="toggleDock()"
+          [attr.aria-label]="galiDockCollapsed() ? 'Abrir panel de Gali' : 'Cerrar panel de Gali'"
+          [attr.aria-expanded]="!galiDockCollapsed()"
+          title="Panel de Gali">
+          <span aria-hidden="true">✦</span> Gali
+        </button>
+      }
       <a routerLink="/gali-6/senales" class="topbar__alerts-badge"
          [attr.aria-label]="'Ver alertas: ' + alertCount + ' pendientes'">
         ◎ <span class="topbar__alerts-count">{{ alertCount }}</span>
@@ -41,13 +52,14 @@
 
     @if (hasSectionPanel()) {
       <dropi-section-nav
+        style="order: 1"
         [panel]="filteredPanel()"
         [collapsed]="sectionCollapsed()"
         (collapseRequested)="toggleSection()"
         (expandRequested)="toggleSection()" />
     }
 
-    <main class="g6shell__content">
+    <main class="g6shell__content" style="order: 3">
       <router-outlet />
 
       <!-- Strip contextual de Gali en Negociaciones -->
@@ -99,23 +111,58 @@
         </div>
       }
     </main>
+
+    <!-- Dock persistente de chat — solo /gali-6 (ver plan). Hermano flex del rail/section-nav, no overlay.
+         Colapsado = ancho 0 (el único punto de apertura es el pill "✦ Gali" del topbar). -->
+    @if (isGaliSixCurrent()) {
+      <aside class="g6shell__chat-dock"
+        [class.g6shell__chat-dock--collapsed]="galiDockCollapsed()"
+        [class.g6shell__chat-dock--left]="galiDockSide() === 'left'"
+        [style.order]="galiDockSide() === 'left' ? 2 : 4"
+        [style.width.px]="galiDockCollapsed() ? 0 : gali.panelWidth()">
+        @if (!galiDockCollapsed()) {
+          <!-- El splitter siempre queda pegado al borde que linda con el contenido principal -->
+          <dropi-panel-splitter
+            [style.order]="galiDockSide() === 'left' ? 1 : -1"
+            [edge]="galiDockSide() === 'left' ? 'right' : 'left'"
+            [currentWidth]="gali.panelWidth()"
+            [minWidth]="380"
+            [maxWidth]="dockMaxWidth()"
+            (widthChange)="gali.setPanelWidth($event)" />
+
+          <!-- "Mover" se proyecta dentro del header real del panel (junto al botón cerrar)
+               vía content projection — así queda en el flujo real del header, no superpuesto.
+               Panel propio de Gali 6 (fork aislado de gali-right-panel/gali-5, ver plan). -->
+          <gali6-chat-panel [style.order]="0" (closed)="toggleDock()" (galiActing)="onGaliActing($event)">
+            <button gali-panel-extra-action class="g6shell__dock-side-toggle" type="button"
+              (click)="toggleDockSide()"
+              [attr.aria-label]="galiDockSide() === 'left' ? 'Mover panel de Gali a la derecha' : 'Mover panel de Gali a la izquierda'"
+              title="Mover panel de Gali al otro lado">
+              <i class="pi pi-arrow-right-arrow-left" aria-hidden="true"></i>
+            </button>
+          </gali6-chat-panel>
+        }
+      </aside>
+    }
   </div>
 
-  <!-- Backdrop nav móvil -->
-  @if (navOpen()) {
-    <div class="g6shell__backdrop" (click)="navOpen.set(false)" aria-hidden="true"></div>
+  <!-- Backdrop nav móvil / dock expandido en mobile -->
+  @if (navOpen() || dockBackdropOpen()) {
+    <div class="g6shell__backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
   }
 
-  <!-- Chat lateral de Gali -->
-  @if (gali.galiMode() > 0) {
+  <!-- Chat lateral de Gali (overlay legado) — solo /gali-6-v1 y /gali-6-v2, sin cambios -->
+  @if (!isGaliSixCurrent() && gali.galiMode() > 0) {
     <div class="g6shell__panel gali-panel-slide-in" [style.width.px]="gali.panelWidth()">
       <gali-right-panel (closed)="gali.togglePanel()" (galiActing)="onGaliActing()" />
     </div>
   }
 </div>
 
-<!-- ── FAB flotante de Gali (único punto de entrada al chat) ── -->
-<app-gali6-fab />
+<!-- ── FAB flotante: huella + torre + chat — igual en las 3 rutas.
+     En /gali-6 el ícono central es un placeholder de chat de soporte (sin acción real);
+     el toggle real del dock persistente vive en el botón "✦ Gali" del topbar. ── -->
+<app-gali6-fab [variant]="isGaliSixCurrent() ? 'placeholder' : 'legacy'" />
 
 <!-- ── ZeroState Onboarding Modal ── -->
 @if (zeroOpen() && zeroStep() < 3) {

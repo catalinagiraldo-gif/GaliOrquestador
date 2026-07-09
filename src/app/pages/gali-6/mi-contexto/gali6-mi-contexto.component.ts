@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,7 @@ import {
   OBJETIVO_DETALLES, ObjetivoDetalle,
   MetricaTipo, METRICA_UNIDAD,
 } from '../../../../../mocks/gali-v6/objetivo';
+import { Gali6ScreenContextService } from '../services/gali6-screen-context.service';
 
 interface MensajeEdit {
   rol: 'gali' | 'usuario';
@@ -23,8 +24,24 @@ interface MensajeEdit {
   styleUrl: './gali6-mi-contexto.component.scss',
 })
 export class Gali6MiContextoComponent implements OnInit {
+  private readonly screenCtx = inject(Gali6ScreenContextService);
+
   // ── Objetivos V2 ─────────────────────────────────────────────────────────
   readonly objetivoV2 = signal<ObjetivoGeneral>(getObjetivoV2());
+
+  // ── Screen-awareness: solo lectura — el chat NO edita el objetivo aquí (ver plan §3.5) ──
+  private readonly publishScreenContext = effect(() => {
+    const g = this.objetivoV2();
+    const principal = g.objetivos[0];
+
+    this.screenCtx.publish({
+      route: '/gali-6/mi-negocio',
+      viewId: 'mi-contexto',
+      viewLabel: 'Mi negocio',
+      summary: g.resumen || (principal ? principal.titulo : 'Sin objetivo definido'),
+      entity: principal ? { kind: 'objetivo', id: principal.id, label: principal.titulo } : undefined,
+    });
+  }, { allowSignalWrites: true });
   readonly objetivoDetalleId = signal<string | null>(null);
   readonly metricaLabel = METRICA_LABEL;
 

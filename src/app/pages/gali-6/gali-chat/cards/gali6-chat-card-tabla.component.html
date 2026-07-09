@@ -1,0 +1,20 @@
+<div class="g6card-tabla">
+  <table>
+    <thead>
+      <tr>
+        @for (col of tabla.columns; track col) {
+          <th>{{ col }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of tabla.rows; track $index) {
+        <tr>
+          @for (cell of row; track $index) {
+            <td>{{ cell }}</td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,24 @@
+<div class="g6agentes">
+  <div class="g6agentes__list">
+    @for (ag of agentes(); track ag.id) {
+      <div class="g6agentes__row">
+        <span class="g6agentes__avatar" [style.background]="ag.colorAvatar + '18'" [style.color]="ag.colorAvatar">
+          <i [class]="ag.icono" aria-hidden="true"></i>
+        </span>
+        <div class="g6agentes__info">
+          <span class="g6agentes__nombre">{{ ag.nombre }}</span>
+          <span class="g6agentes__actividad">{{ accionesHoyLabel(ag) }}</span>
+        </div>
+        <button type="button" class="g6agentes__toggle" [class.g6agentes__toggle--on]="ag.estado === 'activo'"
+          (click)="toggle(ag)" [attr.aria-pressed]="ag.estado === 'activo'"
+          [attr.aria-label]="(ag.estado === 'activo' ? 'Desactivar ' : 'Activar ') + ag.nombre">
+          {{ ag.estado === 'activo' ? 'ON' : 'OFF' }}
+        </button>
+      </div>
+    }
+  </div>
+
+  <button type="button" class="g6agentes__ver-detalles" (click)="verDetalles()">
+    Ver detalles de todos los agentes →
+  </button>
+</div>

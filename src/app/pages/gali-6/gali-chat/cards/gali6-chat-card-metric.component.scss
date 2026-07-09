@@ -1,0 +1,47 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: block;
+}
+
+.g6card-metric {
+  display: flex;
+  flex-direction: column;
+  gap: $os-1;
+  padding: $os-3;
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border;
+  background: $os-surface-2;
+
+  &__label {
+    font-size: 11px;
+    color: $os-text-secondary;
+  }
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    gap: $os-2;
+  }
+
+  &__value {
+    font-family: $os-font-mono;
+    font-size: 20px;
+    font-weight: 600;
+    color: $os-text-primary;
+  }
+
+  &__delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: $os-text-muted;
+
+    i { font-size: 9px; }
+
+    &--up { color: $os-ok; }
+    &--down { color: $os-crit; }
+  }
+}

@@ -12,6 +12,25 @@
     letter-spacing: 0.06em; color: $gray-500; background: $gray-100;
     padding: 3px 10px; border-radius: $radius-full;
   }
+
+  &__puente {
+    font-size: $font-sm;
+    color: $gray-600;
+    margin: 0 0 $size-5;
+    padding: $size-3 $size-4;
+    background: $gray-50;
+    border-radius: $radius-md;
+    border: 1px solid $gray-100;
+
+    a {
+      color: $primary-600;
+      font-weight: $font-semibold;
+      text-decoration: none;
+      margin-left: $size-1;
+
+      &:hover { text-decoration: underline; }
+    }
+  }
 }
 
 /* Tab nav */

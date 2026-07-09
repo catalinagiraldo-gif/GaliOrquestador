@@ -25,6 +25,8 @@
           <i class="pi" [class.pi-chevron-down]="!showThreadList()" [class.pi-chevron-up]="showThreadList()"></i>
         </button>
       }
+      <!-- Slot para acciones extra específicas del consumidor (ej. invertir lado del dock en Gali 6) -->
+      <ng-content select="[gali-panel-extra-action]"></ng-content>
       <button class="gali-panel__close" type="button" aria-label="Cerrar panel" (click)="close()" data-proto-skip>
         <i class="pi pi-times"></i>
       </button>

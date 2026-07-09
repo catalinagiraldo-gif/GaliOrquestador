@@ -1724,6 +1724,17 @@
   &--cerrada { opacity: 0.5; }
   &--borrador { border-left: 2px dashed rgba($primary-400, 0.4); }
 
+  // Modificación en vivo (vía chat o UI normal) — ver Gali6HighlightService
+  &.gali6-highlight--active {
+    background: $os-accent-dim;
+    box-shadow: inset 3px 0 0 $os-accent;
+    transition: background 400ms ease, box-shadow 400ms ease;
+  }
+  &.gali6-highlight--active.gali6-highlight--info {
+    background: $os-info-dim;
+    box-shadow: inset 3px 0 0 $os-info;
+  }
+
   &__left {
     display: flex;
     align-items: center;

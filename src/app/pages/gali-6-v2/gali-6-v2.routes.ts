@@ -9,9 +9,11 @@ import { Routes } from '@angular/router';
 export const GALI_6_V2_CHILD_ROUTES: Routes = [
   {
     path: '',
+    // Fork congelado — /gali-6/home ahora tiene la reorganización 2-col ("Mis
+    // objetivos"), que solo aplica a /gali-6. v2 conserva el layout original.
     loadComponent: () =>
-      import('../gali-6/home/gali6-hoy-home.component').then(
-        m => m.Gali6HoyHomeComponent,
+      import('./home/gali6-hoy-home-v2-frozen.component').then(
+        m => m.Gali6HoyHomeV2FrozenComponent,
       ),
   },
   {

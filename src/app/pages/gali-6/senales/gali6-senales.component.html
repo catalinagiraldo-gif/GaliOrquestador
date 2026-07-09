@@ -10,10 +10,11 @@
         <span class="g6-pill g6-pill--count">{{ totalActivas() }} activas</span>
       </div>
       <button class="g6-ver-dashboard-btn" (click)="irADashboard()">
-        <i class="pi pi-chart-bar"></i> Ver dashboard
+        <i class="pi pi-chart-bar"></i> Ver en reportes
       </button>
     </div>
-    <p class="g6-senales__subtitle">Lo que Gali y tus agentes detectaron antes de que lo vieras tú</p>
+    <p class="g6-senales__subtitle">Lo que Gali y tus agentes detectaron antes de que lo vieras tú.</p>
+    <p class="g6-senales__legend"><strong>Alertas</strong> = ya pasó · <strong>Señales</strong> = viene</p>
   </div>
 
   <!-- ═══════════════════════════════════════════════
@@ -88,6 +89,7 @@
                   class="g6-alert-item g6-alert-item--{{ a.tipo }}"
                   [class.g6-alert-item--selected]="selectedId() === a.id"
                   [class.g6-alert-item--highlighted]="highlightId() === a.id"
+                  [gali6Highlight]="a.id"
                   (click)="selectAlert(a.id)"
                   [style.animation-delay]="(i * 60) + 'ms'">
 
@@ -133,6 +135,7 @@
                   class="g6-signal-item g6-signal-item--{{ s.tipo }}"
                   [class.g6-signal-item--selected]="selectedId() === s.id"
                   [class.g6-signal-item--highlighted]="highlightId() === s.id"
+                  [gali6Highlight]="s.id"
                   (click)="selectSignal(s.id)"
                   [style.animation-delay]="(i * 60) + 'ms'">
 
@@ -194,7 +197,7 @@
         } @else {
           <div class="g6-detail-empty">
             <i class="g6-detail-empty__icon pi pi-eye"></i>
-            <p class="g6-detail-empty__title">Selecciona una señal</p>
+            <p class="g6-detail-empty__title">Selecciona una alerta o señal</p>
             <p class="g6-detail-empty__sub">Ve el análisis completo, los datos de Dropi y la acción recomendada.</p>
           </div>
         }

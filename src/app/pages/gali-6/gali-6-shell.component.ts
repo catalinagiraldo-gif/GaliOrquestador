@@ -7,8 +7,11 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { Gali6IconRailComponent } from './gali-6-icon-rail.component';
 import { Gali6FabComponent } from './components/gali6-fab.component';
 import { DropiSectionNavComponent } from '../gali-5/gali-v5/components/dropi-section-nav.component';
+import { DropiPanelSplitterComponent } from '../gali-5/gali-v5/components/dropi-panel-splitter/dropi-panel-splitter.component';
 import { GaliRightPanelComponent } from '../gali-5/gali-v5/components/gali-right-panel/gali-right-panel.component';
 import { GaliStateService } from '../gali-5/gali-v5/services/gali-state.service';
+import { Gali6ChatPanelComponent } from './gali-chat/gali6-chat-panel.component';
+import { Gali6HighlightService } from './services/gali6-highlight.service';
 import { SectionPanel } from '../gali-5/gali-v5/dropi-sections.config';
 import { resolveG6SectionPanel, GALI_6_MISSION_PANEL } from './gali-6-sections.config';
 import KPIS from '../../../../mocks/gali-v5/kpis-global.json';
@@ -34,7 +37,9 @@ type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
     Gali6IconRailComponent,
     Gali6FabComponent,
     DropiSectionNavComponent,
+    DropiPanelSplitterComponent,
     GaliRightPanelComponent,
+    Gali6ChatPanelComponent,
   ],
   templateUrl: './gali-6-shell.component.html',
   styleUrl: './gali-6-shell.component.scss',
@@ -42,10 +47,56 @@ type Canal = 'meta' | 'tiktok' | 'ambos' | 'ninguno';
 export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   readonly router = inject(Router);
   readonly gali = inject(GaliStateService);
+  private readonly highlight = inject(Gali6HighlightService);
 
   readonly navOpen = signal(false);
   readonly walletHidden = signal(false);
   readonly currentUrl = signal(this.router.url);
+
+  // ── Chat dock (solo /gali-6, no v1/v2 — ver plan) ──
+  readonly isGaliSixCurrent = computed(() => {
+    const u = this.currentUrl();
+    return u === '/gali-6' || u.startsWith('/gali-6/');
+  });
+  readonly viewportWidth = signal(window.innerWidth);
+  readonly isMobileViewport = computed(() => this.viewportWidth() < 1024);
+  readonly galiDockCollapsed = signal(
+    localStorage.getItem('gali-6-dock-collapsed') != null
+      ? localStorage.getItem('gali-6-dock-collapsed') === 'true'
+      : window.innerWidth < 1024,
+  );
+  readonly dockBackdropOpen = computed(() =>
+    this.isGaliSixCurrent() && this.isMobileViewport() && !this.galiDockCollapsed()
+  );
+  readonly dockMaxWidth = computed(() => Math.floor(this.viewportWidth() * 0.78));
+  readonly galiDockSide = signal<'left' | 'right'>(
+    (localStorage.getItem('gali-6-dock-side') as 'left' | 'right') ?? 'right',
+  );
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.viewportWidth.set(window.innerWidth);
+  }
+
+  toggleDock(): void {
+    const next = !this.galiDockCollapsed();
+    this.galiDockCollapsed.set(next);
+    localStorage.setItem('gali-6-dock-collapsed', String(next));
+  }
+
+  toggleDockSide(): void {
+    const next = this.galiDockSide() === 'left' ? 'right' : 'left';
+    this.galiDockSide.set(next);
+    localStorage.setItem('gali-6-dock-side', next);
+  }
+
+  onBackdropClick(): void {
+    this.navOpen.set(false);
+    if (this.dockBackdropOpen()) {
+      this.toggleDock();
+    }
+  }
+
   readonly isOnProveedores = computed(() =>
     this.currentUrl().includes('/gali-6/productos/proveedores')
   );
@@ -103,9 +154,18 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   ].slice(0, 5);
   readonly galiIsActing = signal(false);
 
-  onGaliActing(): void {
+  /**
+   * `evt` viene del panel nuevo (gali6-chat-panel, payload dirigido) cuando
+   * una mutación real cambió algo en pantalla. El overlay legado (gali-5,
+   * /gali-6-v1 y /gali-6-v2) sigue llamando esto sin argumento — el halo
+   * genérico se conserva como fallback mínimo en ambos casos (ver §3.2 del plan).
+   */
+  onGaliActing(evt?: { targetId: string; kind: 'mutate' | 'navigate' }): void {
     this.galiIsActing.set(true);
     setTimeout(() => this.galiIsActing.set(false), 1500);
+    if (evt?.kind === 'mutate') {
+      this.highlight.trigger({ targetId: evt.targetId, variant: 'success' });
+    }
   }
 
   readonly catalogPanelPctDespues = computed(() =>

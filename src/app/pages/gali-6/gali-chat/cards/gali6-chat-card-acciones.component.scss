@@ -1,0 +1,38 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: block;
+}
+
+.g6card-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $os-2;
+}
+
+.g6card-acciones__btn {
+  padding: $os-1 $os-3;
+  border-radius: $os-radius-sm;
+  border: 1px solid $os-border-strong;
+  background: $os-surface;
+  color: $os-text-primary;
+  font-family: $os-font-body;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $os-transition;
+
+  &:hover {
+    background: $os-surface-3;
+  }
+
+  &--primary {
+    border-color: $os-accent;
+    background: $os-accent;
+    color: $os-text-inverse;
+
+    &:hover {
+      background: $os-accent-dark;
+    }
+  }
+}

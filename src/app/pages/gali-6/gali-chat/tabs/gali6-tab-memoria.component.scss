@@ -1,0 +1,197 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.g6memoria {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.g6memoria__header {
+  padding: $os-3 $os-4 $os-2;
+  border-bottom: 1px solid $os-border;
+  flex-shrink: 0;
+}
+
+.g6memoria__title {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.g6memoria__subtitle {
+  margin: 0;
+  font-size: 11px;
+  color: $os-text-muted;
+}
+
+.g6memoria__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $os-3 $os-4;
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+}
+
+.g6memoria__item {
+  display: flex;
+  gap: $os-2;
+  padding: $os-3;
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border;
+  border-left: 3px solid $os-border-strong;
+  background: $os-surface-2;
+
+  &--pattern { border-left-color: $os-info; }
+  &--decision { border-left-color: $os-warn; }
+  &--config { border-left-color: $os-text-secondary; }
+  &--insight { border-left-color: $os-ok; }
+}
+
+.g6memoria__icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.g6memoria__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.g6memoria__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $os-2;
+}
+
+.g6memoria__type {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $os-text-muted;
+
+  &--pattern { color: $os-info; }
+  &--decision { color: $os-warn; }
+  &--insight { color: $os-ok; }
+}
+
+.g6memoria__date {
+  font-size: 10px;
+  color: $os-text-muted;
+}
+
+.g6memoria__item-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.g6memoria__desc {
+  margin: 0;
+  font-size: 11px;
+  color: $os-text-secondary;
+  line-height: 1.4;
+}
+
+.g6memoria__conf {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.g6memoria__conf-bar {
+  flex: 1;
+  max-width: 80px;
+  height: 3px;
+  border-radius: 2px;
+  background: $os-border;
+  overflow: hidden;
+}
+
+.g6memoria__conf-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+
+  &--ok { background: $os-ok; }
+  &--info { background: $os-info; }
+  &--warn { background: $os-warn; }
+}
+
+.g6memoria__conf-label {
+  font-size: 10px;
+  color: $os-text-muted;
+}
+
+.g6memoria__undo {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 3px 8px;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-sm;
+  background: $os-surface;
+  color: $os-text-secondary;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $os-transition;
+
+  &:hover {
+    background: $os-surface-3;
+    color: $os-text-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+}
+
+.g6-toast {
+  position: absolute;
+  bottom: $os-4;
+  left: 50%;
+  transform: translateX(-50%);
+  background: $os-text-primary;
+  color: $os-text-inverse;
+  font-size: 12px;
+  padding: $os-2 $os-4;
+  border-radius: $os-radius-md;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  z-index: 10;
+  animation: g6memoria-fade-in 0.2s ease;
+}
+
+@keyframes g6memoria-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g6memoria__conf-fill {
+    transition: none;
+  }
+  .g6-toast {
+    animation: none;
+  }
+}

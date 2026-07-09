@@ -57,7 +57,7 @@ const ROAS_HISTORICO = 1.93;
 const NOMBRE_SUGERIDO: Record<TipoProyecto, () => string> = {
   lanzar: () => `Lanzamiento — ${new Date().toLocaleDateString('es-CO', { month: 'short', year: 'numeric' })}`,
   escalar: () => 'Escala — Producto estrella',
-  optimizar: () => 'Optimización portafolio',
+  optimizar: () => 'Optimización de proyectos',
   crm: () => 'Estrategia Chatea',
   experimentar: () => `Experimento — ${new Date().toLocaleDateString('es-CO', { month: 'short' })}`,
   operacion: () => 'Mejora operativa',
@@ -111,7 +111,7 @@ const INTENT_OPCIONES: Record<TipoProyecto, string[]> = {
 const GALI_INTENT_RESPUESTA: Record<TipoProyecto, { texto: string; subObjetivo: string }> = {
   lanzar:      { texto: 'Entendido. Te ayudo a lanzar con validación rápida. Voy a recomendar un presupuesto acotado para las primeras 2 semanas.', subObjetivo: 'Primeros pedidos en 7 días' },
   escalar:     { texto: 'Perfecto. Roax escalará el presupuesto de forma controlada para no romper el ROAS.', subObjetivo: 'Doblar pedidos/sem sin bajar margen' },
-  optimizar:   { texto: 'Vamos a revisar el portafolio completo. Te mostraré qué proyectos cerrar y cuáles ajustar.', subObjetivo: 'Identificar y cerrar proyectos que no aportan' },
+  optimizar:   { texto: 'Vamos a revisar tus proyectos. Te mostraré qué cerrar y cuáles ajustar.', subObjetivo: 'Identificar y cerrar proyectos que no aportan' },
   crm:         { texto: 'Chatea Pro es la herramienta ideal para esto. Sin pauta, solo conversaciones que convierten.', subObjetivo: 'Reactivar base de contactos existente' },
   experimentar:{ texto: 'Experimento acotado con presupuesto y tiempo límite definidos. ADA monitoreará los resultados.', subObjetivo: 'Validar hipótesis en 14 días' },
   operacion:   { texto: 'Vamos a identificar los cuellos de botella operativos. Te daré un diagnóstico claro y acciones concretas.', subObjetivo: 'Mejorar eficiencia operativa en 30 días' },

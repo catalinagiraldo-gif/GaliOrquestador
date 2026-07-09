@@ -244,7 +244,7 @@
           </button>
         }
         @if (subMetasPendientes().length === 0) {
-          <p class="sub-meta-empty">No tienes metas pendientes. Puedes crearlas desde Mi Negocio.</p>
+          <p class="sub-meta-empty">No tienes metas pendientes. Puedes crearlas desde Mi contexto.</p>
         }
       </div>
 
@@ -345,7 +345,7 @@
 
         <p class="wizard__gali-hint">
           <span aria-hidden="true">✦</span>
-          Un proyecto puede existir sin campañas: CRM por Chatea, seguimiento de portafolio, o experimentos que no siempre necesitan pauta.
+          Un proyecto puede existir sin campañas: CRM por Chatea, seguimiento de proyectos, o experimentos que no siempre necesitan pauta.
         </p>
       }
     </div>
@@ -534,7 +534,7 @@
                     <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
                     <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
                     <span class="producto-card__meta">{{ p.tendencia }}</span>
-                    <span class="producto-card__meta">~{{ p.pedidosEstSem }} ped/sem</span>
+                    <span class="producto-card__meta">~{{ p.pedidosEstSem }} pedidos/sem</span>
                   </div>
                   @if (selectedProductos().has(p.id)) {
                     <span class="producto-card__check-badge" aria-hidden="true">✓</span>
@@ -566,7 +566,7 @@
                   <span class="producto-card__meta">Margen est. {{ p.margenEst }}</span>
                   <span class="producto-card__meta">Stock {{ p.stockLabel }}</span>
                   <span class="producto-card__meta">{{ p.tendencia }}</span>
-                  <span class="producto-card__meta">~{{ p.pedidosEstSem }} ped/sem</span>
+                  <span class="producto-card__meta">~{{ p.pedidosEstSem }} pedidos/sem</span>
                 </div>
                 @if (selectedProductos().has(p.id)) {
                   <span class="producto-card__check-badge" aria-hidden="true">✓</span>
@@ -699,7 +699,7 @@
                     }
                   </span>
                   <span class="brujula-factor__val">~${{ pautaEfectivaPorPedido() | number:'1.0-0':'es' }}</span>
-                  <span class="brujula-factor__tag">${{ presupuestoDiario() | number:'1.0-0':'es' }}/día ÷ ~{{ expectativaPedidosSem() }} ped/sem</span>
+                  <span class="brujula-factor__tag">${{ presupuestoDiario() | number:'1.0-0':'es' }}/día ÷ ~{{ expectativaPedidosSem() }} pedidos/sem</span>
                 </div>
               }
               @if (suscripcionesActivas().length > 0) {
@@ -757,7 +757,7 @@
                   <span class="brujula-util-item__val brujula-util-item__val--mes">
                     ${{ utilidadMensual() | number:'1.0-0':'es' }}
                   </span>
-                  <span class="brujula-util-item__sub">con ~{{ expectativaPedidosSem() }} ped/sem</span>
+                  <span class="brujula-util-item__sub">con ~{{ expectativaPedidosSem() }} pedidos/sem</span>
                 </div>
               </div>
               <div class="brujula-semaforo" [attr.data-color]="margenSemaforoNuevo()">

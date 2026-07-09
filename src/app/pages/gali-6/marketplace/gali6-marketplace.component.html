@@ -93,10 +93,10 @@
           <div class="g6-mkt-card__badges">
             <span class="g6-mkt-badge g6-mkt-badge--comunidad">Comunidad</span>
             @if (ag.tier === 'paid') {
-              <span class="g6-mkt-badge g6-mkt-badge--paid">PAGO</span>
+              <span class="g6-mkt-badge g6-mkt-badge--paid">Pago</span>
             }
             @if (ag.tier === 'tokens') {
-              <span class="g6-mkt-badge g6-mkt-badge--tokens">TOKENS</span>
+              <span class="g6-mkt-badge g6-mkt-badge--tokens">Tokens</span>
             }
           </div>
           <div class="g6-mkt-card__avatar" [style.background]="ag.colorAvatar + '18'" [style.color]="ag.colorAvatar">
@@ -158,13 +158,13 @@
           <!-- Badges superiores -->
           <div class="g6-mkt-card__badges">
             @if (ag.tier === 'free') {
-              <span class="g6-mkt-badge g6-mkt-badge--free">FREE</span>
+              <span class="g6-mkt-badge g6-mkt-badge--free">Gratis</span>
             }
             @if (ag.tier === 'paid') {
-              <span class="g6-mkt-badge g6-mkt-badge--paid">PAGO</span>
+              <span class="g6-mkt-badge g6-mkt-badge--paid">Pago</span>
             }
             @if (ag.tier === 'tokens') {
-              <span class="g6-mkt-badge g6-mkt-badge--tokens">TOKENS</span>
+              <span class="g6-mkt-badge g6-mkt-badge--tokens">Tokens</span>
             }
             @if (ag.tipo === 'ia-compleja') {
               <span class="g6-mkt-badge g6-mkt-badge--ia-warn"
@@ -268,7 +268,7 @@
             <span class="g6-mkt-skill__tipo {{ getProcesoClass(sk.tipo) }}">{{ procesoTipoLabel[sk.tipo] }}</span>
           </div>
           @if (sk.tier === 'free') {
-            <span class="g6-mkt-badge g6-mkt-badge--free" style="margin-left: auto">FREE</span>
+            <span class="g6-mkt-badge g6-mkt-badge--free" style="margin-left: auto">Gratis</span>
           } @else if (sk.tier === 'paid') {
             <span class="g6-mkt-badge g6-mkt-badge--paid" style="margin-left: auto">${{ (sk.precioCopMes ?? 0) | number }}/mes</span>
           } @else {

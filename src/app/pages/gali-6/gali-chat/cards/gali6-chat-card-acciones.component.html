@@ -1,0 +1,10 @@
+<div class="g6card-acciones">
+  @for (accion of acciones; track accion.actionId) {
+    <button type="button"
+      class="g6card-acciones__btn"
+      [class.g6card-acciones__btn--primary]="accion.isPrimary"
+      (click)="actionClick.emit(accion.actionId)">
+      {{ accion.label }}
+    </button>
+  }
+</div>

@@ -1,0 +1,10 @@
+<div class="g6card-comp">
+  @for (item of items; track item.label) {
+    <div class="g6card-comp__col">
+      <div class="g6card-comp__track">
+        <div class="g6card-comp__bar" [class.g6card-comp__bar--highlight]="item.highlight" [style.height.%]="item.valuePct"></div>
+      </div>
+      <span class="g6card-comp__label">{{ item.label }}</span>
+    </div>
+  }
+</div>

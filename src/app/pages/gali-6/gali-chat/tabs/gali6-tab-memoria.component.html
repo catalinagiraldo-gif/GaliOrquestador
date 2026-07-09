@@ -1,0 +1,47 @@
+<div class="g6memoria">
+  <div class="g6memoria__header">
+    <p class="g6memoria__title">Lo que Gali aprendió</p>
+    <p class="g6memoria__subtitle">Patrones, decisiones y configuración detectados de tu negocio.</p>
+  </div>
+
+  <div class="g6memoria__list">
+    @for (item of items(); track item.id) {
+      <div class="g6memoria__item" [class]="'g6memoria__item--' + item.type">
+        <span class="g6memoria__icon">{{ item.icon }}</span>
+        <div class="g6memoria__body">
+          <div class="g6memoria__top">
+            <span class="g6memoria__type" [class]="'g6memoria__type--' + item.type">
+              @switch (item.type) {
+                @case ('pattern') { Patrón }
+                @case ('decision') { Decisión }
+                @case ('config') { Config }
+                @case ('insight') { Insight }
+              }
+            </span>
+            <span class="g6memoria__date">{{ item.date }}</span>
+          </div>
+          <p class="g6memoria__item-title">{{ item.title }}</p>
+          <p class="g6memoria__desc">{{ item.desc }}</p>
+
+          @if (item.confidence < 100) {
+            <div class="g6memoria__conf">
+              <span class="g6memoria__conf-bar">
+                <span class="g6memoria__conf-fill" [class]="'g6memoria__conf-fill--' + confidenceTone(item.confidence)"
+                  [style.width.%]="item.confidence"></span>
+              </span>
+              <span class="g6memoria__conf-label">{{ item.confidence }}% confianza</span>
+            </div>
+          }
+
+          @if (item.canUndo) {
+            <button type="button" class="g6memoria__undo" (click)="undo(item)">Deshacer ↩</button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (toastMsg()) {
+    <div class="g6-toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
+  }
+</div>

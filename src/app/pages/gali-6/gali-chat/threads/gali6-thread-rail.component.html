@@ -1,0 +1,80 @@
+<nav class="g6rail" [class.g6rail--expanded]="expanded()" [class.g6rail--overlay]="isOverlay()"
+  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()"
+  aria-label="Conversaciones de Gali">
+
+  <button type="button" class="g6rail__pin-toggle"
+    (click)="toggleRailPinned()"
+    [attr.aria-label]="railPinnedOpen() ? 'Fijar rail cerrado' : 'Mantener rail abierto'"
+    [attr.aria-pressed]="railPinnedOpen()"
+    title="Mantener conversaciones siempre visibles">
+    <i class="pi" [class.pi-chevron-right]="!railPinnedOpen()" [class.pi-chevron-left]="railPinnedOpen()" aria-hidden="true"></i>
+  </button>
+
+  @if (expanded()) {
+    <div class="g6rail__search">
+      <i class="pi pi-search" aria-hidden="true"></i>
+      <input type="text" placeholder="Buscar…" [ngModel]="search()" (ngModelChange)="search.set($event)"
+        (focus)="isSearchFocused.set(true)" (blur)="isSearchFocused.set(false)"
+        aria-label="Buscar conversación" />
+    </div>
+  }
+
+  <div class="g6rail__list">
+    @if (filteredPinned().length > 0) {
+      <div class="g6rail__section">
+        @if (expanded()) { <span class="g6rail__section-label"><i class="pi pi-bookmark-fill" aria-hidden="true"></i> Fijados</span> }
+        @for (t of filteredPinned(); track t.id) {
+          <gali6-thread-row [thread]="t" [isActive]="threadsSvc.activeThreadId() === t.id" [isPinned]="true"
+            [expanded]="expanded()" [isEditing]="editingId() === t.id" [canArchive]="t.id !== 'gali-main'"
+            (switchClick)="switchThread(t.id)" (pinClick)="togglePin(t.id)"
+            (startEditClick)="startEdit(t.id)" (renameCommit)="commitRename(t.id, $event)" (cancelEdit)="cancelEdit()"
+            (archiveClick)="archiveThread(t.id)" />
+        }
+      </div>
+    }
+
+    @if (filteredProjects().length > 0) {
+      <div class="g6rail__section">
+        @if (expanded()) { <span class="g6rail__section-label"><i class="pi pi-briefcase" aria-hidden="true"></i> Por proyecto</span> }
+        @for (t of filteredProjects(); track t.id) {
+          <gali6-thread-row [thread]="t" [isActive]="threadsSvc.activeThreadId() === t.id" [isPinned]="false"
+            [expanded]="expanded()" [isEditing]="editingId() === t.id" [canArchive]="true"
+            (switchClick)="switchThread(t.id)" (pinClick)="togglePin(t.id)"
+            (startEditClick)="startEdit(t.id)" (renameCommit)="commitRename(t.id, $event)" (cancelEdit)="cancelEdit()"
+            (archiveClick)="archiveThread(t.id)" />
+        }
+      </div>
+    }
+
+    @if (filteredAgents().length > 0) {
+      <div class="g6rail__section">
+        @if (expanded()) { <span class="g6rail__section-label"><i class="pi pi-bolt" aria-hidden="true"></i> Por agente</span> }
+        @for (t of filteredAgents(); track t.id) {
+          <gali6-thread-row [thread]="t" [isActive]="threadsSvc.activeThreadId() === t.id" [isPinned]="false"
+            [expanded]="expanded()" [isEditing]="editingId() === t.id" [canArchive]="true"
+            (switchClick)="switchThread(t.id)" (pinClick)="togglePin(t.id)"
+            (startEditClick)="startEdit(t.id)" (renameCommit)="commitRename(t.id, $event)" (cancelEdit)="cancelEdit()"
+            (archiveClick)="archiveThread(t.id)" />
+        }
+      </div>
+    }
+
+    @if (filteredUnfiled().length > 0) {
+      <div class="g6rail__section">
+        @if (expanded()) { <span class="g6rail__section-label">Sin categoría</span> }
+        @for (t of filteredUnfiled(); track t.id) {
+          <gali6-thread-row [thread]="t" [isActive]="threadsSvc.activeThreadId() === t.id" [isPinned]="false"
+            [expanded]="expanded()" [isEditing]="editingId() === t.id" [canArchive]="true"
+            (switchClick)="switchThread(t.id)" (pinClick)="togglePin(t.id)"
+            (startEditClick)="startEdit(t.id)" (renameCommit)="commitRename(t.id, $event)" (cancelEdit)="cancelEdit()"
+            (archiveClick)="archiveThread(t.id)" />
+        }
+      </div>
+    }
+  </div>
+
+  <button type="button" class="g6rail__new" (click)="createThread()" aria-label="Nueva conversación" title="Nueva conversación">
+    <i class="pi pi-plus" aria-hidden="true"></i>
+    @if (expanded()) { <span>Nueva conversación</span> }
+  </button>
+</nav>

@@ -1,0 +1,39 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: block;
+}
+
+.g6card-tabla {
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border;
+  background: $os-surface-2;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+
+  th, td {
+    padding: $os-1 $os-2;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    color: $os-text-secondary;
+    font-weight: 600;
+    border-bottom: 1px solid $os-border;
+  }
+
+  td {
+    color: $os-text-primary;
+    border-bottom: 1px solid $os-border;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}

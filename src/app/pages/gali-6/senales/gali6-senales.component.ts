@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, effect, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
@@ -16,6 +16,8 @@ import {
   PROCESO_TIPO_LABEL,
   PROCESO_TIPO_TOOLTIP,
 } from '../../../../../mocks/gali-v6/agentes-especializados';
+import { Gali6ScreenContextService } from '../services/gali6-screen-context.service';
+import { Gali6HighlightDirective } from '../directives/gali6-highlight.directive';
 
 type SignalFiltro = 'todas' | 'dato-real' | 'analisis-ia' | 'alertas';
 type AgenteFiltro = 'todos' | string;
@@ -23,13 +25,30 @@ type AgenteFiltro = 'todos' | string;
 @Component({
   selector: 'app-gali6-senales',
   standalone: true,
-  imports: [CommonModule, TooltipModule, SenalDetalleComponent, ConfirmActionModalComponent],
+  imports: [CommonModule, TooltipModule, SenalDetalleComponent, ConfirmActionModalComponent, Gali6HighlightDirective],
   templateUrl: './gali6-senales.component.html',
   styleUrls: ['./gali6-senales.component.scss'],
 })
 export class Gali6SenalesComponent implements OnInit {
   readonly router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly screenCtx = inject(Gali6ScreenContextService);
+
+  // ── Screen-awareness: publica la señal/alerta seleccionada (ver plan §2) ──
+  private readonly publishScreenContext = effect(() => {
+    const item = this.selectedItem();
+    const total = this.totalActivas();
+
+    this.screenCtx.publish({
+      route: '/gali-6/senales',
+      viewId: 'senales',
+      viewLabel: 'Señales',
+      summary: `${total} señal${total === 1 ? '' : 'es'} activa${total === 1 ? '' : 's'}`,
+      entity: item
+        ? { kind: item.kind === 'alerta' ? 'alerta' : 'senal', id: item.data.id, label: item.data.titulo }
+        : undefined,
+    });
+  }, { allowSignalWrites: true });
 
   // ─────────────────────────────────────────────────────────────
   // Estado de tabs y filtros

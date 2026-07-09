@@ -1,0 +1,120 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.g6agentes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.g6agentes__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $os-3 $os-4;
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+}
+
+.g6agentes__row {
+  display: flex;
+  align-items: center;
+  gap: $os-3;
+  padding: $os-2 $os-3;
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border;
+  background: $os-surface-2;
+}
+
+.g6agentes__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $os-radius-sm;
+  flex-shrink: 0;
+
+  i { font-size: 13px; }
+}
+
+.g6agentes__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.g6agentes__nombre {
+  font-size: 12px;
+  font-weight: 600;
+  color: $os-text-primary;
+}
+
+.g6agentes__actividad {
+  font-size: 11px;
+  color: $os-text-muted;
+}
+
+.g6agentes__toggle {
+  flex-shrink: 0;
+  min-width: 40px;
+  padding: 4px 8px;
+  border-radius: $os-radius-sm;
+  border: 1px solid $os-border-strong;
+  background: $os-surface;
+  color: $os-text-muted;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: $os-transition;
+
+  &:hover {
+    background: $os-surface-3;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+
+  &--on {
+    background: $os-ok-dim;
+    border-color: $os-ok;
+    color: $os-ok;
+  }
+}
+
+.g6agentes__ver-detalles {
+  flex-shrink: 0;
+  margin: $os-2 $os-4 $os-4;
+  padding: $os-2 $os-3;
+  border: none;
+  border-radius: $os-radius-sm;
+  background: transparent;
+  color: $os-accent;
+  font-family: $os-font-body;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: $os-transition;
+
+  &:hover {
+    background: $os-accent-dim;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+}

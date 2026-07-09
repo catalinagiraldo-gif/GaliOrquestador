@@ -1,0 +1,171 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.g6trow-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.g6trow {
+  display: flex;
+  align-items: center;
+  gap: $os-2;
+  width: 100%;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: $os-radius-sm;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+  transition: background $os-transition;
+
+  &:hover {
+    background: $os-surface-3;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+
+  &--active {
+    background: $os-accent-dim;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      border-radius: 2px;
+      background: $os-accent;
+    }
+  }
+
+  &--expanded {
+    justify-content: flex-start;
+  }
+}
+
+.g6trow__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.g6trow__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: $os-text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.g6trow__unread {
+  flex-shrink: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: $os-radius-sm;
+  background: $os-accent;
+  color: $os-text-inverse;
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.g6trow__badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: $os-radius-sm;
+  background: $os-accent;
+  color: $os-text-inverse;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.g6trow__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding-right: 4px;
+}
+
+.g6trow__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  border-radius: $os-radius-sm;
+  color: $os-text-muted;
+  cursor: pointer;
+  transition: $os-transition;
+
+  i { font-size: 11px; }
+
+  &:hover {
+    background: $os-surface-3;
+    color: $os-text-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+
+  &--on {
+    color: $os-accent;
+  }
+}
+
+.g6trow--editing {
+  display: flex;
+  align-items: center;
+  gap: $os-2;
+  padding: 6px;
+}
+
+.g6trow__input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid $os-accent;
+  border-radius: $os-radius-sm;
+  padding: 3px 6px;
+  font-size: 12px;
+  font-family: $os-font-body;
+  color: $os-text-primary;
+  background: $os-surface;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g6trow {
+    transition: none;
+  }
+}

@@ -20,7 +20,7 @@
     </div>
 
     <!-- Estado del portafolio — 3 indicadores concretos, subordinados al objetivo -->
-    <div class="port__salud-v2" role="status" aria-label="Alineación del portafolio con tus objetivos">
+    <div class="port__salud-v2" role="status" aria-label="Alineación de tus proyectos con tus objetivos">
       <div class="port__salud-v2__metrics">
         <div class="port__salud-v2__metric">
           <span class="port__salud-v2__val"
@@ -28,7 +28,7 @@
                 [class.port__salud-v2__val--warn]="saludPortafolioV2().campanasPct < 60">
             {{ saludPortafolioV2().campanasPct }}%
           </span>
-          <span class="port__salud-v2__desc">campañas sobre objetivo ROAS</span>
+          <span class="port__salud-v2__desc">campañas sobre objetivo <span galiGlosario="ROAS">ROAS</span></span>
         </div>
         <div class="port__salud-v2__divider"></div>
         <div class="port__salud-v2__metric">
@@ -64,7 +64,7 @@
   <!-- ── Alertas unificadas (máx. 2 en pantalla — el resto vive en Señales) ── -->
   @if (alertasUnificadas().length > 0) {
     <section class="alertas-unif">
-      <span class="alertas-unif__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tu portafolio</span>
+      <span class="alertas-unif__eyebrow"><span aria-hidden="true">✦</span> Gali sobre tus proyectos</span>
       <div class="alertas-unif__list">
         @for (a of alertasUnificadas().slice(0, 2); track a.titulo) {
           <article class="alerta-item" [attr.data-tipo]="a.tipo">
@@ -96,7 +96,7 @@
       <div class="port__head">
         <div class="port__head-left">
           <span class="port__eyebrow">Mis proyectos</span>
-          <div class="port__mini-stats" aria-label="Resumen del portafolio">
+          <div class="port__mini-stats" aria-label="Resumen de proyectos">
             <span class="port__mini-stat port__mini-stat--activo">{{ filterCounts().activos }} activos</span>
             @if (conteoEnRiesgo() > 0) {
               <span class="port__mini-stat port__mini-stat--riesgo">{{ conteoEnRiesgo() }} en riesgo</span>
@@ -347,7 +347,7 @@
                       <span class="port__fin-sep">→</span>
                       <span class="port__fin-retorno"
                             [class.port__fin-retorno--ok]="gananciaMes(p.id) > presupuestoMes(p.id)">
-                        ret. {{ formatCOP(gananciaMes(p.id)) }}
+                        ganancia {{ formatCOP(gananciaMes(p.id)) }}
                       </span>
                     }
                   </span>
@@ -377,7 +377,7 @@
               <div class="sin-camp-gali">
                 @if (accionesAgentes(p.id).length > 0) {
                   <div class="sin-camp-gali__feed">
-                    <span class="sin-camp-gali__feed-title">✦ GALI actuando ahora</span>
+                    <span class="sin-camp-gali__feed-title">✦ Gali está actuando</span>
                     @for (a of accionesAgentes(p.id); track a.id) {
                       <div class="sin-camp-gali__accion">
                         <span class="sin-camp-gali__icon">{{ a.agenteIcon }}</span>
@@ -412,7 +412,7 @@
                 </div>
                 <div class="campanas-accordion__list">
                   @for (c of getCampanas(p.id); track c.id) {
-                    <div class="campana-row campana-row--{{ c.estado }}">
+                    <div class="campana-row campana-row--{{ c.estado }}" [gali6Highlight]="c.id">
                       <div class="campana-row__left">
                         <span class="campana-row__estado" [attr.data-estado]="c.estado">
                           {{ getCampanaEstadoLabel(c.estado) }}
@@ -428,7 +428,7 @@
                           <span class="campana-row__roas"
                                 [class.campana-row__roas--ok]="(c.roasActual ?? 0) >= c.roasObjetivo"
                                 [class.campana-row__roas--low]="(c.roasActual ?? 0) < c.roasObjetivo">
-                            ROAS {{ c.roasActualLabel }}
+                            <span galiGlosario="ROAS">ROAS</span> {{ c.roasActualLabel }}
                           </span>
                         }
                         <span class="campana-row__presupuesto">{{ c.presupuestoDiarioLabel }}</span>
@@ -538,8 +538,8 @@
           <div class="obj-gali-header__context">
             <span class="obj-gali-header__label">Gali analizó tu negocio</span>
             <div class="obj-gali-header__chips">
-              <span class="obj-gali-chip"><i class="pi pi-box"></i> {{ pedidosActual }} ped/sem</span>
-              <span class="obj-gali-chip"><i class="pi pi-chart-bar"></i> ROAS 1.91x</span>
+              <span class="obj-gali-chip"><i class="pi pi-box"></i> {{ pedidosActual }} pedidos/sem</span>
+              <span class="obj-gali-chip"><i class="pi pi-chart-bar"></i> <span galiGlosario="ROAS">ROAS</span> 1.91x</span>
               <span class="obj-gali-chip"><i class="pi pi-send"></i> 2 campañas</span>
             </div>
           </div>
@@ -559,7 +559,7 @@
                 </div>
                 <p class="obj-sug-card__detalle">{{ sug.detalle }}</p>
                 <div class="obj-sug-card__nums">
-                  <span class="obj-sug-card__kpi">{{ sug.pedidos }} <small>ped/sem</small></span>
+                  <span class="obj-sug-card__kpi">{{ sug.pedidos }} <small>pedidos/sem</small></span>
                   <span class="obj-sug-card__kpi">{{ sug.semanas }} <small>semanas</small></span>
                 </div>
               </div>
@@ -594,7 +594,7 @@
               <input id="draft-meta" class="obj-input" type="number" min="1" max="1000"
                      [value]="draftMeta()"
                      (input)="draftMeta.set(+$any($event.target).value)">
-              <span class="obj-input-unit">ped/sem</span>
+              <span class="obj-input-unit">pedidos/sem</span>
             </div>
           </div>
           <div class="obj-input-divider" aria-hidden="true">en</div>
@@ -611,7 +611,7 @@
 
         <div class="obj-fact-bar obj-fact-bar--{{ factibilidad().clase }}" role="status" aria-live="polite">
           <span class="obj-fact-bar__label">{{ factibilidad().label }}</span>
-          <span class="obj-fact-bar__meta">{{ draftMeta() }} ped/sem · {{ draftPlazo() }} semanas</span>
+          <span class="obj-fact-bar__meta">{{ draftMeta() }} pedidos/sem · {{ draftPlazo() }} semanas</span>
         </div>
 
         <div class="obj-vision-group">
@@ -722,7 +722,7 @@
 
     <div class="modal__row2">
       <div class="modal__field">
-        <label class="modal__label">Contribución al objetivo (ped/sem)</label>
+        <label class="modal__label">Contribución al objetivo (pedidos/sem)</label>
         <input class="modal__input" type="number" min="0" max="500"
                [value]="draftProyectoContribucion()"
                (input)="draftProyectoContribucion.set(+$any($event.target).value)">
@@ -817,7 +817,7 @@
             ✦ Con este proyecto llegarías al {{ galiPropuestaAuto()?.pctDespues }}% de tu objetivo.
           </p>
           <button class="nuevo-card__cta" (click)="irPreviewAuto()">
-            Correr con Gali →
+            Lanzar con Gali →
           </button>
         </article>
 
@@ -826,7 +826,7 @@
           <h3 class="nuevo-card__title">Crear de cero</h3>
           <p class="nuevo-card__porque">Define tú cada paso: producto, ángulo, presupuesto y agentes. Para quien quiere control total.</p>
           <ul class="nuevo-card__features" aria-label="Incluye">
-            <li>Calculadora Brújula</li>
+            <li>Calculadora de rentabilidad (Brújula)</li>
             <li>Ángulo de venta</li>
             <li>Agentes a medida</li>
           </ul>

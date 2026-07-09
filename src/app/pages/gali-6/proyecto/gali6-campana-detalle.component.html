@@ -166,7 +166,7 @@
                       </span>
                     }
                     @if (a.pedidosSem) {
-                      <span class="cd__angulo-ped">{{ a.pedidosSem }} ped/sem</span>
+                      <span class="cd__angulo-ped">{{ a.pedidosSem }} pedidos/sem</span>
                     }
                     <button class="cd__angulo-pausa"
                             type="button"
@@ -319,7 +319,7 @@
             <span class="cd__agente-estado"
                   [class.cd__agente-estado--auto]="getAgenteInfo(agId).autopilot"
                   [class.cd__agente-estado--manual]="!getAgenteInfo(agId).autopilot">
-              {{ getAgenteInfo(agId).autopilot ? 'Auto' : 'Manual' }}
+              {{ getAgenteInfo(agId).autopilot ? 'Automático' : 'Con tu OK' }}
             </span>
             <button class="cd__agente-btn" (click)="router.navigate(['/gali-6/agentes'])">
               Configurar →

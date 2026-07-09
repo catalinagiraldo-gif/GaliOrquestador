@@ -1,0 +1,181 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: block;
+  position: relative;
+  height: 100%;
+  flex-shrink: 0;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.g6rail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 32px;
+  height: 100%;
+  padding: $os-2 4px;
+  border-right: 1px solid $os-border;
+  background: $os-surface-2;
+  overflow: hidden;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &--expanded {
+    width: 168px;
+    overflow: visible;
+  }
+
+  // Expansión transitoria (solo hover/foco, no fijada): flota sobre el
+  // hilo de mensajes en vez de empujar el layout — el :host mantiene 32px
+  // vía [style.width.px], así que nada se desplaza al pasar el mouse.
+  &--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .g6rail {
+    transition: none;
+  }
+}
+
+.g6rail__pin-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  border-radius: $os-radius-sm;
+  color: $os-text-muted;
+  cursor: pointer;
+  transition: $os-transition;
+
+  i { font-size: 10px; }
+
+  &:hover {
+    background: $os-surface-3;
+    color: $os-text-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+
+  &[aria-pressed='true'] {
+    color: $os-accent;
+  }
+}
+
+.g6rail__search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: $os-radius-sm;
+  background: $os-surface;
+  border: 1px solid $os-border;
+  flex-shrink: 0;
+  transition: border-color $os-transition;
+
+  &:focus-within {
+    border-color: $os-accent;
+  }
+
+  i {
+    font-size: 10px;
+    color: $os-text-muted;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    font-family: $os-font-body;
+    color: $os-text-primary;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $os-text-muted;
+    }
+  }
+}
+
+.g6rail__list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+  min-width: 0;
+}
+
+.g6rail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.g6rail__section-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $os-text-muted;
+  white-space: nowrap;
+
+  i { font-size: 8px; }
+}
+
+.g6rail__new {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  padding: 6px;
+  flex-shrink: 0;
+  border: 1px dashed $os-border-strong;
+  border-radius: $os-radius-sm;
+  background: transparent;
+  color: $os-text-secondary;
+  font-size: 11px;
+  font-family: $os-font-body;
+  cursor: pointer;
+  transition: $os-transition;
+
+  i { font-size: 10px; }
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    border-color: $os-accent;
+    color: $os-accent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $os-accent;
+    outline-offset: 1px;
+  }
+}

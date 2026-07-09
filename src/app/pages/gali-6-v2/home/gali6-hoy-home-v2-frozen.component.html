@@ -1,0 +1,192 @@
+<div class="hoy gali-stagger-in">
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE A — HEADER: saludo + semana + objetivos
+  ══════════════════════════════════════════════ -->
+  <header class="hoy__status">
+    <h1 class="hoy__status-saludo">
+      <span class="hoy__status-spark" aria-hidden="true">✦</span>
+      Hola Cata. Gali tiene el timón.
+    </h1>
+    <p class="hoy__status-semana">
+      Semana {{ semanaDeObjetivo().semana }} de {{ semanaDeObjetivo().total }} del objetivo
+    </p>
+
+    <!-- Objetivo general + mini-barras por objetivo -->
+    <div class="hoy__objetivo-bloque">
+      <p class="hoy__objetivo-texto">{{ objetivoV2().resumen }}</p>
+
+      <div class="hoy__objetivos-mini">
+        @for (obj of (objetivoV2().objetivos ?? []).slice(0, 3); track obj.id) {
+          <div class="hoy__obj-mini">
+            <span class="hoy__obj-mini-label">{{ obj.titulo }}</span>
+            <div class="hoy__obj-mini-track">
+              <div class="hoy__obj-mini-fill"
+                   [style.width.%]="obj.progreso_pct"
+                   [class.hoy__obj-mini-fill--logrado]="obj.progreso_pct >= 90">
+              </div>
+            </div>
+            <span class="hoy__obj-mini-val">{{ obj.actualValor }}{{ obj.unidad }}</span>
+            @if (obj.sugerenciaGali) {
+              <span class="hoy__obj-mini-dot" [title]="obj.sugerenciaGali.texto" aria-label="Gali tiene una sugerencia">✦</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="hoy__objetivo-acciones">
+        <button class="hoy__objetivo-edit" (click)="irAMiContextoObjetivo()">
+          Editar objetivos →
+        </button>
+        <a routerLink="/gali-6/proyectos" class="hoy__objetivo-proyectos">
+          Ver proyectos →
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE B — SEÑALES DEL DÍA
+  ══════════════════════════════════════════════ -->
+  @if (senalesVisibles().length) {
+    <section class="hoy__senales">
+      <div class="hoy__senales-hdr">
+        <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Señales del día</span>
+        <a routerLink="/gali-6/senales" class="hoy__ver-mas">Ver todas →</a>
+      </div>
+      <div class="hoy__senales-grid">
+        @for (s of senalesVisibles(); track s.id) {
+          <article class="hoy__senal-card hoy__senal-card--{{ s.tipo }}"
+                   [class.hoy__senal-card--critica]="s.urgencia === 'critica'"
+                   [class.hoy__senal-card--media]="s.urgencia === 'media'">
+            <button class="hoy__senal-dismiss" (click)="descartarSenal(s.id)" aria-label="Descartar señal">×</button>
+            <p class="hoy__senal-evento">{{ s.senal }}</p>
+            <p class="hoy__senal-accion"><span aria-hidden="true">→</span> {{ s.accion }}</p>
+            <div class="hoy__senal-footer">
+              <div class="hoy__senal-agente">
+                <span class="hoy__senal-dot" [style.background]="s.agenteColor"></span>
+                <span class="hoy__senal-quien">{{ s.agente }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                @if (s.diasRestantes) {
+                  <span class="hoy__senal-urgencia"><i class="pi pi-clock"></i> {{ s.diasRestantes }}d</span>
+                }
+                <a routerLink="/gali-6/senales" class="hoy__senal-ver">Ver →</a>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE C — GALI HIZO POR TI (full-width)
+  ══════════════════════════════════════════════ -->
+  <section class="hoy__aporte">
+    <div class="hoy__aporte-hdr">
+      <span class="hoy__section-eyebrow"><span aria-hidden="true">✦</span> Gali hizo por ti</span>
+      <button class="hoy__aporte-toggle" (click)="toggleAporte()">
+        {{ verAporte() ? 'Ocultar ↑' : 'Ver desglose ↓' }}
+      </button>
+    </div>
+
+    <!-- Preview siempre visible: 3 números clave -->
+    <div class="hoy__aporte-preview-row">
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.acciones }}</span>
+      <span class="hoy__aporte-preview-lbl">acciones</span>
+      <span class="hoy__aporte-sep" aria-hidden="true">·</span>
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.pesosAhorrados }}</span>
+      <span class="hoy__aporte-preview-lbl">ahorrados</span>
+      <span class="hoy__aporte-sep" aria-hidden="true">·</span>
+      <span class="hoy__aporte-preview-num">{{ estado.impactoSemana.horasLibradas }}h</span>
+      <span class="hoy__aporte-preview-lbl">libres</span>
+    </div>
+
+    <!-- Desglose expandible -->
+    @if (verAporte()) {
+      <div class="hoy__aporte-body">
+        <div class="hoy__aporte-grid">
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.acciones }}</span>
+            <span class="hoy__aporte-lbl">acciones · <em>{{ estado.impactoSemana.accionesAutonomas }} autónomas</em></span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.pesosAhorrados }}</span>
+            <span class="hoy__aporte-lbl">ahorrados esta semana</span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.novedadesEvitadas }}</span>
+            <span class="hoy__aporte-lbl">novedades evitadas</span>
+          </div>
+          <div class="hoy__aporte-stat">
+            <span class="hoy__aporte-val">{{ estado.impactoSemana.horasLibradas }}h</span>
+            <span class="hoy__aporte-lbl">que no operaste tú</span>
+          </div>
+        </div>
+        <div class="hoy__aporte-bar">
+          <span class="hoy__aporte-bar-lbl">Acciones iniciadas por Gali</span>
+          <span class="hoy__aporte-bar-track">
+            <span class="hoy__aporte-bar-fill" [style.width.%]="estado.impactoSemana.pctAccionesGali"></span>
+          </span>
+          <span class="hoy__aporte-bar-val">{{ estado.impactoSemana.pctAccionesGali }}%</span>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       BLOQUE D — BOTTOM 2-COL: Asistentes + Novedades
+  ══════════════════════════════════════════════ -->
+  <div class="hoy__cols">
+
+    <!-- Asistentes activos -->
+    <div class="hoy__col hoy__col--izq">
+      <section class="hoy__asistentes">
+        <span class="hoy__section-eyebrow">Asistentes activos</span>
+        <div class="hoy__asistentes-cards">
+          @for (a of estado.agentesActivos; track a.id) {
+            <button class="hoy__asistente-card" (click)="onAgenteClick(a)" [title]="a.nombre">
+              <div class="hoy__asistente-avatar" [style.background]="a.colorAvatar + '18'">
+                <span class="hoy__asistente-icono">{{ a.icono }}</span>
+                <span class="hoy__asistente-estado"
+                      [class.hoy__asistente-estado--auto]="a.autopilot"
+                      [class.hoy__asistente-estado--manual]="!a.autopilot"
+                      aria-hidden="true"></span>
+              </div>
+              <div class="hoy__asistente-info">
+                <span class="hoy__asistente-nombre">{{ a.nombreCorto }}</span>
+                <span class="hoy__asistente-modo">{{ a.autopilot ? 'Autopilot' : 'Manual' }}</span>
+              </div>
+            </button>
+          }
+        </div>
+        <a routerLink="/gali-6/agentes" class="hoy__ver-mas">Gestionar asistentes →</a>
+      </section>
+    </div>
+
+    <!-- Novedades de clientes -->
+    <div class="hoy__col hoy__col--der">
+      @if (estado.chatProResumen) {
+        <section class="hoy__chatea">
+          <span class="hoy__section-eyebrow"><i class="pi pi-comments"></i> Novedades de clientes</span>
+          <p class="hoy__chatea-resumen">
+            <strong>{{ estado.chatProResumen.mensajes }}</strong> mensajes sin responder
+            @if (estado.chatProResumen.urgentes > 0) {
+              · <span class="hoy__chatea-urgente">{{ estado.chatProResumen.urgentes }} urgentes</span>
+            }
+          </p>
+          <a routerLink="/gali-6/marketing/chatea-pro" class="hoy__chatea-cta">
+            Ir a Chatea Pro →
+          </a>
+        </section>
+      }
+    </div>
+
+  </div><!-- /cols -->
+
+</div>
+
+@if (toastMsg()) {
+  <div class="hoy__toast" role="status" aria-live="polite">{{ toastMsg() }}</div>
+}

@@ -53,7 +53,7 @@
             <p class="mcp__dato">{{ m.dato }}</p>
             <p class="mcp__contexto"><span aria-hidden="true">✦</span> Le da contexto a Gali para: {{ m.contexto }}</p>
           } @else {
-            <p class="mcp__dato mcp__dato--prox">Próximamente disponible en Gali 6.</p>
+            <p class="mcp__dato mcp__dato--prox">Próximamente en Dropi.</p>
           }
           <button class="mcp__cta" [attr.data-estado]="m.estado"
                   [disabled]="m.estado === 'proximamente'"
@@ -266,9 +266,9 @@
         </div>
 
         <div class="cnx-panel__api-row">
-          <label class="cnx-panel__api-label" for="cnx-api-key">API Key / Token</label>
+          <label class="cnx-panel__api-label" for="cnx-api-key">Clave de acceso</label>
           <input id="cnx-api-key" class="cnx-panel__api-input" type="password"
-                 placeholder="Pega tu clave de acceso aquí…"
+                 placeholder="Pega tu clave de Meta, Google u otra plataforma…"
                  [value]="apiKeyInput()"
                  (input)="apiKeyInput.set($any($event.target).value)">
         </div>

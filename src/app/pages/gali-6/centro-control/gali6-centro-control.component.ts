@@ -37,9 +37,14 @@ type TabId = 'agentes' | 'reglas' | 'conexiones' | 'marketplace';
       <app-g6-page-header
         [breadcrumbs]="['Centro de Gali']"
         title="Centro de Gali"
-        sub="La maquinaria que opera tu negocio de fondo. Gali la orquesta — tú ajustas cuándo quieres.">
+        sub="Conexiones, agentes y reglas en un solo lugar. Ajústalos cuando quieras; Gali sigue operando con lo que ya tienes.">
         <span g6Actions class="cc__modo-tag">Solo modo experto</span>
       </app-g6-page-header>
+
+      <p class="cc__puente">
+        ¿Solo quieres saber qué hacer hoy?
+        <a routerLink="/gali-6">Ve a Hoy →</a>
+      </p>
 
       <!-- Nav de tabs -->
       <nav class="cc-tabs" role="tablist" aria-label="Secciones del Centro de Gali">

@@ -1,0 +1,34 @@
+<div class="g6senales">
+  @if (resolvingError(); as err) {
+    <div class="g6senales__error" role="alert">{{ err }}</div>
+  }
+
+  @if (items().length === 0) {
+    <div class="g6senales__empty">No tienes señales ni alertas activas.</div>
+  } @else {
+    <div class="g6senales__list">
+      @for (item of items(); track item.id) {
+        <div class="g6senales__item" [class]="'g6senales__item--' + item.tipo">
+          <span class="g6senales__dot" [class]="'g6senales__dot--' + item.tipo"></span>
+          <div class="g6senales__body">
+            <p class="g6senales__titulo">{{ item.titulo }}</p>
+            <div class="g6senales__meta">
+              <span class="g6senales__agente">{{ item.agente }}</span>
+              <span class="g6senales__badge" [class]="'g6senales__badge--' + item.tipo">
+                @if (item.categoria === 'alerta') {
+                  {{ item.tipo === 'critical' ? 'Urgente' : 'Pendiente' }}
+                } @else {
+                  {{ item.dias }}d
+                }
+              </span>
+            </div>
+          </div>
+          <div class="g6senales__actions">
+            <button type="button" class="g6senales__btn" (click)="ver(item.id)">Ver</button>
+            <button type="button" class="g6senales__btn g6senales__btn--primary" (click)="resolver(item.id)">Resolver</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

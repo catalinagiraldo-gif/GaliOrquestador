@@ -1,0 +1,111 @@
+<div class="g6chat">
+  <div class="g6chat__header">
+    <div class="g6chat__identity">
+      <span class="g6chat__glyph">✦</span>
+      <span class="g6chat__name">Gali</span>
+    </div>
+    <div class="g6chat__header-actions">
+      <ng-content select="[gali-panel-extra-action]"></ng-content>
+      <button class="g6chat__close" type="button" aria-label="Cerrar panel" (click)="close()" data-proto-skip>
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="g6chat__tabs" role="tablist" aria-label="Secciones del panel de Gali">
+    <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'chat'"
+      [attr.aria-selected]="activeTab() === 'chat'" (click)="activeTab.set('chat')">
+      <i class="pi pi-comments" aria-hidden="true"></i> Chat
+    </button>
+    <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'agentes'"
+      [attr.aria-selected]="activeTab() === 'agentes'" (click)="activeTab.set('agentes')">
+      <i class="pi pi-bolt" aria-hidden="true"></i> Agentes
+    </button>
+    <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'senales'"
+      [attr.aria-selected]="activeTab() === 'senales'" (click)="activeTab.set('senales')">
+      <i class="pi pi-bell" aria-hidden="true"></i> Señales
+    </button>
+    <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'memoria'"
+      [attr.aria-selected]="activeTab() === 'memoria'" (click)="activeTab.set('memoria')">
+      <i class="pi pi-sparkles" aria-hidden="true"></i> Memoria
+    </button>
+  </div>
+
+  @switch (activeTab()) {
+    @case ('chat') {
+      @if (chat.screenAwareBanner(); as banner) {
+        <div class="g6chat__context-banner">
+          <i class="pi pi-eye" aria-hidden="true"></i>
+          <span>{{ banner }}</span>
+        </div>
+      }
+
+      <div class="g6chat__body">
+        <gali6-thread-rail />
+        <div class="g6chat__messages">
+          @for (msg of activeMessages(); track msg.id) {
+            <div class="g6chat__msg" [class.g6chat__msg--usuario]="msg.rol === 'usuario'">
+              <div class="g6chat__bubble">{{ msg.texto }}</div>
+              @if (msg.visual; as visual) {
+                <div class="g6chat__visual">
+                  @switch (visual.kind) {
+                    @case ('metric') {
+                      @if (visual.metric) {
+                        <gali6-chat-card-metric [metric]="visual.metric" />
+                      }
+                    }
+                    @case ('comparativa') {
+                      @if (visual.comparativa) {
+                        <gali6-chat-card-comparativa [items]="visual.comparativa" />
+                      }
+                    }
+                    @case ('tabla') {
+                      @if (visual.tabla) {
+                        <gali6-chat-card-tabla [tabla]="visual.tabla" />
+                      }
+                    }
+                    @case ('acciones') {
+                      @if (visual.acciones) {
+                        <gali6-chat-card-acciones [acciones]="visual.acciones" (actionClick)="onActionClick($event)" />
+                      }
+                    }
+                  }
+                </div>
+              }
+              <span class="g6chat__time">{{ msg.timestamp }}</span>
+            </div>
+          }
+          @if (isMainThread() && chat.isTyping()) {
+            <div class="g6chat__msg">
+              <div class="g6chat__bubble g6chat__bubble--typing">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="g6chat__input">
+        <textarea
+          rows="1"
+          placeholder="Pregúntale algo a Gali…"
+          [ngModel]="draft()"
+          (ngModelChange)="draft.set($event)"
+          (keydown.enter)="onEnter($event)"
+        ></textarea>
+        <button type="button" class="g6chat__send" [disabled]="!draft().trim()" (click)="send()" aria-label="Enviar mensaje">
+          <i class="pi pi-send"></i>
+        </button>
+      </div>
+    }
+    @case ('agentes') {
+      <gali6-tab-agentes (navigated)="close()" />
+    }
+    @case ('senales') {
+      <gali6-tab-senales (navigated)="close()" />
+    }
+    @case ('memoria') {
+      <gali6-tab-memoria />
+    }
+  }
+</div>
