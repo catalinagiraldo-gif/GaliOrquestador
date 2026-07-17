@@ -12,12 +12,26 @@ export interface AgenteSkillDefault {
   label: string;
   tipo: AgenteProcesoTipo;
   descripcion: string;
+  /** Última vez que se ejecutó esta skill, ej: "hace 2h" */
+  ultimaEjecucion?: string;
+  /** Número total de veces que se ha ejecutado */
+  ejecucionesTotal?: number;
 }
 
 export interface AgenteReglaDefault {
   condicion: string;
   accion: string;
   tipo: AgenteProcesoTipo;
+  /** Dónde aplica esta regla, ej: "Meta Ads · escalamiento" */
+  scope?: string;
+  /** id de la skill en skillsDefecto que esta regla dispara */
+  skillVinculada?: string;
+  /** Orden de prioridad frente a otras reglas del mismo agente (1 = más alta) */
+  prioridad?: number;
+  /** Última vez que se disparó esta regla, ej: "hace 15 min" */
+  ultimaEjecucion?: string;
+  /** Número total de veces que se ha disparado */
+  ejecucionesTotal?: number;
 }
 
 export interface AgenteEspecializado {
@@ -67,12 +81,16 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         label: 'Verificar stock cada 6 horas',
         tipo: 'deterministico',
         descripcion: 'Consulta el inventario de Dropi para cada producto en campaña activa',
+        ultimaEjecucion: 'hace 2h',
+        ejecucionesTotal: 214,
       },
       {
         id: 'sk-stock-alert',
         label: 'Alertar cuando stock < umbral',
         tipo: 'deterministico',
         descripcion: 'Genera señal cuando las unidades disponibles caen por debajo del umbral configurado (por defecto: 10 uds)',
+        ultimaEjecucion: 'hace 15 min',
+        ejecucionesTotal: 18,
       },
     ],
     reglasDefecto: [
@@ -80,6 +98,11 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         condicion: 'Si stock < 10 unidades en producto de campaña activa',
         accion: 'Generar alerta crítica de stock',
         tipo: 'deterministico',
+        scope: 'Inventario · campañas activas',
+        skillVinculada: 'sk-stock-alert',
+        prioridad: 1,
+        ultimaEjecucion: 'hace 15 min',
+        ejecucionesTotal: 18,
       },
     ],
     enPaquetePrincipiantes: true,
@@ -107,18 +130,24 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         label: 'Calcular ROAS diario por campaña',
         tipo: 'deterministico',
         descripcion: 'Revenue / (COGS + flete + pauta + novedades + garantías)',
+        ultimaEjecucion: 'hace 40 min',
+        ejecucionesTotal: 312,
       },
       {
         id: 'sk-roas-compare',
         label: 'Comparar ROAS con objetivo',
         tipo: 'deterministico',
         descripcion: 'Evalúa si el ROAS actual supera el ROAS mínimo configurado',
+        ultimaEjecucion: 'hace 40 min',
+        ejecucionesTotal: 312,
       },
       {
         id: 'sk-roas-trend',
         label: 'Detectar caídas sostenidas',
         tipo: 'ia-ligera',
         descripcion: 'Identifica si el ROAS lleva 3+ días consecutivos bajo el umbral — distingue fluctuación normal de tendencia real',
+        ultimaEjecucion: 'hace 1h 40min',
+        ejecucionesTotal: 26,
       },
     ],
     reglasDefecto: [
@@ -126,11 +155,21 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         condicion: 'Si ROAS real < 1.3 por 3 días consecutivos',
         accion: 'Generar alerta crítica de rentabilidad',
         tipo: 'deterministico',
+        scope: 'Meta Ads · rentabilidad',
+        skillVinculada: 'sk-roas-trend',
+        prioridad: 1,
+        ultimaEjecucion: 'hace 1h 40min',
+        ejecucionesTotal: 9,
       },
       {
         condicion: 'Si ROAS real > 2.0 por 7 días y hay margen de escala',
         accion: 'Sugerir escala de presupuesto',
         tipo: 'ia-ligera',
+        scope: 'Meta Ads · escalamiento',
+        skillVinculada: 'sk-roas-compare',
+        prioridad: 2,
+        ultimaEjecucion: 'hace 23 min',
+        ejecucionesTotal: 5,
       },
     ],
     enPaquetePrincipiantes: true,
@@ -157,18 +196,24 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         label: 'Contar novedades activas',
         tipo: 'deterministico',
         descripcion: 'Totaliza las novedades abiertas y las clasifica por transportadora',
+        ultimaEjecucion: 'hace 1h',
+        ejecucionesTotal: 89,
       },
       {
         id: 'sk-log-rate',
         label: 'Calcular tasa de novedad por transportadora',
         tipo: 'deterministico',
         descripcion: 'Novedades / Pedidos totales por cada transportadora en los últimos 30 días',
+        ultimaEjecucion: 'hace 1h',
+        ejecucionesTotal: 89,
       },
       {
         id: 'sk-log-suggest',
         label: 'Sugerir cambio de transportadora',
         tipo: 'ia-ligera',
         descripcion: 'Basado en tu historial propio (no comparación de mercado), identifica la transportadora con menor tasa de novedades para tu ruta principal',
+        ultimaEjecucion: 'hace 4h',
+        ejecucionesTotal: 11,
       },
     ],
     reglasDefecto: [
@@ -176,6 +221,11 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         condicion: 'Si tasa de novedades > 20% en 7 días',
         accion: 'Alertar y mostrar análisis por transportadora',
         tipo: 'deterministico',
+        scope: 'Logística · novedades',
+        skillVinculada: 'sk-log-rate',
+        prioridad: 1,
+        ultimaEjecucion: 'hace 45 min',
+        ejecucionesTotal: 6,
       },
     ],
     enPaquetePrincipiantes: true,
@@ -206,12 +256,16 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         label: 'Comparar precio vs productos similares',
         tipo: 'ia-compleja',
         descripcion: 'Analiza el catálogo de Dropi para encontrar productos comparables y estima un rango de precio de mercado',
+        ultimaEjecucion: 'hace 6h',
+        ejecucionesTotal: 41,
       },
       {
         id: 'sk-price-suggest',
         label: 'Sugerir precio óptimo',
         tipo: 'ia-compleja',
         descripcion: 'Basado en tu margen objetivo y el análisis de mercado, propone un precio que equilibra conversión y rentabilidad',
+        ultimaEjecucion: 'hace 6h',
+        ejecucionesTotal: 17,
       },
     ],
     reglasDefecto: [
@@ -219,6 +273,11 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         condicion: 'Si precio está >15% por encima del estimado de mercado',
         accion: 'Generar alerta de precio alto con sugerencia de ajuste',
         tipo: 'ia-compleja',
+        scope: 'Precios · catálogo',
+        skillVinculada: 'sk-price-suggest',
+        prioridad: 1,
+        ultimaEjecucion: 'hace 6h',
+        ejecucionesTotal: 4,
       },
     ],
     enPaquetePrincipiantes: false,

@@ -55,6 +55,41 @@
           </button>
         }
       </div>
+    } @else if (currentStep === presupuestoStepIndex) {
+      <h2>Presupuesto</h2>
+      <p>Gali ya te sugirió un punto de partida en el chat — ajusta las cifras libremente antes de confirmar.</p>
+
+      <div class="roax-lanzador-page__breakeven">
+        <span class="roax-lanzador-page__breakeven-label">Break-even ROAS</span>
+        <span class="roax-lanzador-page__breakeven-value">{{ breakEvenRoas.toFixed(1) }}x</span>
+        <span class="roax-lanzador-page__breakeven-hint">Margen ${{ margenAbsoluto }} sobre ${{ ventaPromedio }} de venta — mínimo para no perder dinero</span>
+      </div>
+
+      <div class="roax-lanzador-page__budget-fields">
+        <div class="roax-lanzador-page__field">
+          <label for="targetRoas">Target ROAS</label>
+          <div class="roax-lanzador-page__field-input">
+            <input id="targetRoas" type="number" step="0.1" min="0" [(ngModel)]="targetRoas" />
+            <span class="roax-lanzador-page__field-suffix">x</span>
+          </div>
+        </div>
+
+        <div class="roax-lanzador-page__field">
+          <label for="presupuestoDiario">Presupuesto diario</label>
+          <div class="roax-lanzador-page__field-input">
+            <span class="roax-lanzador-page__field-prefix">$</span>
+            <input id="presupuestoDiario" type="number" step="5000" min="0" [(ngModel)]="presupuestoDiario" />
+          </div>
+        </div>
+      </div>
+
+      <label class="roax-lanzador-page__toggle">
+        <input type="checkbox" [(ngModel)]="escalarAutomatico" />
+        <span>
+          Escalar presupuesto automáticamente cuando el ROAS supere mi objetivo (+10-20% cada 48-72h)
+          <small>Gali ajustará el presupuesto solo y te lo reportará después — puedes desactivarlo cuando quieras.</small>
+        </span>
+      </label>
     } @else {
       <h2>{{ steps[currentStep] }}</h2>
       <p>Configura este paso para continuar con el lanzador ROAX.</p>
@@ -62,6 +97,6 @@
   </section>
 
   <div class="roax-lanzador-page__footer">
-    <dropi-button-new label="Continuar" hierarchy="primary" [width]="160" />
+    <dropi-button-new label="Continuar" hierarchy="primary" [width]="160" (click)="continuar()" />
   </div>
 </div>

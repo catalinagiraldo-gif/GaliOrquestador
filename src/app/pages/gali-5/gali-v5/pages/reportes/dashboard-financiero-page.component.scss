@@ -1,4 +1,5 @@
 @import 'styles/variables';
+@import 'styles/gali-os-tokens';
 
 :host {
   display: block;
@@ -29,15 +30,15 @@
   &__title {
     font-size: $font-2xl;
     font-weight: 800;
-    color: $gray-900;
+    color: $os-text-primary;
     margin: 0;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     letter-spacing: -0.02em;
   }
 
   &__sub {
     font-size: $font-sm;
-    color: $gray-500;
+    color: $os-text-secondary;
     margin-top: 2px;
     display: block;
   }
@@ -63,7 +64,7 @@
   &__gali-label {
     font-size: $font-xs;
     font-weight: 600;
-    color: $gray-700;
+    color: $os-text-secondary;
   }
 }
 
@@ -83,9 +84,9 @@
 }
 
 .kpi-card {
-  background: #fff;
-  border: 1px solid $gray-200;
-  border-radius: $radius-lg;
+  background: $os-surface;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
   padding: $size-4;
   display: flex;
   flex-direction: column;
@@ -98,7 +99,7 @@
 
   &__label {
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -107,8 +108,8 @@
   &__value {
     font-size: $font-xl;
     font-weight: 800;
-    color: $gray-900;
-    font-family: $font-primary;
+    color: $os-text-primary;
+    font-family: $os-font-body;
     letter-spacing: -0.02em;
   }
 
@@ -124,8 +125,8 @@
 // ── Waterfall ─────────────────────────────────────────────────
 .waterfall-section {
   background: #fff;
-  border: 1px solid $gray-200;
-  border-radius: $radius-xl;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
   padding: $size-5 $size-6;
 
   &__header {
@@ -135,14 +136,14 @@
   &__title {
     font-size: $font-lg;
     font-weight: 700;
-    color: $gray-900;
+    color: $os-text-primary;
     margin: 0 0 2px;
-    font-family: $font-primary;
+    font-family: $os-font-body;
   }
 
   &__sub {
     font-size: $font-sm;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 }
 
@@ -158,7 +159,7 @@
   align-items: center;
   gap: $size-3;
   padding: $size-2 0;
-  border-bottom: 1px solid $gray-100;
+  border-bottom: 1px solid $os-border;
 
   @media (max-width: 767px) {
     grid-template-columns: 1fr;
@@ -169,11 +170,11 @@
   &--subtotal,
   &--net {
     .waterfall-row__label { font-weight: 700; }
-    border-top: 2px solid $gray-200;
-    border-bottom: 2px solid $gray-200;
-    background: $gray-50;
+    border-top: 2px solid $os-border-strong;
+    border-bottom: 2px solid $os-border-strong;
+    background: $os-surface-2;
     padding: $size-2 $size-2;
-    border-radius: $radius-md;
+    border-radius: $os-radius-md;
   }
 
   &--net {
@@ -189,14 +190,14 @@
 
   &__label {
     font-size: $font-sm;
-    color: $gray-800;
-    font-family: $font-primary;
+    color: $os-text-primary;
+    font-family: $os-font-body;
     font-weight: 500;
   }
 
   &__tooltip {
     font-size: 10px;
-    color: $gray-400;
+    color: $os-text-muted;
     line-height: 1.3;
   }
 
@@ -209,7 +210,7 @@
   &__bar-track {
     flex: 1;
     height: 18px;
-    background: $gray-100;
+    background: $os-border;
     border-radius: 4px;
     overflow: hidden;
   }
@@ -229,7 +230,7 @@
     font-size: $font-sm;
     font-weight: 700;
     color: #22c55e;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     min-width: 80px;
     text-align: right;
 
@@ -245,19 +246,19 @@
   padding: $size-4 $size-5;
   background: linear-gradient(135deg, rgba(#22c55e, 0.1), rgba(#22c55e, 0.04));
   border: 2px solid rgba(#22c55e, 0.3);
-  border-radius: $radius-lg;
+  border-radius: $os-radius-lg;
 
   &__left { display: flex; flex-direction: column; gap: 3px; }
 
   &__label {
     font-size: $font-base;
     font-weight: 700;
-    color: $gray-900;
+    color: $os-text-primary;
   }
 
   &__sub {
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 
   &__right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
@@ -266,7 +267,7 @@
     font-size: $font-2xl;
     font-weight: 800;
     color: #15803d;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     letter-spacing: -0.02em;
   }
 
@@ -280,8 +281,8 @@
 // ── Weekly table ──────────────────────────────────────────────
 .weekly-section {
   background: #fff;
-  border: 1px solid $gray-200;
-  border-radius: $radius-xl;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
   padding: $size-5 $size-6;
 
   &__header {
@@ -296,9 +297,9 @@
   &__title {
     font-size: $font-lg;
     font-weight: 700;
-    color: $gray-900;
+    color: $os-text-primary;
     margin: 0;
-    font-family: $font-primary;
+    font-family: $os-font-body;
   }
 }
 
@@ -310,20 +311,20 @@
     font-size: $font-xs;
     font-weight: 600;
     padding: 5px 12px;
-    border-radius: $radius-sm;
-    border: 1px solid $gray-200;
+    border-radius: $os-radius-sm;
+    border: 1px solid $os-border-strong;
     background: transparent;
-    color: $gray-500;
+    color: $os-text-secondary;
     cursor: pointer;
     transition: all 0.15s;
 
     &--active {
-      background: $primary-500;
-      border-color: $primary-500;
+      background: $os-accent;
+      border-color: $os-accent;
       color: #fff;
     }
 
-    &:not(&--active):hover { background: $gray-50; color: $gray-700; }
+    &:not(&--active):hover { background: $os-surface-2; color: $os-text-secondary; }
   }
 }
 
@@ -334,17 +335,17 @@
 .weekly-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: $font-primary;
+  font-family: $os-font-body;
 
   th {
     font-size: $font-xs;
     font-weight: 700;
-    color: $gray-500;
+    color: $os-text-secondary;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     padding: $size-2 $size-3;
     text-align: right;
-    border-bottom: 2px solid $gray-200;
+    border-bottom: 2px solid $os-border-strong;
 
     &:first-child { text-align: left; }
   }
@@ -353,7 +354,7 @@
     padding: $size-2 $size-3;
     font-size: $font-sm;
     text-align: right;
-    border-bottom: 1px solid $gray-100;
+    border-bottom: 1px solid $os-border;
 
     &:first-child { text-align: left; }
   }
@@ -362,16 +363,16 @@
 .weekly-row {
   transition: background 0.1s;
 
-  &:hover td { background: $gray-50; }
+  &:hover td { background: $os-surface-2; }
 
   &__week {
     font-weight: 600;
-    color: $gray-700;
+    color: $os-text-secondary;
   }
 
   &__num {
     font-weight: 500;
-    color: $gray-700;
+    color: $os-text-secondary;
 
     &--cost    { color: #dc2626; }
     &--warn    { color: #d97706; }
@@ -382,10 +383,10 @@
 .weekly-total {
   td {
     font-weight: 700;
-    color: $gray-900;
-    border-top: 2px solid $gray-300;
+    color: $os-text-primary;
+    border-top: 2px solid $os-text-muted;
     border-bottom: none;
-    background: $gray-50;
+    background: $os-surface-2;
     padding: $size-3;
   }
 }
@@ -394,7 +395,7 @@
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border-radius: $radius-sm;
+  border-radius: $os-radius-sm;
   font-size: $font-xs;
   font-weight: 700;
 
@@ -405,8 +406,8 @@
 // ── Projections ───────────────────────────────────────────────
 .projections-section {
   background: #fff;
-  border: 1px solid $gray-200;
-  border-radius: $radius-xl;
+  border: 1px solid $os-border-strong;
+  border-radius: $os-radius-lg;
   padding: $size-5 $size-6;
 }
 
@@ -425,7 +426,7 @@
 
   &__glyph {
     font-size: 20px;
-    color: $primary-500;
+    color: $os-accent;
     margin-top: 2px;
     animation: glyphPulse 2.4s ease-in-out infinite;
   }
@@ -433,14 +434,14 @@
   &__title {
     font-size: $font-lg;
     font-weight: 700;
-    color: $gray-900;
+    color: $os-text-primary;
     margin: 0 0 2px;
-    font-family: $font-primary;
+    font-family: $os-font-body;
   }
 
   &__sub {
     font-size: $font-sm;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 }
 
@@ -461,31 +462,31 @@
   align-items: center;
   gap: $size-1;
   padding: $size-2 $size-4;
-  border-radius: $radius-md;
-  border: 1.5px solid $gray-200;
+  border-radius: $os-radius-md;
+  border: 1.5px solid $os-border-strong;
   background: transparent;
   font-size: $font-sm;
   font-weight: 600;
-  color: $gray-500;
+  color: $os-text-secondary;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: $font-primary;
+  font-family: $os-font-body;
 
   &--active {
-    background: $primary-500;
-    border-color: $primary-500;
+    background: $os-accent;
+    border-color: $os-accent;
     color: #fff;
   }
 
   &--recommended:not(&--active) {
-    border-color: $primary-500;
-    color: $primary-500;
+    border-color: $os-accent;
+    color: $os-accent;
   }
 
   &:not(&--active):hover {
-    background: $gray-50;
-    color: $gray-700;
-    border-color: $gray-300;
+    background: $os-surface-2;
+    color: $os-text-secondary;
+    border-color: $os-text-muted;
   }
 
   &__rec {
@@ -497,8 +498,8 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: $size-5;
-  background: $gray-50;
-  border-radius: $radius-lg;
+  background: $os-surface-2;
+  border-radius: $os-radius-lg;
   padding: $size-5;
 
   @media (max-width: 768px) { grid-template-columns: 1fr; }
@@ -515,13 +516,13 @@
   flex-direction: column;
   gap: 3px;
   padding-bottom: $size-3;
-  border-bottom: 1px solid $gray-200;
+  border-bottom: 1px solid $os-border-strong;
 
   &:last-child { border-bottom: none; }
 
   &__label {
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -530,8 +531,8 @@
   &__value {
     font-size: $font-xl;
     font-weight: 800;
-    color: $gray-900;
-    font-family: $font-primary;
+    color: $os-text-primary;
+    font-family: $os-font-body;
     letter-spacing: -0.02em;
 
     &--ok   { color: #15803d; }
@@ -540,7 +541,7 @@
 
   &__compare {
     font-size: $font-xs;
-    color: $gray-400;
+    color: $os-text-muted;
   }
 }
 
@@ -552,7 +553,7 @@
   &__label {
     font-size: $font-sm;
     font-weight: 700;
-    color: $gray-700;
+    color: $os-text-secondary;
     margin-bottom: $size-1;
   }
 }
@@ -563,15 +564,15 @@
   gap: $size-2;
   padding: $size-2 $size-3;
   background: #fff;
-  border-radius: $radius-md;
-  border: 1px solid $gray-200;
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border-strong;
 }
 
 .proj-action-num {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: $primary-500;
+  background: $os-accent;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -583,32 +584,32 @@
 
 .proj-action-text {
   font-size: $font-sm;
-  color: $gray-700;
+  color: $os-text-secondary;
   line-height: 1.4;
 }
 
 .proj-execute-btn {
   margin-top: $size-2;
   padding: $size-3 $size-4;
-  background: $primary-500;
+  background: $os-accent;
   color: #fff;
   border: none;
-  border-radius: $radius-md;
+  border-radius: $os-radius-md;
   font-size: $font-sm;
   font-weight: 700;
   cursor: pointer;
-  font-family: $font-primary;
+  font-family: $os-font-body;
   transition: background 0.15s;
   align-self: flex-start;
 
-  &:hover { background: darken(#ff6102, 8%); }
+  &:hover { background: $os-accent-dark; }
 }
 
 // ── Glosario de términos ─────────────────────────────────────────────────
 .fin-glosario {
   background: #fffbf7;
   border: 1px solid rgba(255, 97, 2, 0.15);
-  border-radius: $radius-lg;
+  border-radius: $os-radius-lg;
   padding: 0;
   margin-bottom: -$size-2;
 
@@ -618,20 +619,20 @@
     justify-content: space-between;
     padding: $size-3 $size-4;
     cursor: pointer;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $gray-700;
+    color: $os-text-secondary;
     list-style: none;
     transition: background 0.12s;
 
-    &:hover { background: rgba(255, 97, 2, 0.04); border-radius: $radius-lg; }
+    &:hover { background: rgba(255, 97, 2, 0.04); border-radius: $os-radius-lg; }
     &::-webkit-details-marker { display: none; }
   }
 
   &__icon {
     font-size: 14px;
-    color: $gray-400;
+    color: $os-text-muted;
     transition: transform 0.2s;
   }
 
@@ -659,15 +660,15 @@
     font-family: $font-mono;
     font-size: $font-xs;
     font-weight: $font-bold;
-    color: $primary-500;
+    color: $os-accent;
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
 
   &__def {
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-xs;
-    color: $gray-600;
+    color: $os-text-secondary;
     line-height: 1.45;
   }
 }
@@ -675,7 +676,7 @@
 // abbr tooltip native
 abbr[title] {
   cursor: help;
-  border-bottom: 1px dashed $primary-300;
+  border-bottom: 1px dashed $os-accent;
   text-decoration: none;
 }
 
@@ -683,8 +684,8 @@ abbr[title] {
 
 .eco-section {
   margin-top: $size-8;
-  border: 1px solid $gray-100;
-  border-radius: $radius-xl;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-lg;
   overflow: hidden;
   background: $white;
 
@@ -695,8 +696,8 @@ abbr[title] {
     flex-wrap: wrap;
     gap: $size-3;
     padding: $size-4 $size-6;
-    background: $gray-50;
-    border-bottom: 1px solid $gray-100;
+    background: $os-surface-2;
+    border-bottom: 1px solid $os-border;
   }
 
   &__title-group {
@@ -709,12 +710,12 @@ abbr[title] {
     margin: 0;
     font-size: $font-md;
     font-weight: $font-bold;
-    color: $gray-800;
+    color: $os-text-primary;
   }
 
   &__sub {
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 
   &__gali {
@@ -722,15 +723,15 @@ abbr[title] {
     align-items: center;
     gap: $size-2;
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 
   &__gali-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: $primary-500;
-    box-shadow: 0 0 0 2px rgba($primary-500, 0.2);
+    background: $os-accent;
+    box-shadow: 0 0 0 2px rgba($os-accent, 0.2);
   }
 }
 
@@ -746,8 +747,8 @@ abbr[title] {
     font-weight: $font-semibold;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: $gray-400;
-    border-bottom: 1px solid $gray-100;
+    color: $os-text-muted;
+    border-bottom: 1px solid $os-border;
     min-width: 900px;
   }
 
@@ -757,12 +758,12 @@ abbr[title] {
     gap: $size-2;
     align-items: center;
     padding: $size-3 $size-6;
-    border-bottom: 1px solid $gray-50;
+    border-bottom: 1px solid $os-surface-2;
     transition: background 0.12s;
     min-width: 900px;
 
     &:last-child { border-bottom: none; }
-    &:hover { background: $gray-50; }
+    &:hover { background: $os-surface-2; }
     &--riesgo { background: rgba(251, 191, 36, 0.04); }
     &--pausado { opacity: 0.6; }
   }
@@ -770,18 +771,18 @@ abbr[title] {
   &__product {
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $gray-800;
+    color: $os-text-primary;
   }
 
   &__num {
     font-family: 'IBM Plex Sans', monospace;
     font-size: $font-sm;
-    color: $gray-600;
+    color: $os-text-secondary;
     cursor: default;
 
     &--cost { color: #dc2626; }
     &--margin { color: #15803d; font-weight: $font-bold; }
-    &--ltv { color: $primary-600; font-weight: $font-semibold; }
+    &--ltv { color: $os-accent-text; font-weight: $font-semibold; }
     &--low { color: #dc2626 !important; }
     &--danger { color: #dc2626 !important; font-weight: $font-bold; }
   }
@@ -797,7 +798,7 @@ abbr[title] {
 
   &--escala { background: rgba(34, 197, 94, 0.1); color: #15803d; }
   &--riesgo { background: rgba(251, 191, 36, 0.12); color: #b45309; }
-  &--pausado { background: $gray-100; color: $gray-500; }
+  &--pausado { background: $os-border; color: $os-text-secondary; }
 }
 
 .eco-insight {
@@ -805,12 +806,12 @@ abbr[title] {
   align-items: flex-start;
   gap: $size-3;
   padding: $size-4 $size-6;
-  background: linear-gradient(135deg, rgba($primary-500, 0.04) 0%, $gray-50 100%);
-  border-top: 1px solid $gray-100;
+  background: linear-gradient(135deg, rgba($os-accent, 0.04) 0%, $os-surface-2 100%);
+  border-top: 1px solid $os-border;
   font-size: $font-sm;
 
   &__dot {
-    color: $primary-500;
+    color: $os-accent;
     font-size: 14px;
     flex-shrink: 0;
     margin-top: 2px;
@@ -818,15 +819,15 @@ abbr[title] {
 
   &__body {
     flex: 1;
-    color: $gray-600;
+    color: $os-text-secondary;
     line-height: 1.5;
 
-    strong { color: $gray-800; }
+    strong { color: $os-text-primary; }
   }
 
   &__cta {
     flex-shrink: 0;
-    color: $primary-500;
+    color: $os-accent;
     font-size: $font-sm;
     font-weight: $font-semibold;
     text-decoration: none;
@@ -839,7 +840,7 @@ abbr[title] {
 // ── Kronos dot variant ──────────────────────────────────────────────────────
 
 .fin-header__gali-dot--kronos {
-  background: #60a5fa !important;
+  background: $os-agent-financiero !important;
   animation: kronos-pulse 2s ease-in-out infinite !important;
 }
 
@@ -855,15 +856,15 @@ abbr[title] {
   align-items: center;
   padding: 2px 10px;
   border-radius: $radius-pill;
-  font-family: $font-primary;
+  font-family: $os-font-body;
   font-size: 11px;
   font-weight: $font-semibold;
   letter-spacing: 0.03em;
 
   &--monthly {
-    background: rgba(#60a5fa, 0.1);
+    background: rgba($os-agent-financiero, 0.1);
     color: #3b82f6;
-    border: 1px solid rgba(#60a5fa, 0.25);
+    border: 1px solid rgba($os-agent-financiero, 0.25);
   }
 
   &--weekly {
@@ -882,10 +883,10 @@ abbr[title] {
   margin-bottom: -$size-2;
 
   &__label {
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $gray-700;
+    color: $os-text-secondary;
   }
 }
 
@@ -896,10 +897,10 @@ abbr[title] {
   align-items: flex-start;
   gap: $size-3;
   padding: $size-3 $size-5;
-  border-left: 3px solid #60a5fa;
-  background: rgba(#60a5fa, 0.05);
-  border-radius: 0 $radius-lg $radius-lg 0;
-  border: 1px solid rgba(#60a5fa, 0.2);
+  border-left: 3px solid $os-agent-financiero;
+  background: rgba($os-agent-financiero, 0.05);
+  border-radius: 0 $os-radius-lg $os-radius-lg 0;
+  border: 1px solid rgba($os-agent-financiero, 0.2);
   border-left-width: 3px;
 
   &__identity {
@@ -914,28 +915,28 @@ abbr[title] {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #60a5fa;
+    background: $os-agent-financiero;
     flex-shrink: 0;
     animation: kronos-pulse 2s ease-in-out infinite;
   }
 
   &__name {
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-xs;
     font-weight: $font-semibold;
-    color: #60a5fa;
+    color: $os-agent-financiero;
     white-space: nowrap;
   }
 
   p {
     flex: 1;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-sm;
-    color: $gray-600;
+    color: $os-text-secondary;
     line-height: 1.6;
     margin: 0;
 
-    strong { color: $gray-900; font-weight: $font-semibold; }
+    strong { color: $os-text-primary; font-weight: $font-semibold; }
   }
 }
 
@@ -952,20 +953,20 @@ abbr[title] {
   align-items: center;
   gap: 4px;
   padding: 2px $size-2;
-  background: rgba(#60a5fa, 0.08);
-  border: 1px solid rgba(#60a5fa, 0.18);
+  background: rgba($os-agent-financiero, 0.08);
+  border: 1px solid rgba($os-agent-financiero, 0.18);
   border-radius: $radius-full;
   font-size: $font-xs;
-  color: $gray-600;
+  color: $os-text-secondary;
 
   .term-info {
-    color: $gray-500;
-    border-bottom: 1px dashed $gray-300;
+    color: $os-text-secondary;
+    border-bottom: 1px dashed $os-text-muted;
     cursor: help;
     font-size: 11px;
   }
 
-  strong { color: $gray-800; font-weight: $font-semibold; }
+  strong { color: $os-text-primary; font-weight: $font-semibold; }
 }
 
 // ── Weekly section title group ───────────────────────────────────────────────
@@ -992,24 +993,24 @@ abbr[title] {
   align-items: flex-start;
   gap: $size-3;
   padding: $size-3 $size-4;
-  background: rgba(#60a5fa, 0.04);
-  border: 1px solid rgba(#60a5fa, 0.15);
-  border-radius: $radius-lg;
+  background: rgba($os-agent-financiero, 0.04);
+  border: 1px solid rgba($os-agent-financiero, 0.15);
+  border-radius: $os-radius-lg;
 
   &__dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #60a5fa;
+    background: $os-agent-financiero;
     flex-shrink: 0;
     margin-top: 4px;
     animation: kronos-pulse 2s ease-in-out infinite;
   }
 
   &__text {
-    font-family: $font-primary;
+    font-family: $os-font-body;
     font-size: $font-xs;
-    color: $gray-500;
+    color: $os-text-secondary;
     line-height: 1.5;
 
     strong { color: #3b82f6; }
@@ -1019,12 +1020,12 @@ abbr[title] {
 // ── Eco section kronos variant ───────────────────────────────────────────────
 
 .eco-section__gali--kronos {
-  border-color: rgba(#60a5fa, 0.2) !important;
+  border-color: rgba($os-agent-financiero, 0.2) !important;
   background: #eff6ff !important;
 }
 
 .eco-section__gali-dot--kronos {
-  background: #60a5fa !important;
+  background: $os-agent-financiero !important;
   animation: kronos-pulse 2s ease-in-out infinite;
 }
 
@@ -1032,8 +1033,8 @@ abbr[title] {
 
 .channel-section {
   background: $white;
-  border: 1px solid $gray-100;
-  border-radius: $radius-xl;
+  border: 1px solid $os-border;
+  border-radius: $os-radius-lg;
   padding: $size-6;
   display: flex;
   flex-direction: column;
@@ -1056,13 +1057,13 @@ abbr[title] {
   &__title {
     font-size: $font-lg;
     font-weight: $font-semibold;
-    color: $gray-900;
+    color: $os-text-primary;
     margin: 0;
   }
 
   &__sub {
     font-size: $font-sm;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 
   &__kronos {
@@ -1070,7 +1071,7 @@ abbr[title] {
     align-items: center;
     gap: 6px;
     font-size: $font-sm;
-    color: $gray-600;
+    color: $os-text-secondary;
     padding: $size-1 $size-3;
     background: #eff6ff;
     border: 1px solid #bfdbfe;
@@ -1081,7 +1082,7 @@ abbr[title] {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #60a5fa;
+    background: $os-agent-financiero;
     animation: kronos-pulse 2s ease-in-out infinite;
   }
 }
@@ -1099,7 +1100,7 @@ abbr[title] {
 
 .channel-share-bar {
   height: 10px;
-  background: $gray-100;
+  background: $os-border;
   border-radius: $radius-full;
   overflow: hidden;
 
@@ -1112,7 +1113,7 @@ abbr[title] {
     &--tik { background: #010101; }
     &--sho { background: #96bf48; }
     &--wha { background: #25d366; }
-    &--dir { background: $gray-400; }
+    &--dir { background: $os-text-muted; }
   }
 }
 
@@ -1124,19 +1125,19 @@ abbr[title] {
 
 .channel-legend-item {
   font-size: $font-xs;
-  color: $gray-600;
+  color: $os-text-secondary;
 
   &--met { color: #1877f2; }
   &--tik { color: #000; }
   &--sho { color: #5a8a00; }
   &--wha { color: #128c7e; }
-  &--dir { color: $gray-500; }
+  &--dir { color: $os-text-secondary; }
 }
 
 .channel-table-wrap {
   overflow-x: auto;
-  border-radius: $radius-lg;
-  border: 1px solid $gray-100;
+  border-radius: $os-radius-lg;
+  border: 1px solid $os-border;
 }
 
 .channel-table {
@@ -1149,18 +1150,18 @@ abbr[title] {
     text-align: left;
     font-size: $font-xs;
     font-weight: $font-semibold;
-    color: $gray-500;
-    background: $gray-50;
-    border-bottom: 1px solid $gray-100;
+    color: $os-text-secondary;
+    background: $os-surface-2;
+    border-bottom: 1px solid $os-border;
     white-space: nowrap;
   }
 }
 
 .channel-row {
-  border-bottom: 1px solid $gray-100;
+  border-bottom: 1px solid $os-border;
 
   &:last-child { border-bottom: none; }
-  &:hover { background: $gray-50; }
+  &:hover { background: $os-surface-2; }
 
   &__name {
     display: flex;
@@ -1168,7 +1169,7 @@ abbr[title] {
     gap: $size-2;
     padding: $size-3;
     font-weight: $font-medium;
-    color: $gray-800;
+    color: $os-text-primary;
     white-space: nowrap;
   }
 
@@ -1177,7 +1178,7 @@ abbr[title] {
   &__num {
     padding: $size-3;
     text-align: right;
-    color: $gray-700;
+    color: $os-text-secondary;
     white-space: nowrap;
 
     &--profit { font-weight: $font-semibold; color: #16a34a; }
@@ -1186,7 +1187,7 @@ abbr[title] {
 
   &__organic {
     font-size: $font-xs;
-    color: $gray-400;
+    color: $os-text-muted;
     font-style: italic;
   }
 }
@@ -1210,8 +1211,8 @@ abbr[title] {
   padding: $size-4 $size-5;
   background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
   border: 1px solid #bfdbfe;
-  border-left: 4px solid #60a5fa;
-  border-radius: $radius-lg;
+  border-left: 4px solid $os-agent-financiero;
+  border-radius: $os-radius-lg;
   font-size: $font-sm;
 
   &__dot {
@@ -1222,7 +1223,7 @@ abbr[title] {
 
   &__body {
     flex: 1;
-    color: $gray-700;
+    color: $os-text-secondary;
     line-height: 1.5;
 
     strong { color: #1e40af; }
@@ -1246,7 +1247,7 @@ abbr[title] {
   display: block;
   font-size: 9px;
   font-weight: 600;
-  font-family: $font-primary;
+  font-family: $os-font-body;
   color: #2563eb;
   text-transform: uppercase;
   letter-spacing: 0.04em;

@@ -1,23 +1,27 @@
 <div class="reglas-page">
 
-  <dropi-gali-bar
-    agent="Gali"
-    status="gobernando 3 agentes"
-    [message]="reglas().length + ' reglas activas · Gali interpreta y aplica cada Si → Entonces automáticamente'"
-    ctaLabel="Ver señales"
-    secondaryCta="Ir a Agentes"
-  />
+  @if (!embedded()) {
+    <dropi-gali-bar
+      agent="Gali"
+      status="gobernando 3 agentes"
+      [message]="reglas().length + ' reglas activas · Gali interpreta y aplica cada Si → Entonces automáticamente'"
+      ctaLabel="Ver señales"
+      secondaryCta="Ir a Agentes"
+    />
+  }
 
   <header class="reglas-page__header">
-    <div>
-      <span class="reglas-page__eyebrow">Condicionales · Si → Entonces</span>
-      <h1 class="reglas-page__title">Reglas</h1>
-      <p class="reglas-page__sub">
-        Acciones simples y rápidas. No son <a routerLink="/gali-v5/skills">Skills</a> — esas llevan historial, triggers complejos y varios agentes.
-      </p>
-    </div>
+    @if (!embedded()) {
+      <div>
+        <span class="reglas-page__eyebrow">Condicionales · Si → Entonces</span>
+        <h1 class="reglas-page__title">Reglas</h1>
+        <p class="reglas-page__sub">
+          Acciones simples y rápidas. No son <a routerLink="/gali-6/skills">Skills</a> — esas llevan historial, triggers complejos y varios agentes.
+        </p>
+      </div>
+    }
     <div class="reglas-page__header-actions">
-      <a routerLink="/gali-v5/marketing/chatea-pro" class="reglas-page__link">Centro Chatea Pro →</a>
+      <a routerLink="/gali-6/marketing/chatea-pro" class="reglas-page__link">Centro Chatea Pro →</a>
       <button type="button" class="reglas-page__btn" (click)="showNewRule.set(!showNewRule())">
         {{ showNewRule() ? '✕ Cerrar' : '+ Nueva regla' }}
       </button>
@@ -151,7 +155,7 @@
         <h2 class="esc-panel__title">Escalamiento automático · Roax</h2>
         <span class="esc-panel__subtitle">Reglas estilo Revealbot para tus campañas de Meta Ads</span>
       </div>
-      <a routerLink="/gali-v5/skills/nueva" class="esc-panel__cta-new">+ Nueva regla</a>
+      <a routerLink="/gali-6/skills/nueva" class="esc-panel__cta-new">+ Nueva regla</a>
     </header>
 
     <p class="esc-panel__hint">
@@ -201,7 +205,7 @@
 
     <div class="esc-panel__footer">
       <span class="esc-panel__active-count">{{ activeEscalamientoCount }} de {{ escalamiento().length }} reglas activas</span>
-      <a routerLink="/gali-v5/skills" class="esc-panel__link">Ver skills avanzadas →</a>
+      <a routerLink="/gali-6/skills" class="esc-panel__link">Ver skills avanzadas →</a>
     </div>
   </section>
 
@@ -209,8 +213,8 @@
     <h3>¿Necesitas lógica más potente?</h3>
     <p>Convierte una regla en Skill para condiciones compuestas, métricas de impacto y ejecución multi-módulo.</p>
     <div class="reglas-upgrade__actions">
-      <a routerLink="/gali-v5/skills/nueva" class="reglas-upgrade__cta">Crear skill →</a>
-      <a routerLink="/gali-v5/marketplace" class="reglas-upgrade__secondary">Explorar marketplace</a>
+      <a routerLink="/gali-6/skills/nueva" class="reglas-upgrade__cta">Crear skill →</a>
+      <a routerLink="/gali-6/marketplace" class="reglas-upgrade__secondary">Explorar marketplace</a>
     </div>
   </section>
 </div>

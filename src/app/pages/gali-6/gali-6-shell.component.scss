@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 
 :host {
   --dropi-rail-width: 72px;
@@ -17,8 +18,8 @@
   display: block;
   height: 100vh;
   overflow: hidden;
-  font-family: $font-primary;
-  color: $gray-800;
+  font-family: $os-font-body;
+  color: $os-text-primary;
 }
 
 .g6shell--section-collapsed {
@@ -26,7 +27,7 @@
 }
 
 .g6shell--gali-acting .g6shell__content {
-  box-shadow: inset 0 0 0 2px rgba(244, 154, 61, 0.35);
+  box-shadow: inset 0 0 0 2px rgba($os-accent, 0.35);
   transition: box-shadow 200ms ease;
 }
 
@@ -34,7 +35,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: $white;
+  background: $os-surface;
 
   &__body {
     flex: 1;
@@ -63,7 +64,7 @@
     right: 0;
     bottom: 0;
     max-width: 92vw;
-    background: #fff;
+    background: $os-surface;
     box-shadow: -8px 0 28px rgba(0, 0, 0, 0.12);
     z-index: 40;
     animation: g6-panel-in 240ms cubic-bezier(0, 0, 0.2, 1);
@@ -75,17 +76,17 @@
   &__chat-dock {
     flex-shrink: 0;
     max-width: 92vw;
-    border-left: 1px solid $gray-100;
+    border-left: 1px solid $os-border;
     overflow: hidden;
     transition: width 220ms ease;
-    background: #fff;
+    background: $os-surface;
     display: flex;
     position: relative;
   }
 
   &__chat-dock--left {
     border-left: none;
-    border-right: 1px solid $gray-100;
+    border-right: 1px solid $os-border;
   }
 
   &__chat-dock--collapsed {
@@ -131,16 +132,16 @@
   padding: 0 $size-5;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid $gray-100;
+  border-bottom: 1px solid $os-border;
   flex-shrink: 0;
   z-index: 30;
 
   &__menu {
     display: none;
-    background: none; border: none; cursor: pointer; font-size: $font-lg; color: $gray-600;
+    background: none; border: none; cursor: pointer; font-size: $font-lg; color: $os-text-secondary;
     padding: 6px;
-    border-radius: $radius-sm;
-    &:hover { background: $gray-100; }
+    border-radius: $os-radius-sm;
+    &:hover { background: $os-border; }
   }
 
   /* Brand section — igual a V5v1: gallery button + logo imagen */
@@ -157,11 +158,11 @@
     gap: $size-2;
     flex-shrink: 0;
     padding: 6px $size-3;
-    border: 1px solid $gray-200;
-    border-radius: $radius-md;
-    background: $white;
-    color: $gray-600;
-    font-family: $font-primary;
+    border: 1px solid $os-border-strong;
+    border-radius: $os-radius-md;
+    background: $os-surface;
+    color: $os-text-secondary;
+    font-family: $os-font-body;
     font-size: $font-xs;
     font-weight: $font-medium;
     line-height: 1;
@@ -170,13 +171,13 @@
 
     .pi {
       font-size: 13px;
-      color: $primary-500;
+      color: $os-accent;
     }
 
     &:hover {
-      background: $gray-50;
-      border-color: $primary-500;
-      color: $gray-800;
+      background: $os-surface-2;
+      border-color: $os-accent;
+      color: $os-text-primary;
     }
   }
 
@@ -199,8 +200,8 @@
   &__version-tag {
     font-size: 10px;
     font-weight: $font-semibold;
-    color: $primary-500;
-    background: rgba($primary-500, 0.1);
+    color: $os-accent-text;
+    background: $os-accent-dim;
     border-radius: $radius-pill;
     padding: 2px 7px;
     line-height: 1.4;
@@ -210,14 +211,14 @@
 
   &__goal {
     display: flex; align-items: center; gap: $size-2; text-decoration: none;
-    color: $gray-600; margin-left: $size-2;
-    &-label { font-size: $font-xs; color: $gray-500; font-weight: $font-semibold;
+    color: $os-text-secondary; margin-left: $size-2;
+    &-label { font-size: $font-xs; color: $os-text-secondary; font-weight: $font-semibold;
                text-transform: uppercase; letter-spacing: 0.04em; }
     &-track { width: 110px; height: 6px; border-radius: $radius-full;
-               background: $gray-100; overflow: hidden; }
+               background: $os-border; overflow: hidden; }
     &-fill { display: block; height: 100%; border-radius: $radius-full;
-              background: $primary-500; transition: width 300ms ease; }
-    &-val { font-size: $font-xs; color: $gray-600; font-weight: $font-semibold; }
+              background: $os-accent; transition: width 300ms ease; }
+    &-val { font-size: $font-xs; color: $os-text-secondary; font-weight: $font-semibold; }
   }
 
   &__right { margin-left: auto; display: flex; align-items: center; gap: $size-3; }
@@ -225,46 +226,46 @@
   &__alerts-badge {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 4px 10px; border-radius: $radius-full;
-    background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
-    color: $primary-700; text-decoration: none;
+    background: $os-accent-dim; border: 1px solid rgba($os-accent, 0.2);
+    color: $os-accent-dark; text-decoration: none;
     font-size: $font-xs; font-weight: $font-semibold;
     transition: background 120ms ease;
-    &:hover { background: rgba($primary-500, 0.14); }
+    &:hover { background: rgba($os-accent, 0.14); }
   }
 
   &__alerts-count {
-    font-size: $font-xs; font-weight: $font-bold; color: $primary-600;
+    font-size: $font-xs; font-weight: $font-bold; color: $os-accent-text;
   }
 
   &__modo {
-    background: none; border: 1px solid $gray-200; border-radius: $radius-full; cursor: pointer;
-    padding: 5px $size-3; font-size: $font-xs; font-weight: $font-semibold; color: $gray-600;
+    background: none; border: 1px solid $os-border-strong; border-radius: $radius-full; cursor: pointer;
+    padding: 5px $size-3; font-size: $font-xs; font-weight: $font-semibold; color: $os-text-secondary;
     transition: all 120ms ease;
-    &[data-modo='experto'] { border-color: $primary-300; color: $primary-600;
-                              background: rgba($primary-500, 0.06); }
-    &:hover { border-color: $primary-300; }
+    &[data-modo='experto'] { border-color: $os-accent; color: $os-accent-text;
+                              background: $os-accent-dim; }
+    &:hover { border-color: $os-accent; }
   }
 
   &__wallet {
     display: flex; align-items: center; gap: $size-2; background: none; border: none;
-    cursor: pointer; color: $gray-700; font-size: $font-sm; font-weight: $font-semibold;
-    &-ico { color: $primary-500; }
+    cursor: pointer; color: $os-text-secondary; font-size: $font-sm; font-weight: $font-semibold;
+    &-ico { color: $os-accent; }
   }
 
   &__gali {
     display: flex; align-items: center; gap: 6px;
-    background: $primary-500; color: #fff; border: none; cursor: pointer;
+    background: $os-accent; color: #fff; border: none; cursor: pointer;
     padding: $size-2 $size-4; border-radius: $radius-full;
     font-size: $font-sm; font-weight: $font-semibold;
     transition: background 120ms ease;
-    &:hover { background: $primary-600; }
-    &.is-on { background: $gray-900; }
+    &:hover { background: $os-accent-dark; }
+    &.is-on { background: $os-text-primary; }
   }
 
   &__avatar {
-    width: 32px; height: 32px; border-radius: 50%; background: $gray-800; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; background: $os-text-primary; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: $font-bold; font-family: 'Montserrat', $font-primary;
+    font-size: 11px; font-weight: $font-bold; font-family: 'Montserrat', $os-font-body;
     flex-shrink: 0;
   }
 }
@@ -352,7 +353,7 @@
 .zero {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
   width: min(480px, calc(100vw - 32px));
-  background: #fff; border-radius: $radius-xl;
+  background: $os-surface; border-radius: $os-radius-lg;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
   z-index: 201;
   animation: zero-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -363,73 +364,73 @@
   }
 
   &__step {
-    font-family: $font-secondary; font-size: 11px; text-transform: uppercase;
-    letter-spacing: 0.08em; color: $gray-500; font-weight: $font-semibold;
+    font-family: $os-font-body; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: $os-text-secondary; font-weight: $font-semibold;
   }
 
   &__gali {
-    font-size: 28px; color: $primary-500;
+    font-size: 28px; color: $os-accent;
     animation: gali-breathe 2.8s ease-in-out infinite;
     &--lg { font-size: 40px; }
   }
 
   &__title {
     margin: 0; font-size: $font-xl; font-weight: $font-bold;
-    color: $gray-900; letter-spacing: -0.02em; line-height: 1.25;
+    color: $os-text-primary; letter-spacing: -0.02em; line-height: 1.25;
   }
 
   &__sub {
-    margin: 0; font-size: $font-sm; color: $gray-500; max-width: 38ch; line-height: 1.55;
+    margin: 0; font-size: $font-sm; color: $os-text-secondary; max-width: 38ch; line-height: 1.55;
   }
 
   &__slider { width: 100%; display: flex; flex-direction: column; gap: $size-3; }
 
   &__range {
-    width: 100%; accent-color: $primary-500; cursor: pointer;
+    width: 100%; accent-color: $os-accent; cursor: pointer;
   }
 
   &__slider-val {
     display: flex; align-items: baseline; justify-content: center; gap: $size-2;
   }
 
-  &__big { font-size: 48px; font-weight: $font-bold; color: $gray-900; line-height: 1; }
-  &__unit { font-size: $font-sm; color: $gray-500; }
+  &__big { font-size: 48px; font-weight: $font-bold; color: $os-text-primary; line-height: 1; }
+  &__unit { font-size: $font-sm; color: $os-text-secondary; }
 
   &__options {
     display: grid; grid-template-columns: 1fr 1fr; gap: $size-2; width: 100%;
   }
 
   &__opt {
-    padding: $size-3 $size-4; border: 1px solid $gray-200; border-radius: $radius-md;
-    background: #fff; cursor: pointer; font-size: $font-sm; font-weight: $font-medium;
-    color: $gray-700; transition: all 120ms ease;
-    &:hover { border-color: $primary-300; color: $primary-600; background: rgba($primary-500, 0.04); }
-    &--sel { border-color: $primary-500; background: rgba($primary-500, 0.08); color: $primary-600; }
+    padding: $size-3 $size-4; border: 1px solid $os-border-strong; border-radius: $os-radius-md;
+    background: $os-surface; cursor: pointer; font-size: $font-sm; font-weight: $font-medium;
+    color: $os-text-secondary; transition: all 120ms ease;
+    &:hover { border-color: $os-accent; color: $os-accent-text; background: rgba($os-accent, 0.04); }
+    &--sel { border-color: $os-accent; background: $os-accent-dim; color: $os-accent-text; }
   }
 
   &__cta {
-    width: 100%; padding: $size-3 $size-5; background: $primary-500; color: #fff;
-    border: none; border-radius: $radius-md; cursor: pointer; font-size: $font-md;
+    width: 100%; padding: $size-3 $size-5; background: $os-accent; color: #fff;
+    border: none; border-radius: $os-radius-md; cursor: pointer; font-size: $font-md;
     font-weight: $font-semibold; transition: background 120ms ease; margin-top: $size-2;
-    &:hover:not(:disabled) { background: $primary-600; }
+    &:hover:not(:disabled) { background: $os-accent-dark; }
     &:disabled { opacity: 0.45; cursor: default; }
     &--confirm { font-size: $font-lg; padding: $size-4 $size-6; }
   }
 
   &__respuesta {
-    font-size: $font-md; color: $gray-700; line-height: 1.6;
-    background: rgba($primary-500, 0.06); border: 1px solid rgba($primary-500, 0.2);
-    border-radius: $radius-md; padding: $size-4 $size-5; margin: 0; text-align: left;
+    font-size: $font-md; color: $os-text-secondary; line-height: 1.6;
+    background: $os-accent-dim; border: 1px solid rgba($os-accent, 0.2);
+    border-radius: $os-radius-md; padding: $size-4 $size-5; margin: 0; text-align: left;
   }
 
   &__hint {
-    font-size: $font-sm; color: $gray-500; line-height: 1.55; margin: 0;
-    strong { color: $gray-800; }
+    font-size: $font-sm; color: $os-text-secondary; line-height: 1.55; margin: 0;
+    strong { color: $os-text-primary; }
   }
 
   &__value-prop {
-    font-size: $font-sm; color: $gray-500; line-height: 1.6; margin: 0;
-    border-top: 1px solid $gray-100; padding-top: $size-3; width: 100%; text-align: center;
+    font-size: $font-sm; color: $os-text-secondary; line-height: 1.6; margin: 0;
+    border-top: 1px solid $os-border; padding-top: $size-3; width: 100%; text-align: center;
   }
 
   &--confirm .zero__body { gap: $size-5; }
@@ -451,15 +452,15 @@
 .experto-slide {
   position: fixed; right: $size-6; top: 72px;
   width: min(360px, calc(100vw - 32px));
-  background: $gray-900; color: #fff;
-  border-radius: $radius-xl; padding: $size-6;
+  background: $os-text-primary; color: #fff;
+  border-radius: $os-radius-lg; padding: $size-6;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
   z-index: 211;
   display: flex; flex-direction: column; gap: $size-4;
   animation: experto-slide-in 280ms cubic-bezier(0.22, 1, 0.36, 1);
 
   &__icon {
-    font-size: 24px; color: $primary-400;
+    font-size: 24px; color: $os-accent-text;
     animation: gali-breathe 2.8s ease-in-out infinite;
     line-height: 1;
   }
@@ -481,11 +482,11 @@
   }
 
   &__cta {
-    align-self: flex-end; background: $primary-500; color: #fff;
+    align-self: flex-end; background: $os-accent; color: #fff;
     border: none; cursor: pointer; padding: $size-2 $size-5;
-    border-radius: $radius-md; font-size: $font-sm; font-weight: $font-semibold;
+    border-radius: $os-radius-md; font-size: $font-sm; font-weight: $font-semibold;
     transition: background 120ms ease;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 }
 
@@ -503,26 +504,26 @@
 .g6-cat-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 400px; max-width: 92vw;
-  background: #fff; z-index: 61;
+  background: $os-surface; z-index: 61;
   display: flex; flex-direction: column;
   box-shadow: -6px 0 32px rgba(0,0,0,0.14);
   transform: translateX(0);
 
   &__head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: $size-4 $size-5; border-bottom: 1px solid $gray-100;
+    padding: $size-4 $size-5; border-bottom: 1px solid $os-border;
     flex-shrink: 0;
   }
 
   &__eyebrow {
-    font-size: $font-sm; font-weight: $font-bold; color: $primary-600;
+    font-size: $font-sm; font-weight: $font-bold; color: $os-accent-text;
     display: flex; align-items: center; gap: $size-1;
   }
 
   &__close {
     background: none; border: none; cursor: pointer; font-size: 20px;
-    color: $gray-400; line-height: 1; padding: 2px 6px;
-    &:hover { color: $gray-700; }
+    color: $os-text-muted; line-height: 1; padding: 2px 6px;
+    &:hover { color: $os-text-secondary; }
   }
 
   &__body {
@@ -531,63 +532,63 @@
   }
 
   &__context {
-    font-size: $font-xs; color: $gray-500; margin: 0;
+    font-size: $font-xs; color: $os-text-secondary; margin: 0;
   }
 
   &__title {
-    font-size: $font-base; font-weight: $font-bold; color: $gray-900;
+    font-size: $font-base; font-weight: $font-bold; color: $os-text-primary;
     line-height: 1.4; margin: 0;
   }
 
   &__cta {
-    background: $primary-500; color: #fff; border: none;
-    border-radius: $radius-md; padding: $size-3 $size-4;
+    background: $os-accent; color: #fff; border: none;
+    border-radius: $os-radius-md; padding: $size-3 $size-4;
     font-size: $font-sm; font-weight: $font-semibold;
     cursor: pointer; width: 100%;
     transition: background 150ms ease;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 
   &__sec {
-    background: none; border: 1px solid $gray-200; border-radius: $radius-md;
-    padding: $size-2 $size-4; font-size: $font-xs; color: $gray-600;
+    background: none; border: 1px solid $os-border-strong; border-radius: $os-radius-md;
+    padding: $size-2 $size-4; font-size: $font-xs; color: $os-text-secondary;
     cursor: pointer; width: 100%;
-    &:hover { background: $gray-50; }
+    &:hover { background: $os-surface-2; }
   }
 }
 
 .g6-cat-card {
-  background: rgba($primary-500, 0.04);
-  border: 1px solid rgba($primary-500, 0.18);
-  border-radius: $radius-md; padding: $size-4;
+  background: rgba($os-accent, 0.04);
+  border: 1px solid rgba($os-accent, 0.18);
+  border-radius: $os-radius-md; padding: $size-4;
   display: flex; flex-direction: column; gap: $size-3;
 
   &__badge {
     font-size: 10px; font-weight: $font-semibold; text-transform: uppercase;
-    letter-spacing: 0.06em; color: $primary-600;
-    background: rgba($primary-500, 0.1); padding: 2px 10px;
+    letter-spacing: 0.06em; color: $os-accent-text;
+    background: $os-accent-dim; padding: 2px 10px;
     border-radius: $radius-full; width: fit-content;
   }
 
-  &__product { font-size: $font-base; font-weight: $font-bold; color: $gray-900; }
+  &__product { font-size: $font-base; font-weight: $font-bold; color: $os-text-primary; }
 
   &__why {
-    font-size: $font-xs; color: $gray-600; line-height: 1.55; margin: 0;
+    font-size: $font-xs; color: $os-text-secondary; line-height: 1.55; margin: 0;
   }
 
   &__stats {
     display: flex; gap: $size-3;
-    border-top: 1px solid rgba($primary-500, 0.1);
+    border-top: 1px solid rgba($os-accent, 0.1);
     padding-top: $size-3;
   }
 
   &__stat { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-  &__val { font-size: $font-sm; font-weight: $font-bold; color: $gray-900; }
-  &__lbl { font-size: 10px; color: $gray-500; }
+  &__val { font-size: $font-sm; font-weight: $font-bold; color: $os-text-primary; }
+  &__lbl { font-size: 10px; color: $os-text-secondary; }
 
   &__objetivo {
-    font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
-    background: rgba($primary-500, 0.06); border-radius: $radius-sm;
+    font-size: $font-xs; font-weight: $font-semibold; color: $os-accent-text;
+    background: $os-accent-dim; border-radius: $os-radius-sm;
     padding: $size-2 $size-3; margin: 0;
   }
 }
@@ -603,8 +604,8 @@
   align-items: center;
   gap: $size-3;
   background: linear-gradient(135deg, #1c1c1e, #2d2012);
-  border: 1px solid rgba($primary-500, 0.3);
-  border-radius: $radius-lg;
+  border: 1px solid rgba($os-accent, 0.3);
+  border-radius: $os-radius-lg;
   padding: $size-3 $size-4;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
   animation: cat-panel-in 0.22s ease-out;
@@ -612,7 +613,7 @@
 
   &__icon {
     font-size: 18px;
-    color: $primary-400;
+    color: $os-accent-text;
     flex-shrink: 0;
     animation: g6FabPulse 3s ease-in-out infinite;
   }
@@ -627,18 +628,18 @@
   }
 
   &__cta {
-    background: $primary-500;
+    background: $os-accent;
     color: #fff;
     border: none;
-    border-radius: $radius-sm;
+    border-radius: $os-radius-sm;
     padding: $size-2 $size-4;
     font-size: $font-xs;
     font-weight: $font-semibold;
-    font-family: $font-primary;
+    font-family: $os-font-body;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s ease;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 
   &__dismiss {
@@ -710,7 +711,7 @@
   }
 
   &__stat--primary .g6-cat-card__val {
-    color: $primary-600; font-weight: $font-bold;
+    color: $os-accent-text; font-weight: $font-bold;
   }
 }
 
@@ -736,15 +737,15 @@
   text-align: left;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid $gray-200;
-  background: $gray-50;
+  border: 1px solid $os-border-strong;
+  background: $os-surface-2;
   cursor: pointer;
   transition: background 0.12s ease, border-color 0.12s ease;
-  border-left: 3px solid $gray-300;
+  border-left: 3px solid $os-border-strong;
 
   &:hover {
-    background: $gray-100;
-    border-color: $gray-300;
+    background: $os-surface-3;
+    border-color: $os-border-strong;
   }
 
   // Colores por tipo — consistentes con main panel
@@ -758,7 +759,7 @@
     width: 7px; height: 7px;
     border-radius: 50%;
     flex-shrink: 0;
-    background: $gray-400;
+    background: $os-text-muted;
 
     &--critical { background: #f87171; box-shadow: 0 0 5px rgba(248, 113, 113, 0.5); }
     &--warning  { background: #fbbf24; }
@@ -776,7 +777,7 @@
   &__titulo {
     font-size: 12px;
     font-weight: 500;
-    color: $gray-800;
+    color: $os-text-primary;
     line-height: 1.4;
     white-space: nowrap;
     overflow: hidden;
@@ -785,7 +786,7 @@
 
   &__meta {
     font-size: 11px;
-    color: $gray-500;
+    color: $os-text-secondary;
   }
 
   &__badge {
@@ -795,8 +796,8 @@
     border-radius: 100px;
     white-space: nowrap;
     flex-shrink: 0;
-    background: $gray-100;
-    color: $gray-500;
+    background: $os-border;
+    color: $os-text-secondary;
 
     &--urgent {
       background: rgba(239, 68, 68, 0.1);

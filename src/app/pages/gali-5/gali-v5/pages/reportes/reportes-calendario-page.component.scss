@@ -17,6 +17,7 @@
     display: flex;
     align-items: flex-end;
     gap: $size-3;
+    flex-wrap: wrap;
   }
 
   &__select {
@@ -48,6 +49,15 @@
   border-radius: 12px;
   overflow: hidden;
   background: $white;
+
+  @media (max-width: 640px) {
+    overflow-x: auto;
+
+    &__weekdays,
+    &__cells {
+      min-width: 560px;
+    }
+  }
 
   &__head {
     display: flex;

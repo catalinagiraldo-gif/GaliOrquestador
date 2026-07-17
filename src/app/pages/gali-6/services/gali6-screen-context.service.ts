@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type Gali6ScreenEntityKind = 'proyecto' | 'campana' | 'senal' | 'alerta' | 'objetivo';
+export type Gali6ScreenEntityKind = 'proyecto' | 'campana' | 'senal' | 'alerta' | 'objetivo' | 'direccion' | 'garantia';
 
 export interface Gali6ScreenEntity {
   kind: Gali6ScreenEntityKind;

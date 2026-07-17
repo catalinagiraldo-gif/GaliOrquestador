@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   DropiScreenConfig,
   DropiScreenLayout,
@@ -9,6 +9,9 @@ import {
   DropiTableRow,
   getScreenConfig,
 } from './dropi-screens.registry';
+import { Gali6ScreenContextService } from '../../../gali-6/services/gali6-screen-context.service';
+import { Gali6ChatService } from '../../../gali-6/gali-chat/gali6-chat.service';
+import { AGENTES_ESPECIALIZADOS } from '../../../../../../mocks/gali-v6/agentes-especializados';
 
 @Component({
   selector: 'app-dropi-screen-page',
@@ -20,6 +23,9 @@ import {
 export class DropiScreenPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly screenCtx = inject(Gali6ScreenContextService);
+  private readonly chat = inject(Gali6ChatService);
 
   academyCourses = signal<AcademyCourse[]>([]);
   activeSecurityTab = signal(0);
@@ -40,7 +46,84 @@ export class DropiScreenPageComponent implements OnInit {
       } else {
         this.academyCourses.set([]);
       }
+      this.publishScreenAwareness(screenId, cfg);
     });
+  }
+
+  /**
+   * Screen-awareness: 3 pantallas con comportamiento específico narrado en
+   * 18.FlujoUsuarioGali6.md (Flujo A, Flujo B y Flujo D) + 4 pantallas más de
+   * Financiero con solo banner de contexto (misma familia "Analítica" que
+   * Facturas pendientes, sin mensaje proactivo). El resto de las ~13
+   * pantallas genéricas de este componente quedan sin publicar contexto, tal
+   * como documenta el backlog en Gali6.md §Modelo de intervención de Gali
+   * por sección (decisión de PlanChat.md §B4: evitar alcance descontrolado
+   * extendiendo esto a las 25 pantallas a la vez).
+   */
+  private publishScreenAwareness(screenId: string, cfg: DropiScreenConfig | null): void {
+    if (screenId === 'garantias-recolecciones' && cfg) {
+      // Flujo A (§1.2): sección operativa — Gali interviene sin que se le pregunte.
+      const stockGuardian = AGENTES_ESPECIALIZADOS.find(a => a.id === 'stock-guardian');
+      this.screenCtx.publish({
+        route: this.router.url,
+        viewId: 'garantias-recolecciones',
+        viewLabel: cfg.title,
+        summary: '3 en riesgo de stock-out',
+      });
+      if (stockGuardian?.ejemploSenal) {
+        this.chat.pushProactiveAlert(
+          'stock-guardian::collar-gps',
+          `${stockGuardian.ejemploSenal} — hay 14 recolecciones pendientes de ese producto.`,
+          {
+            kind: 'acciones',
+            acciones: [
+              { label: 'Pausar recolección de Collar GPS mientras repones stock', actionId: 'pausar-recoleccion::collar-gps', isPrimary: true },
+              { label: 'Ahora no', actionId: 'cancelar' },
+            ],
+          },
+        );
+      }
+      return;
+    }
+
+    if (screenId === 'facturas-pendientes' && cfg) {
+      // Flujo B (§1.3): sección analítica — Gali no interrumpe, solo responde si se le pregunta (ver regla en gali6-chat.service.ts).
+      this.screenCtx.publish({
+        route: this.router.url,
+        viewId: 'facturas-pendientes',
+        viewLabel: cfg.title,
+        summary: `${this.rows().length} facturas`,
+      });
+      return;
+    }
+
+    // Resto de Financiero — misma familia "Analítica" que Facturas pendientes (Gali6.md
+    // §Modelo de intervención: pasiva por defecto). Solo banner de contexto, sin mensaje
+    // proactivo ni regla reactiva nueva — extensión chica pedida además de los Flujos A-D.
+    const FINANCIERO_ANALITICO: Record<string, (rowsCount: number) => string | undefined> = {
+      'datos-bancarios': n => `${n} cuentas bancarias`,
+      'retiros-de-saldo': n => `${n} retiros`,
+      'notas-credito': n => `${n} notas crédito`,
+      'datos-facturacion': () => undefined, // pantalla de formulario, sin filas que contar
+    };
+    if (screenId in FINANCIERO_ANALITICO && cfg) {
+      this.screenCtx.publish({
+        route: this.router.url,
+        viewId: screenId,
+        viewLabel: cfg.title,
+        summary: FINANCIERO_ANALITICO[screenId](this.rows().length),
+      });
+      return;
+    }
+
+    if (screenId === 'integraciones-config' && cfg) {
+      // Flujo D (§1.5): pantalla stub — Gali admite el límite en vez de fingir capacidad (ver regla "recuperación explicada" en gali6-chat.service.ts).
+      this.screenCtx.publish({
+        route: this.router.url,
+        viewId: 'integraciones-config',
+        viewLabel: cfg.title,
+      });
+    }
   }
 
   setSecurityTab(i: number): void { this.activeSecurityTab.set(i); }
@@ -91,7 +174,7 @@ export class DropiScreenPageComponent implements OnInit {
   }
 
   shouldBadge(key: string, cfg: DropiScreenConfig): boolean {
-    return ['estado', 'tipo', 'prioridad', 'estatusOrden', 'estatusGuia'].includes(key)
+    return ['estado', 'tipo', 'prioridad', 'estatusOrden', 'estatusGuia', 'riesgo'].includes(key)
       || (cfg.layout === 'list-orders' && key === 'estado');
   }
 
@@ -99,7 +182,7 @@ export class DropiScreenPageComponent implements OnInit {
     const v = String(value ?? '').toLowerCase();
     if (/entreg|aprob|activ|conect|listo|generada|success|entrada|alta/.test(v)) return 'dropi-page__tag dropi-page__tag--success';
     if (/pend|revis|program|proces|media|warning|noved/.test(v)) return 'dropi-page__tag dropi-page__tag--warning';
-    if (/cancel|rechaz|error|baja|vencid|salida/.test(v)) return 'dropi-page__tag dropi-page__tag--error';
+    if (/cancel|rechaz|error|baja|vencid|salida|riesgo/.test(v)) return 'dropi-page__tag dropi-page__tag--error';
     if (/transit|info|escal/.test(v)) return 'dropi-page__tag dropi-page__tag--info';
     return 'dropi-page__tag dropi-page__tag--neutral';
   }
@@ -202,6 +285,14 @@ export class DropiScreenPageComponent implements OnInit {
         { label: 'Idioma', value: 'Español', type: 'select' },
         { label: 'Notificaciones email', value: 'Activadas', type: 'select' },
         { label: 'Zona horaria', value: 'America/Bogota', type: 'select' },
+      ],
+      'datos-facturacion': [
+        { label: 'Razón social', value: 'Dropi Tienda SAS', type: 'text' },
+        { label: 'NIT', value: '901.234.567-8', type: 'text' },
+        { label: 'Régimen tributario', value: 'Régimen común', type: 'select' },
+        { label: 'Responsabilidad IVA', value: 'Responsable de IVA', type: 'select' },
+        { label: 'Correo de facturación electrónica', value: 'facturacion@dropitienda.co', type: 'text' },
+        { label: 'Dirección fiscal', value: 'Cra 45 # 12-30, Bogotá', type: 'text' },
       ],
     };
     return map[id] ?? [

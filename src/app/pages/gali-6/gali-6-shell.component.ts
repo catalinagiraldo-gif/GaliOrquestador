@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, computed, inject, isDevMode, signal } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -221,12 +221,40 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
     this.syncNav(this.router.url);
     this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(e => this.syncNav(e.urlAfterRedirects));
+      .subscribe(e => {
+        this.warnIfOrphanRedirect(e.url, e.urlAfterRedirects);
+        this.syncNav(e.urlAfterRedirects);
+      });
     // Si ya tiene pedidos en Dropi, saltar P1 directamente al paso 1
     if (this.zeroOpen() && this.hasOrders) {
       this.zeroPedidos.set(this.hasOrders ? this.objetivoActual + 30 : 100);
       this.zeroStep.set(1);
     }
+  }
+
+  /**
+   * Defensa en profundidad del wildcard `{ path: '**', redirectTo: '' }` de
+   * gali-6.routes.ts (PlanChat.md §B2). Un `canActivate` puesto directamente
+   * en esa entrada nunca corre — Angular resuelve `redirectTo` en la fase de
+   * "recognize", antes de evaluar guards, así que el guard solo vería el
+   * destino ya redirigido. Comparar `NavigationEnd.url` (lo pedido) contra
+   * `urlAfterRedirects` (a dónde aterrizó) es el punto real donde se puede
+   * detectar un aterrizaje silencioso en Home — el bug "Loy"/"Hoy" que
+   * reportó Catalina. Solo loggea en dev; no bloquea la navegación.
+   */
+  private warnIfOrphanRedirect(requestedUrl: string, finalUrl: string): void {
+    const HOME_EXACT = new Set(['/gali-6', '/gali-6/']);
+    const requestedPath = requestedUrl.split('?')[0];
+    const finalPath = finalUrl.split('?')[0];
+    if (requestedUrl === finalUrl) return;
+    if (!HOME_EXACT.has(finalPath)) return;
+    if (HOME_EXACT.has(requestedPath)) return;
+    if (!isDevMode()) return;
+    console.warn(
+      `[gali-6] Ruta huérfana: "${requestedUrl}" no está registrada en gali-6.routes.ts y cayó ` +
+      `al wildcard, aterrizando en Home ("${finalUrl}") en vez de mostrar un error. ` +
+      `Si es una pantalla real, regístrala en gali-6.routes.ts (ver PlanChat.md §B1).`,
+    );
   }
 
   private syncNav(url: string): void {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
@@ -14,6 +14,9 @@ import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip
   styleUrl: './skills-page.component.scss',
 })
 export class SkillsPageComponent {
+  /** true cuando se embebe dentro de otro shell (ej. Centro de Gali) — oculta el título propio */
+  readonly embedded = input(false);
+
   readonly ws = inject(GaliWorkspaceService);
   readonly router = inject(Router);
 

@@ -705,7 +705,7 @@
 
   &__kebab-btn {
     display: flex; align-items: center; justify-content: center;
-    width: 24px; height: 24px; flex-shrink: 0;
+    width: 32px; height: 32px; flex-shrink: 0;
     background: none; border: 1px solid transparent; border-radius: $radius-sm;
     color: $gray-400; font-size: 15px; line-height: 1; cursor: pointer;
     transition: background 100ms ease, color 100ms ease, border-color 100ms ease;
@@ -759,7 +759,7 @@
   &__item--recien {
     border-left: 3px solid $primary-400;
     background: linear-gradient(90deg, rgba($primary-50, 0.6) 0%, transparent 40%);
-    animation: recien-pulse 2.4s ease-in-out infinite;
+    animation: recien-pulse 2.4s ease-in-out 4;
   }
 
 @keyframes recien-pulse {
@@ -789,7 +789,7 @@
 .modal {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
   width: 480px; max-width: 94vw; max-height: 90vh; overflow-y: auto;
-  background: #fff; border-radius: $radius-lg;
+  background: $os-surface; border-radius: $os-radius-lg;
   padding: $size-6; z-index: 51; box-shadow: 0 12px 40px rgba(0,0,0,0.2);
 
   &--objetivo { width: 540px; }
@@ -799,54 +799,54 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: $size-5; gap: $size-3;
   }
-  &__title { margin: 0; font-size: $font-lg; font-weight: $font-bold; color: $gray-900; }
+  &__title { margin: 0; font-size: $font-lg; font-weight: $font-bold; color: $os-text-primary; }
   &__close-btn {
     display: flex; align-items: center; justify-content: center;
-    width: 28px; height: 28px; border: none; border-radius: $radius-sm;
-    background: transparent; color: $gray-400; font-size: $font-lg; cursor: pointer;
+    width: 28px; height: 28px; border: none; border-radius: $os-radius-sm;
+    background: transparent; color: $os-text-muted; font-size: $font-lg; cursor: pointer;
     flex-shrink: 0; line-height: 1;
-    &:hover { background: $gray-100; color: $gray-700; }
-    &:focus-visible { outline: 2px solid $primary-500; outline-offset: 2px; }
+    &:hover { background: $os-border; color: $os-text-secondary; }
+    &:focus-visible { outline: 2px solid $os-accent; outline-offset: 2px; }
   }
-  &__label { display: block; font-size: $font-xs; font-weight: $font-semibold; color: $gray-600; margin-bottom: 6px; margin-top: $size-4; }
+  &__label { display: block; font-size: $font-xs; font-weight: $font-semibold; color: $os-text-secondary; margin-bottom: 6px; margin-top: $size-4; }
   &__input {
-    width: 100%; box-sizing: border-box; border: 1px solid $gray-200; border-radius: $radius-md;
-    padding: $size-2 $size-3; font-size: $font-sm; font-family: $font-primary;
-    &:focus { outline: none; border-color: $primary-500; }
+    width: 100%; box-sizing: border-box; border: 1px solid $os-border-strong; border-radius: $os-radius-md;
+    padding: $size-2 $size-3; font-size: $font-sm; font-family: $os-font-body;
+    &:focus { outline: none; border-color: $os-accent; }
   }
   &__textarea { resize: vertical; min-height: 64px; }
   &__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: $size-4; }
   &__field { display: flex; flex-direction: column; }
-  &__hint { font-size: $font-xs; color: $gray-500; margin: $size-3 0 $size-5; line-height: 1.5; }
-  &__hint-sm { font-size: 11px; color: $gray-500; margin: 4px 0 $size-3; line-height: 1.5; }
+  &__hint { font-size: $font-xs; color: $os-text-secondary; margin: $size-3 0 $size-5; line-height: 1.5; }
+  &__hint-sm { font-size: 11px; color: $os-text-secondary; margin: 4px 0 $size-3; line-height: 1.5; }
   &__add-btn {
     background: none; border: none; cursor: pointer; font-size: $font-xs;
-    color: $primary-600; font-weight: $font-semibold; padding: 0;
+    color: $os-accent-text; font-weight: $font-semibold; padding: 0;
     &:hover { text-decoration: underline; }
   }
   &__submetas { margin-top: $size-4; }
   &__submetas-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: $size-3; }
   &__submeta-row { display: flex; align-items: center; gap: $size-2; margin-bottom: $size-2; }
   &__submeta-check {
-    cursor: pointer; font-size: 13px; color: $gray-300; flex-shrink: 0;
+    cursor: pointer; font-size: 13px; color: $os-text-muted; flex-shrink: 0;
     &.is-done { color: #16a34a; }
     input { display: none; }
   }
   &__submeta-input {
-    flex: 1; border: 1px solid $gray-200; border-radius: $radius-sm;
-    padding: 4px $size-2; font-size: $font-xs; font-family: $font-primary;
-    &:focus { outline: none; border-color: $primary-500; }
+    flex: 1; border: 1px solid $os-border-strong; border-radius: $os-radius-sm;
+    padding: 4px $size-2; font-size: $font-xs; font-family: $os-font-body;
+    &:focus { outline: none; border-color: $os-accent; }
   }
   &__submeta-del {
-    background: none; border: none; cursor: pointer; font-size: 16px; color: $gray-300; padding: 0 4px;
+    background: none; border: none; cursor: pointer; font-size: 16px; color: $os-text-muted; padding: 0 4px;
     &:hover { color: #dc2626; }
   }
   &__actions { display: flex; justify-content: flex-end; gap: $size-2; margin-top: $size-5; }
-  &__cancel { background: none; border: 1px solid $gray-200; border-radius: $radius-md; cursor: pointer; padding: $size-2 $size-4; font-size: $font-sm; color: $gray-600; }
+  &__cancel { background: none; border: 1px solid $os-border-strong; border-radius: $os-radius-md; cursor: pointer; padding: $size-2 $size-4; font-size: $font-sm; color: $os-text-secondary; }
   &__save {
-    background: $primary-500; color: #fff; border: none; cursor: pointer;
-    padding: $size-2 $size-4; border-radius: $radius-md; font-size: $font-sm; font-weight: $font-semibold;
-    &:hover { background: $primary-600; }
+    background: $os-accent; color: #fff; border: none; cursor: pointer;
+    padding: $size-2 $size-4; border-radius: $os-radius-md; font-size: $font-sm; font-weight: $font-semibold;
+    &:hover { background: $os-accent-dark; }
   }
 }
 
@@ -856,12 +856,12 @@
   margin-bottom: $size-4;
 }
 .tipo-opt {
-  border: 2px solid $gray-100; border-radius: $radius-md; padding: $size-3;
+  border: 2px solid $os-border; border-radius: $os-radius-md; padding: $size-3;
   cursor: pointer; display: flex; flex-direction: column; gap: 2px;
   transition: border-color 120ms ease;
-  &.active { border-color: $primary-500; background: rgba($primary-500, 0.05); }
-  &__label { font-size: $font-xs; font-weight: $font-bold; color: $gray-800; }
-  &__desc { font-size: 11px; color: $gray-400; }
+  &.active { border-color: $os-accent; background: rgba($os-accent, 0.05); }
+  &__label { font-size: $font-xs; font-weight: $font-bold; color: $os-text-primary; }
+  &__desc { font-size: 11px; color: $os-text-muted; }
   input { display: none; }
 }
 
@@ -887,11 +887,11 @@
     display: flex; align-items: center; gap: $size-3;
   }
   &__budget-val {
-    font-size: $font-sm; font-weight: $font-bold; color: $gray-800;
+    font-size: $font-sm; font-weight: $font-bold; color: $os-text-primary;
     min-width: 90px; white-space: nowrap;
   }
   &__budget-slider {
-    flex: 1; accent-color: $primary-500; cursor: pointer;
+    flex: 1; accent-color: $os-accent; cursor: pointer;
     &:focus { outline: none; }
   }
 
@@ -901,26 +901,26 @@
   }
   &__agente-opt {
     display: flex; align-items: center; gap: $size-3;
-    padding: $size-2 $size-3; border: 1px solid $gray-100; border-radius: $radius-md;
+    padding: $size-2 $size-3; border: 1px solid $os-border; border-radius: $os-radius-md;
     cursor: pointer; transition: border-color 120ms ease;
     &.is-on {
-      border-color: rgba($primary-500, 0.35);
-      background: rgba($primary-500, 0.03);
+      border-color: rgba($os-accent, 0.35);
+      background: rgba($os-accent, 0.03);
     }
-    &:hover { border-color: $gray-200; }
+    &:hover { border-color: $os-border-strong; }
   }
   &__agente-dot {
     width: 8px; height: 8px; border-radius: $radius-full; flex-shrink: 0;
-    background: $gray-200; transition: background 120ms ease;
-    &.is-on { background: $primary-500; }
+    background: $os-border-strong; transition: background 120ms ease;
+    &.is-on { background: $os-accent; }
   }
   &__agente-info { flex: 1; display: flex; flex-direction: column; gap: 1px; }
-  &__agente-label { font-size: $font-xs; font-weight: $font-semibold; color: $gray-800; }
-  &__agente-desc  { font-size: 11px; color: $gray-500; }
+  &__agente-label { font-size: $font-xs; font-weight: $font-semibold; color: $os-text-primary; }
+  &__agente-desc  { font-size: 11px; color: $os-text-secondary; }
   &__agente-toggle {
     font-size: 10px; font-weight: $font-bold; letter-spacing: 0.04em;
-    color: $gray-300; flex-shrink: 0;
-    .modal__agente-opt.is-on & { color: $primary-600; }
+    color: $os-text-muted; flex-shrink: 0;
+    .modal__agente-opt.is-on & { color: $os-accent-text; }
   }
 }
 
@@ -937,7 +937,7 @@
   .modal {
     top: auto; bottom: 0; left: 0; right: 0;
     transform: none; width: 100%; max-width: 100%; max-height: 88vh;
-    border-radius: $radius-xl $radius-xl 0 0;
+    border-radius: $os-radius-lg $os-radius-lg 0 0;
     padding: $size-5 $size-4 calc($size-5 + env(safe-area-inset-bottom));
   }
   .modal__row2 { grid-template-columns: 1fr; }
@@ -953,7 +953,7 @@
 
 .gali-mejorar {
   margin-top: $size-4;
-  border-top: 1px dashed $gray-100;
+  border-top: 1px dashed $os-border;
   padding-top: $size-4;
 
   &__row {

@@ -193,6 +193,26 @@
   }
 }
 
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.skill-list > .skill-item {
+  animation: gali-fade-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.skill-list > .skill-item:nth-child(1) { animation-delay: 0ms; }
+.skill-list > .skill-item:nth-child(2) { animation-delay: 30ms; }
+.skill-list > .skill-item:nth-child(3) { animation-delay: 60ms; }
+.skill-list > .skill-item:nth-child(4) { animation-delay: 90ms; }
+.skill-list > .skill-item:nth-child(5) { animation-delay: 120ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-list > .skill-item { animation: none; }
+}
+
 .skill-item {
   display: flex;
   align-items: center;
@@ -1585,16 +1605,18 @@
   background: transparent;
   color: $os-text-secondary;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
 
   &--active {
     background: var(--chip-color, #{$os-accent});
     border-color: var(--chip-color, #{$os-accent});
     color: #fff;
+    transform: scale(1.04);
   }
 
   &:not(&--active):hover {
     background: $os-surface-3;
     border-color: $os-text-secondary;
+    transform: translateY(-1px);
   }
 }

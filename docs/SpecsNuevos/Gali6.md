@@ -1,8 +1,8 @@
 # Gali 6 — "La Casita Definitiva" · Documento de Estado
 
 > **Keyword de reanudación:** `ContinuarGali6`
-> **Última actualización:** 2026-06-16
-> **Fuentes:** `docs/SpecsNuevos/ultimate-plan.md` · `docs/SpecsNuevos/gali-projects-plan.md`
+> **Última actualización:** 2026-07-16
+> **Fuentes:** `docs/SpecsNuevos/ultimate-plan.md` · `docs/SpecsNuevos/gali-projects-plan.md` · `docs/Specs/PlanChat.md` · `docs/SpecsNuevos/18.FlujoUsuarioGali6.md` · `docs/SpecsNuevos/19.ConexionesIA.md`
 
 ---
 
@@ -82,6 +82,145 @@ Todas disponibles bajo `/gali-6/*`:
 
 ---
 
+## Sesión 2026-07-15 — Navegación recuperada + modelo de intervención de Gali
+
+Trabajo hecho sobre `docs/Specs/PlanChat.md` Parte B (navegación + intervención) y Parte A
+(Conexiones IA). Detalle completo abajo en §Modelo de intervención de Gali por sección; resumen
+ejecutivo aquí:
+
+- **§B1 — 25 rutas huérfanas registradas** en `gali-6.routes.ts` (el bug "Loy"/"Hoy": el sidebar
+  referenciaba rutas que nunca se registraron y caían silenciosamente en Home). Incluye Calendario,
+  Garantías recolecciones, Validador de direcciones, Roax Lanzador, las 11 de Configuraciones, CAS/Tickets
+  y 5 de Financiero. Ver nota de conteo (20 → 25) más abajo.
+- **§B2 — Defensa del wildcard.** `gali-6-shell.component.ts` compara `NavigationEnd.url` vs
+  `urlAfterRedirects` y loggea en dev si algo aterriza en Home sin haberlo pedido — red de seguridad para
+  que un futuro drift entre sidebar y rutas no vuelva a pasar en silencio.
+- **§B3 — Modelo de intervención de Gali por sección**, tabla nueva más abajo en este documento.
+- **§B4 — Screen-awareness extendida a 7 pantallas** (Validador de direcciones, Garantías/Órdenes de
+  despacho, Garantías-recolecciones, Facturas pendientes + 4 pantallas más de Financiero, Configuración→
+  Integraciones), con comportamientos reales de Gali (proactivo, reactivo o "recuperación explicada") en
+  4 de ellas — ver tabla "Estado de implementación" más abajo.
+- **Roax Lanzador rediseñado:** paso nuevo "Presupuesto" en el wizard (Target ROAS y presupuesto diario
+  editables, toggle de escalamiento automático) + se conectó el botón "Continuar", que antes no tenía
+  ningún `(click)` cableado.
+- **Parte A — `docs/SpecsNuevos/19.ConexionesIA.md` escrito**: spec formal (visión → capas → modelo de
+  tokens → selector de motor → fases → límites), puramente documento, sin código, tal como pedía el plan.
+
+**Build:** `ng build --configuration development` limpio. Verificado también con smoke tests en
+navegador real (Playwright) para las 25 rutas, el wildcard, y cada flujo de intervención.
+
+---
+
+## Sesión 2026-07-16 — Expansión de plan (PARTE 5) + Auditoría de diseño completa (Fases 1-3)
+
+Dos hilos de trabajo en la misma sesión: (1) documentar la siguiente capa de la relación chat↔Dropi
+sobre `18.FlujoUsuarioGali6.md`, y (2) correr `/design-audit` sobre todo `/gali-6` y ejecutar sus tres
+fases de hallazgos. 17 builds limpios (`ng build --configuration development`, exit 0) a lo largo de la
+sesión, uno por cada lote de cambios.
+
+### Documento — PARTE 5 de `18.FlujoUsuarioGali6.md` (diseñado, sin código)
+
+Nueva sección al final de ese documento, continuando la numeración de Partes 1-4:
+
+- **Flujo H** — tab "Conexiones" condensado dentro del panel de chat (junto a Señales), extiende
+  `Gali6PanelTab` con un quinto valor `'conexiones'`, calcado del patrón de `gali6-tab-senales.component.ts`.
+- **Flujo I** — agentes configurables por sección: nuevo campo `apareceEn?: string[]` en
+  `AgenteEspecializado`, UI de reasignación en `gali6-agentes.component.ts`, nueva mutación
+  `Gali6LiveMutationsService.moverAgenteASeccion()`. Señala como bloqueante el bug ya documentado de
+  `agentesEstado` (no relee `version()`).
+- **Flujo J** — artefactos personalizados: el chat puede "fijar" una respuesta visual (metric/comparativa/
+  tabla) en una pantalla real de Dropi vía un nuevo `Gali6ScreenArtifactsService` + componente compartido
+  `<gali6-screen-artifacts>`, reusando las mismas cards que ya renderiza el chat.
+
+`docs/SpecsNuevos/19.ConexionesIA.md` §2 se **reescribió** (con nota de changelog en el propio doc): el
+diseño original ("tarjeta `tipo: 'ia'` más en el grid plano de `mcps[]`") no sostenía un mockup real que
+Catalina mostró — un panel de 3 tabs LLM/Tools/MCPs con datos que no caben en el shape de `Mcp`. Ahora §2
+diseña una sub-vista propia "Motor de Gali" dentro de Conexiones, con la tab LLM reusando el flujo de
+conexión ya existente (`abrirPanel`/`apiKeyInput`/`conectarMcp`) para el caso "Mi propia IA".
+
+### Quick win implementado — shortcut de Dashboard
+
+`G6_ICON_RAIL` en `gali-6-sections.config.ts` reordena el ítem "Reportes" (ya apunta a
+`/gali-6/reportes/dashboard`) a la 2ª posición, justo después de Productos, sin tocar el
+`DROPI_ICON_RAIL` compartido con `/gali-v5`.
+
+### Auditoría de diseño — Fase 1 (Crítico)
+
+- **Migración completa de tokens legacy → `$os-*`** (el hallazgo raíz que explicaba casi todo lo demás:
+  gran parte de Gali 6 seguía en el sistema de tokens de `/gali-v5` en vez del propio `_gali-os-tokens.scss`)
+  en: `gali6-senales.component.scss` (doble naranja `#f49a3d`/`$os-accent` unificado), `gali-6-shell.component.scss`
+  (811 líneas — topbar, ZeroState, panel contextual de Catálogo), `gali6-proyecto-detalle.component.scss`
+  (875 líneas, ~225 refs), `gali6-marketplace.component.scss` (785 líneas, ~180 refs),
+  `gali6-conexiones-casa.component.scss` (65 refs), `gali6-centro-control.component.scss`,
+  `dashboard-financiero-page.component.scss` (1200+ líneas — incluye un bug real de hover donde el botón
+  "Ejecutar plan" cambiaba de naranja al pasar el mouse).
+- **Navegación rota dentro de Centro de Gali**: `reglas-page.component.html`/`skills-page.component.html`
+  tenían `routerLink="/gali-v5/..."` en vez de `/gali-6/...` (7 links) — sacaban al usuario del hub sin
+  avisar. Además se les agregó un input `embedded` (mismo patrón que `Gali6ConexionesCasaComponent`) para
+  no duplicar banner/título cuando viven dentro de `gali6-centro-control`.
+- **Binding roto**: `validador-direcciones-page.component.html:2` — `[breadcrumbs="breadcrumbs"` sin
+  cerrar el corchete.
+- **Anatomía de "card" unificada**: `.mcp`/`.nube-item` (Conexiones) y las cards de Marketplace pasaron
+  de sombra permanente a sombra solo en `:hover`, igual que ya hacía Agentes.
+- **Señal de stock-out ahora visible en pantalla**: `garantias-recolecciones` (`dropi-screens.registry.ts`)
+  ganó columnas `Producto`/`Riesgo` — 3 de 10 filas mock marcan "Collar GPS para mascotas" con "Riesgo
+  stock-out" (mismo caso real que ya citaba `stock-guardian.ejemploSenal`), pintado en rojo reusando el
+  mecanismo genérico `shouldBadge()`/`statusTagClass()` de `DropiScreenPageComponent` (se le agregó la
+  palabra clave `riesgo`, cambio inerte para las demás ~20 pantallas que sirve ese componente).
+- **Kronos recoloreado**: `dashboard-financiero-page.component.scss/html` usaba `#60a5fa` (azul ad-hoc,
+  19 ocurrencias) para el agente "Kronos"; ahora usa `$os-agent-financiero` (violeta), el token ya
+  reservado para ese rol y que estaba sin usar. No se renombró ni se reemplazó el agente — sigue siendo
+  una decisión de producto pendiente si Kronos debe mapear a un agente real del roster de `AGENTES_ESPECIALIZADOS`.
+- **Catálogo de Productos conectado al chat** — antes era la única pantalla operativa que el chat
+  ignoraba. `CatalogPageComponent.ngOnInit()` ahora publica `Gali6ScreenContextService` y empuja una
+  alerta proactiva citando el mismo texto que ya tiene `.catalog-gali-cta` en pantalla ("Difusor de
+  aromaterapia..."), con un botón que abre el panel real (`GaliStateService.openCatalogPanel()`). El
+  primer mensaje de bienvenida del chat también ganó un botón "Buscar productos →" (`actionId: 'ir-a-catalogo'`).
+
+### Auditoría de diseño — Fase 2 (Refinamiento)
+
+- **Touch targets**: `DropiScreenPageComponent` (~20 pantallas) `__row-actions button` 24→32px,
+  `__page-btn` 32→44px (de paso corrigió un bug real: `padding: 12px` dentro de un box fijo con
+  `border-box` dejaba solo 8×8px útiles); `.g6-agente-card__toggle` y `.port__kebab-btn` 24→32px.
+- **Breadcrumb unificado**: 7 pantallas de Configuraciones decían "Configuraciones" en vez de "Configurar"
+  (el nombre real del ítem del icon rail) — corregido en `dropi-screens.registry.ts`, sin tocar el dato
+  mock homónimo que aparece como valor de columna en Historial de actividades.
+
+### Auditoría de diseño — Fase 3 (Pulido)
+
+- **CSS muerto eliminado**: ~300 líneas — el tab completo "Fuentes y Conexiones" en `gali6-senales.component.scss`
+  (0 referencias en el HTML) y `.g6-mkt-regla*` en Marketplace (ídem).
+- **Animación infinita limitada**: `.port__item--recien` (`recien-pulse`) pasó de `infinite` a 4 iteraciones.
+- **Iconografía consistente**: el empty state "Todo bajo control" de Señales pasó del glifo `✦` a
+  `pi-check-circle`, coherente con el `pi-eye` del panel vecino — ambos con `aria-hidden`.
+- **Auto-grow real en el textarea del chat** (`gali6-chat-panel.component.ts/html/scss`) — crece hasta el
+  `max-height: 96px` ya definido en CSS, con scroll interno si lo supera, y colapsa al enviar.
+- **Placeholder literal corregido**: Financiero → Datos de facturación mostraba "Campo 1 / Valor de
+  ejemplo" (fallback genérico de `DropiScreenPageComponent.formFields()`); ahora tiene datos mock reales
+  de facturación electrónica colombiana (Razón social, NIT, Régimen tributario, etc.).
+- **Modal de Proyectos unificado en tokens**: `.modal`/`.tipo-picker`/`.gali-mejorar` en
+  `gali6-proyectos-casa.component.scss` migrados a `$os-*` — visualmente igual ahora al modal ZeroState y
+  al panel `.g6-cat-panel` del shell (no se fusionaron en un solo componente Angular, solo se igualó el
+  lenguaje visual).
+
+### Deliberadamente no tocado esta sesión
+
+- **ARIA de toggles** — se corrigió en los 2 toggles de skill de Agentes; `.g6-mkt-regla__toggle` de
+  Marketplace resultó ser CSS muerto (eliminado, no necesitaba el fix).
+- **Checkbox → switch visual en Roax Lanzador** — `input[type=checkbox]` de "Escalar presupuesto
+  automáticamente" se restyled en CSS puro (sin tocar `[(ngModel)]` ni lógica) para verse como el resto de
+  los switches de la app.
+- **Wizard de Roax Lanzador con 3 pasos vacíos** ("Entendimiento del producto", "Ángulos de venta",
+  "Guiones" solo muestran un placeholder) — necesita contenido real de formulario, no es un fix de diseño.
+- **"Recuperación explicada" en los 10 stubs restantes de Configuraciones** — solo `integraciones-config`
+  la tiene; generalizarla implica escribir diálogo nuevo en `gali6-chat.service.ts`, contenido/lógica, no CSS.
+- **Dark mode** — ausente por completo en `_gali-os-tokens.scss`; requiere diseñar un tema completo, fuera
+  de alcance de una auditoría de refinamiento.
+- **Fusionar los 3 modales en un componente Angular compartido** — se unificó el token visual, no la
+  estructura; sería un refactor con más riesgo que los cambios de esta sesión.
+
+---
+
 ## Archivos clave
 
 | Archivo | Descripción |
@@ -124,8 +263,12 @@ Estos 4 ítems estaban pendientes del `ultimate-plan.md §9` ("Should Have" / "N
 ## Estado de compilación
 
 ```
-Application bundle generation complete. [~10s]
+Application bundle generation complete. [~13-20s]
 ```
+
+Verificado por última vez el 2026-07-16, tras la sesión de expansión de plan + auditoría de diseño
+(Fases 1-3). 17 builds limpios a lo largo de la sesión, uno por lote de cambios. Sin errores de
+TypeScript nuevos.
 
 Warnings existentes (pre-existentes, no bloqueantes):
 - TypeScript optional chain en `GaliProjectPanelComponent` y `SkillEditorPageComponent`
@@ -135,10 +278,87 @@ Warnings existentes (pre-existentes, no bloqueantes):
 
 ## Posibles siguientes pasos
 
-Al retomar con `ContinuarGali6`, verificar si hay algo en `ultimate-plan.md §9` aún pendiente o si el equipo tiene nuevas specs. Posibles ítems a explorar:
+Al retomar con `ContinuarGali6`, verificar si hay algo en `ultimate-plan.md §9` aún pendiente o si el equipo tiene nuevas specs.
+
+### De la sesión 2026-07-16 (expansión de plan + auditoría de diseño)
+
+- [ ] Implementar Flujo H de PARTE 5 (`18.FlujoUsuarioGali6.md`): tab "Conexiones" condensado en el chat
+- [ ] Implementar Flujo I: agentes configurables por sección (requiere primero arreglar el bug de
+      sincronización de `agentesEstado` en `gali6-agentes.component.ts`, ver punto de abajo)
+- [ ] Implementar Flujo J: artefactos personalizados fijables en pantalla desde el chat
+- [ ] Wizard de Roax Lanzador: contenido real para los 3 pasos vacíos (Entendimiento del producto,
+      Ángulos de venta, Guiones) — hoy solo muestran un placeholder genérico
+- [ ] Generalizar "recuperación explicada" a los 10 stubs restantes de Configuraciones (hoy solo
+      `integraciones-config` la tiene) — requiere diálogo nuevo en `gali6-chat.service.ts`
+- [ ] Fusionar ZeroState / modal de Proyectos / `.g6-cat-panel` en un solo componente Angular compartido
+      (ya comparten el mismo lenguaje visual `$os-*`, falta la unificación estructural)
+- [ ] Dark mode — `_gali-os-tokens.scss` no define ninguna variante oscura
+- [ ] Decidir si "Kronos" (Dashboard Financiero) debe mapear a un agente real de
+      `AGENTES_ESPECIALIZADOS` o mantenerse como identidad propia (ya tiene color correcto,
+      `$os-agent-financiero`, pendiente la decisión de nombre/roster)
+- [ ] Reconciliar el spec 19.ConexionesIA.md §2 (ya reescrito con la sub-vista "Motor de Gali") con
+      código real — sigue siendo puro documento
+
+### De la sesión 2026-07-15 (navegación + intervención de Gali)
+
+- [ ] Roax Lanzador: conectar `escalarAutomatico` al `autonomiaPct` real de `roas-tracker` — hoy es un
+      toggle autocontenido en el wizard porque el slider de `gali6-agentes.component.ts` (`agentesEstado`)
+      tiene un bug de sincronización conocido con `Gali6LiveMutationsService` (no se propaga)
+- [ ] Roax Lanzador: Loop de Acción Cerrada del paso 7 (CTR cae → Gali pausa creativo → resultado visible)
+      — necesita un modelo de campaña en vivo con métricas evolucionando, que el prototipo no tiene
+- [ ] Screen-awareness para el resto de las ~13 pantallas genéricas de `DropiScreenPageComponent`
+      (7 de 20 ya están cubiertas) — dejado como backlog explícito para no expandir el alcance de una sola vez
+- [ ] Implementación real de código de Parte A (Conexiones IA): `tipo: 'ia'` en `Mcp`, modelo de tokens
+      en el panel de detalle, selector de motor en `gali6-agentes.component.ts` — el spec ya está escrito
+      en `19.ConexionesIA.md`, pero la implementación es trabajo aparte, explícitamente no incluido ahí
+- [ ] Fase 2 de Conexiones IA: fusionar el grafo tipo Obsidian de `ConexionesPageComponent` (gali-v5)
+      dentro de `gali6-conexiones-casa`
+
+### De sesiones anteriores (sin retomar aún)
 
 - [ ] Persistencia del objetivo entre sesiones (ya hay `localStorage` para meta; pendiente sincronizar subtareas)
 - [ ] Animación de transición entre filtros del portfolio
 - [ ] Vista móvil completa (responsive ya existe pero no se testeó en profundidad)
 - [ ] Conexión del FAB de Gali con decisiones pendientes (actualmente abre panel genérico)
 - [ ] Tests de accesibilidad (aria-labels, focus management en modales)
+
+---
+
+## Modelo de intervención de Gali por sección
+
+> Escrito en la implementación de `docs/Specs/PlanChat.md` §B3, como referencia viva citada por
+> `docs/SpecsNuevos/18.FlujoUsuarioGali6.md` §1.1. Aplica el AI-UX Trust Stack y la escala de
+> "Nivel de agencia" de `docs/Conocimientos/AlcancesIADropi.md` §II a las 5 familias de pantallas
+> que hoy tiene Gali 6.
+
+| Tipo de sección | Ejemplos | Nivel de agencia | Comportamiento del chat lateral |
+|---|---|---|---|
+| Operativas/transaccionales | Pedidos, Novedades, Garantías, Órdenes de despacho, Logística | Vigilante permanente (proactiva) | Banner de contexto siempre visible; acciones vía patrón *preview-then-confirm* ya usado en `pausar-campana`/`resolver-alerta` (Reversibility) |
+| Analíticas | Reportes, Calendario, Financiero | Analítica + alertante | Pasiva por defecto, responde bajo demanda; alerta solo ante anomalías |
+| Creación/marketing | Campañas, Automatización, Roax, Etiquetas | Generativa + confirmativa | Propone, nunca publica sin aprobación explícita (Steering + Reversibility) |
+| Configuración | Configurar, Conexiones | Silenciosa / solo ayuda contextual | Gali no sugiere cambios de seguridad/facturación sin que se le pida (coherente con el límite "nunca mueve dinero sin aprobación") |
+| Pantallas stub (recuperadas en §B1) | Garantías-recolecciones, los 11 de Configuraciones, CAS/Tickets, Financiero secundario | Recuperación explicada | El chat reconoce el límite: *"Estás en una vista simplificada, todavía no tengo mucho contexto aquí"* — en vez de fingir capacidad completa (Refusal & Recovery, evita el anti-patrón de calibración) |
+
+### Estado de implementación (2026-07-15)
+
+| Pantalla | Fila de la tabla | Screen-awareness (`Gali6ScreenContextService.publish`) | Comportamiento narrado en `18.FlujoUsuarioGali6.md` |
+|---|---|---|---|
+| Validador de direcciones | Operativas | ✅ implementado (`validador-direcciones-page.component.ts`) | ✅ Regla reactiva "corrige la dirección" con preview-then-confirm → `Gali6LiveMutationsService.corregirDireccion()` |
+| Garantías / Órdenes de despacho | Operativas | ✅ implementado (`garantias-page.component.ts`, ambas variantes) | ⚠️ Solo banner pasivo (`viewLabel` + conteo). No implementa el mensaje proactivo del Flujo A — ese se implementó en la pantalla vecina `garantias-recolecciones`, no aquí |
+| Garantías y recolecciones | Operativas | ✅ implementado (`dropi-screen-page.component.ts`, gated a `screenId === 'garantias-recolecciones'`) | ✅ Flujo A **completo, incluido el paso 8**: banner "3 en riesgo de stock-out" + mensaje proactivo citando el `ejemploSenal` real de `stock-guardian` + acción `pausar-recoleccion::<producto>` + siguiente paso propuesto ("¿te aviso 5 días antes?") vía `actionId: 'crear-regla-aviso-stock::<producto>'` |
+| Facturas pendientes | Analíticas | ✅ implementado (`dropi-screen-page.component.ts`, gated a `screenId === 'facturas-pendientes'`) | ✅ Flujo B: sin banner proactivo (sección analítica); regla reactiva ante la palabra "facturar" cita el dato mock real de la conexión Siigo y ofrece deep-link a Conexiones |
+| Financiero — Datos bancarios, Retiros de saldo, Datos de facturación, Notas crédito | Analíticas | ✅ implementado (`dropi-screen-page.component.ts`, gated por `screenId`) | Solo banner de contexto (mismo trato pasivo que Facturas pendientes) — ninguna regla reactiva nueva para estas 4, extensión chica agregada además de los Flujos A-D |
+| Roax Lanzador (Flujo C) | Creación/marketing | ✅ implementado (`roax-lanzador-page.component.ts`) | ⚠️ Parcial pero con más cobertura que antes: banner (ahora se re-publica en cada paso del wizard, no solo al entrar) + mensaje proactivo citando Break-even ROAS 4.0x / Target ROAS 5.0x + **paso nuevo "Presupuesto"** en el wizard (Target ROAS y presupuesto diario editables, toggle de escalamiento automático) + confirmación en el chat al avanzar ese paso. **Sigue sin implementar:** la lectura real del `autonomiaPct` de `roas-tracker` (`escalarAutomatico` es un toggle propio del wizard, no está cableado al slider de Agentes — ese slider tiene un bug conocido de sincronización que no valía la pena heredar) y el Loop de Acción Cerrada del paso 7 (CTR cae → Gali pausa creativo) — requiere un modelo de campaña en vivo que este wizard no tiene |
+| Configuración → Integraciones (Flujo D) | Stub | ✅ implementado (`dropi-screen-page.component.ts`, gated a `screenId === 'integraciones-config'`) | ✅ Flujo D completo: banner "Viendo: Integraciones" + regla "recuperación explicada" (dispara ante cualquier pregunta en esta vista, no solo una palabra clave) + deep-link a Conexiones vía `actionId: 'ir-a-conexiones'` |
+| Resto de las ~13 pantallas genéricas (`DropiScreenPageComponent`) | Todas | ❌ no implementado | Documentado como backlog por diseño (`PlanChat.md` §B4: "evita una tarea de alcance descontrolado") — este componente sirve ~20 pantallas distintas por `screenId`; 7 ya están gateadas explícitamente (`garantias-recolecciones`, `facturas-pendientes`, `integraciones-config` + las 4 de Financiero) |
+| Spec formal "Conexiones IA" (Parte A de `PlanChat.md`) | — | ✅ documento escrito (`docs/SpecsNuevos/19.ConexionesIA.md`) | Puramente documento, sin código — así lo pidió `PlanChat.md` §Parte A. Formato visión → capas → modelo de tokens → selector de motor → fases → límites, siguiendo la convención de `AlcancesIADropi.md` |
+
+### Nota — corrección 20 → 25 rutas huérfanas
+
+`PlanChat.md` (texto narrativo, línea 10) y las primeras versiones de `18.FlujoUsuarioGali6.md` dicen
+"20 rutas huérfanas". La tabla de `PlanChat.md` §B1 ("Lista completa") en realidad enumera **25** rutas
+— la tabla, no el resumen narrativo, fue la fuente de verdad usada al implementar §B1, porque es la que
+tiene el detalle mecánico (componente + screenId) necesario para escribir cada entrada de
+`gali-6.routes.ts`. Las 25 rutas están registradas y verificadas (build limpio + smoke test en
+navegador: ninguna cae en el wildcard). Los "20" del texto narrativo probablemente contaban ítems de
+menú (p. ej. "Configurar" como 1 ítem) en vez de rutas individuales — "Configurar" solo son 11 rutas.

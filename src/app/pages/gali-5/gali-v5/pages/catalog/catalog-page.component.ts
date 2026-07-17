@@ -5,6 +5,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliStateService } from '../../services/gali-state.service';
 import { GaliAdaSpyDetailComponent } from '../../components/gali-ada-spy-detail/gali-ada-spy-detail.component';
+import { Gali6ScreenContextService } from '../../../../gali-6/services/gali6-screen-context.service';
+import { Gali6ChatService } from '../../../../gali-6/gali-chat/gali6-chat.service';
 
 type ProductBadge = 'Variable' | 'Combo';
 
@@ -43,6 +45,8 @@ export class CatalogPageComponent implements OnInit {
   private router = inject(Router);
   private ws = inject(GaliWorkspaceService);
   readonly gali = inject(GaliStateService);
+  private readonly screenCtx = inject(Gali6ScreenContextService);
+  private readonly chat = inject(Gali6ChatService);
 
   abrirGaliPanel(): void { this.gali.openCatalogPanel(); }
 
@@ -232,6 +236,24 @@ export class CatalogPageComponent implements OnInit {
       }
     });
     this.products = this.buildMockProducts();
+
+    this.screenCtx.publish({
+      route: this.router.url,
+      viewId: 'catalogo',
+      viewLabel: 'Catálogo de productos',
+      summary: 'Gali tiene una recomendación para tu objetivo',
+    });
+
+    // Misma copia exacta del CTA en pantalla (.catalog-gali-cta, catalog-page.component.html:75-76)
+    // — no se inventa un caso nuevo, solo se refuerza por el canal del chat.
+    this.chat.pushProactiveAlert(
+      'catalogo::oportunidad-difusor',
+      'Gali tiene una recomendación para tu objetivo: Difusor de aromaterapia · ventana 10 días · ~18 pedidos/sem estimados.',
+      {
+        kind: 'acciones',
+        acciones: [{ label: 'Ver recomendación →', actionId: 'ver-oportunidad-catalogo', isPrimary: true }],
+      },
+    );
   }
 
   get filteredProducts(): CatalogProduct[] {

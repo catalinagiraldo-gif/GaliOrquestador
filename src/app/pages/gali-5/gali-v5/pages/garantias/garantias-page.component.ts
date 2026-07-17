@@ -1,8 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { Gali6ScreenContextService } from '../../../../gali-6/services/gali6-screen-context.service';
 
 type GarantiasVariant = 'garantias' | 'ordenes-despacho';
 
@@ -23,6 +24,8 @@ interface GarantiasConfig {
 })
 export class GarantiasPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly screenCtx = inject(Gali6ScreenContextService);
 
   variant: GarantiasVariant = 'garantias';
   config: GarantiasConfig = GARANTIAS;
@@ -31,6 +34,17 @@ export class GarantiasPageComponent implements OnInit {
     this.route.data.subscribe(data => {
       this.variant = (data['variant'] as GarantiasVariant) ?? 'garantias';
       this.config = this.variant === 'ordenes-despacho' ? ORDENES_DESPACHO : GARANTIAS;
+
+      // Screen-awareness (PlanChat.md §B4) — mismo mecanismo que
+      // gali6-proyectos-casa.component.ts:121. Componente compartido con
+      // /gali-v5: la ruta publicada sale de `router.url`, no de un prefijo
+      // asumido, así que fuera del shell de Gali 6 esto es un no-op.
+      this.screenCtx.publish({
+        route: this.router.url,
+        viewId: this.variant === 'ordenes-despacho' ? 'ordenes-de-despacho' : 'garantias',
+        viewLabel: this.config.title,
+        summary: `${this.config.rows.length} ${this.config.title.toLowerCase()}`,
+      });
     });
   }
 }

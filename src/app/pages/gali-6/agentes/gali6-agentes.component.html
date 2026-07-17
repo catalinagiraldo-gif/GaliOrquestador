@@ -153,20 +153,27 @@
               <!-- Skills con toggle ON/OFF -->
               <div class="g6-agente-card__skills">
                 <div class="g6-agente-card__skills-hdr">
-                  <span class="g6-agente-card__skills-label">Automatizaciones activas</span>
+                  <span class="g6-agente-card__skills-label">Skills activas</span>
                 </div>
                 @for (sk of ag.skills; track sk.id) {
                   <div class="g6-agente-skill" [class.g6-agente-skill--off]="!sk.activa">
                     <span class="g6-agente-skill__tipo {{ getProcesoClass(sk.tipo) }}">
                       {{ procesoTipoLabel[sk.tipo] }}
                     </span>
-                    <span class="g6-agente-skill__label">{{ sk.label }}</span>
+                    <div class="g6-agente-skill__content">
+                      <span class="g6-agente-skill__label">{{ sk.label }}</span>
+                      @if (sk.activa && sk.ultimaEjecucion) {
+                        <span class="g6-agente-skill__meta">Última vez {{ sk.ultimaEjecucion }} · {{ sk.ejecucionesTotal }} ejec.</span>
+                      }
+                    </div>
                     <button
                       class="g6-skill-toggle"
                       [class.g6-skill-toggle--on]="sk.activa"
                       [class.g6-skill-toggle--off]="!sk.activa"
                       (click)="$event.stopPropagation(); toggleSkill(ag.id, sk.id)"
-                      [title]="sk.activa ? 'Desactivar skill' : 'Activar skill'">
+                      [attr.aria-pressed]="sk.activa"
+                      [title]="sk.activa ? 'Desactivar skill' : 'Activar skill'"
+                      [attr.aria-label]="(sk.activa ? 'Desactivar skill: ' : 'Activar skill: ') + sk.label">
                       <span class="g6-skill-toggle__dot"></span>
                     </button>
                   </div>
@@ -187,7 +194,9 @@
                         <button class="g6-skill-toggle"
                                 [class.g6-skill-toggle--on]="sk.activa"
                                 [class.g6-skill-toggle--off]="!sk.activa"
-                                (click)="toggleSkill(ag.id, sk.id)">
+                                (click)="toggleSkill(ag.id, sk.id)"
+                                [attr.aria-pressed]="sk.activa"
+                                [attr.aria-label]="(sk.activa ? 'Desactivar skill: ' : 'Activar skill: ') + sk.label">
                           <span class="g6-skill-toggle__dot"></span>
                         </button>
                       </div>
@@ -204,13 +213,31 @@
                 }
                 @for (r of ag.reglas; track r.id) {
                   <div class="g6-agente-regla">
-                    <span class="g6-agente-regla__si">Si</span>
-                    <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
-                    <span class="g6-agente-regla__entonces">→</span>
-                    <span class="g6-agente-regla__accion">{{ r.accion }}</span>
-                    <button class="g6-agente-regla__del"
-                            (click)="$event.stopPropagation(); eliminarRegla(ag.id, r.id)"
-                            title="Eliminar regla">×</button>
+                    <div class="g6-agente-regla__logic">
+                      <span class="g6-agente-regla__si">Si</span>
+                      <span class="g6-agente-regla__cond">{{ r.condicion }}</span>
+                      <span class="g6-agente-regla__entonces">→</span>
+                      <span class="g6-agente-regla__accion">{{ r.accion }}</span>
+                      <button class="g6-agente-regla__del"
+                              (click)="$event.stopPropagation(); eliminarRegla(ag.id, r.id)"
+                              title="Eliminar regla">×</button>
+                    </div>
+                    <div class="g6-agente-regla__meta">
+                      @if (r.prioridad && ag.reglas.length > 1) {
+                        <span class="g6-agente-regla__priority">P{{ r.prioridad }}</span>
+                      }
+                      @if (r.scope) {
+                        <span class="g6-agente-regla__scope">{{ r.scope }}</span>
+                      }
+                      @if (getSkillLabel(ag, r.skillVinculada); as skillLabel) {
+                        <span class="g6-agente-regla__skill-chip">✦ {{ skillLabel }}</span>
+                      }
+                      @if (r.ultimaEjecucion) {
+                        <span class="g6-agente-regla__ejec">Última vez: {{ r.ultimaEjecucion }} · {{ r.ejecucionesTotal }} ejecuciones</span>
+                      } @else {
+                        <span class="g6-agente-regla__ejec g6-agente-regla__ejec--empty">Sin ejecuciones todavía</span>
+                      }
+                    </div>
                   </div>
                 }
 

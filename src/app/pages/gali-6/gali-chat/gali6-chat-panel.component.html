@@ -92,6 +92,8 @@
           [ngModel]="draft()"
           (ngModelChange)="draft.set($event)"
           (keydown.enter)="onEnter($event)"
+          (input)="autoGrow($event)"
+          #draftInput
         ></textarea>
         <button type="button" class="g6chat__send" [disabled]="!draft().trim()" (click)="send()" aria-label="Enviar mensaje">
           <i class="pi pi-send"></i>

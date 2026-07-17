@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
@@ -45,6 +45,9 @@ const STORAGE_KEY = 'gali_reglas_state';
   styleUrl: './reglas-page.component.scss',
 })
 export class ReglasPageComponent {
+  /** true cuando se embebe dentro de otro shell (ej. Centro de Gali) — oculta el banner y el título propios */
+  readonly embedded = input(false);
+
   readonly reglas = signal<GaliRegla[]>(this.loadReglas());
   readonly escalamiento = signal<EscalamientoRegla[]>(ESCALAMIENTO_DEFAULTS);
   readonly showEscalamientoInfo = signal<string | null>(null);

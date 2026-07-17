@@ -10,8 +10,8 @@
   &--not-found {
     display: flex; flex-direction: column; align-items: center;
     gap: $size-4; padding-top: $size-10; text-align: center;
-    h2 { font-size: $font-xl; color: $gray-700; }
-    p  { color: $gray-500; max-width: 360px; line-height: 1.6; }
+    h2 { font-size: $font-xl; color: $os-text-secondary; }
+    p  { color: $os-text-secondary; max-width: 360px; line-height: 1.6; }
   }
 
   &--loading {
@@ -20,7 +20,7 @@
   }
 
   &__loading-msg {
-    font-size: $font-sm; color: $gray-400;
+    font-size: $font-sm; color: $os-text-muted;
     animation: pulse 1.5s ease infinite;
   }
 
@@ -31,9 +31,9 @@
 
   &__back {
     background: none; border: none; cursor: pointer;
-    font-size: $font-sm; color: $gray-500; padding: 0;
+    font-size: $font-sm; color: $os-text-secondary; padding: 0;
     margin-bottom: $size-4; display: flex; align-items: center; gap: $size-1;
-    &:hover { color: $primary-600; }
+    &:hover { color: $os-accent-text; }
   }
 
   &__header { margin-bottom: $size-5; }
@@ -44,26 +44,26 @@
   }
 
   &__title {
-    font-size: $font-2xl; font-weight: $font-bold; color: $gray-900;
+    font-size: $font-2xl; font-weight: $font-bold; color: $os-text-primary;
     margin: 0;
   }
 
   &__estado {
     font-size: 11px; font-weight: $font-semibold; padding: 3px 8px;
-    border-radius: $radius-full; background: $gray-100; color: $gray-600;
+    border-radius: $radius-full; background: $os-border; color: $os-text-secondary;
     &[data-estado='en_escala'] { background: #f0fdf4; color: #16a34a; }
     &[data-estado='activo']    { background: #eff6ff; color: #2563eb; }
     &[data-estado='pausado']   { background: #fef2f2; color: #dc2626; }
     &[data-estado='recien_lanzado'], &[data-estado='lanzando'] { background: #fff7ed; color: #c2410c; }
-    &[data-estado='cerrado']   { background: $gray-50; color: $gray-400; }
+    &[data-estado='cerrado']   { background: $os-surface-2; color: $os-text-muted; }
     &[data-estado='en_riesgo'] { background: #fef2f2; color: #dc2626; }
     &[data-estado='configurando'] { background: #fefce8; color: #a16207; }
-    &[data-estado='borrador']  { background: $gray-100; color: $gray-500; }
+    &[data-estado='borrador']  { background: $os-border; color: $os-text-secondary; }
   }
 
   &__subobjetivo {
     margin: 0 0 $size-2;
-    font-size: $font-sm; color: $gray-500; line-height: 1.5;
+    font-size: $font-sm; color: $os-text-secondary; line-height: 1.5;
     font-style: italic;
   }
 
@@ -78,9 +78,9 @@
 
   &__toast {
     position: fixed; bottom: $size-6; left: 50%; transform: translateX(-50%);
-    background: $gray-900; color: #fff;
+    background: $os-text-primary; color: #fff;
     font-size: $font-sm; font-weight: $font-medium;
-    padding: $size-3 $size-5; border-radius: $radius-lg;
+    padding: $size-3 $size-5; border-radius: $os-radius-lg;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 100;
     white-space: nowrap;
   }
@@ -90,38 +90,38 @@
   }
 
   &__meta-item {
-    font-size: $font-sm; color: $gray-600;
+    font-size: $font-sm; color: $os-text-secondary;
   }
 
   &__gali-nota {
     display: flex; align-items: flex-start; gap: $size-2;
-    background: rgba($primary-500, 0.04); border: 1px solid rgba($primary-500, 0.12);
-    border-radius: $radius-md; padding: $size-2 $size-3;
-    font-size: $font-sm; color: $gray-700; line-height: 1.5;
-    .gali-spark { color: $primary-500; flex-shrink: 0; margin-top: 1px; }
+    background: rgba($os-accent, 0.04); border: 1px solid rgba($os-accent, 0.12);
+    border-radius: $os-radius-md; padding: $size-2 $size-3;
+    font-size: $font-sm; color: $os-text-secondary; line-height: 1.5;
+    .gali-spark { color: $os-accent; flex-shrink: 0; margin-top: 1px; }
   }
 
   // ── Tabs ──
   &__tabs {
-    display: flex; gap: 0; border-bottom: 2px solid $gray-100;
+    display: flex; gap: 0; border-bottom: 2px solid $os-border;
     margin-bottom: $size-5;
   }
 
   &__tab {
     display: flex; align-items: center; gap: $size-1;
     background: none; border: none; cursor: pointer;
-    font-size: $font-sm; font-weight: $font-medium; color: $gray-500;
+    font-size: $font-sm; font-weight: $font-medium; color: $os-text-secondary;
     padding: $size-2 $size-4; margin-bottom: -2px; border-bottom: 2px solid transparent;
     transition: color 120ms ease, border-color 120ms ease;
-    font-family: $font-primary;
+    font-family: $os-font-body;
 
-    &:hover { color: $gray-700; }
-    &--active { color: $primary-600; border-bottom-color: $primary-500; font-weight: $font-semibold; }
+    &:hover { color: $os-text-primary; }
+    &--active { color: $os-accent-text; border-bottom-color: $os-accent; font-weight: $font-semibold; }
   }
 
   &__tab-badge {
     font-size: 10px; font-weight: $font-semibold;
-    background: $primary-100; color: $primary-600;
+    background: $os-accent-dim; color: $os-accent-text;
     border-radius: $radius-full; padding: 1px 6px;
   }
 }
@@ -137,12 +137,12 @@
   &__alerta {
     display: flex; align-items: flex-start; gap: $size-2;
     background: #fef2f2; border: 1px solid #fecaca;
-    border-radius: $radius-md; padding: $size-3 $size-4;
+    border-radius: $os-radius-md; padding: $size-3 $size-4;
     margin-bottom: $size-4;
     &-icon { font-size: 16px; flex-shrink: 0; }
     &-texto { flex: 1; font-size: $font-sm; color: #991b1b; line-height: 1.4; }
     &-cta {
-      background: none; border: 1px solid #fca5a5; border-radius: $radius-sm;
+      background: none; border: 1px solid #fca5a5; border-radius: $os-radius-sm;
       padding: 3px 8px; font-size: 11px; font-weight: $font-semibold;
       color: #dc2626; cursor: pointer; white-space: nowrap;
       &:hover { background: rgba(220,38,38,0.06); }
@@ -150,7 +150,7 @@
   }
 
   &__campanas-preview {
-    border: 1px solid $gray-100; border-radius: $radius-md;
+    border: 1px solid $os-border; border-radius: $os-radius-md;
     padding: $size-3 $size-4; margin-bottom: $size-4;
   }
 
@@ -159,43 +159,43 @@
     margin-bottom: $size-2;
   }
 
-  &__campanas-title { font-size: $font-sm; font-weight: $font-semibold; color: $gray-700; }
+  &__campanas-title { font-size: $font-sm; font-weight: $font-semibold; color: $os-text-secondary; }
 
   &__campanas-ver {
     background: none; border: none; cursor: pointer;
-    font-size: 11px; color: $primary-500; font-weight: $font-semibold;
+    font-size: 11px; color: $os-accent; font-weight: $font-semibold;
     &:hover { text-decoration: underline; }
   }
 
   &__no-campanas {
     display: flex; align-items: center; justify-content: space-between;
     gap: $size-3; padding: $size-3 $size-4;
-    border: 1px dashed $gray-200; border-radius: $radius-md;
+    border: 1px dashed $os-border-strong; border-radius: $os-radius-md;
     margin-bottom: $size-4;
-    p { font-size: $font-sm; color: $gray-500; margin: 0; }
+    p { font-size: $font-sm; color: $os-text-secondary; margin: 0; }
   }
 
   &__nueva-campana {
-    background: $primary-500; color: #fff; border: none;
-    border-radius: $radius-sm; padding: $size-1 $size-3;
+    background: $os-accent; color: #fff; border: none;
+    border-radius: $os-radius-sm; padding: $size-1 $size-3;
     font-size: $font-xs; font-weight: $font-semibold; cursor: pointer;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 
   &__agentes-section { margin-top: $size-5; }
 
   &__section-title {
     display: block; font-size: $font-sm; font-weight: $font-semibold;
-    color: $gray-700; margin-bottom: $size-3;
+    color: $os-text-secondary; margin-bottom: $size-3;
   }
 
   // ── Setup guide (borrador sin campañas) ──
   &__setup-guide {
-    padding: $size-5; border: 1px dashed $gray-200; border-radius: $radius-lg;
+    padding: $size-5; border: 1px dashed $os-border-strong; border-radius: $os-radius-lg;
   }
 
   &__setup-intro {
-    margin: 0 0 $size-4; font-size: $font-sm; color: $gray-500;
+    margin: 0 0 $size-4; font-size: $font-sm; color: $os-text-secondary;
   }
 
   &__steps {
@@ -204,8 +204,8 @@
 
   &__step {
     display: flex; align-items: flex-start; gap: $size-3;
-    padding: $size-3 $size-4; border-radius: $radius-md;
-    background: $gray-50; border: 1px solid $gray-100;
+    padding: $size-3 $size-4; border-radius: $os-radius-md;
+    background: $os-surface-2; border: 1px solid $os-border;
 
     &--done {
       background: rgba(#059669, 0.04); border-color: rgba(#059669, 0.15);
@@ -221,7 +221,7 @@
 
   &__step-num {
     flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
-    background: rgba($primary-500, 0.1); color: $primary-600;
+    background: $os-accent-dim; color: $os-accent-text;
     display: flex; align-items: center; justify-content: center;
     font-size: 11px; font-weight: $font-bold; margin-top: 1px;
   }
@@ -231,31 +231,31 @@
   }
 
   &__step-label {
-    font-size: $font-sm; font-weight: $font-semibold; color: $gray-800;
+    font-size: $font-sm; font-weight: $font-semibold; color: $os-text-primary;
   }
 
   &__step-desc {
-    font-size: $font-xs; color: $gray-500; line-height: 1.5;
+    font-size: $font-xs; color: $os-text-secondary; line-height: 1.5;
   }
 
   &__step-cta {
     flex-shrink: 0; align-self: center;
-    background: $primary-500; color: #fff; border: none;
-    border-radius: $radius-sm; padding: $size-1 $size-3;
+    background: $os-accent; color: #fff; border: none;
+    border-radius: $os-radius-sm; padding: $size-1 $size-3;
     font-size: 11px; font-weight: $font-semibold; cursor: pointer;
     white-space: nowrap;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 }
 
 .g6-kpi {
   display: flex; flex-direction: column; gap: $size-1;
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
+  background: $os-surface; border: 1px solid $os-border; border-radius: $os-radius-md;
   padding: $size-3 $size-4;
 
-  &__label { font-size: 11px; color: $gray-500; }
+  &__label { font-size: 11px; color: $os-text-secondary; }
   &__val {
-    font-size: $font-lg; font-weight: $font-bold; color: $gray-800;
+    font-size: $font-lg; font-weight: $font-bold; color: $os-text-primary;
     &--ok   { color: #16a34a; }
     &--warn { color: #d97706; }
   }
@@ -264,10 +264,10 @@
 .g6-campana-preview-row {
   display: flex; align-items: center; gap: $size-2;
   padding: $size-1 0;
-  border-top: 1px solid $gray-50;
+  border-top: 1px solid $os-surface-2;
 
   &__nombre {
-    flex: 1; font-size: $font-xs; color: $gray-700;
+    flex: 1; font-size: $font-xs; color: $os-text-secondary;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
@@ -276,7 +276,7 @@
     border-radius: $radius-full;
     &[data-estado='activa']  { background: #f0fdf4; color: #16a34a; }
     &[data-estado='pausada'] { background: #fef2f2; color: #dc2626; }
-    &[data-estado='borrador'] { background: $gray-100; color: $gray-500; }
+    &[data-estado='borrador'] { background: $os-border; color: $os-text-secondary; }
   }
 
   &__roas {
@@ -288,11 +288,11 @@
 
 .g6-agent-action {
   display: flex; gap: $size-3; padding: $size-2 0;
-  border-top: 1px solid $gray-50;
+  border-top: 1px solid $os-surface-2;
 
   &__dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: $gray-300; flex-shrink: 0; margin-top: 4px;
+    background: $os-text-muted; flex-shrink: 0; margin-top: 4px;
   }
 
   &--verde .g6-agent-action__dot  { background: #22c55e; }
@@ -301,10 +301,10 @@
 
   &__body { display: flex; flex-direction: column; gap: 2px; }
 
-  &__agente { font-size: 11px; font-weight: $font-semibold; color: $gray-600; }
-  &__tiempo { font-size: 11px; color: $gray-400; }
-  &__accion { font-size: $font-xs; color: $gray-700; margin: 0; }
-  &__impacto { font-size: 11px; color: $primary-500; margin: 0; }
+  &__agente { font-size: 11px; font-weight: $font-semibold; color: $os-text-secondary; }
+  &__tiempo { font-size: 11px; color: $os-text-muted; }
+  &__accion { font-size: $font-xs; color: $os-text-secondary; margin: 0; }
+  &__impacto { font-size: 11px; color: $os-accent; margin: 0; }
 }
 
 // ── Campañas tab ──────────────────────────────────────────────────────────
@@ -315,10 +315,10 @@
   }
 
   &__nueva {
-    background: $primary-500; color: #fff; border: none;
-    border-radius: $radius-sm; padding: $size-1 $size-3;
+    background: $os-accent; color: #fff; border: none;
+    border-radius: $os-radius-sm; padding: $size-1 $size-3;
     font-size: $font-xs; font-weight: $font-semibold; cursor: pointer;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 }
 
@@ -328,16 +328,16 @@
 
 .g6-campana-filtro {
   display: inline-flex; align-items: center; gap: 4px;
-  background: none; border: 1px solid $gray-200; border-radius: $radius-full;
-  padding: 3px 10px; font-size: 11px; font-weight: $font-medium; color: $gray-600;
+  background: none; border: 1px solid $os-border-strong; border-radius: $radius-full;
+  padding: 3px 10px; font-size: 11px; font-weight: $font-medium; color: $os-text-secondary;
   cursor: pointer; transition: border-color 100ms, background 100ms, color 100ms;
 
-  &:hover { border-color: $primary-300; color: $primary-600; }
-  &--active { background: rgba($primary-500, 0.08); border-color: $primary-400; color: $primary-600; font-weight: $font-semibold; }
+  &:hover { border-color: $os-accent; color: $os-accent-text; }
+  &--active { background: $os-accent-dim; border-color: $os-accent; color: $os-accent-text; font-weight: $font-semibold; }
 
   &__count {
-    font-size: 10px; background: $gray-100; border-radius: $radius-full;
-    padding: 0 5px; color: $gray-500;
+    font-size: 10px; background: $os-border; border-radius: $radius-full;
+    padding: 0 5px; color: $os-text-secondary;
   }
 }
 
@@ -346,13 +346,13 @@
 }
 
 .g6-campana-card {
-  background: #fff; border: 1px solid $gray-100; border-radius: $radius-md;
+  background: $os-surface; border: 1px solid $os-border; border-radius: $os-radius-md;
   padding: $size-4; transition: border-color 120ms ease;
 
-  &:hover { border-color: $primary-200; }
+  &:hover { border-color: $os-border-strong; }
   &--pausada { opacity: 0.75; border-style: dashed; }
-  &--cerrada { opacity: 0.5; background: $gray-50; }
-  &--borrador { border-color: rgba($primary-300, 0.4); border-style: dashed; }
+  &--cerrada { opacity: 0.5; background: $os-surface-2; }
+  &--borrador { border-color: rgba($os-accent, 0.4); border-style: dashed; }
 
   &--activa { border-left: 3px solid #22c55e; }
 
@@ -365,30 +365,30 @@
   &__title-block { flex: 1; min-width: 0; }
 
   &__nombre {
-    font-size: $font-sm; font-weight: $font-semibold; color: $gray-800;
+    font-size: $font-sm; font-weight: $font-semibold; color: $os-text-primary;
     margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
-  &__canal { font-size: 11px; color: $gray-400; }
+  &__canal { font-size: 11px; color: $os-text-muted; }
 
   &__estado {
     font-size: 10px; font-weight: $font-semibold; padding: 2px 8px;
     border-radius: $radius-full; flex-shrink: 0;
     &[data-estado='activa']   { background: #f0fdf4; color: #16a34a; }
     &[data-estado='pausada']  { background: #fef2f2; color: #dc2626; }
-    &[data-estado='borrador'] { background: $gray-100; color: $gray-500; }
-    &[data-estado='cerrada']  { background: $gray-50; color: $gray-400; }
+    &[data-estado='borrador'] { background: $os-border; color: $os-text-secondary; }
+    &[data-estado='cerrada']  { background: $os-surface-2; color: $os-text-muted; }
   }
 
   &__gali-badge {
-    font-size: 10px; font-weight: $font-semibold; color: $primary-500;
-    background: rgba($primary-500, 0.08); border: 1px solid rgba($primary-500, 0.2);
+    font-size: 10px; font-weight: $font-semibold; color: $os-accent;
+    background: $os-accent-dim; border: 1px solid rgba($os-accent, 0.2);
     border-radius: $radius-full; padding: 2px 7px; flex-shrink: 0;
   }
 
   &__metrics {
     display: flex; flex-wrap: wrap; gap: $size-3; margin-bottom: $size-3;
-    padding-bottom: $size-3; border-bottom: 1px solid $gray-50;
+    padding-bottom: $size-3; border-bottom: 1px solid $os-surface-2;
   }
 
   &__productos {
@@ -396,12 +396,12 @@
     margin-bottom: $size-2; font-size: 11px;
   }
 
-  &__productos-label { color: $gray-400; }
+  &__productos-label { color: $os-text-muted; }
 
   &__producto-chip {
-    background: $gray-50; border: 1px solid $gray-100;
-    border-radius: $radius-sm; padding: 2px 8px;
-    font-size: 11px; color: $gray-600;
+    background: $os-surface-2; border: 1px solid $os-border;
+    border-radius: $os-radius-sm; padding: 2px 8px;
+    font-size: 11px; color: $os-text-secondary;
   }
 
   &__agentes {
@@ -409,37 +409,37 @@
   }
 
   &__agente-chip {
-    font-size: 10px; font-weight: $font-medium; color: $gray-500;
-    background: $gray-50; border: 1px solid $gray-100; border-radius: $radius-full;
+    font-size: 10px; font-weight: $font-medium; color: $os-text-secondary;
+    background: $os-surface-2; border: 1px solid $os-border; border-radius: $radius-full;
     padding: 1px 7px;
     &--off { opacity: 0.4; }
   }
 
   &__nota {
     display: flex; align-items: flex-start; gap: 4px;
-    font-size: $font-xs; color: $gray-600; line-height: 1.4;
-    .gali-spark { color: $primary-500; flex-shrink: 0; }
+    font-size: $font-xs; color: $os-text-secondary; line-height: 1.4;
+    .gali-spark { color: $os-accent; flex-shrink: 0; }
   }
 }
 
 .g6-campana-metric {
   display: flex; flex-direction: column; gap: 2px;
 
-  &__label { font-size: 11px; color: $gray-400; }
+  &__label { font-size: 11px; color: $os-text-muted; }
   &__val {
-    font-size: $font-sm; font-weight: $font-semibold; color: $gray-700;
+    font-size: $font-sm; font-weight: $font-semibold; color: $os-text-secondary;
     display: flex; align-items: center; gap: 4px;
     &.roas--ok  { color: #16a34a; }
     &.roas--low { color: #dc2626; }
   }
-  &__obj { font-size: 11px; font-weight: 400; color: $gray-400; }
+  &__obj { font-size: 11px; font-weight: 400; color: $os-text-muted; }
 }
 
 // ── Rendimiento expandible en campaña card ───────────────────────────────
 .g6-campana-card__toggle-rend {
   background: none; border: 1px solid rgba($os-accent, 0.3); color: $os-accent-dark;
   padding: 4px 10px; border-radius: $radius-full; font-size: 12px; font-weight: 500;
-  font-family: $font-primary; cursor: pointer; transition: all 120ms ease;
+  font-family: $os-font-body; cursor: pointer; transition: all 120ms ease;
   display: flex; align-items: center; gap: 4px;
 
   &:hover, &.is-open { background: rgba($os-accent, 0.08); }
@@ -452,8 +452,8 @@
 
   &__tabla {
     display: flex; flex-direction: column;
-    background: $gray-50; border-radius: $radius-md; overflow: hidden;
-    border: 1px solid $gray-100;
+    background: $os-surface-2; border-radius: $os-radius-md; overflow: hidden;
+    border: 1px solid $os-border;
   }
 
   &__head, &__row {
@@ -464,26 +464,26 @@
 
   &__head {
     font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.05em; color: $gray-400;
-    border-bottom: 1px solid $gray-100;
+    letter-spacing: 0.05em; color: $os-text-muted;
+    border-bottom: 1px solid $os-border;
   }
 
   &__row {
-    font-size: 13px; color: $gray-700;
+    font-size: 13px; color: $os-text-secondary;
     border-bottom: 1px solid rgba(0,0,0,0.04);
     &:last-child { border-bottom: none; }
     &--stock-bajo { background: rgba(245, 158, 11, 0.05); }
     &--stock-agotado { background: rgba(239, 68, 68, 0.05); }
   }
 
-  &__nombre { font-weight: 500; color: $gray-900; display: flex; align-items: center; gap: $size-1; }
+  &__nombre { font-weight: 500; color: $os-text-primary; display: flex; align-items: center; gap: $size-1; }
 
   &__stock-warn { color: #d97706; }
 
   &__roas--ok { color: #16a34a; font-weight: 600; }
   &__roas--low { color: #dc2626; font-weight: 600; }
 
-  &__stock--ok { color: $gray-600; }
+  &__stock--ok { color: $os-text-secondary; }
   &__stock--bajo { color: #d97706; font-weight: 600; }
   &__stock--agotado { color: #dc2626; font-weight: 600; }
 }
@@ -494,11 +494,11 @@
 }
 
 .g6-campana-angulos {
-  background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: $radius-md;
+  background: $os-surface; border: 1px solid rgba(0,0,0,0.07); border-radius: $os-radius-md;
   padding: $size-3; display: flex; flex-direction: column; gap: $size-1;
 
   &__title {
-    font-size: 11px; font-weight: 600; color: $gray-400; text-transform: uppercase;
+    font-size: 11px; font-weight: 600; color: $os-text-muted; text-transform: uppercase;
     letter-spacing: 0.05em; margin-bottom: $size-1;
   }
 }
@@ -513,12 +513,12 @@
   &__dot {
     font-size: 10px;
     &[data-estado='activo'] { color: #16a34a; }
-    &[data-estado='pausado'] { color: $gray-400; }
-    &[data-estado='borrador'] { color: $gray-300; }
+    &[data-estado='pausado'] { color: $os-text-muted; }
+    &[data-estado='borrador'] { color: $os-text-muted; }
   }
-  &__nombre { font-weight: 500; color: $gray-800; flex: 1; }
-  &__pub { color: $gray-500; font-size: 11px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  &__roas { color: $gray-500; font-size: 11px; &--ok { color: #16a34a; font-weight: 600; } }
+  &__nombre { font-weight: 500; color: $os-text-primary; flex: 1; }
+  &__pub { color: $os-text-secondary; font-size: 11px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__roas { color: $os-text-secondary; font-size: 11px; &--ok { color: #16a34a; font-weight: 600; } }
 }
 
 // ── Vacío campañas ────────────────────────────────────────────────────────
@@ -527,14 +527,14 @@
   gap: $size-3; padding: $size-10; text-align: center;
 
   &__icon { font-size: 32px; }
-  p { font-size: $font-sm; color: $gray-500; margin: 0; }
+  p { font-size: $font-sm; color: $os-text-secondary; margin: 0; }
 
   &__ver-todas, &__nueva {
-    background: none; border: 1px solid $primary-300;
-    border-radius: $radius-sm; padding: $size-1 $size-3;
-    font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+    background: none; border: 1px solid $os-accent;
+    border-radius: $os-radius-sm; padding: $size-1 $size-3;
+    font-size: $font-xs; font-weight: $font-semibold; color: $os-accent-text;
     cursor: pointer;
-    &:hover { background: rgba($primary-500, 0.06); }
+    &:hover { background: rgba($os-accent, 0.06); }
   }
 }
 
@@ -542,32 +542,32 @@
 .g6-agentes-tab {
   &__footer {
     display: flex; justify-content: flex-end; margin-top: $size-4;
-    padding-top: $size-3; border-top: 1px solid $gray-100;
+    padding-top: $size-3; border-top: 1px solid $os-border;
   }
 
   &__ver-todos {
     background: none; border: none; cursor: pointer;
-    font-size: $font-sm; font-weight: $font-semibold; color: $primary-500;
+    font-size: $font-sm; font-weight: $font-semibold; color: $os-accent;
     &:hover { text-decoration: underline; }
   }
 }
 
 .g6-agente-row {
   display: flex; align-items: center; gap: $size-3;
-  padding: $size-3 $size-4; background: #fff;
-  border: 1px solid $gray-100; border-radius: $radius-md;
+  padding: $size-3 $size-4; background: $os-surface;
+  border: 1px solid $os-border; border-radius: $os-radius-md;
   margin-bottom: $size-2;
 
   &__icon { font-size: 20px; flex-shrink: 0; }
 
   &__info { flex: 1; min-width: 0; }
-  &__nombre { display: block; font-size: $font-sm; font-weight: $font-semibold; color: $gray-800; }
-  &__desc   { display: block; font-size: 11px; color: $gray-500; }
+  &__nombre { display: block; font-size: $font-sm; font-weight: $font-semibold; color: $os-text-primary; }
+  &__desc   { display: block; font-size: 11px; color: $os-text-secondary; }
 
   &__tipo {
     font-size: 10px; font-weight: $font-semibold; padding: 2px 8px;
     border-radius: $radius-full; white-space: nowrap;
-    background: $gray-100; color: $gray-500;
+    background: $os-border; color: $os-text-secondary;
     &[data-tipo='deterministico'] { background: rgba(96,165,250,0.12); color: #1d4ed8; }
     &[data-tipo='ia-ligera']      { background: rgba(134,239,172,0.15); color: #15803d; }
     &[data-tipo='ia-compleja']    { background: rgba(167,139,250,0.15); color: #7c3aed; }
@@ -577,14 +577,14 @@
 .g6-agentes-empty {
   display: flex; flex-direction: column; align-items: center;
   gap: $size-3; padding: $size-10; text-align: center;
-  p { font-size: $font-sm; color: $gray-500; margin: 0; }
+  p { font-size: $font-sm; color: $os-text-secondary; margin: 0; }
 
   &__cta {
-    background: none; border: 1px solid $primary-300;
-    border-radius: $radius-sm; padding: $size-1 $size-3;
-    font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
+    background: none; border: 1px solid $os-accent;
+    border-radius: $os-radius-sm; padding: $size-1 $size-3;
+    font-size: $font-xs; font-weight: $font-semibold; color: $os-accent-text;
     cursor: pointer;
-    &:hover { background: rgba($primary-500, 0.06); }
+    &:hover { background: rgba($os-accent, 0.06); }
   }
 }
 
@@ -592,7 +592,7 @@
 .g6-detalle__estado {
   &[data-estado='en_riesgo']    { background: #fef2f2; color: #dc2626; }
   &[data-estado='configurando'] { background: #fefce8; color: #92400e; }
-  &[data-estado='borrador']     { background: $gray-100; color: $gray-500; }
+  &[data-estado='borrador']     { background: $os-border; color: $os-text-secondary; }
 }
 
 // ── Contribución + proyección (header PV) ────────────────────────────────────
@@ -602,10 +602,10 @@
 
 .g6-detalle__contribucion-chip {
   display: inline-flex; align-items: center; gap: $size-1;
-  background: rgba($primary-500, 0.07); border: 1px solid rgba($primary-500, 0.18);
+  background: rgba($os-accent, 0.07); border: 1px solid rgba($os-accent, 0.18);
   border-radius: $radius-full; padding: 4px 12px;
-  font-size: $font-sm; color: $gray-700;
-  strong { color: $primary-600; }
+  font-size: $font-sm; color: $os-text-secondary;
+  strong { color: $os-accent-text; }
 }
 
 .g6-detalle__proyeccion-chip {
@@ -625,7 +625,7 @@
   font-size: $font-xs;
 }
 .g6-detalle__subobj-icon { color: rgba(0,0,0,0.3); }
-.g6-detalle__subobj-label { color: $gray-500; font-weight: $font-medium; }
+.g6-detalle__subobj-label { color: $os-text-secondary; font-weight: $font-medium; }
 .g6-detalle__subobj-link {
   color: $os-accent;
   font-weight: $font-semibold;
@@ -637,7 +637,7 @@
 .g6-detalle__alerta-gali {
   display: flex; align-items: flex-start; gap: $size-2; margin-top: $size-3;
   background: #fffbeb; border: 1px solid rgba(#d97706, 0.3);
-  border-radius: $radius-md; padding: $size-3 $size-4;
+  border-radius: $os-radius-md; padding: $size-3 $size-4;
   font-size: $font-sm; color: #92400e; line-height: 1.5;
 
   &--riesgo {
@@ -653,13 +653,13 @@
   display: flex; flex-direction: column; align-items: center;
   gap: $size-4; padding: $size-10; text-align: center;
 
-  &-desc { font-size: $font-sm; color: $gray-500; max-width: 340px; margin: 0; line-height: 1.5; }
+  &-desc { font-size: $font-sm; color: $os-text-secondary; max-width: 340px; margin: 0; line-height: 1.5; }
 
   &-cta {
-    background: $primary-500; color: #fff; border: none;
-    border-radius: $radius-sm; padding: $size-2 $size-5;
+    background: $os-accent; color: #fff; border: none;
+    border-radius: $os-radius-sm; padding: $size-2 $size-5;
     font-size: $font-sm; font-weight: $font-semibold; cursor: pointer;
-    &:hover { background: $primary-600; }
+    &:hover { background: $os-accent-dark; }
   }
 }
 
@@ -673,7 +673,7 @@
 
   &__nombres { flex: 1; min-width: 0; }
   &__nombre {
-    display: block; font-size: $font-sm; font-weight: $font-semibold; color: $gray-800;
+    display: block; font-size: $font-sm; font-weight: $font-semibold; color: $os-text-primary;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   &__canal-label { display: block; font-size: 11px; font-weight: $font-medium; margin-top: 1px; }
@@ -681,24 +681,24 @@
   &__estado-badge {
     font-size: 10px; font-weight: $font-semibold; padding: 2px 8px;
     border-radius: $radius-full; flex-shrink: 0;
-    background: $gray-100; color: $gray-500;
+    background: $os-border; color: $os-text-secondary;
     &[data-estado='activa']      { background: #f0fdf4; color: #16a34a; }
     &[data-estado='pausada']     { background: #fef2f2; color: #dc2626; }
     &[data-estado='sin_producto']{ background: #fefce8; color: #92400e; }
-    &[data-estado='borrador']    { background: $gray-100; color: $gray-400; }
+    &[data-estado='borrador']    { background: $os-border; color: $os-text-muted; }
   }
 
   &__producto-row { margin-bottom: $size-3; }
 
   &__producto-chip {
     display: inline-flex; align-items: center; gap: 4px;
-    background: $gray-50; border: 1px solid $gray-100;
-    border-radius: $radius-sm; padding: 3px 8px;
-    font-size: 11px; color: $gray-700;
+    background: $os-surface-2; border: 1px solid $os-border;
+    border-radius: $os-radius-sm; padding: 3px 8px;
+    font-size: 11px; color: $os-text-secondary;
   }
 
   &__sin-producto {
-    background: none; border: 1px dashed #fbbf24; border-radius: $radius-sm;
+    background: none; border: 1px dashed #fbbf24; border-radius: $os-radius-sm;
     padding: 3px 10px; font-size: 11px; font-weight: $font-semibold;
     color: #92400e; cursor: pointer;
     &:hover { background: #fefce8; }
@@ -707,7 +707,7 @@
   // Agentes + conexiones row
   &__agentes-cnx {
     display: flex; flex-direction: column; gap: $size-2;
-    padding-top: $size-2; border-top: 1px solid $gray-50; margin-top: $size-2;
+    padding-top: $size-2; border-top: 1px solid $os-surface-2; margin-top: $size-2;
   }
 
   &__agentes-row, &__cnx-row {
@@ -717,38 +717,38 @@
   &__agente-avatar, &__cnx-avatar {
     display: inline-flex; align-items: center; justify-content: center;
     width: 28px; height: 28px; border-radius: 50%;
-    background: $gray-100; border: 1px solid $gray-200;
+    background: $os-border; border: 1px solid $os-border-strong;
     font-size: 14px; cursor: pointer; transition: background 120ms;
-    &:hover { background: rgba($primary-500, 0.1); border-color: $primary-300; }
+    &:hover { background: rgba($os-accent, 0.1); border-color: $os-accent; }
   }
 
-  &__cnx-avatar { background: rgba($primary-500, 0.06); border-color: rgba($primary-500, 0.15); }
+  &__cnx-avatar { background: rgba($os-accent, 0.06); border-color: rgba($os-accent, 0.15); }
 
   &__agentes-link, &__cnx-link {
     background: none; border: none; cursor: pointer;
-    font-size: 11px; font-weight: $font-semibold; color: $primary-500;
+    font-size: 11px; font-weight: $font-semibold; color: $os-accent;
     padding: 0;
     &:hover { text-decoration: underline; }
   }
 
   &__asignar-agente, &__conectar {
-    background: none; border: 1px dashed $primary-300; border-radius: $radius-sm;
+    background: none; border: 1px dashed $os-accent; border-radius: $os-radius-sm;
     padding: 2px 10px; font-size: 11px; font-weight: $font-semibold;
-    color: $primary-600; cursor: pointer;
-    &:hover { background: rgba($primary-500, 0.06); }
+    color: $os-accent-text; cursor: pointer;
+    &:hover { background: rgba($os-accent, 0.06); }
   }
 
   &__acciones {
     display: flex; align-items: center; gap: $size-2; flex-wrap: wrap;
-    padding-top: $size-3; margin-top: $size-2; border-top: 1px solid $gray-100;
+    padding-top: $size-3; margin-top: $size-2; border-top: 1px solid $os-border;
   }
 
   &__pausa {
-    background: none; border: 1px solid $gray-200; border-radius: $radius-sm;
+    background: none; border: 1px solid $os-border-strong; border-radius: $os-radius-sm;
     padding: $size-1 $size-3; font-size: $font-xs; font-weight: $font-semibold;
-    color: $gray-600; cursor: pointer; transition: all 0.15s;
+    color: $os-text-secondary; cursor: pointer; transition: all 0.15s;
 
-    &:hover { border-color: $gray-300; background: $gray-50; }
+    &:hover { border-color: $os-border-strong; background: $os-surface-2; }
 
     &--pausada {
       border-color: rgba(#dc2626, 0.25); color: #dc2626; background: rgba(#dc2626, 0.03);
@@ -758,8 +758,8 @@
 
   &__ver-detalle {
     background: none; border: none; cursor: pointer; padding: 0;
-    font-size: $font-xs; font-weight: $font-semibold; color: $primary-600;
-    &:hover { color: $primary-700; text-decoration: underline; }
+    font-size: $font-xs; font-weight: $font-semibold; color: $os-accent-text;
+    &:hover { color: $os-accent-dark; text-decoration: underline; }
     margin-left: auto;
   }
 }
@@ -767,14 +767,14 @@
 // ── Nueva campaña CTA (bottom PV) ─────────────────────────────────────────────
 .g6-campanas__nueva-cta {
   display: flex; justify-content: flex-start; margin-top: $size-4;
-  padding-top: $size-3; border-top: 1px solid $gray-100;
+  padding-top: $size-3; border-top: 1px solid $os-border;
 }
 
 .g6-campanas__nueva {
-  background: $primary-500; color: #fff; border: none;
-  border-radius: $radius-sm; padding: $size-2 $size-4;
+  background: $os-accent; color: #fff; border: none;
+  border-radius: $os-radius-sm; padding: $size-2 $size-4;
   font-size: $font-sm; font-weight: $font-semibold; cursor: pointer;
-  &:hover { background: $primary-600; }
+  &:hover { background: $os-accent-dark; }
 }
 
 // ── Métricas de productos por proyecto ──────────────────────────────────────
@@ -840,21 +840,21 @@
 .det__resumen-extra {
   display: flex; flex-wrap: wrap; gap: $size-2;
   padding: $size-3 $size-4;
-  background: $os-surface-2; border-radius: $radius-md;
+  background: $os-surface-2; border-radius: $os-radius-md;
   border: 1px solid $os-border;
   margin-bottom: $size-4;
 }
 
 .det__resumen-stat {
   display: flex; align-items: center; gap: $size-2;
-  font-size: $font-sm; color: $gray-600;
+  font-size: $font-sm; color: $os-text-secondary;
   padding: $size-1 $size-3;
-  background: #fff; border-radius: $radius-sm;
-  border: 1px solid $gray-100;
+  background: $os-surface; border-radius: $os-radius-sm;
+  border: 1px solid $os-border;
 
-  strong { color: $gray-900; font-weight: $font-semibold; }
+  strong { color: $os-text-primary; font-weight: $font-semibold; }
 
-  &__icon { font-size: 13px; color: $gray-400; }
+  &__icon { font-size: 13px; color: $os-text-muted; }
 
   &--up {
     border-color: rgba(5, 150, 105, 0.2);

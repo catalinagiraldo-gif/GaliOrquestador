@@ -288,8 +288,8 @@
   color: $os-text-muted;
   padding: 0.25rem;
   flex-shrink: 0;
-  min-width: 24px;
-  min-height: 24px;
+  min-width: 32px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -366,6 +366,12 @@
   gap: 0.5rem;
   font-size: 0.73rem;
   color: $os-text-secondary;
+  padding: 0.2rem 0.3rem;
+  margin: 0 -0.3rem;
+  border-radius: $os-radius-sm;
+  transition: background $os-transition;
+
+  &:hover { background: $os-surface-3; }
 
   &__tipo {
     font-size: 0.58rem;
@@ -373,6 +379,19 @@
     padding: 0.1rem 0.4rem;
     border-radius: 8px;
     flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__meta {
+    font-size: 0.64rem;
+    color: $os-text-muted;
   }
 }
 
@@ -384,9 +403,21 @@
 
 .g6-agente-regla {
   display: flex;
-  align-items: flex-start;
-  gap: 0.4rem;
-  font-size: 0.72rem;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.3rem 0.3rem;
+  margin: 0 -0.3rem;
+  border-radius: $os-radius-sm;
+  transition: background $os-transition;
+
+  &:hover { background: $os-surface-3; }
+
+  &__logic {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+  }
 
   &__si { color: $os-warn; font-weight: 700; flex-shrink: 0; }
   &__cond { color: $os-text-secondary; flex: 1; }
@@ -396,7 +427,52 @@
     border: none; background: none; color: $gray-400; cursor: pointer;
     font-size: 1rem; line-height: 1; padding: 0 $size-1; flex-shrink: 0;
     border-radius: $radius-sm;
+    transition: color $os-transition, background $os-transition;
     &:hover { color: #dc2626; background: rgba(#dc2626, 0.06); }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding-left: calc(1.4rem);
+  }
+
+  &__priority {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #fff;
+    background: $os-accent;
+    padding: 0.05rem 0.35rem;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  &__scope {
+    font-size: 0.64rem;
+    color: $os-text-muted;
+    background: $os-surface;
+    border: 1px solid $os-border;
+    padding: 0.05rem 0.4rem;
+    border-radius: 8px;
+  }
+
+  &__skill-chip {
+    font-size: 0.64rem;
+    font-weight: 600;
+    color: $os-accent;
+    background: rgba($os-accent, 0.08);
+    border: 1px solid rgba($os-accent, 0.2);
+    padding: 0.05rem 0.4rem;
+    border-radius: 8px;
+  }
+
+  &__ejec {
+    font-size: 0.64rem;
+    color: $os-text-muted;
+
+    &--empty { font-style: italic; }
   }
 }
 
@@ -411,7 +487,6 @@
 // ── Skill toggle ───────────────────────────────────────────
 .g6-agente-skill {
   &--off { opacity: 0.45; }
-  &__label { flex: 1; }
 }
 
 .g6-skill-toggle {

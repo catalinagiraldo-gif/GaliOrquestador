@@ -3,6 +3,7 @@ import { PROYECTOS_MOCK } from '../../../../../mocks/gali-v6/proyectos.mock';
 import { MOCK_CAMPANAS } from '../../../../../mocks/gali-v6/campanas.mock';
 import { MOCK_ALERTAS, MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
 import { AGENTES_ESPECIALIZADOS } from '../../../../../mocks/gali-v6/agentes-especializados';
+import addressesData from '../../../../../mocks/gali-v5/validador-addresses.json';
 
 /**
  * Fuente de verdad única para mutaciones que tanto el chat de Gali como la UI
@@ -18,6 +19,9 @@ import { AGENTES_ESPECIALIZADOS } from '../../../../../mocks/gali-v6/agentes-esp
 @Injectable({ providedIn: 'root' })
 export class Gali6LiveMutationsService {
   readonly version = signal(0);
+
+  /** Productos con recolección pausada por stock-out (mock — Flujo A, 18.FlujoUsuarioGali6.md §1.2). */
+  private readonly recoleccionesPausadas = new Set<string>();
 
   pausarCampana(proyectoId: string, campanaId: string): boolean {
     const enMockCampanas = MOCK_CAMPANAS.find(c => c.id === campanaId && c.proyectoId === proyectoId);
@@ -50,6 +54,26 @@ export class Gali6LiveMutationsService {
       return true;
     }
     return false;
+  }
+
+  /** Marca una dirección del Validador como corregida/validada (mock — ver gali6-chat.service.ts, regla "corrige la dirección"). */
+  corregirDireccion(addressId: string): boolean {
+    const addr = addressesData.addresses.find(a => a.id === addressId);
+    if (!addr) return false;
+    addr.validated = true;
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  /** Pausa la recolección de un producto en riesgo de stock-out (mock — ver gali6-chat.service.ts, Flujo A). */
+  pausarRecoleccion(productoId: string): boolean {
+    this.recoleccionesPausadas.add(productoId);
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  recoleccionPausada(productoId: string): boolean {
+    return this.recoleccionesPausadas.has(productoId);
   }
 
   /**

@@ -67,19 +67,19 @@ type TabId = 'agentes' | 'reglas' | 'conexiones' | 'marketplace';
         </div>
       }
 
-      <!-- ── REGLAS (+ Automatizaciones) ── -->
+      <!-- ── REGLAS Y SKILLS ── -->
       @if (activeTab() === 'reglas') {
         <div role="tabpanel" id="cc-panel-reglas" aria-labelledby="cc-tab-reglas">
-          <app-reglas-page />
+          <app-reglas-page [embedded]="true" />
 
-          <section class="cc-sub" [class.cc-sub--open]="automatizacionesOpen()">
-            <button class="cc-sub__toggle" (click)="automatizacionesOpen.set(!automatizacionesOpen())">
-              <span class="cc-sub__chevron" aria-hidden="true">{{ automatizacionesOpen() ? '▾' : '▸' }}</span>
-              Automatizaciones
+          <section class="cc-sub" [class.cc-sub--open]="skillsOpen()">
+            <button class="cc-sub__toggle" (click)="skillsOpen.set(!skillsOpen())">
+              <span class="cc-sub__chevron" aria-hidden="true">{{ skillsOpen() ? '▾' : '▸' }}</span>
+              Skills
             </button>
-            @if (automatizacionesOpen()) {
+            @if (skillsOpen()) {
               <div class="cc-sub__body">
-                <app-skills-page />
+                <app-skills-page [embedded]="true" />
               </div>
             }
           </section>
@@ -120,7 +120,7 @@ export class Gali6CentroControlComponent {
 
   readonly tabs: Array<{ id: TabId; label: string }> = [
     { id: 'agentes', label: 'Agentes' },
-    { id: 'reglas', label: 'Reglas' },
+    { id: 'reglas', label: 'Reglas y Skills' },
     { id: 'conexiones', label: 'Conexiones' },
     { id: 'marketplace', label: 'Marketplace' },
   ];
@@ -129,6 +129,6 @@ export class Gali6CentroControlComponent {
   private readonly initialFocus = this.route.snapshot.data['focus'] as string | undefined;
 
   readonly activeTab = signal<TabId>(this.initialTab);
-  readonly automatizacionesOpen = signal(this.initialFocus === 'skills');
+  readonly skillsOpen = signal(this.initialFocus === 'skills');
   readonly historialOpen = signal(this.initialFocus === 'historial');
 }

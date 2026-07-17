@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 
 :host { display: block; width: 100%; }
 
@@ -9,21 +10,21 @@
 
   &__modo-tag {
     font-size: 10px; font-weight: $font-semibold; text-transform: uppercase;
-    letter-spacing: 0.06em; color: $gray-500; background: $gray-100;
+    letter-spacing: 0.06em; color: $os-text-secondary; background: $os-surface-3;
     padding: 3px 10px; border-radius: $radius-full;
   }
 
   &__puente {
     font-size: $font-sm;
-    color: $gray-600;
+    color: $os-text-secondary;
     margin: 0 0 $size-5;
     padding: $size-3 $size-4;
-    background: $gray-50;
-    border-radius: $radius-md;
-    border: 1px solid $gray-100;
+    background: $os-surface-2;
+    border-radius: $os-radius-md;
+    border: 1px solid $os-border;
 
     a {
-      color: $primary-600;
+      color: $os-accent;
       font-weight: $font-semibold;
       text-decoration: none;
       margin-left: $size-1;
@@ -35,7 +36,7 @@
 
 /* Tab nav */
 .cc-tabs {
-  display: flex; gap: 0; border-bottom: 1px solid $gray-100;
+  display: flex; gap: 0; border-bottom: 1px solid $os-border;
   margin-bottom: $size-5; overflow-x: auto;
 }
 
@@ -43,28 +44,28 @@
   display: flex; align-items: center; gap: $size-2;
   padding: $size-3 $size-5; background: transparent; border: none;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
-  font-family: $font-primary; font-size: $font-sm; font-weight: $font-medium;
-  color: $gray-500; cursor: pointer; white-space: nowrap;
+  font-family: $os-font-body; font-size: $font-sm; font-weight: $font-medium;
+  color: $os-text-secondary; cursor: pointer; white-space: nowrap;
   transition: color 120ms ease, border-color 120ms ease;
 
-  &:hover { color: $gray-800; }
-  &--active { color: $primary-600; border-bottom-color: $primary-500; font-weight: $font-semibold; }
+  &:hover { color: $os-text-primary; }
+  &--active { color: $os-accent; border-bottom-color: $os-accent; font-weight: $font-semibold; }
 }
 
 /* Sub-sección colapsable (Automatizaciones dentro de Reglas, Lo que Gali hizo dentro de Conexiones) */
 .cc-sub {
   margin-top: $size-6;
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid $os-border;
   padding-top: $size-4;
 
   &__toggle {
     display: flex; align-items: center; gap: $size-2;
     background: transparent; border: none; padding: 0;
-    font-family: $font-primary; font-size: $font-base; font-weight: $font-bold;
-    color: $gray-800; cursor: pointer;
+    font-family: $os-font-body; font-size: $font-base; font-weight: $font-bold;
+    color: $os-text-primary; cursor: pointer;
   }
 
-  &__chevron { color: $gray-400; font-size: 12px; }
+  &__chevron { color: $os-text-muted; font-size: 12px; }
 
   &__body {
     margin-top: $size-4;

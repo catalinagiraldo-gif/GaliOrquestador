@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Gali6ChatService } from './gali6-chat.service';
@@ -43,8 +43,17 @@ export class Gali6ChatPanelComponent {
   @Output() closed = new EventEmitter<void>();
   @Output() galiActing = new EventEmitter<{ targetId: string; kind: 'mutate' | 'navigate' }>();
 
+  @ViewChild('draftInput') draftInput?: ElementRef<HTMLTextAreaElement>;
+
   readonly draft = signal('');
   readonly activeTab = signal<Gali6PanelTab>('chat');
+
+  /** Auto-grow del textarea hasta el max-height definido en CSS (96px) — nunca lo excede, la propia CSS lo recorta. */
+  autoGrow(event: Event): void {
+    const el = event.target as HTMLTextAreaElement;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
 
   readonly isMainThread = computed(() => this.threadsSvc.activeThreadId() === 'gali-main');
 
@@ -60,6 +69,7 @@ export class Gali6ChatPanelComponent {
       this.threadsSvc.sendToActiveThread(text);
     }
     this.draft.set('');
+    if (this.draftInput) this.draftInput.nativeElement.style.height = 'auto';
   }
 
   onActionClick(actionId: string): void {

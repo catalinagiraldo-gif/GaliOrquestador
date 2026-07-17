@@ -34,7 +34,20 @@ function remapRail(items: IconRailItem[]): IconRailItem[] {
   }));
 }
 
-export const G6_ICON_RAIL: IconRailItem[] = remapRail(DROPI_ICON_RAIL);
+/**
+ * Shortcut a Dashboard justo después de Productos (pedido explícito de Catalina, 2026-07-16).
+ * Reordena solo la copia remapeada de Gali 6 — `DROPI_ICON_RAIL` (compartido con /gali-v5) no se toca.
+ */
+function withDashboardShortcut(items: IconRailItem[]): IconRailItem[] {
+  const idx = items.findIndex(i => i.key === 'reportes');
+  if (idx <= 1) return items;
+  const reordered = [...items];
+  const [reportes] = reordered.splice(idx, 1);
+  reordered.splice(1, 0, reportes);
+  return reordered;
+}
+
+export const G6_ICON_RAIL: IconRailItem[] = withDashboardShortcut(remapRail(DROPI_ICON_RAIL));
 
 export const G6_SECTION_PANELS: Record<string, SectionPanel> = Object.fromEntries(
   Object.entries(DROPI_SECTION_PANELS).map(([k, v]) => [k, remapPanel(v)]),

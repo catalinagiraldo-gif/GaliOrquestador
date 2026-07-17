@@ -152,6 +152,11 @@ export class Gali6AgentesComponent implements OnInit {
     return map[tipo];
   }
 
+  getSkillLabel(ag: { skills: Array<{ id: string; label: string }> }, skillId?: string): string | null {
+    if (!skillId) return null;
+    return ag.skills.find(sk => sk.id === skillId)?.label ?? null;
+  }
+
   getProyectoEstadoClass(estado: string): string {
     const map: Record<string, string> = {
       en_escala: 'estado--escala', activo: 'estado--activo',

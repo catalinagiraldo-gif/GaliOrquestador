@@ -218,6 +218,7 @@
       color: $os-text-primary;
       background: $os-surface-2;
       max-height: 96px;
+      overflow-y: auto;
       transition: $os-transition;
 
       &:focus {

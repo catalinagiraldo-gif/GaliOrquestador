@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 @import './marketing-shared';
 
 :host {
@@ -232,5 +233,158 @@
   &__footer {
     display: flex;
     justify-content: flex-end;
+  }
+
+  &__breakeven {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: $size-2 $size-3;
+    padding: $size-4;
+    margin-bottom: $size-6;
+    background: rgba($primary-500, 0.06);
+    border: 1px solid rgba($primary-500, 0.2);
+    border-radius: $radius-lg;
+
+    &-label {
+      font-family: $font-primary;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-700;
+    }
+
+    &-value {
+      font-family: $font-primary;
+      font-size: 22px;
+      font-weight: $font-bold;
+      color: $primary-600;
+    }
+
+    &-hint {
+      flex-basis: 100%;
+      font-family: $font-primary;
+      font-size: $font-xs;
+      color: $gray-500;
+    }
+  }
+
+  &__budget-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $size-4;
+    margin-bottom: $size-6;
+    max-width: 480px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $size-2;
+    flex: 1;
+    min-width: 180px;
+
+    label {
+      font-family: $font-primary;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-700;
+    }
+
+    &-input {
+      display: flex;
+      align-items: center;
+      gap: $size-2;
+      height: 40px;
+      padding: 0 $size-3;
+      border: 1px solid $gray-200;
+      border-radius: $radius-lg;
+      background: $white;
+      transition: border-color 0.15s ease;
+
+      &:focus-within {
+        border-color: $primary-500;
+      }
+
+      input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        font-family: $font-primary;
+        font-size: $font-sm;
+        color: $gray-800;
+        background: transparent;
+      }
+    }
+
+    &-prefix,
+    &-suffix {
+      font-family: $font-primary;
+      font-size: $font-sm;
+      color: $gray-500;
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: $size-3;
+    max-width: 480px;
+    cursor: pointer;
+
+    // Checkbox nativo restyled como switch (misma paleta que .g6-mkt-regla__toggle) —
+    // sigue siendo un <input type="checkbox"> real, solo cambia su apariencia visual.
+    input[type='checkbox'] {
+      appearance: none;
+      -webkit-appearance: none;
+      margin-top: 2px;
+      width: 36px;
+      height: 20px;
+      border-radius: 999px;
+      background: $os-text-muted;
+      cursor: pointer;
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.2s ease;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.2s ease;
+      }
+
+      &:checked {
+        background: $os-accent;
+        &::after { transform: translateX(16px); }
+      }
+
+      &:focus-visible {
+        outline: 2px solid $os-accent;
+        outline-offset: 2px;
+      }
+    }
+
+    span {
+      font-family: $font-primary;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $gray-700;
+      display: flex;
+      flex-direction: column;
+      gap: $size-1;
+    }
+
+    small {
+      font-family: $font-primary;
+      font-size: $font-xs;
+      font-weight: $font-regular;
+      color: $gray-500;
+    }
   }
 }

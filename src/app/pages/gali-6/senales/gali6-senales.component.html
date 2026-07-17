@@ -173,7 +173,7 @@
         <!-- Estado vacío -->
         @if (senalesVisibles().length === 0 && alertasVisibles().length === 0) {
           <div class="g6-list-empty">
-            <span class="g6-list-empty__icon">✦</span>
+            <i class="g6-list-empty__icon pi pi-check-circle" aria-hidden="true"></i>
             <p class="g6-list-empty__title">Todo bajo control</p>
             <p class="g6-list-empty__sub">Gali monitoreó tu negocio — 0 riesgos en este filtro</p>
           </div>
@@ -196,7 +196,7 @@
           </app-senal-detalle>
         } @else {
           <div class="g6-detail-empty">
-            <i class="g6-detail-empty__icon pi pi-eye"></i>
+            <i class="g6-detail-empty__icon pi pi-eye" aria-hidden="true"></i>
             <p class="g6-detail-empty__title">Selecciona una alerta o señal</p>
             <p class="g6-detail-empty__sub">Ve el análisis completo, los datos de Dropi y la acción recomendada.</p>
           </div>

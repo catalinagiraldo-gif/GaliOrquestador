@@ -2,12 +2,16 @@
 
   <!-- Header -->
   <div class="skills-os__header">
-    <div class="skills-os__header-left">
-      <h1 class="skills-os__title">Skills</h1>
-      <span class="skills-os__sub">{{ skills.length }} activas · capacidades reutilizables para tus agentes</span>
-    </div>
+    @if (!embedded()) {
+      <div class="skills-os__header-left">
+        <h1 class="skills-os__title">Skills</h1>
+        <span class="skills-os__sub">{{ skills.length }} activas · capacidades reutilizables para tus agentes</span>
+      </div>
+    }
     <div class="skills-os__header-right">
-      <a routerLink="/gali-v5/agentes" class="skills-os__btn skills-os__btn--ghost">Agentes</a>
+      @if (!embedded()) {
+        <a routerLink="/gali-6/agentes" class="skills-os__btn skills-os__btn--ghost">Agentes</a>
+      }
       <button type="button" class="skills-os__btn skills-os__btn--accent" (click)="goToNewSkill()">
         + Nueva skill
       </button>
@@ -25,7 +29,7 @@
 
     <div class="skills-main-tabs__sep"></div>
 
-    <a routerLink="/gali-v5/marketplace" class="skills-main-tab skills-main-tab--marketplace">
+    <a routerLink="/gali-6/marketplace" class="skills-main-tab skills-main-tab--marketplace">
       <span class="skills-main-tab__label">Marketplace</span>
       <span class="skills-main-tab__sub">Skills · Agentes · Conexiones</span>
       <i class="pi pi-external-link skills-main-tab__ext"></i>
@@ -64,26 +68,28 @@
         }
       </div>
 
-      @for (skill of filteredSkills(); track skill.id) {
-        <button
-          type="button"
-          class="skill-item"
-          [class.skill-item--selected]="selectedSkillId() === skill.id"
-          [class.skill-item--paused]="skill.status === 'paused'"
-          (click)="selectSkill(skill.id)">
-          <span class="skill-item__dot"
-            [class.skill-item__dot--on]="skill.status === 'active'"
-            [class.skill-item__dot--off]="skill.status === 'paused'">
-          </span>
-          <div class="skill-item__content">
-            <strong class="skill-item__name">{{ skill.nombre }}</strong>
-            <span class="skill-item__meta">{{ (skill.agentesQueLaUsan?.[0]?.nombre ?? 'Sin agente') }} · {{ skill.ejecuciones_total }} ejec.</span>
-          </div>
-        </button>
-      }
+      <div class="skill-list">
+        @for (skill of filteredSkills(); track skill.id) {
+          <button
+            type="button"
+            class="skill-item"
+            [class.skill-item--selected]="selectedSkillId() === skill.id"
+            [class.skill-item--paused]="skill.status === 'paused'"
+            (click)="selectSkill(skill.id)">
+            <span class="skill-item__dot"
+              [class.skill-item__dot--on]="skill.status === 'active'"
+              [class.skill-item__dot--off]="skill.status === 'paused'">
+            </span>
+            <div class="skill-item__content">
+              <strong class="skill-item__name">{{ skill.nombre }}</strong>
+              <span class="skill-item__meta">{{ (skill.agentesQueLaUsan?.[0]?.nombre ?? 'Sin agente') }} · última vez {{ skill.ultima_ejecucion }} · {{ skill.ejecuciones_total }} ejec.</span>
+            </div>
+          </button>
+        }
+      </div>
 
       <!-- Quick link to Agentes page -->
-      <a routerLink="/gali-v5/agentes" class="skills-os__agentes-link">
+      <a routerLink="/gali-6/agentes" class="skills-os__agentes-link">
         <span>Ver mis agentes →</span>
         <span class="skills-os__agentes-link__sub">4 activos · gestionan estas skills</span>
       </a>

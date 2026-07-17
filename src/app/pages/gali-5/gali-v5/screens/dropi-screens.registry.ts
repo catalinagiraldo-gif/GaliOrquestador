@@ -132,23 +132,33 @@ function novedadesRows(): DropiTableRow[] {
   }));
 }
 
+// Filas con riesgo de stock-out para "Collar GPS para mascotas" — mismo producto y
+// motivo que cita Stock Guardian en su ejemploSenal (mocks/gali-v6/agentes-especializados.ts):
+// "Collar GPS tiene solo 3 unidades disponibles — tu campaña activa puede quedar sin stock en ~2 días".
+const GARANTIAS_RIESGO_IDX = new Set([1, 4, 7]);
+
 function garantiasRecoleccionesRows(): DropiTableRow[] {
-  return Array.from({ length: 10 }, (_, i) => ({
-    id: `gar-rec-${i + 1}`,
-    cells: {
-      id: String(50028 + i),
-      adminId: pick(['wendy.rojas@dropi.co', 'admin@dropitienda.co', 'ops@dropi.co'], i),
-      garantiaId: String(301 + i),
-      ordenId: String(160604 + i),
-      fechaCreacion: pick(S.dates, i),
-      transportadora: pick(S.transport, i),
-      fechaRecoleccion: pick(S.dates, i),
-      numeroOrden: String(160604 + i),
-      estatusOrden: pick(S.statusPedido, i),
-      numeroGuia: pick(['1123266584698', '8876543210123', '5544332211009'], i),
-      estatusGuia: pick(['En tránsito', 'Entregada', 'Novedad', 'Generada'], i),
-    },
-  }));
+  return Array.from({ length: 10 }, (_, i) => {
+    const enRiesgo = GARANTIAS_RIESGO_IDX.has(i);
+    return {
+      id: `gar-rec-${i + 1}`,
+      cells: {
+        id: String(50028 + i),
+        producto: enRiesgo ? 'Collar GPS para mascotas' : pick(S.products, i),
+        riesgo: enRiesgo ? 'Riesgo stock-out' : '—',
+        adminId: pick(['wendy.rojas@dropi.co', 'admin@dropitienda.co', 'ops@dropi.co'], i),
+        garantiaId: String(301 + i),
+        ordenId: String(160604 + i),
+        fechaCreacion: pick(S.dates, i),
+        transportadora: pick(S.transport, i),
+        fechaRecoleccion: pick(S.dates, i),
+        numeroOrden: String(160604 + i),
+        estatusOrden: pick(S.statusPedido, i),
+        numeroGuia: pick(['1123266584698', '8876543210123', '5544332211009'], i),
+        estatusGuia: pick(['En tránsito', 'Entregada', 'Novedad', 'Generada'], i),
+      },
+    };
+  });
 }
 
 type ListDef = {
@@ -249,6 +259,8 @@ const LIST_DEFS: ListDef[] = [
     bulk: { label: 'Actualización masiva', icon: 'pi-upload', variant: 'outline' },
     cols: [
       { key: 'id', label: 'Id', width: '90px' },
+      { key: 'producto', label: 'Producto', width: '180px' },
+      { key: 'riesgo', label: 'Riesgo', width: '130px' },
       { key: 'adminId', label: 'Admin Id', width: '200px' },
       { key: 'garantiaId', label: 'Garantia Id', width: '200px' },
       { key: 'ordenId', label: 'Orden Id', width: '160px' },
@@ -332,13 +344,13 @@ const LIST_DEFS: ListDef[] = [
   { id: 'retiros-de-saldo', figma: '12401:43803', title: 'Retiros de saldo', bc: ['Financiero', 'Wallet'], primary: { label: 'Solicitar retiro', variant: 'primary' }, badge: 'estado',
     cols: [{ key: 'retiro', label: 'Retiro' }, { key: 'fecha', label: 'Fecha' }, { key: 'banco', label: 'Cuenta destino' }, { key: 'monto', label: 'Monto', align: 'right' }, { key: 'estado', label: 'Estado' }],
     seeds: { retiro: ['RET-901', 'RET-902', 'RET-903'], fecha: S.dates, banco: ['Bancolombia ****4521', 'Nequi ****8832', 'Davivienda ****1102'], monto: S.montos, estado: ['Procesado', 'En revisión', 'Rechazado'] } },
-  { id: 'mis-sesiones', figma: '12401:43862', title: 'Mis Sesiones', bc: ['Configuraciones'], badge: 'estado',
+  { id: 'mis-sesiones', figma: '12401:43862', title: 'Mis Sesiones', bc: ['Configurar'], badge: 'estado',
     cols: [{ key: 'dispositivo', label: 'Dispositivo' }, { key: 'navegador', label: 'Navegador' }, { key: 'ubicacion', label: 'Ubicación' }, { key: 'ultimoAcceso', label: 'Último acceso' }, { key: 'estado', label: 'Estado' }],
     seeds: { dispositivo: ['MacBook Pro', 'iPhone 15', 'Windows PC', 'iPad Air'], navegador: ['Chrome 136', 'Safari 18', 'Edge 136'], ubicacion: ['Bogotá, CO', 'Medellín, CO', 'Cali, CO'], ultimoAcceso: ['27/05/2026 14:32', '26/05/2026 09:15'], estado: ['Activa', 'Activa', 'Cerrada'] } },
-  { id: 'historial-de-actividades', figma: '12401:43994', title: 'Historial de Actividades', bc: ['Configuraciones'], search: 'Filtrar actividad…',
+  { id: 'historial-de-actividades', figma: '12401:43994', title: 'Historial de Actividades', bc: ['Configurar'], search: 'Filtrar actividad…',
     cols: [{ key: 'fecha', label: 'Fecha' }, { key: 'accion', label: 'Acción' }, { key: 'modulo', label: 'Módulo' }, { key: 'ip', label: 'IP' }],
     seeds: { fecha: ['27/05/2026 14:32', '27/05/2026 12:10', '26/05/2026 18:40'], accion: ['Inicio de sesión', 'Generó etiquetas', 'Actualizó datos bancarios', 'Creó campaña'], modulo: ['Auth', 'Pedidos', 'Configuraciones', 'Marketing'], ip: ['190.85.xx.xx', '181.49.xx.xx', '200.24.xx.xx'] } },
-  { id: 'usuarios-equipo', figma: '12401:44055', title: 'Usuarios del equipo', bc: ['Configuraciones'], primary: { label: 'Invitar usuario', variant: 'primary' }, badge: 'estado',
+  { id: 'usuarios-equipo', figma: '12401:44055', title: 'Usuarios del equipo', bc: ['Configurar'], primary: { label: 'Invitar usuario', variant: 'primary' }, badge: 'estado',
     cols: [{ key: 'usuario', label: 'Usuario' }, { key: 'email', label: 'Email' }, { key: 'rol', label: 'Rol' }, { key: 'ultimoAcceso', label: 'Último acceso' }, { key: 'estado', label: 'Estado' }],
     seeds: { usuario: ['María Ops', 'Carlos Fulfillment', 'Laura Marketing', 'Asistente virtual'], email: ['maria@dropitienda.co', 'carlos@dropitienda.co', 'laura@dropitienda.co'], rol: ['Admin', 'Operador', 'Marketing', 'Solo lectura'], ultimoAcceso: S.dates, estado: ['Activo', 'Activo', 'Invitado'] } },
 ];
@@ -401,11 +413,11 @@ export const DROPI_SCREEN_REGISTRY: Record<string, DropiScreenConfig> = {
 
   'preferencias-cuenta': toForm({
     id: 'preferencias-cuenta', figmaNode: '12401:44203', title: 'Preferencias de cuenta',
-    breadcrumbs: ['Configuraciones'], primaryAction: { label: 'Guardar', variant: 'primary' },
+    breadcrumbs: ['Configurar'], primaryAction: { label: 'Guardar', variant: 'primary' },
   }),
 
   planes: toCards(
-    { id: 'planes', figmaNode: '12401:43541', title: 'Planes', breadcrumbs: ['Configuraciones'] },
+    { id: 'planes', figmaNode: '12401:43541', title: 'Planes', breadcrumbs: ['Configurar'] },
     ['Starter', 'Pro', 'Enterprise'],
     'plans',
   ),
@@ -463,7 +475,7 @@ export const DROPI_SCREEN_REGISTRY: Record<string, DropiScreenConfig> = {
   }, 'security-tabs'),
 
   'integraciones-config': toList({
-    id: 'integraciones-config', figma: '12401:44291', title: 'Integraciones', bc: ['Configuraciones'], badge: 'estado',
+    id: 'integraciones-config', figma: '12401:44291', title: 'Integraciones', bc: ['Configurar'], badge: 'estado',
     cols: [{ key: 'integracion', label: 'Integración' }, { key: 'estado', label: 'Estado' }, { key: 'ultimaSync', label: 'Última sync' }],
     seeds: { integracion: ['Shopify', 'Tienda Nube', 'WooCommerce'], estado: ['Conectado', 'Conectado', 'Desconectado'], ultimaSync: S.dates },
   }),
@@ -482,7 +494,7 @@ export const DROPI_SCREEN_REGISTRY: Record<string, DropiScreenConfig> = {
   },
 
   'dropi-testers': toList({
-    id: 'dropi-testers', figma: '12401:44055', title: 'Dropi testers', bc: ['Configuraciones'], badge: 'estado',
+    id: 'dropi-testers', figma: '12401:44055', title: 'Dropi testers', bc: ['Configurar'], badge: 'estado',
     cols: [{ key: 'tester', label: 'Tester' }, { key: 'feature', label: 'Feature' }, { key: 'estado', label: 'Estado' }],
     seeds: { tester: S.clients, feature: ['Nueva UI', 'Beta Caza'], estado: ['Activo', 'Invitado'] },
   }),
