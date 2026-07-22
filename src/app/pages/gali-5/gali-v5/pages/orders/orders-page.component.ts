@@ -7,6 +7,8 @@ import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
 import { GaliGlosarioDirective } from '../../directives/gali-glosario.directive';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
 
 
 interface OrderRow {
@@ -31,7 +33,7 @@ type GaliTriageStatus = 'ok' | 'managing' | 'decision' | 'auto';
 @Component({
   selector: 'app-orders-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiGaliBarComponent, GaliInsightDirective, GaliGlosarioDirective],
+  imports: [CommonModule, FormsModule, DropiGaliBarComponent, GaliInsightDirective, GaliGlosarioDirective, Gali6AgentPresenceBarComponent, Gali6ScreenArtifactsComponent],
   templateUrl: './orders-page.component.html',
   styleUrl: './orders-page.component.scss',
 })

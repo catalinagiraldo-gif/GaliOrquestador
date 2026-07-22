@@ -16,9 +16,13 @@ export interface AgenteSkillDefault {
   ultimaEjecucion?: string;
   /** Número total de veces que se ha ejecutado */
   ejecucionesTotal?: number;
+  /** Si el usuario la desactivó desde /gali-6/agentes. Default: true (activa). */
+  activa?: boolean;
 }
 
 export interface AgenteReglaDefault {
+  /** Estable — requerido para reglas agregadas por el usuario o por el chat, algunas reglas de fábrica aún no lo tienen */
+  id?: string;
   condicion: string;
   accion: string;
   tipo: AgenteProcesoTipo;
@@ -32,6 +36,8 @@ export interface AgenteReglaDefault {
   ultimaEjecucion?: string;
   /** Número total de veces que se ha disparado */
   ejecucionesTotal?: number;
+  /** Si el usuario la desactivó desde /gali-6/agentes. Default: true (activa). */
+  activa?: boolean;
 }
 
 export interface AgenteEspecializado {
@@ -61,6 +67,10 @@ export interface AgenteEspecializado {
   ejemploSenal?: string;
   /** Conexiones/integraciones requeridas para funcionar */
   conexionesRequeridas?: string[];
+  /** % de autonomía configurado en /gali-6/agentes (0-100). Default: 60. */
+  autonomiaPct?: number;
+  /** screenId (DROPI_SCREEN_REGISTRY) donde este agente aparece como "activo aquí". */
+  apareceEn?: string[];
 }
 
 export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
@@ -95,6 +105,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     ],
     reglasDefecto: [
       {
+        id: 'stock-guardian-r1',
         condicion: 'Si stock < 10 unidades en producto de campaña activa',
         accion: 'Generar alerta crítica de stock',
         tipo: 'deterministico',
@@ -111,6 +122,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     estado: 'activo',
     ejemploSenal: '📦 "Collar GPS tiene solo 3 unidades disponibles — tu campaña activa puede quedar sin stock en ~2 días"',
     conexionesRequeridas: ['Inventario Dropi'],
+    apareceEn: ['garantias-recolecciones'],
   },
 
   {
@@ -152,6 +164,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     ],
     reglasDefecto: [
       {
+        id: 'roas-tracker-r1',
         condicion: 'Si ROAS real < 1.3 por 3 días consecutivos',
         accion: 'Generar alerta crítica de rentabilidad',
         tipo: 'deterministico',
@@ -162,6 +175,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
         ejecucionesTotal: 9,
       },
       {
+        id: 'roas-tracker-r2',
         condicion: 'Si ROAS real > 2.0 por 7 días y hay margen de escala',
         accion: 'Sugerir escala de presupuesto',
         tipo: 'ia-ligera',
@@ -177,6 +191,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     colorAvatar: '#10b981',
     estado: 'activo',
     ejemploSenal: '📊 "Campaña TikTok Mallas Nike: ROAS bajó a 1.2x (3 días consecutivos) — por debajo de tu objetivo 1.5x"',
+    apareceEn: ['roax-lanzador'],
   },
 
   {
@@ -218,6 +233,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     ],
     reglasDefecto: [
       {
+        id: 'logistics-pro-r1',
         condicion: 'Si tasa de novedades > 20% en 7 días',
         accion: 'Alertar y mostrar análisis por transportadora',
         tipo: 'deterministico',
@@ -270,6 +286,7 @@ export const AGENTES_ESPECIALIZADOS: AgenteEspecializado[] = [
     ],
     reglasDefecto: [
       {
+        id: 'price-radar-r1',
         condicion: 'Si precio está >15% por encima del estimado de mercado',
         accion: 'Generar alerta de precio alto con sugerencia de ajuste',
         tipo: 'ia-compleja',

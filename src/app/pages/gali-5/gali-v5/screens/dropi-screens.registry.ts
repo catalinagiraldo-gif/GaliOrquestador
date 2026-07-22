@@ -386,6 +386,14 @@ export const DROPI_SCREEN_REGISTRY: Record<string, DropiScreenConfig> = {
   'productos-vendidos': toList(LIST_DEFS.find(d => d.id === 'productos-vendidos')!, 'report-metrics'),
   'torre-logistica': toList(LIST_DEFS.find(d => d.id === 'torre-logistica')!, 'report-metrics'),
 
+  // Entrada mínima solo para el catálogo de destinos del chat (gali6ScreenCatalog) —
+  // la ruta real carga DashboardFinancieroPageComponent directamente, nunca
+  // DropiScreenPageComponent, así que este registro nunca se renderiza con este config.
+  'dashboard-financiero': toForm({
+    id: 'dashboard-financiero', figmaNode: '', title: 'Dashboard Financiero',
+    breadcrumbs: ['Financiero'],
+  }),
+
   preferencias: toForm({
     id: 'preferencias', figmaNode: '12401:44548', title: 'Transportadoras',
     breadcrumbs: ['Logística'], primaryAction: { label: 'Guardar cambios', variant: 'primary' },

@@ -10,6 +10,24 @@
   gap: $os-2;
 }
 
+.g6card-acciones__destino {
+  display: flex;
+  align-items: center;
+  gap: $os-1;
+  flex-wrap: wrap;
+}
+
+.g6card-acciones__select {
+  padding: $os-1 $os-2;
+  border-radius: $os-radius-sm;
+  border: 1px solid $os-border-strong;
+  background: $os-surface;
+  color: $os-text-primary;
+  font-family: $os-font-body;
+  font-size: 12px;
+  max-width: 200px;
+}
+
 .g6card-acciones__btn {
   padding: $os-1 $os-3;
   border-radius: $os-radius-sm;

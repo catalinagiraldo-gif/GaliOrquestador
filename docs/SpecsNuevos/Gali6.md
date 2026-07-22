@@ -221,6 +221,87 @@ conexión ya existente (`abrirPanel`/`apiKeyInput`/`conectarMcp`) para el caso "
 
 ---
 
+## Sesión 2026-07-17 — Creación conversacional compartida + Artefactos con destino + Presencia de agentes
+
+Catalina retomó el proceso pidiendo ir más allá de lo diseñado (sin código) en PARTE 5 de
+`18.FlujoUsuarioGali6.md`: que el chat de Gali pueda crear/editar agentes, reglas y skills hablando, que un
+artefacto fijado desde el chat pueda ir a cualquier pantalla (no solo la actual), y que se vea en qué
+secciones operativas está activo cada agente — no solo como texto en `/gali-6/agentes`. Implementado en 7
+fases secuenciales, cada una con `ng build --configuration development` limpio (exit 0) antes de pasar a la
+siguiente. Ver plan completo en `/Users/user/.claude/plans/en-una-sesi-n-anterior-rustling-meteor.md`.
+
+### Fase 0 — Fix del bug de sincronización de `agentesEstado`
+
+El bug ya documentado (`gali6-live-mutations.service.ts`, comentario sobre `toggleAgenteEstado`) quedó
+resuelto: `agentesEstado` en `gali6-agentes.component.ts` pasó de signal local a `computed` que relee
+`Gali6LiveMutationsService.version()`. Se promovieron `autonomiaPct`, `activa` (por skill) e `id` (por regla)
+al mock base `AgenteEspecializado`/`AgenteSkillDefault`/`AgenteReglaDefault`
+(`mocks/gali-v6/agentes-especializados.ts`), y se agregaron los setters correspondientes a
+`Gali6LiveMutationsService` (`setAutonomiaAgente`, `toggleSkillAgente`, `agregarReglaAgente`,
+`eliminarReglaAgente`, `setEstadoAgente`). Esto desbloqueó todo lo demás de la sesión.
+
+### Fase 1 — Flujo I: `apareceEn` + mover agente (ver extensión inline en `18.FlujoUsuarioGali6.md` §5.2)
+
+Implementado tal como estaba diseñado: `apareceEn?: string[]` con defaults (`stock-guardian` →
+`garantias-recolecciones`, `roas-tracker` → `roax-lanzador`), `moverAgenteASeccion`/`agregarSeccionAAgente`/
+`quitarSeccionDeAgente` en `Gali6LiveMutationsService`, caso `mover-agente::` en
+`Gali6ChatService.handleAction()`, y chips "Aparece en" en `gali6-agentes.component.ts` con selector de
+sección derivado de `DROPI_SCREEN_REGISTRY` (nuevo helper `gali6-screen-catalog.ts`, fuente única para
+cualquier selector de pantalla del resto de la sesión).
+
+### Fase 2 — `Gali6CreationRegistryService`
+
+Nuevo store compartido (`services/gali6-creation-registry.service.ts`), persistido en `localStorage`, con
+`agentesCreados`/`reglasCreadas`/`skillsCreadas`. `gali6-agentes.component.ts`, `reglas-page.component.ts` y
+`skills-page.component.ts` ahora leen de ahí además de sus fuentes base (mezclado en un `computed`).
+Hallazgos no previstos, encontrados al implementar esto: `SkillsPageComponent.skills` era un array `readonly`
+plano (no signal) — se convirtió en `computed`; `ReglasPageComponent.persist()` solo guardaba el mapa de
+activo/inactivo, nunca el contenido de una regla nueva creada con el form inline original, que se perdía al
+refrescar (bug preexistente, evitado por el nuevo registro, no arreglado en el mecanismo viejo).
+
+### Fase 3-4 — Flujo K: creación/edición conversacional compartida (nuevo, ver `18.FlujoUsuarioGali6.md` §5.8)
+
+Sin spec previo — Catalina lo pidió al retomar el proceso. El mini-chat modal aislado que ya existía para
+crear agentes (`panelCrear` en `gali6-agentes.component.ts`, que además nunca persistía nada realmente) se
+retiró por completo y se reemplazó por un state machine dentro de `Gali6ChatService`
+(`iniciarFlujoCreacion(tipo, modo, agenteId?)`) que genera mensajes normales en el hilo principal del chat —
+nunca un panel flotante aparte, para que "crear mientras conversas" sea literal. Cubre crear agente/regla/
+skill y editar agente (autonomía o sección, con diff antes de confirmar). Botones **"+ Crear con Gali"** /
+**"✦ Editar con Gali"** en Agentes/Reglas/Skills abren y enfocan el panel de chat
+(`Gali6ChatService.requestFocusChat()`, observado por `Gali6ShellComponent`/`Gali6ChatPanelComponent` vía
+`effect()`) y arrancan el mismo flujo — sin duplicar UI. Estrategia de retroalimentación (el motor sigue
+siendo reglas/keywords, no un LLM real): detección de intención gruesa solo para elegir el flujo, validación
+por paso con ejemplos de respaldo si no reconoce la respuesta, nunca aplica un cambio sin confirmación
+explícita.
+
+### Fase 5 — Flujo J extendido: artefactos con selector de destino + tab "Artefactos"
+
+`VisualAccion` ganó `requiereDestino?: boolean`; `Gali6ChatCardAccionesComponent` muestra un `<select>` de
+pantalla destino antes de resolver `fijar-artefacto::<screenId>`. Nuevo `Gali6ScreenArtifactsService`
+(localStorage) y 5º tab del panel de chat, `gali6-tab-artefactos.component.ts`, que lista todo lo fijado con
+acciones de reubicar/eliminar. Nuevo componente compartido `<gali6-screen-artifacts [screenId]>` (reusa las
+3 cards del chat, cero widgets nuevos), montado en `DropiScreenPageComponent` y en Roax Lanzador/Catálogo de
+Productos.
+
+### Fase 6 — Flujo I extendido: barra de presencia de agentes en páginas operativas
+
+Nuevo `gali6-agent-presence-bar.component.ts`, nativo de Gali 6 (no extiende `GaliModuleActivationBarComponent`
+de gali-v5 porque su `agentId` es una unión cerrada de un roster distinto y solo soporta un agente por barra).
+Muestra chip(s) "Agente activo aquí" por cada agente cuyo `apareceEn` incluye la pantalla, con "Mover a otra
+sección" que solo dispara la propuesta en el chat (preview-then-confirm, nunca muta directo). Montada debajo
+del header en `DropiScreenPageComponent` (cubre Garantías y recolecciones automáticamente, sin wiring extra)
+y en Roax Lanzador/Catálogo de Productos.
+
+### No tocado esta sesión (queda de backlog)
+
+- **Editar regla/skill desde el chat** — el Flujo K solo cubre editar agentes; Catalina pidió explícitamente
+  "editar los agentes", no reglas/skills, así que se dejó fuera de alcance en vez de inventarlo.
+- **Reubicación de artefactos por drag-and-drop real** — Catalina eligió explícitamente selector/menú en vez
+  de HTML5 DnD al validar el alcance.
+- **Flujo H** (tab Conexiones condensado) — sigue sin código, no era parte de lo pedido esta sesión.
+
+---
+
 ## Archivos clave
 
 | Archivo | Descripción |
@@ -283,9 +364,10 @@ Al retomar con `ContinuarGali6`, verificar si hay algo en `ultimate-plan.md §9`
 ### De la sesión 2026-07-16 (expansión de plan + auditoría de diseño)
 
 - [ ] Implementar Flujo H de PARTE 5 (`18.FlujoUsuarioGali6.md`): tab "Conexiones" condensado en el chat
-- [ ] Implementar Flujo I: agentes configurables por sección (requiere primero arreglar el bug de
-      sincronización de `agentesEstado` en `gali6-agentes.component.ts`, ver punto de abajo)
-- [ ] Implementar Flujo J: artefactos personalizados fijables en pantalla desde el chat
+- [x] Implementar Flujo I: agentes configurables por sección — hecho 2026-07-17, ampliado con barra de
+      presencia visible en páginas operativas (ver sesión 2026-07-17 más abajo)
+- [x] Implementar Flujo J: artefactos personalizados fijables en pantalla desde el chat — hecho 2026-07-17,
+      ampliado con selector de destino + tab "Artefactos"
 - [ ] Wizard de Roax Lanzador: contenido real para los 3 pasos vacíos (Entendimiento del producto,
       Ángulos de venta, Guiones) — hoy solo muestran un placeholder genérico
 - [ ] Generalizar "recuperación explicada" a los 10 stubs restantes de Configuraciones (hoy solo
@@ -301,9 +383,9 @@ Al retomar con `ContinuarGali6`, verificar si hay algo en `ultimate-plan.md §9`
 
 ### De la sesión 2026-07-15 (navegación + intervención de Gali)
 
-- [ ] Roax Lanzador: conectar `escalarAutomatico` al `autonomiaPct` real de `roas-tracker` — hoy es un
-      toggle autocontenido en el wizard porque el slider de `gali6-agentes.component.ts` (`agentesEstado`)
-      tiene un bug de sincronización conocido con `Gali6LiveMutationsService` (no se propaga)
+- [ ] Roax Lanzador: conectar `escalarAutomatico` al `autonomiaPct` real de `roas-tracker` — el bug de
+      sincronización de `agentesEstado` que bloqueaba esto ya se arregló (sesión 2026-07-17), sigue
+      pendiente solo el cableado del wizard mismo
 - [ ] Roax Lanzador: Loop de Acción Cerrada del paso 7 (CTR cae → Gali pausa creativo → resultado visible)
       — necesita un modelo de campaña en vivo con métricas evolucionando, que el prototipo no tiene
 - [ ] Screen-awareness para el resto de las ~13 pantallas genéricas de `DropiScreenPageComponent`

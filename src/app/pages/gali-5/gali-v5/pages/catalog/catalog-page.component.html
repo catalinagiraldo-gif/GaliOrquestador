@@ -4,6 +4,8 @@
     <span class="gali-page-header__sub">Explora y gestiona tu catálogo · ADA Spy activa</span>
   </div>
 
+  <gali6-agent-presence-bar screenId="catalogo" />
+
   <!-- ADA Spy: Panel de oportunidades detectadas (única alerta por sección) -->
   <div class="catalog-ada-strip" [class.catalog-ada-strip--collapsed]="adaStripCollapsed()">
     <div class="catalog-ada-strip__header">
@@ -500,6 +502,8 @@
 
   </div><!-- /catalog-gali-layout -->
 </div>
+
+<gali6-screen-artifacts screenId="catalogo" />
 
 @if (adaDetailProductId()) {
   <gali-ada-spy-detail

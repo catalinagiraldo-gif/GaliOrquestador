@@ -245,6 +245,20 @@
   </div>
 }
 
+<!-- ── Spot "Nuevo en Gali" — primera apertura real del dock, una sola vez ── -->
+@if (nuevoEnGaliOpen()) {
+  <div class="experto-bg" aria-hidden="true" (click)="nuevoEnGaliCerrar()"></div>
+  <aside class="experto-slide" role="dialog" aria-modal="true" aria-labelledby="nuevo-en-gali-title">
+    <span class="experto-slide__icon" aria-hidden="true">✦</span>
+    <h3 id="nuevo-en-gali-title" class="experto-slide__title">Ahora puedes pedírselo hablando</h3>
+    <p class="experto-slide__body">
+      Prueba: <strong>"{{ NUEVO_EN_GALI_EJEMPLO }}"</strong> — o "fija esto en Catálogo" cuando Gali te responda con una tabla.
+    </p>
+    <p class="experto-slide__hint">Gali crea agentes, reglas y skills mientras conversás, y puede dejar cualquier respuesta fijada en la pantalla de Dropi que elijas.</p>
+    <button class="experto-slide__cta" type="button" (click)="nuevoEnGaliProbar()">Probar ahora →</button>
+  </aside>
+}
+
 <!-- ── Panel contextual de Gali desde catálogo (Cambio B) ── -->
 @if (gali.galiCatalogPanelOpen()) {
   <div class="g6-cat-panel-bg" (click)="gali.closeCatalogPanel()" aria-hidden="true"></div>

@@ -1,0 +1,118 @@
+@import 'styles/gali-os-tokens';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.g6art {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.g6art__empty {
+  padding: $os-4;
+  color: $os-text-muted;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.g6art__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $os-3 $os-4;
+  display: flex;
+  flex-direction: column;
+  gap: $os-2;
+}
+
+.g6art__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $os-2;
+  padding: $os-2 $os-3;
+  border-radius: $os-radius-md;
+  border: 1px solid $os-border;
+  background: $os-surface-2;
+}
+
+.g6art__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.g6art__titulo {
+  margin: 0;
+  font-size: 12px;
+  color: $os-text-primary;
+  line-height: 1.4;
+}
+
+.g6art__meta {
+  display: flex;
+  align-items: center;
+  gap: $os-2;
+}
+
+.g6art__pantalla {
+  font-size: 10px;
+  font-weight: 600;
+  color: $os-accent;
+}
+
+.g6art__fecha {
+  font-size: 10px;
+  color: $os-text-muted;
+}
+
+.g6art__sin-cobertura {
+  font-size: 10px;
+  color: $os-warn;
+}
+
+.g6art__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  align-items: flex-end;
+}
+
+.g6art__select {
+  padding: 2px 6px;
+  border-radius: $os-radius-sm;
+  border: 1px solid $os-border-strong;
+  background: $os-surface;
+  color: $os-text-secondary;
+  font-size: 10px;
+  max-width: 140px;
+}
+
+.g6art__btn {
+  padding: 3px 8px;
+  border-radius: $os-radius-sm;
+  border: 1px solid $os-border-strong;
+  background: $os-surface;
+  color: $os-text-secondary;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $os-transition;
+  white-space: nowrap;
+
+  &:hover { background: $os-surface-3; }
+
+  &--del:hover {
+    border-color: $os-crit;
+    color: $os-crit;
+    background: $os-crit-dim;
+  }
+}

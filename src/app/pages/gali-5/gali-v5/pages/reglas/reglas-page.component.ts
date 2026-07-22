@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
 import { DropiGaliBarComponent } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
+import { Gali6CreationRegistryService } from '../../../../gali-6/services/gali6-creation-registry.service';
+import { Gali6ChatService } from '../../../../gali-6/gali-chat/gali6-chat.service';
 
 export interface EscalamientoRegla {
   id: string;
@@ -48,7 +50,24 @@ export class ReglasPageComponent {
   /** true cuando se embebe dentro de otro shell (ej. Centro de Gali) — oculta el banner y el título propios */
   readonly embedded = input(false);
 
-  readonly reglas = signal<GaliRegla[]>(this.loadReglas());
+  private readonly creationRegistry = inject(Gali6CreationRegistryService);
+  private readonly chat = inject(Gali6ChatService);
+
+  /** Flujo K (18.FlujoUsuarioGali6.md §5.8) — "ambos lados": misma conversación que en el chat, iniciada desde este botón. */
+  crearReglaConGali(): void {
+    this.chat.iniciarFlujoCreacion('regla', 'crear');
+    this.chat.requestFocusChat();
+  }
+  /** Fuerza recomputar `reglas` cuando cambia el active de una regla base (no vive en un signal, solo en localStorage). */
+  private readonly baseVersion = signal(0);
+
+  /** Defaults + lo creado por el usuario (form inline o chat, Flujo K, 18.FlujoUsuarioGali6.md §5.8). */
+  readonly reglas = computed(() => {
+    this.baseVersion();
+    this.creationRegistry.version();
+    return [...this.loadReglas(), ...this.creationRegistry.reglasCreadas()];
+  });
+
   readonly escalamiento = signal<EscalamientoRegla[]>(ESCALAMIENTO_DEFAULTS);
   readonly showEscalamientoInfo = signal<string | null>(null);
 
@@ -68,6 +87,15 @@ export class ReglasPageComponent {
 
   tipoClass(tipo: EscalamientoRegla['tipo']): string {
     return `esc-badge--${tipo}`;
+  }
+
+  private loadActiveMap(): Record<string, boolean> {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as Record<string, boolean>) : {};
+    } catch {
+      return {};
+    }
   }
 
   private loadReglas(): GaliRegla[] {
@@ -144,26 +172,18 @@ export class ReglasPageComponent {
       },
     ];
 
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return defaults;
-      const saved = JSON.parse(raw) as Record<string, boolean>;
-      return defaults.map(r => ({ ...r, active: saved[r.id] ?? r.active }));
-    } catch {
-      return defaults;
-    }
-  }
-
-  private persist(): void {
-    const map = Object.fromEntries(this.reglas().map(r => [r.id, r.active]));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    const saved = this.loadActiveMap();
+    return defaults.map(r => ({ ...r, active: saved[r.id] ?? r.active }));
   }
 
   toggle(id: string): void {
-    this.reglas.update(list =>
-      list.map(r => (r.id === id ? { ...r, active: !r.active } : r)),
-    );
-    this.persist();
+    if (this.creationRegistry.toggleRegla(id)) return;
+    const base = this.loadReglas().find(r => r.id === id);
+    if (!base) return;
+    const map = this.loadActiveMap();
+    map[id] = !(map[id] ?? base.active);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    this.baseVersion.update(v => v + 1);
   }
 
   readonly showNewRule = signal(false);
@@ -240,8 +260,7 @@ export class ReglasPageComponent {
       active: true,
       scope: `Personalizada · ${this.assignedAgentIds().length} agente${this.assignedAgentIds().length !== 1 ? 's' : ''}`,
     };
-    this.reglas.update(list => [newRegla, ...list]);
-    this.persist();
+    this.creationRegistry.agregarReglaExistente(newRegla);
     this.newRuleSaved.set(true);
     setTimeout(() => {
       this.newRuleText.set('');

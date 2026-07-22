@@ -7,6 +7,8 @@ import { GaliStateService } from '../../services/gali-state.service';
 import { GaliAdaSpyDetailComponent } from '../../components/gali-ada-spy-detail/gali-ada-spy-detail.component';
 import { Gali6ScreenContextService } from '../../../../gali-6/services/gali6-screen-context.service';
 import { Gali6ChatService } from '../../../../gali-6/gali-chat/gali6-chat.service';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
 
 type ProductBadge = 'Variable' | 'Combo';
 
@@ -36,7 +38,7 @@ interface CatalogProduct {
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, GaliAdaSpyDetailComponent],
+  imports: [CommonModule, FormsModule, RouterLink, GaliAdaSpyDetailComponent, Gali6ScreenArtifactsComponent, Gali6AgentPresenceBarComponent],
   templateUrl: './catalog-page.component.html',
   styleUrl: './catalog-page.component.scss',
 })

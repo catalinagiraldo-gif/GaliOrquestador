@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { PROYECTOS_MOCK } from '../../../../../mocks/gali-v6/proyectos.mock';
 import { MOCK_CAMPANAS } from '../../../../../mocks/gali-v6/campanas.mock';
 import { MOCK_ALERTAS, MOCK_SENALES } from '../../../../../mocks/gali-v5/senales.mock';
-import { AGENTES_ESPECIALIZADOS } from '../../../../../mocks/gali-v6/agentes-especializados';
+import { AGENTES_ESPECIALIZADOS, AgenteReglaDefault } from '../../../../../mocks/gali-v6/agentes-especializados';
 import addressesData from '../../../../../mocks/gali-v5/validador-addresses.json';
 
 /**
@@ -76,17 +76,89 @@ export class Gali6LiveMutationsService {
     return this.recoleccionesPausadas.has(productoId);
   }
 
-  /**
-   * Nota conocida: /gali-6/agentes mantiene su propio signal local
-   * (`agentesEstado`) que no re-lee `version()`, así que un toggle disparado
-   * desde el chat no se refleja ahí hasta recargar esa página. Corregirlo
-   * tocaría esa página, fuera de alcance de este panel — ver plan §"Tab Agentes".
-   */
   toggleAgenteEstado(agenteId: string): 'activo' | 'pausado' | null {
     const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
     if (!agente) return null;
     agente.estado = agente.estado === 'activo' ? 'pausado' : 'activo';
     this.version.update(v => v + 1);
     return agente.estado;
+  }
+
+  /** Fuerza un estado específico (a diferencia de toggleAgenteEstado) — usado por "pausar" explícito. */
+  setEstadoAgente(agenteId: string, estado: 'activo' | 'pausado' | 'disponible'): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    agente.estado = estado;
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  setAutonomiaAgente(agenteId: string, pct: number): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    agente.autonomiaPct = pct;
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  toggleSkillAgente(agenteId: string, skillId: string): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    const skill = agente?.skillsDefecto.find(sk => sk.id === skillId);
+    if (!skill) return false;
+    skill.activa = skill.activa === false ? true : false;
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  agregarReglaAgente(agenteId: string, condicion: string, accion: string): AgenteReglaDefault | null {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return null;
+    const regla: AgenteReglaDefault = {
+      id: `${agenteId}-r${Date.now()}`,
+      condicion,
+      accion,
+      tipo: 'deterministico',
+      activa: true,
+    };
+    agente.reglasDefecto.push(regla);
+    this.version.update(v => v + 1);
+    return regla;
+  }
+
+  eliminarReglaAgente(agenteId: string, reglaId: string): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    const idx = agente.reglasDefecto.findIndex(r => r.id === reglaId);
+    if (idx === -1) return false;
+    agente.reglasDefecto.splice(idx, 1);
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  /** Reasigna el agente a una única sección (Flujo I, 18.FlujoUsuarioGali6.md §5.2) — reemplaza apareceEn en vez de sumarlo. */
+  moverAgenteASeccion(agenteId: string, screenId: string): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    agente.apareceEn = [screenId];
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  agregarSeccionAAgente(agenteId: string, screenId: string): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    const actuales = agente.apareceEn ?? [];
+    if (actuales.includes(screenId)) return true;
+    agente.apareceEn = [...actuales, screenId];
+    this.version.update(v => v + 1);
+    return true;
+  }
+
+  quitarSeccionDeAgente(agenteId: string, screenId: string): boolean {
+    const agente = AGENTES_ESPECIALIZADOS.find(a => a.id === agenteId);
+    if (!agente) return false;
+    agente.apareceEn = (agente.apareceEn ?? []).filter(s => s !== screenId);
+    this.version.update(v => v + 1);
+    return true;
   }
 }

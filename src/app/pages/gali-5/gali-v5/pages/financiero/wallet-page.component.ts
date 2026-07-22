@@ -12,6 +12,8 @@ import {
 } from '../../components/shared';
 import walletData from '../../../../../../../mocks/gali-v5/wallet-transactions.json';
 import { GaliGlosarioDirective } from '../../directives/gali-glosario.directive';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
 
 interface WalletTransaction {
   num: string;
@@ -55,6 +57,8 @@ interface GaliRoiItem {
     DropiSearchOficialComponent,
     DropiPaginatorComponent,
     GaliGlosarioDirective,
+    Gali6AgentPresenceBarComponent,
+    Gali6ScreenArtifactsComponent,
   ],
   templateUrl: './wallet-page.component.html',
   styleUrl: './wallet-page.component.scss',

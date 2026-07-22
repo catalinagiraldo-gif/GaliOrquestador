@@ -24,6 +24,8 @@ export interface VisualAccion {
   label: string;
   actionId: string;
   isPrimary?: boolean;
+  /** Flujo J extendido (18.FlujoUsuarioGali6.md §5.3) — el click abre un selector de pantalla destino antes de resolver `${actionId}::${screenId}`. */
+  requiereDestino?: boolean;
 }
 
 /**

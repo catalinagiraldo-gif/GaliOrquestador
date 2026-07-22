@@ -5,14 +5,17 @@
     @if (!embedded()) {
       <div class="skills-os__header-left">
         <h1 class="skills-os__title">Skills</h1>
-        <span class="skills-os__sub">{{ skills.length }} activas · capacidades reutilizables para tus agentes</span>
+        <span class="skills-os__sub">{{ skills().length }} activas · capacidades reutilizables para tus agentes</span>
       </div>
     }
     <div class="skills-os__header-right">
       @if (!embedded()) {
         <a routerLink="/gali-6/agentes" class="skills-os__btn skills-os__btn--ghost">Agentes</a>
       }
-      <button type="button" class="skills-os__btn skills-os__btn--accent" (click)="goToNewSkill()">
+      <button type="button" class="skills-os__btn skills-os__btn--accent" (click)="crearSkillConGali()">
+        ✦ Crear con Gali
+      </button>
+      <button type="button" class="skills-os__btn skills-os__btn--ghost" (click)="goToNewSkill()">
         + Nueva skill
       </button>
     </div>
@@ -24,7 +27,7 @@
       [class.skills-main-tab--active]="mainTab() === 'mis-skills'"
       (click)="mainTab.set('mis-skills')">
       <span class="skills-main-tab__label">Mis Skills</span>
-      <span class="skills-main-tab__count">{{ skills.length }}</span>
+      <span class="skills-main-tab__count">{{ skills().length }}</span>
     </button>
 
     <div class="skills-main-tabs__sep"></div>

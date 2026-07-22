@@ -5,6 +5,8 @@ import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
 import { GaliGlosarioDirective } from '../../directives/gali-glosario.directive';
 import { GaliModuleActivationBarComponent } from '../../components/gali-module-activation-bar/gali-module-activation-bar.component';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
 import KPIS_GLOBAL from '../../../../../../../mocks/gali-v5/kpis-global.json';
 
 interface WaterfallBar {
@@ -51,7 +53,7 @@ interface ChannelRow {
 @Component({
   selector: 'app-dashboard-financiero-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, GaliInsightDirective, GaliGlosarioDirective, GaliModuleActivationBarComponent],
+  imports: [CommonModule, RouterModule, GaliInsightDirective, GaliGlosarioDirective, GaliModuleActivationBarComponent, Gali6AgentPresenceBarComponent, Gali6ScreenArtifactsComponent],
   templateUrl: './dashboard-financiero-page.component.html',
   styleUrl: './dashboard-financiero-page.component.scss',
 })

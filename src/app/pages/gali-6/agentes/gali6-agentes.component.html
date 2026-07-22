@@ -25,12 +25,83 @@
 
   <!-- ── AGENTES ACTIVOS ── -->
   <section class="g6-agentes__section">
-    <h3 class="g6-agentes__section-title">Tus agentes activos</h3>
+    <div class="g6-agentes__section-hdr">
+      <h3 class="g6-agentes__section-title">Tus agentes activos</h3>
+      <div class="g6-vista-toggle" role="tablist" aria-label="Vista de agentes">
+        <button type="button" role="tab" class="g6-vista-toggle__btn" [class.g6-vista-toggle__btn--active]="vistaAgentes() === 'lista'"
+          [attr.aria-selected]="vistaAgentes() === 'lista'" (click)="vistaAgentes.set('lista')">Lista</button>
+        <button type="button" role="tab" class="g6-vista-toggle__btn" [class.g6-vista-toggle__btn--active]="vistaAgentes() === 'mapa'"
+          [attr.aria-selected]="vistaAgentes() === 'mapa'" (click)="vistaAgentes.set('mapa')">Mapa</button>
+      </div>
+    </div>
 
+    <!-- ── CREAR AGENTE PERSONALIZADO (Flujo K — continúa en el chat, 18.FlujoUsuarioGali6.md §5.8) ──
+         Reposicionado aquí (antes vivía al final de la página, después de todo el catálogo) — el
+         camino conversacional debe ser lo primero que se ve, no lo último tras hacer scroll completo. -->
+    <div class="g6-agentes__crear-row">
+      <button class="g6-agentes__crear-btn" (click)="crearAgenteConGali()">
+        <span class="g6-agentes__crear-icon" aria-hidden="true">+</span>
+        Describir un agente con Gali
+      </button>
+    </div>
+
+    @if (vistaAgentes() === 'mapa') {
+      <!-- ── MAPA DE AGENTES × SECCIONES ── -->
+      <div class="g6-mapa-scroll">
+        <table class="g6-mapa">
+          <thead>
+            <tr>
+              <th class="g6-mapa__th g6-mapa__th--agente">Agente</th>
+              @for (col of columnasVisibles(); track col.id) {
+                <th class="g6-mapa__th">{{ col.label }}</th>
+              }
+              <th class="g6-mapa__th g6-mapa__th--add">
+                <div class="g6-mapa__addcol-wrap">
+                  <button type="button" class="g6-mapa__addcol-btn" (click)="mapaAddColOpen.set(!mapaAddColOpen())">+ Agregar sección</button>
+                  @if (mapaAddColOpen()) {
+                    <div class="g6-mapa__popover" role="menu">
+                      @if (columnasOfrecibles().length === 0) {
+                        <span class="g6-mapa__popover-empty">No hay más secciones con vista disponible</span>
+                      }
+                      @for (opt of columnasOfrecibles(); track opt.id) {
+                        <button type="button" class="g6-mapa__opcion" role="menuitem" (click)="agregarColumnaMapa(opt)">{{ opt.label }}</button>
+                      }
+                    </div>
+                  }
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (ag of agentesActivos(); track ag.id) {
+              <tr>
+                <td class="g6-mapa__td g6-mapa__td--agente">
+                  <span class="g6-mapa__agente-dot" [style.background]="ag.colorAvatar"></span>
+                  {{ ag.nombre }}
+                </td>
+                @for (col of columnasVisibles(); track col.id) {
+                  <td class="g6-mapa__td">
+                    @if (tieneSeccion(ag, col.id)) {
+                      <button type="button" class="g6-mapa__chip" [style.background]="ag.colorAvatar + '1c'" [style.color]="ag.colorAvatar"
+                        (click)="toggleCelda(ag, col.id)" [attr.aria-label]="'Quitar ' + ag.nombre + ' de ' + col.label">✓</button>
+                    } @else {
+                      <button type="button" class="g6-mapa__plus" (click)="toggleCelda(ag, col.id)"
+                        [attr.aria-label]="'Agregar ' + ag.nombre + ' a ' + col.label">+</button>
+                    }
+                  </td>
+                }
+                <td class="g6-mapa__td"></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
     <div class="g6-agentes__list">
       @for (ag of agentesActivos(); track ag.id) {
         <div class="g6-agente-card g6-agente-card--activo"
-             [class.g6-agente-card--expanded]="expandedAgenteId() === ag.id">
+             [class.g6-agente-card--expanded]="expandedAgenteId() === ag.id"
+             [gali6Highlight]="ag.id">
 
           <!-- Cabecera del card -->
           <div class="g6-agente-card__header" (click)="toggleDetalle(ag.id)">
@@ -149,6 +220,36 @@
                   </div>
                 </div>
               }
+
+              <!-- "Aparece en" pantallas (Flujo I, 18.FlujoUsuarioGali6.md §5.2) -->
+              <div class="g6-agente-aparece-en" (click)="$event.stopPropagation()">
+                <span class="g6-agente-aparece-en__label">Aparece en</span>
+                <div class="g6-agente-aparece-en__list">
+                  @for (screenId of ag.apareceEn ?? []; track screenId) {
+                    <span class="g6-agente-aparece-en__chip">
+                      {{ screenLabel(screenId) }}
+                      <button class="g6-agente-aparece-en__remove"
+                              (click)="quitarSeccion(ag.id, screenId)"
+                              [attr.aria-label]="'Quitar de ' + screenLabel(screenId)"
+                              title="Quitar de esta sección">×</button>
+                    </span>
+                  }
+                  @if (!apareceEnAddOpen()[ag.id]) {
+                    <button class="g6-agente-aparece-en__add" (click)="toggleApareceEnAdd(ag.id)">
+                      + Agregar sección
+                    </button>
+                  } @else {
+                    <select class="g6-agente-aparece-en__select"
+                            (change)="agregarSeccion(ag.id, $any($event.target).value)"
+                            (blur)="toggleApareceEnAdd(ag.id)">
+                      <option value="" selected disabled>Elige una pantalla…</option>
+                      @for (opt of screensDisponiblesPara(ag); track opt.id) {
+                        <option [value]="opt.id">{{ opt.label }}</option>
+                      }
+                    </select>
+                  }
+                </div>
+              </div>
 
               <!-- Skills con toggle ON/OFF -->
               <div class="g6-agente-card__skills">
@@ -291,8 +392,12 @@
                 </div>
               </div>
 
-              <!-- CTA desactivar -->
+              <!-- CTA desactivar / editar con Gali (Flujo K) -->
               <div class="g6-agente-card__footer-actions">
+                <button class="g6-agente-card__editar-gali"
+                        (click)="$event.stopPropagation(); editarAgenteConGali(ag.id)">
+                  ✦ Editar con Gali
+                </button>
                 <button class="g6-agente-card__desactivar"
                         (click)="$event.stopPropagation(); desactivarAgente(ag.id)">
                   Pausar agente
@@ -306,6 +411,7 @@
         </div>
       }
     </div>
+    }
   </section>
 
   <!-- ── DISPONIBLES EN MARKETPLACE ── -->
@@ -359,112 +465,7 @@
     </section>
   }
 
-  <!-- ── CREAR AGENTE PERSONALIZADO ── -->
-  <div class="g6-agentes__crear-row">
-    <button class="g6-agentes__crear-btn" (click)="crearAgente()">
-      <span class="g6-agentes__crear-icon" aria-hidden="true">+</span>
-      Describir un agente con Gali
-    </button>
-  </div>
-
 </div>
-
-<!-- ── PANEL CREAR AGENTE (chatbot slide-in) ── -->
-@if (panelCrear()) {
-  <div class="g6-crear-backdrop" (click)="cerrarCrearModal()" aria-hidden="true"></div>
-  <div class="g6-crear-panel" role="dialog" aria-label="Describir un agente con Gali">
-
-    <div class="g6-crear-panel__header">
-      <div class="g6-crear-panel__hdr-left">
-        <span class="g6-crear-panel__spark" aria-hidden="true">✦</span>
-        <span class="g6-crear-panel__title">Describir un agente con Gali</span>
-      </div>
-      <button class="g6-crear-panel__close" (click)="cerrarCrearModal()" aria-label="Cerrar">×</button>
-    </div>
-
-    <div class="g6-crear-panel__chat">
-      @for (m of chatMensajes(); track $index) {
-        <div class="g6-crear-msg g6-crear-msg--{{ m.tipo }}">
-          @if (m.tipo === 'gali') {
-            <span class="g6-crear-msg__avatar">G</span>
-          }
-          <p class="g6-crear-msg__texto">{{ m.texto }}</p>
-        </div>
-      }
-      @if (chatEscribiendo()) {
-        <div class="g6-crear-msg g6-crear-msg--gali">
-          <span class="g6-crear-msg__avatar">G</span>
-          <div class="g6-crear-typing">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
-      }
-
-      <!-- Propuesta de agente -->
-      @if (agentePropuesto(); as prop) {
-        <div class="g6-crear-propuesta">
-          <p class="g6-crear-propuesta__eyebrow">✦ Propuesta de Gali</p>
-          <div class="g6-crear-propuesta__campo">
-            <span class="g6-crear-propuesta__label">Nombre</span>
-            <span class="g6-crear-propuesta__valor">{{ prop.nombre }}</span>
-          </div>
-          <div class="g6-crear-propuesta__campo">
-            <span class="g6-crear-propuesta__label">Tipo</span>
-            <span class="g6-crear-propuesta__valor">{{ prop.tipo }}</span>
-          </div>
-          <div class="g6-crear-propuesta__campo">
-            <span class="g6-crear-propuesta__label">Skills</span>
-            <div class="g6-crear-propuesta__chips">
-              @for (sk of prop.skills; track sk) {
-                <span class="g6-crear-propuesta__chip">{{ sk }}</span>
-              }
-            </div>
-          </div>
-          <div class="g6-crear-propuesta__campo">
-            <span class="g6-crear-propuesta__label">Regla principal</span>
-            <span class="g6-crear-propuesta__valor">{{ prop.regla }}</span>
-          </div>
-          <div class="g6-crear-propuesta__campo">
-            <span class="g6-crear-propuesta__label">Autonomía</span>
-            <span class="g6-crear-propuesta__valor">{{ prop.autonomia }}</span>
-          </div>
-        </div>
-      }
-
-      <!-- Éxito -->
-      @if (agenteCreado()) {
-        <div class="g6-crear-exito">
-          <span class="g6-crear-exito__icon">✓</span>
-          <p class="g6-crear-exito__texto">¡Agente creado! Aparecerá en tu lista al activarlo desde Marketplace.</p>
-        </div>
-      }
-    </div>
-
-    <!-- Input -->
-    @if (!agentePropuesto() && !agenteCreado()) {
-      <div class="g6-crear-panel__input-row">
-        <textarea class="g6-crear-panel__input"
-                  placeholder="Escribe tu respuesta…"
-                  rows="2"
-                  [value]="chatInput()"
-                  (input)="chatInput.set($any($event.target).value)"
-                  (keydown.enter)="$event.preventDefault(); enviarMensajeCrear()"></textarea>
-        <button class="g6-crear-panel__send"
-                [disabled]="!chatInput().trim() || chatEscribiendo()"
-                (click)="enviarMensajeCrear()">→</button>
-      </div>
-    }
-
-    <!-- Acciones finales -->
-    @if (agentePropuesto() && !agenteCreado()) {
-      <div class="g6-crear-panel__acciones">
-        <button class="g6-crear-panel__btn-crear" (click)="confirmarCrearAgente()">Crear agente</button>
-        <button class="g6-crear-panel__btn-ajustar" (click)="ajustarAgente()">Ajustar →</button>
-      </div>
-    }
-
-  </div>
-}
 
 <!-- Toast -->
 @if (toastMsg()) {

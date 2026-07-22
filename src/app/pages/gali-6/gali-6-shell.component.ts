@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, computed, inject, isDevMode, signal } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, computed, effect, inject, isDevMode, signal } from '@angular/core';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -11,6 +11,7 @@ import { DropiPanelSplitterComponent } from '../gali-5/gali-v5/components/dropi-
 import { GaliRightPanelComponent } from '../gali-5/gali-v5/components/gali-right-panel/gali-right-panel.component';
 import { GaliStateService } from '../gali-5/gali-v5/services/gali-state.service';
 import { Gali6ChatPanelComponent } from './gali-chat/gali6-chat-panel.component';
+import { Gali6ChatService } from './gali-chat/gali6-chat.service';
 import { Gali6HighlightService } from './services/gali6-highlight.service';
 import { SectionPanel } from '../gali-5/gali-v5/dropi-sections.config';
 import { resolveG6SectionPanel, GALI_6_MISSION_PANEL } from './gali-6-sections.config';
@@ -202,8 +203,48 @@ export class Gali6ShellComponent implements AfterViewInit, OnDestroy {
   ];
 
   private route = inject(ActivatedRoute);
+  private readonly gali6Chat = inject(Gali6ChatService);
+  private lastFocusRequest = 0;
+
+  // ── Spot "Nuevo en Gali" — resucita la card .experto-slide (antes CSS huérfano de un
+  // "modo experto" que nunca se cableó) para enseñar crear/editar hablando y fijar artefactos,
+  // mostrado una sola vez en la primera apertura real del dock tras el ZeroState. ──
+  readonly nuevoEnGaliOpen = signal(false);
+  private nuevoEnGaliYaEvaluado = false;
+  readonly NUEVO_EN_GALI_EJEMPLO = 'crea una regla que me avise si un producto cae en stock';
+
+  nuevoEnGaliProbar(): void {
+    this.nuevoEnGaliOpen.set(false);
+    localStorage.setItem('gali-6-nuevo-en-gali-done', 'true');
+    this.gali6Chat.precargarEjemplo(this.NUEVO_EN_GALI_EJEMPLO);
+  }
+
+  nuevoEnGaliCerrar(): void {
+    this.nuevoEnGaliOpen.set(false);
+    localStorage.setItem('gali-6-nuevo-en-gali-done', 'true');
+  }
 
   constructor() {
+    // Botón "+ Crear con Gali" / "Editar con Gali" desde Agentes/Reglas/Skills (Flujo K) — abre el dock si estaba cerrado.
+    // allowSignalWrites: NG0600 — este efecto escribe galiDockCollapsed, que no lee, así que no hay ciclo.
+    effect(() => {
+      const n = this.gali6Chat.focusRequest();
+      if (n > this.lastFocusRequest) {
+        this.lastFocusRequest = n;
+        this.galiDockCollapsed.set(false);
+      }
+    }, { allowSignalWrites: true });
+
+    // Primera apertura real del dock esta sesión, después de completar el ZeroState — nunca compite con él.
+    effect(() => {
+      const dockAbierto = !this.galiDockCollapsed();
+      if (!dockAbierto || this.zeroOpen() || this.nuevoEnGaliYaEvaluado) return;
+      this.nuevoEnGaliYaEvaluado = true;
+      if (!localStorage.getItem('gali-6-nuevo-en-gali-done')) {
+        this.nuevoEnGaliOpen.set(true);
+      }
+    }, { allowSignalWrites: true });
+
     // Detectar ?zero=1 para resetear onboarding (Punto Cero desde galería)
     this.route.queryParams.subscribe(params => {
       if (params['zero'] === '1') {

@@ -11,12 +11,14 @@ import {
 } from './dropi-screens.registry';
 import { Gali6ScreenContextService } from '../../../gali-6/services/gali6-screen-context.service';
 import { Gali6ChatService } from '../../../gali-6/gali-chat/gali6-chat.service';
+import { Gali6ScreenArtifactsComponent } from '../../../gali-6/components/gali6-screen-artifacts.component';
+import { Gali6AgentPresenceBarComponent } from '../../../gali-6/components/gali6-agent-presence-bar.component';
 import { AGENTES_ESPECIALIZADOS } from '../../../../../../mocks/gali-v6/agentes-especializados';
 
 @Component({
   selector: 'app-dropi-screen-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Gali6ScreenArtifactsComponent, Gali6AgentPresenceBarComponent],
   templateUrl: './dropi-screen-page.component.html',
   styleUrl: './dropi-screen-page.component.scss',
 })

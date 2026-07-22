@@ -5,6 +5,8 @@ import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliSkillBuilderV2Component, SkillRule, SkillRegla } from '../../components/gali-skill-builder-v2/gali-skill-builder-v2.component';
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 import { GaliOntologyStripComponent } from '../../components/gali-ontology-strip/gali-ontology-strip.component';
+import { Gali6CreationRegistryService } from '../../../../gali-6/services/gali6-creation-registry.service';
+import { Gali6ChatService } from '../../../../gali-6/gali-chat/gali6-chat.service';
 
 @Component({
   selector: 'app-skills-page',
@@ -19,21 +21,35 @@ export class SkillsPageComponent {
 
   readonly ws = inject(GaliWorkspaceService);
   readonly router = inject(Router);
+  private readonly creationRegistry = inject(Gali6CreationRegistryService);
+  private readonly chat = inject(Gali6ChatService);
+
+  /** Flujo K (18.FlujoUsuarioGali6.md §5.8) — "ambos lados": misma conversación que en el chat, iniciada desde este botón. */
+  crearSkillConGali(): void {
+    this.chat.iniciarFlujoCreacion('skill', 'crear');
+    this.chat.requestFocusChat();
+  }
 
   readonly selectedSkillId = signal<string>('skill-001');
   readonly selectedAgentId = signal<string | null>(null);
   readonly mainTab = signal<'mis-skills' | 'marketplace'>('mis-skills');
   readonly skillAgentFilter = signal<string | null>(null);
 
+  /** Base + lo creado por el usuario desde el chat (Flujo K, 18.FlujoUsuarioGali6.md §5.8). */
+  readonly skills = computed(() => {
+    this.creationRegistry.version();
+    return [...this.skillsBase, ...this.creationRegistry.skillsCreadas()];
+  });
+
   readonly filteredSkills = computed(() => {
     const f = this.skillAgentFilter();
-    if (!f) return this.skills;
-    return this.skills.filter(s =>
+    if (!f) return this.skills();
+    return this.skills().filter(s =>
       s.agentesQueLaUsan?.some((a: any) => a.nombre.toLowerCase().includes(f.toLowerCase()))
     );
   });
 
-  readonly skills: SkillRule[] = [
+  private readonly skillsBase: SkillRule[] = [
     {
       id: 'skill-001',
       nombre: 'Auto-pausa si CTR cae',
@@ -113,7 +129,7 @@ export class SkillsPageComponent {
   ];
 
   get selectedSkill(): SkillRule | undefined {
-    return this.skills.find(s => s.id === this.selectedSkillId());
+    return this.skills().find(s => s.id === this.selectedSkillId());
   }
 
   selectSkill(id: string): void {

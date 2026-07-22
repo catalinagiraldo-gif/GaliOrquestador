@@ -11,6 +11,11 @@ import {
   TIER_LABEL,
 } from '../../../../../mocks/gali-v6/agentes-especializados';
 import { MOCK_SENALES, MOCK_ALERTAS } from '../../../../../mocks/gali-v5/senales.mock';
+import { Gali6LiveMutationsService } from '../services/gali6-live-mutations.service';
+import { Gali6CreationRegistryService } from '../services/gali6-creation-registry.service';
+import { Gali6ChatService } from '../gali-chat/gali6-chat.service';
+import { gali6ScreenCatalogConDestino, gali6ScreenLabel, Gali6ScreenOption } from '../models/gali6-screen-catalog';
+import { Gali6HighlightDirective } from '../directives/gali6-highlight.directive';
 
 type AgenteDetallTab = 'config' | 'historial';
 
@@ -64,19 +69,33 @@ const PROYECTOS_POR_AGENTE: Record<string, Array<{ nombre: string; estado: strin
 @Component({
   selector: 'app-gali6-agentes',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, Gali6HighlightDirective],
   templateUrl: './gali6-agentes.component.html',
   styleUrls: ['./gali6-agentes.component.scss'],
 })
 export class Gali6AgentesComponent implements OnInit {
   readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly mutations = inject(Gali6LiveMutationsService);
+  private readonly creationRegistry = inject(Gali6CreationRegistryService);
+  private readonly chat = inject(Gali6ChatService);
 
   ngOnInit(): void {
     const crear = this.route.snapshot.queryParamMap.get('crear');
     if (crear === 'true') {
-      setTimeout(() => this.crearAgente(), 300);
+      setTimeout(() => this.crearAgenteConGali(), 300);
     }
+  }
+
+  /** Flujo K (18.FlujoUsuarioGali6.md §5.8) — "ambos lados": mismo flujo que el texto libre en el chat, disparado desde este botón. */
+  crearAgenteConGali(): void {
+    this.chat.iniciarFlujoCreacion('agente', 'crear');
+    this.chat.requestFocusChat();
+  }
+
+  editarAgenteConGali(agenteId: string): void {
+    this.chat.iniciarFlujoCreacion('agente', 'editar', agenteId);
+    this.chat.requestFocusChat();
   }
 
   readonly paqueteBasico = PAQUETE_PRINCIPIANTES;
@@ -98,23 +117,89 @@ export class Gali6AgentesComponent implements OnInit {
   readonly showCrearModal = signal(false);
   readonly toastMsg = signal<string | null>(null);
 
-  // ── G4.1: Panel chatbot crear agente ─────────────────────────────────────
-  readonly panelCrear = signal(false);
-  readonly chatMensajes = signal<Array<{ tipo: 'gali' | 'user'; texto: string }>>([]);
-  readonly chatInput = signal('');
-  readonly chatEscribiendo = signal(false);
-  readonly chatPaso = signal(0);
-  readonly agentePropuesto = signal<{
-    nombre: string; proposito: string; tipo: string;
-    skills: string[]; regla: string; autonomia: string;
-  } | null>(null);
-  readonly agenteCreado = signal(false);
-
   // ── G4.2: Forms inline regla/skill ────────────────────────────────────────
   readonly nuevaReglaOpen = signal<Record<string, boolean>>({});
   readonly nuevaReglaSi = signal<Record<string, string>>({});
   readonly nuevaReglaEntonces = signal<Record<string, string>>({});
   readonly skillsDispOpen = signal<Record<string, boolean>>({});
+
+  // ── Flujo I: apareceEn (18.FlujoUsuarioGali6.md §5.2) ──────────────────────
+  // Solo pantallas con <gali6-agent-presence-bar>/<gali6-screen-artifacts> montado — asignar un agente
+  // a una pantalla sin cobertura lo dejaría "invisible" ahí (18.FlujoUsuarioGali6.md §5.9).
+  readonly screenCatalog: Gali6ScreenOption[] = gali6ScreenCatalogConDestino();
+  readonly apareceEnAddOpen = signal<Record<string, boolean>>({});
+
+  screenLabel(screenId: string): string {
+    return gali6ScreenLabel(screenId);
+  }
+
+  /** Pantallas del catálogo que este agente todavía no tiene marcadas — evita duplicados en el select. */
+  screensDisponiblesPara(ag: { apareceEn?: string[] }): Gali6ScreenOption[] {
+    const actuales = new Set(ag.apareceEn ?? []);
+    return this.screenCatalog.filter(s => !actuales.has(s.id));
+  }
+
+  toggleApareceEnAdd(agenteId: string): void {
+    this.apareceEnAddOpen.update(m => ({ ...m, [agenteId]: !m[agenteId] }));
+  }
+
+  agregarSeccion(agenteId: string, screenId: string): void {
+    if (!screenId) return;
+    this.mutations.agregarSeccionAAgente(agenteId, screenId);
+    this.apareceEnAddOpen.update(m => ({ ...m, [agenteId]: false }));
+  }
+
+  quitarSeccion(agenteId: string, screenId: string): void {
+    this.mutations.quitarSeccionDeAgente(agenteId, screenId);
+  }
+
+  // ── Vista "Mapa de agentes" (18.FlujoUsuarioGali6.md §5.9 — percepción del concepto) ──────
+  // Tabla agentes × secciones sobre los mismos datos y mutaciones de arriba, sin servicio nuevo.
+  readonly vistaAgentes = signal<'lista' | 'mapa'>('lista');
+  readonly mapaAddColOpen = signal(false);
+  /** Columnas agregadas a la vista manualmente (aún sin ningún agente asignado) — mezcladas con
+   * las que ya surgen de apareceEn en columnasVisibles(). */
+  private readonly columnasExtra = signal<Gali6ScreenOption[]>([]);
+
+  /** Unión de screenId presentes en algún apareceEn de los agentes activos — típicamente 4-8, no las ~25 del catálogo completo. */
+  readonly columnasMapa = computed<Gali6ScreenOption[]>(() => {
+    const ids = new Set<string>();
+    for (const ag of this.agentesActivos()) {
+      for (const s of ag.apareceEn ?? []) ids.add(s);
+    }
+    return Array.from(ids).map(id => ({ id, label: this.screenLabel(id) }));
+  });
+
+  readonly columnasVisibles = computed<Gali6ScreenOption[]>(() => {
+    const base = this.columnasMapa();
+    const extra = this.columnasExtra().filter(c => !base.some(b => b.id === c.id));
+    return [...base, ...extra].sort((a, b) => a.label.localeCompare(b.label));
+  });
+
+  /** Secciones con cobertura real que todavía no aparecen como columna. */
+  readonly columnasOfrecibles = computed<Gali6ScreenOption[]>(() => {
+    const presentes = new Set(this.columnasVisibles().map(c => c.id));
+    return this.screenCatalog.filter(s => !presentes.has(s.id));
+  });
+
+  tieneSeccion(ag: AgenteEspecializado, screenId: string): boolean {
+    return !!ag.apareceEn?.includes(screenId);
+  }
+
+  /** Clic en celda: edición directa del usuario sobre su propia configuración (no una sugerencia
+   * de Gali) — mismo criterio que ya usan los chips individuales del listado, sin preview-then-confirm. */
+  toggleCelda(ag: AgenteEspecializado, screenId: string): void {
+    if (this.tieneSeccion(ag, screenId)) {
+      this.quitarSeccion(ag.id, screenId);
+    } else {
+      this.agregarSeccion(ag.id, screenId);
+    }
+  }
+
+  agregarColumnaMapa(opt: Gali6ScreenOption): void {
+    this.columnasExtra.update(list => [...list, opt]);
+    this.mapaAddColOpen.set(false);
+  }
 
   getHistorial(agenteId: string): HistorialItem[] {
     return HISTORIAL_POR_AGENTE[agenteId] ?? [];
@@ -166,34 +251,36 @@ export class Gali6AgentesComponent implements OnInit {
     return map[estado] ?? '';
   }
 
-  /** Mutable copy of agentes with extra interactive state */
-  readonly agentesEstado = signal(
-    AGENTES_ESPECIALIZADOS.map(ag => ({
+  /**
+   * Vista derivada de AGENTES_ESPECIALIZADOS, re-derivada cada vez que
+   * Gali6LiveMutationsService.version() cambia — así un toggle/edición
+   * disparado desde el chat (o desde el flujo conversacional de Fase 3)
+   * se refleja aquí sin recargar. Toda mutación pasa por el servicio,
+   * nunca se escribe este computed directamente.
+   */
+  readonly agentesEstado = computed(() => {
+    this.mutations.version();
+    this.creationRegistry.version();
+    const todos = [...AGENTES_ESPECIALIZADOS, ...this.creationRegistry.agentesCreados()];
+    return todos.map(ag => ({
       ...ag,
       estado: ag.estado as 'activo' | 'pausado' | 'disponible',
-      autonomiaPct: 60,
-      skills: ag.skillsDefecto.map(sk => ({ ...sk, activa: true })),
-      reglas: ag.reglasDefecto.map((r, i) => ({ ...r, id: `${ag.id}-r${i}`, activa: true })),
-    }))
-  );
+      autonomiaPct: ag.autonomiaPct ?? 60,
+      skills: ag.skillsDefecto.map(sk => ({ ...sk, activa: sk.activa !== false })),
+      reglas: ag.reglasDefecto.map((r, i) => ({ ...r, id: r.id ?? `${ag.id}-r${i}`, activa: r.activa !== false })),
+    }));
+  });
 
   toggleDetalle(id: string): void {
     this.expandedAgenteId.update(cur => (cur === id ? null : id));
   }
 
   toggleSkill(agenteId: string, skillId: string): void {
-    this.agentesEstado.update(list =>
-      list.map(ag => ag.id === agenteId
-        ? { ...ag, skills: ag.skills.map(sk => sk.id === skillId ? { ...sk, activa: !sk.activa } : sk) }
-        : ag
-      )
-    );
+    this.mutations.toggleSkillAgente(agenteId, skillId);
   }
 
   setAutonomia(agenteId: string, pct: number): void {
-    this.agentesEstado.update(list =>
-      list.map(ag => ag.id === agenteId ? { ...ag, autonomiaPct: pct } : ag)
-    );
+    this.mutations.setAutonomiaAgente(agenteId, pct);
   }
 
   onAutonomiaInput(agenteId: string, event: Event): void {
@@ -202,97 +289,13 @@ export class Gali6AgentesComponent implements OnInit {
   }
 
   eliminarRegla(agenteId: string, reglaId: string): void {
-    this.agentesEstado.update(list =>
-      list.map(ag => ag.id === agenteId
-        ? { ...ag, reglas: ag.reglas.filter(r => r.id !== reglaId) }
-        : ag
-      )
-    );
+    this.mutations.eliminarReglaAgente(agenteId, reglaId);
   }
 
   desactivarAgente(agenteId: string): void {
-    this.agentesEstado.update(list =>
-      list.map(ag => ag.id === agenteId ? { ...ag, estado: 'pausado' as const } : ag)
-    );
+    this.mutations.setEstadoAgente(agenteId, 'pausado');
     this.expandedAgenteId.set(null);
     this.showToast('Agente pausado. Puedes reactivarlo desde Marketplace.');
-  }
-
-  crearAgente(): void {
-    this.panelCrear.set(true);
-    this.chatPaso.set(0);
-    this.agentePropuesto.set(null);
-    this.agenteCreado.set(false);
-    this.chatMensajes.set([
-      { tipo: 'gali', texto: '¡Hola! Voy a ayudarte a crear tu agente personalizado. ¿Qué quieres que haga este agente?' },
-    ]);
-  }
-
-  cerrarCrearModal(): void {
-    this.panelCrear.set(false);
-    this.chatMensajes.set([]);
-    this.chatInput.set('');
-    this.agentePropuesto.set(null);
-    this.agenteCreado.set(false);
-  }
-
-  enviarMensajeCrear(): void {
-    const texto = this.chatInput().trim();
-    if (!texto || this.chatEscribiendo()) return;
-    this.chatMensajes.update(m => [...m, { tipo: 'user', texto }]);
-    this.chatInput.set('');
-    this.chatEscribiendo.set(true);
-    const paso = this.chatPaso();
-    setTimeout(() => {
-      this.chatEscribiendo.set(false);
-      if (paso === 0) {
-        this.chatPaso.set(1);
-        this.chatMensajes.update(m => [...m, {
-          tipo: 'gali',
-          texto: `Perfecto. ¿Con qué frecuencia debería actuar: continuamente (monitoring), una vez al día, o solo cuando ocurra un evento específico?`,
-        }]);
-      } else if (paso === 1) {
-        this.chatPaso.set(2);
-        const propuesta = this.generarPropuestaAgente(
-          this.chatMensajes()[1]?.texto ?? texto,
-          this.chatMensajes()[3]?.texto ?? texto
-        );
-        this.agentePropuesto.set(propuesta);
-        this.chatMensajes.update(m => [...m, {
-          tipo: 'gali',
-          texto: `Basado en lo que me dijiste, aquí está la propuesta para tu agente. Revísala abajo y dime si la creamos así.`,
-        }]);
-      }
-    }, 1100);
-  }
-
-  private generarPropuestaAgente(proposito: string, frecuencia: string): {
-    nombre: string; proposito: string; tipo: string;
-    skills: string[]; regla: string; autonomia: string;
-  } {
-    const esContinuo = /continu|monitor|siempre|constan/i.test(frecuencia);
-    return {
-      nombre: 'Mi Agente ' + (proposito.split(' ').slice(0, 2).join(' ')),
-      proposito,
-      tipo: esContinuo ? 'Monitoreo continuo' : 'Por evento',
-      skills: ['monitor-métricas', 'notificaciones-push'],
-      regla: `Si se detecta la condición → notificar y esperar aprobación`,
-      autonomia: 'Solo notifica (20%)',
-    };
-  }
-
-  confirmarCrearAgente(): void {
-    this.agenteCreado.set(true);
-    this.showToast('✦ Agente creado — aparecerá en tu lista al activarlo');
-    setTimeout(() => this.cerrarCrearModal(), 2000);
-  }
-
-  ajustarAgente(): void {
-    this.agentePropuesto.set(null);
-    this.chatPaso.set(0);
-    this.chatMensajes.set([
-      { tipo: 'gali', texto: '¡Claro! Cuéntame qué quieres ajustar del agente.' },
-    ]);
   }
 
   // ── G4.2: Inline regla/skill ──────────────────────────────────────────────
@@ -316,15 +319,7 @@ export class Gali6AgentesComponent implements OnInit {
     const si = (this.nuevaReglaSi()[agenteId] ?? '').trim();
     const entonces = (this.nuevaReglaEntonces()[agenteId] ?? '').trim();
     if (!si || !entonces) return;
-    this.agentesEstado.update(list =>
-      list.map(ag => ag.id === agenteId
-        ? { ...ag, reglas: [...ag.reglas, {
-            id: `${agenteId}-r${Date.now()}`, condicion: si, accion: entonces,
-            activa: true, tipo: 'deterministico' as const,
-          }] }
-        : ag
-      )
-    );
+    this.mutations.agregarReglaAgente(agenteId, si, entonces);
     this.nuevaReglaOpen.update(m => ({ ...m, [agenteId]: false }));
     this.nuevaReglaSi.update(m => ({ ...m, [agenteId]: '' }));
     this.nuevaReglaEntonces.update(m => ({ ...m, [agenteId]: '' }));

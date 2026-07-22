@@ -89,6 +89,14 @@
 
       &:hover { background: darken(#ff6102, 6%); }
     }
+
+    &--gali {
+      background: transparent;
+      border: 1px solid rgba($os-accent, 0.4);
+      color: $os-accent;
+
+      &:hover { background: rgba($os-accent, 0.08); }
+    }
   }
 
   &__body {

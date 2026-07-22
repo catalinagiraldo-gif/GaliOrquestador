@@ -1,4 +1,5 @@
 @import 'styles/gali-v5-tokens';
+@import 'styles/gali-os-tokens';
 @import '../shared/dropi-page-host';
 
 :host {
@@ -74,15 +75,31 @@
     padding: $size-2 $size-4;
     border: none;
     border-radius: $radius-full;
-    background: $primary-500;
-    color: $white;
     font-size: $font-sm;
     font-weight: $font-semibold;
     cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1), background 0.15s;
 
     &:active {
       transform: scale(0.98);
+    }
+
+    // El chat es el camino primario (Catalina: "hablar debería sentirse natural") —
+    // Crear con Gali usa --accent (sólido), Nueva regla usa --ghost (outline neutro).
+    &--accent {
+      background: $os-accent;
+      color: $white;
+      border: none;
+
+      &:hover { background: $os-accent-dark; }
+    }
+
+    &--ghost {
+      background: transparent;
+      border: 1px solid $gray-300;
+      color: $gray-600;
+
+      &:hover { background: $gray-100; }
     }
   }
 }

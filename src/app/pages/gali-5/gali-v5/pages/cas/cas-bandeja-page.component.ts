@@ -6,6 +6,8 @@ import { DropiSearchOficialComponent, DropiTagComponent } from '../../components
 import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-bar/dropi-gali-bar.component';
 import casData from '../../../../../../../mocks/gali-v5/cas-tickets.json';
 import pqrPatternsData from '../../../../../../../mocks/gali-v5/pqr-patterns.json';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
 
 type GaliTicketStatus = 'managing' | 'human' | 'resolved' | 'pending';
 
@@ -39,7 +41,7 @@ interface PqrPattern {
 @Component({
   selector: 'app-cas-bandeja-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, DropiGaliBarComponent],
+  imports: [CommonModule, FormsModule, DropiSearchOficialComponent, DropiTagComponent, DropiGaliBarComponent, Gali6AgentPresenceBarComponent, Gali6ScreenArtifactsComponent],
   templateUrl: './cas-bandeja-page.component.html',
   styleUrl: './cas-bandeja-page.component.scss',
 })

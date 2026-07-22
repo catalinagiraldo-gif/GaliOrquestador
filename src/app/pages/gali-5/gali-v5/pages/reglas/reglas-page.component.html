@@ -22,7 +22,10 @@
     }
     <div class="reglas-page__header-actions">
       <a routerLink="/gali-6/marketing/chatea-pro" class="reglas-page__link">Centro Chatea Pro →</a>
-      <button type="button" class="reglas-page__btn" (click)="showNewRule.set(!showNewRule())">
+      <button type="button" class="reglas-page__btn reglas-page__btn--accent" (click)="crearReglaConGali()">
+        ✦ Crear con Gali
+      </button>
+      <button type="button" class="reglas-page__btn reglas-page__btn--ghost" (click)="showNewRule.set(!showNewRule())">
         {{ showNewRule() ? '✕ Cerrar' : '+ Nueva regla' }}
       </button>
     </div>

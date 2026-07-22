@@ -13,6 +13,8 @@ import { DropiGaliBarComponent, GaliBarStat } from '../../components/dropi-gali-
 import { GaliNewSkillOverlayComponent } from '../../components/gali-new-skill-overlay/gali-new-skill-overlay.component';
 import { GaliWorkspaceService } from '../../services/gali-workspace.service';
 import { GaliInsightDirective } from '../../directives/gali-insight.directive';
+import { Gali6AgentPresenceBarComponent } from '../../../../gali-6/components/gali6-agent-presence-bar.component';
+import { Gali6ScreenArtifactsComponent } from '../../../../gali-6/components/gali6-screen-artifacts.component';
 
 interface CampanaRow {
   id: string;
@@ -35,6 +37,8 @@ interface CampanaRow {
     DropiGaliBarComponent,
     GaliNewSkillOverlayComponent,
     GaliInsightDirective,
+    Gali6AgentPresenceBarComponent,
+    Gali6ScreenArtifactsComponent,
   ],
   templateUrl: './campanas-page.component.html',
   styleUrl: './campanas-page.component.scss',

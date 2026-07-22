@@ -20,6 +20,9 @@
     <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'agentes'"
       [attr.aria-selected]="activeTab() === 'agentes'" (click)="activeTab.set('agentes')">
       <i class="pi pi-bolt" aria-hidden="true"></i> Agentes
+      @if (badgeAgentes()) {
+        <span class="g6chat__tab-badge" aria-label="Cambios sin ver"></span>
+      }
     </button>
     <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'senales'"
       [attr.aria-selected]="activeTab() === 'senales'" (click)="activeTab.set('senales')">
@@ -28,6 +31,13 @@
     <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'memoria'"
       [attr.aria-selected]="activeTab() === 'memoria'" (click)="activeTab.set('memoria')">
       <i class="pi pi-sparkles" aria-hidden="true"></i> Memoria
+    </button>
+    <button type="button" role="tab" class="g6chat__tab" [class.g6chat__tab--active]="activeTab() === 'artefactos'"
+      [attr.aria-selected]="activeTab() === 'artefactos'" (click)="activeTab.set('artefactos')">
+      <i class="pi pi-images" aria-hidden="true"></i> Artefactos
+      @if (badgeArtefactos() > 0) {
+        <span class="g6chat__tab-badge g6chat__tab-badge--count">{{ badgeArtefactos() }}</span>
+      }
     </button>
   </div>
 
@@ -66,9 +76,12 @@
                     }
                     @case ('acciones') {
                       @if (visual.acciones) {
-                        <gali6-chat-card-acciones [acciones]="visual.acciones" (actionClick)="onActionClick($event)" />
+                        <gali6-chat-card-acciones [acciones]="visual.acciones" [screenIdActual]="chat.screenCtx.context()?.viewId" (actionClick)="onActionClick($event)" />
                       }
                     }
+                  }
+                  @if (visual.kind !== 'acciones' && visual.acciones) {
+                    <gali6-chat-card-acciones [acciones]="visual.acciones" [screenIdActual]="chat.screenCtx.context()?.viewId" (actionClick)="onActionClick($event)" />
                   }
                 </div>
               }
@@ -88,7 +101,7 @@
       <div class="g6chat__input">
         <textarea
           rows="1"
-          placeholder="Pregúntale algo a Gali…"
+          [placeholder]="inputPlaceholder"
           [ngModel]="draft()"
           (ngModelChange)="draft.set($event)"
           (keydown.enter)="onEnter($event)"
@@ -108,6 +121,9 @@
     }
     @case ('memoria') {
       <gali6-tab-memoria />
+    }
+    @case ('artefactos') {
+      <gali6-tab-artefactos />
     }
   }
 </div>

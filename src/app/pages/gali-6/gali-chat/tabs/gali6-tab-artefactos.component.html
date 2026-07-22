@@ -1,0 +1,35 @@
+<div class="g6art">
+  @if (items().length === 0) {
+    <div class="g6art__empty">
+      Todavía no has fijado ningún artefacto. Pídele algo a Gali en el chat (ej: "roas") y usa "Fijar en pantalla" en la respuesta.
+    </div>
+  } @else {
+    <div class="g6art__list">
+      @for (item of items(); track item.id) {
+        <div class="g6art__item">
+          <div class="g6art__body">
+            <p class="g6art__titulo">{{ item.titulo }}</p>
+            <div class="g6art__meta">
+              <span class="g6art__pantalla">{{ screenLabel(item.screenId) }}</span>
+              <span class="g6art__fecha">{{ item.timestamp }}</span>
+              @if (sinCobertura(item.screenId)) {
+                <span class="g6art__sin-cobertura">· Sin vista disponible aquí todavía</span>
+              }
+            </div>
+          </div>
+          <div class="g6art__actions">
+            <select class="g6art__select"
+              [value]="item.screenId"
+              (change)="reubicar(item.id, $any($event.target).value)"
+              aria-label="Reubicar artefacto">
+              @for (opt of screenCatalog; track opt.id) {
+                <option [value]="opt.id">{{ opt.label }}</option>
+              }
+            </select>
+            <button type="button" class="g6art__btn g6art__btn--del" (click)="eliminar(item.id)">Eliminar</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

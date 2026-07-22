@@ -1,5 +1,6 @@
 <div class="roax-lanzador-page">
   <dropi-titulos title="Lanzador de campañas" [breadcrumbs]="breadcrumbs" />
+  <gali6-agent-presence-bar screenId="roax-lanzador" />
 
   @if (launched()) {
     <div class="roax-launched-overlay">
@@ -99,4 +100,6 @@
   <div class="roax-lanzador-page__footer">
     <dropi-button-new label="Continuar" hierarchy="primary" [width]="160" (click)="continuar()" />
   </div>
+
+  <gali6-screen-artifacts screenId="roax-lanzador" />
 </div>
